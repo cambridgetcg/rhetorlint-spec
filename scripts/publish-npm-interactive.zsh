@@ -29,12 +29,24 @@ packages=(
   '@rhetorlint/cli:packages/cli'
 )
 
+package_is_installable() {
+  local name=$1
+  local version=$2
+
+  # `npm view` normally proves registry visibility. A newly created package can
+  # briefly expose its version manifest and tarball before the full packument;
+  # `npm pack --dry-run` verifies the exact version is genuinely installable in
+  # that window without writing a tarball.
+  npm view "${name}@${version}" version >/dev/null 2>&1 ||
+    npm pack --dry-run --json "${name}@${version}" >/dev/null 2>&1
+}
+
 for entry in "${packages[@]}"; do
   name=${entry%%:*}
   package_dir=${entry#*:}
   version=$(node -p "require('./${package_dir}/package.json').version")
 
-  if npm view "${name}@${version}" version >/dev/null 2>&1; then
+  if package_is_installable "$name" "$version"; then
     print "✓ ${name}@${version} is already live; skipping"
     continue
   fi
@@ -46,21 +58,21 @@ for entry in "${packages[@]}"; do
   # key). The helper never captures or transports the second factor.
   npm publish --workspace "$name" --access public
 
-  visible=false
+  installable=false
   for attempt in {1..30}; do
-    if npm view "${name}@${version}" version >/dev/null 2>&1; then
-      visible=true
+    if package_is_installable "$name" "$version"; then
+      installable=true
       break
     fi
     sleep 2
   done
 
-  if [[ "$visible" != true ]]; then
-    print -u2 "${name}@${version} was accepted but is not registry-visible after 60 seconds."
+  if [[ "$installable" != true ]]; then
+    print -u2 "${name}@${version} was accepted but is not registry-installable after 60 seconds."
     print -u2 "Stop here and verify the registry before continuing."
     exit 1
   fi
-  print "✓ ${name}@${version} is registry-visible"
+  print "✓ ${name}@${version} is registry-installable"
 done
 
 print
