@@ -1,0 +1,279 @@
+# ============================================================================
+# captioneer taxonomy — the human-readable core of the spec
+# ============================================================================
+#
+# This ONE file does two jobs at once:
+#
+#   1. PORTABLE TAXONOMY (engines read it).  It is the source of truth that the
+#      per-locale rule packs compile against.  Every `id` under `tells` matches a
+#      ruleId in packages/rules-*/rules.json; every `family` matches the fixed
+#      enum in spec/output.schema.json.  Change a family or a rule id here and the
+#      compiled packs change with it.
+#
+#   2. SYLLABUS (learners read it).  It is the curriculum for the learning wing.
+#      Each `tell` is one lesson: what the pattern is, WHY it works on a reader
+#      (the teachable mechanism), a realistic marked example, and an honest plain
+#      rewrite.  Read top to bottom and you have learned to spot the tells yourself.
+#
+# ----------------------------------------------------------------------------
+# THE REFUSAL STANCE — read this before you read anything else.
+# ----------------------------------------------------------------------------
+# captioneer marks tells in the WORDS. That is all it does.
+#   * It does NOT read the person. A tell is a property of the sentence, never a
+#     claim about the speaker's mind, motive, or honesty.
+#   * It does NOT detect lies. A marked passage may be perfectly true; an unmarked
+#     one may be false. captioneer measures how the language is BUILT, not whether
+#     the claim is correct.
+#   * `confidence` is a language-pattern likelihood, NOT a probability that anyone
+#     is deceiving you. It errs toward under-marking.
+# Every mark points at a phrase a reader can see and re-read for themselves. If a
+# pattern would require guessing at intent, captioneer leaves it unmarked.
+#
+# ----------------------------------------------------------------------------
+# PROVENANCE — why this is classroom-defensible.
+# ----------------------------------------------------------------------------
+# The six coarse families are the six coarse persuasion strategies of
+# SemEval-2023 Task 3 (Piskorski, Stefanovitch, Da San Martino & Nakov, 2023;
+# ACL Anthology 2023.semeval-1.317), whose 23 fine techniques nest 5+5+3+3+3+4
+# under those six parents. That taxonomy descends directly from:
+#   * Da San Martino et al. 2019, "Fine-Grained Analysis of Propaganda in News
+#     Articles" (EMNLP-IJCNLP, D19-1565) — the 18-technique Propaganda Techniques
+#     Corpus (PTC); then
+#   * SemEval-2020 Task 11 (Da San Martino et al.) — consolidated to 14 techniques
+#     (Straw Man / Red Herring folded into Whataboutism, etc.); then
+#   * SemEval-2023 Task 3 (Piskorski et al.) — re-expanded to the 23 fine / 6
+#     coarse taxonomy this file aligns to.
+#
+# Two families/tells are captioneer's OWN structural extension, NOT in SemEval,
+# and are labelled as such: the `agency-hiding` family, and the
+# `contrition.rehearsed` tell. Each is mapped to its nearest SemEval kin so the
+# map stays honest.
+#
+# NOTE ON VERBATIM LABELS: `semeval_technique` values are the technique names as
+# published by the SemEval-2023 Task 3 organizers. Where a compiled rule pack
+# spells the same label with different punctuation (e.g. rules-en writes "False
+# Dilemma / No Choice" for SemEval's "False Dilemma or No Choice", and
+# "Obfuscation, Intentional Vagueness, Confusion" for the organizers' "Obfuscation
+# - vagueness or confusion"), the divergence is flagged inline. Verbatim labels
+# were confirmed against the organizers' task page and the ACL 2023 paper; none
+# were invented.
+# ============================================================================
+
+version: "0.1"
+aligned_to: "SemEval-2023 Task 3 (Piskorski et al. 2023); lineage: Da San Martino et al. 2019 → SemEval-2020 Task 11"
+license: "CC-BY-SA-4.0"   # the taxonomy corpus is teachable & shareable
+
+families:
+
+  # ==========================================================================
+  # 1. MANIPULATIVE WORDING  — the volume and vagueness of the language itself
+  # ==========================================================================
+  - id: manipulative-wording
+    semeval_parent: "Manipulative Wording"
+    what: "Word choices that move your feelings or blur your grip on a promise, separately from whatever facts are (or aren't) present."
+    seeded_tells: 5
+    semeval_siblings_not_yet_seeded: ["Repetition", "Exaggeration or Minimisation"]
+    tells:
+
+      - id: intensifier.loaded
+        semeval_technique: "Loaded Language"
+        what: "An intensifier — an adverb or adjective that turns up the emotional volume without adding a single fact."
+        why_it_works: "Emotional charge is read as evidence: the reader feels a certainty the words never actually earned."
+        examples:
+          - marked: "We take your privacy extremely seriously"
+            tell: "extremely"
+            plain: "We encrypt your messages end-to-end and never sell them."
+          - marked: "This is a hugely successful program"
+            tell: "hugely"
+            plain: "The program served 1,200 people last year."
+        lineage: "SemEval-2023 · Manipulative Wording › Loaded Language"
+
+      - id: hedge.softener
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"   # organizers' page: "Obfuscation - vagueness or confusion"
+        what: "A soft qualifier that lowers a promise so it can quietly be denied later."
+        why_it_works: "It sounds like a commitment while committing to nothing; challenged, the speaker just points back at the hedge."
+        examples:
+          - marked: "We believe this will fix the issue for most people"
+            tell: "We believe"
+            plain: "This fixes the login bug. It does not fix the sync bug."
+          - marked: "We're reaching out to some affected users"
+            tell: "reaching out to"
+            plain: "We emailed the 4,000 users whose records leaked."
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
+
+      - id: hedge.deniable
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        what: "A deniable modal — may / might / could + verb, or reportedly / allegedly — that leaves room to say you never actually promised."
+        why_it_works: "The modal manufactures plausible deniability: the claim was floated, never made, so no one can be held to it."
+        examples:
+          - marked: "Your data may have been exposed"
+            tell: "may have been"
+            plain: "Your email address and password hash were exposed."
+          - marked: "The outage could potentially affect some regions"
+            tell: "could potentially"
+            plain: "The outage took down EU-West and US-East for 40 minutes."
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
+
+      - id: weasel.attribution
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        # NOTE: the marked thing is the *unnamed source* wording ("experts say",
+        # "studies show") — vagueness of source, which is Manipulative Wording.
+        # A NAMED authority ("Dr. X, a Nobel laureate, says") would instead be
+        # SemEval's "Appeal to Authority" under the Justification parent — a
+        # different, future tell. family and technique agree here on purpose.
+        what: "An appeal to an unnamed authority — the 'who says?' has been deleted."
+        why_it_works: "Borrowed authority you cannot check: a reader can't weigh a source they can't see, so the claim rides for free."
+        examples:
+          - marked: "Experts agree this is safe"
+            tell: "Experts agree"
+            plain: "Two of our own engineers think it's safe; no outside body has reviewed it."
+          - marked: "Studies show our method works"
+            tell: "Studies show"
+            plain: "One internal study (n=30, unpublished) showed a 5% improvement."
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation (unnamed source; cf. Justification › Appeal to Authority for a named one)"
+
+      - id: contrition.rehearsed
+        semeval_technique: "(captioneer extension)"
+        # STRUCTURAL EXTENSION — not a SemEval technique. Nearest SemEval kin below.
+        what: "The shape of an apology with the substance removed — corporate boilerplate that performs concern without admitting a specific fault or naming a specific fix."
+        why_it_works: "It discharges the social debt of an apology while conceding nothing, so the reader's urge to be satisfied is met before any accountability lands."
+        examples:
+          - marked: "We take your security seriously and apologize for any inconvenience"
+            tell: "we take your security seriously"
+            plain: "We stored passwords in plain text for three years. They are now hashed, and we've hired an external auditor."
+        lineage: "captioneer extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
+
+  # ==========================================================================
+  # 2. SIMPLIFICATION  — collapsing a complex reality into one option / cause / certainty
+  # ==========================================================================
+  - id: simplification
+    semeval_parent: "Simplification"
+    what: "Flattening a messy reality into a single option, a single cause, or a single certainty — and hiding the middle ground."
+    seeded_tells: 1
+    semeval_siblings_not_yet_seeded: ["Causal Oversimplification", "Consequential Oversimplification"]
+    tells:
+
+      - id: absolute.universal
+        semeval_technique: "False Dilemma or No Choice"   # rules-en rule string: "False Dilemma / No Choice"
+        # The marked words split two ways: "only option / no choice" is squarely
+        # False Dilemma; "obviously / everyone knows / undeniable" also brushes
+        # SemEval's Conversation Killer (thought-terminating). captioneer marks the
+        # visible absolute either way.
+        what: "An absolute — always / never / everyone / obviously / the only option — that claims more than anyone could know, or flattens the choices to one."
+        why_it_works: "A universal can't be argued with in detail, and 'everyone knows' reframes disagreement as ignorance; 'no other choice' simply deletes the alternatives from view."
+        examples:
+          - marked: "Everyone knows this is the only option"
+            tell: "the only option"
+            plain: "Two of five reviewers preferred this; the other three options are still viable."
+          - marked: "This will always be free"
+            tell: "always"
+            plain: "It's free today. Pricing may change with 30 days' notice."
+        lineage: "SemEval-2023 · Simplification › False Dilemma or No Choice"
+
+  # ==========================================================================
+  # 3. DISTRACTION  — moving your attention off the question actually on the table
+  # ==========================================================================
+  - id: distraction
+    semeval_parent: "Distraction"
+    what: "Pulling your attention off the question that was actually asked and onto something easier to answer."
+    seeded_tells: 1
+    semeval_siblings_not_yet_seeded: ["Straw Man", "Red Herring"]
+    tells:
+
+      - id: deflection.whataboutism
+        semeval_technique: "Whataboutism"
+        what: "Answering a charge by pointing at someone else's fault instead of the question in front of you."
+        why_it_works: "It swaps accountability for a hypocrisy contest: if 'they do it too', your original question suddenly feels unfair rather than unanswered."
+        examples:
+          - marked: "What about our competitors' leaks?"
+            tell: "What about"
+            plain: "We leaked 2 million records. Here is what we're doing about ours; theirs is a separate matter."
+          - marked: "But what about the last administration's record?"
+            tell: "But what about"
+            plain: "Here is our record. Judge it first."
+        lineage: "SemEval-2023 · Distraction › Whataboutism"
+
+  # ==========================================================================
+  # 4. ATTACK ON REPUTATION  — going after the person or group, not the claim
+  #    (no seed rule yet — shown so the curriculum map is complete)
+  # ==========================================================================
+  - id: attack-on-reputation
+    semeval_parent: "Attack on Reputation"
+    what: "Undermining the person or group making a claim instead of engaging with the claim itself."
+    status: "(no seed rule yet)"
+    why_not_seeded: "Reputation attacks usually need a target and context to be read correctly ('is this a slur or a description?'). That is exactly the intent-modelling captioneer's deterministic, words-only core refuses to do, so these await a carefully-scoped pack."
+    semeval_techniques:
+      - name: "Name Calling or Labelling"
+        what: "Pinning a loaded label on the target so the label does the arguing."
+      - name: "Guilt by Association"
+        what: "Tarring a target by tying them to a disliked group or figure."
+      - name: "Doubt"
+        what: "Casting doubt on someone's credibility or sincerity without evidence."
+      - name: "Appeal to Hypocrisy"
+        what: "Dismissing an argument by charging the arguer with inconsistency."
+      - name: "Questioning the Reputation"
+        what: "Undercutting a target's standing so their claims are pre-discounted."
+    lineage: "SemEval-2023 · Attack on Reputation (5 fine techniques)"
+
+  # ==========================================================================
+  # 5. JUSTIFICATION  — propping a claim on an external appeal instead of evidence
+  #    (no seed rule yet)
+  # ==========================================================================
+  - id: justification
+    semeval_parent: "Justification"
+    what: "Backing a claim with an outside appeal — authority, the crowd, shared values, fear, or the flag — in place of evidence."
+    status: "(no seed rule yet)"
+    note: "captioneer's weasel.attribution touches SemEval's Appeal to Authority, but files it as a wording tell under manipulative-wording. A dedicated justification pack (crowd, values, fear, flag) is future work."
+    semeval_techniques:
+      - name: "Flag Waving"
+        what: "Riding group loyalty or patriotism to carry the claim."
+      - name: "Appeal to Authority"
+        what: "Leaning on an authority's say-so as if it settled the matter."
+      - name: "Appeal to Popularity"
+        what: "'Everyone's doing it' as a reason to agree."
+      - name: "Appeal to Values"
+        what: "Wrapping the claim in cherished values so rejecting it feels like betraying them."
+      - name: "Appeal to Fear/Prejudice"
+        what: "Attaching dread or bias to the alternative to steer the choice."
+    lineage: "SemEval-2023 · Justification (5 fine techniques)"
+
+  # ==========================================================================
+  # 6. CALL  — pushing you toward an action or shutting thought down
+  #    (no seed rule yet)
+  # ==========================================================================
+  - id: call
+    semeval_parent: "Call"
+    what: "Driving you to act now, or closing the topic down, rather than letting you weigh it."
+    status: "(no seed rule yet)"
+    semeval_techniques:
+      - name: "Slogans"
+        what: "A short, catchy phrase that substitutes for an argument."
+      - name: "Conversation Killer"
+        what: "A thought-terminating cliché ('it is what it is') that ends the discussion."
+      - name: "Appeal to Time"
+        what: "Manufacturing urgency ('act now', 'the time is now') to short-circuit deliberation."
+    lineage: "SemEval-2023 · Call (3 fine techniques)"
+
+  # ==========================================================================
+  # 7. AGENCY-HIDING  — grammar that deletes who did the thing
+  #    CAPTIONEER STRUCTURAL EXTENSION — not a SemEval family.
+  # ==========================================================================
+  - id: agency-hiding
+    semeval_parent: "(captioneer extension — not in SemEval)"
+    what: "Sentence structure that removes the actor: the harm is described, but who chose it is gone."
+    why_extension: "SemEval's taxonomy is lexical/rhetorical; captioneer adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar, so it earns its own family."
+    seeded_tells: 1
+    tells:
+
+      - id: agency-hiding.deleted-subject
+        semeval_technique: "(captioneer extension)"
+        what: "An agentless passive — 'mistakes were made', 'your account was closed' — a sentence whose grammar has no subject, so who acted has been deleted."
+        why_it_works: "No actor, no accountability: the harm reads like weather that simply happened rather than a choice a specific someone made."
+        examples:
+          - marked: "Mistakes were made and your account was closed"
+            tell: "Mistakes were made"
+            plain: "We made a mistake and closed your account by error."
+          - marked: "Your data was shared with partners"
+            tell: "was shared"
+            plain: "We shared your data with 12 advertising partners."
+        lineage: "captioneer structural extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"

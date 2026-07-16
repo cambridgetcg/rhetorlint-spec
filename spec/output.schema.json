@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://captioneer.io/spec/0.1/output.schema.json",
+  "title": "Captioneer Analysis Result",
+  "description": "The result of analyzing a passage of text for rhetorical tells. Captioneer marks countable manipulation in the WORDS; it never claims to read the person, and it never adjudicates whether a claim is factually true.",
+  "type": "object",
+  "required": ["captioneer", "source", "density", "marks"],
+  "additionalProperties": false,
+  "properties": {
+    "captioneer": {
+      "type": "string",
+      "description": "Spec/schema version (semver).",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
+    },
+    "source": {
+      "type": "object",
+      "required": ["chars", "words", "locale"],
+      "additionalProperties": false,
+      "properties": {
+        "chars": { "type": "integer", "minimum": 0 },
+        "words": { "type": "integer", "minimum": 0 },
+        "locale": { "type": "string", "description": "BCP-47 language tag, e.g. 'en'." }
+      }
+    },
+    "density": {
+      "type": "object",
+      "description": "The headline metric: how thickly the text is marked.",
+      "required": ["tells", "per100Words"],
+      "additionalProperties": false,
+      "properties": {
+        "tells": { "type": "integer", "minimum": 0 },
+        "per100Words": { "type": "number", "minimum": 0 }
+      }
+    },
+    "marks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/mark" }
+    },
+    "strip": {
+      "type": "string",
+      "description": "Deterministic de-spun version: adverbial spin (intensifiers, deniable adverbs) removed and agentless passives flagged with [who?]. Verb-phrase hedges and other tells are left marked, not paraphrased. On-device, no model required."
+    },
+    "rewrite": {
+      "type": ["string", "null"],
+      "description": "OPTIONAL plain-truth paraphrase. Requires a pluggable model adapter; null when only the deterministic core ran. Never fabricate this in the core."
+    },
+    "engine": {
+      "type": "object",
+      "description": "Provenance for reproducibility.",
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "rules": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "mark": {
+      "type": "object",
+      "required": ["ruleId", "family", "actual", "position"],
+      "additionalProperties": false,
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "description": "family.tell — the verbatim taxonomy label, e.g. 'agency-hiding.deleted-subject'.",
+          "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$"
+        },
+        "family": {
+          "type": "string",
+          "description": "One coarse family. The six SemEval-2023 parents plus captioneer's structural extension.",
+          "enum": [
+            "manipulative-wording",
+            "simplification",
+            "distraction",
+            "attack-on-reputation",
+            "justification",
+            "call",
+            "agency-hiding"
+          ]
+        },
+        "technique": {
+          "type": "string",
+          "description": "Fine-grained technique label, aligned verbatim to SemEval-2023 (Piskorski et al.) where one maps, e.g. 'Loaded Language', 'Obfuscation, Intentional Vagueness, Confusion', 'False Dilemma / No Choice', 'Whataboutism'."
+        },
+        "actual": {
+          "type": "string",
+          "description": "The real, visible phrase that was marked. Every mark MUST point at text a reader can see."
+        },
+        "position": {
+          "type": "object",
+          "required": ["start", "end"],
+          "additionalProperties": false,
+          "properties": {
+            "start": { "$ref": "#/$defs/point" },
+            "end": { "$ref": "#/$defs/point" }
+          }
+        },
+        "note": {
+          "type": "string",
+          "description": "A one-line, phrase-level explanation of what the language is doing. Describes the WORDS, not the speaker's intent."
+        },
+        "expected": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Suggested plain-truth phrasing(s) for this mark."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Rule-level confidence. Heuristic — not a probability of deception. Captioneer detects language patterns, not lies."
+        },
+        "level": {
+          "type": "string",
+          "enum": ["info", "note", "warning"],
+          "description": "Severity band. Maps to SARIF result.level. Default 'info' — a mark is an observation, not an accusation."
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "required": ["offset"],
+      "additionalProperties": false,
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 },
+        "offset": { "type": "integer", "minimum": 0, "description": "0-based character offset into the source." }
+      }
+    }
+  }
+}

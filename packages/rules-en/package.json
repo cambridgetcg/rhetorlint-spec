@@ -1,0 +1,22 @@
+{
+  "name": "@captioneer/rules-en",
+  "version": "0.1.0",
+  "description": "English tell-pack for Captioneer: declarative rules for the families of rhetorical manipulation, aligned to the SemEval-2023 persuasion taxonomy.",
+  "type": "module",
+  "license": "MIT",
+  "main": "rules.json",
+  "exports": {
+    ".": "./rules.json"
+  },
+  "files": [
+    "rules.json",
+    "README.md"
+  ],
+  "homepage": "https://captioneer.io",
+  "keywords": [
+    "captioneer",
+    "rules",
+    "rhetoric",
+    "propaganda-techniques"
+  ]
+}

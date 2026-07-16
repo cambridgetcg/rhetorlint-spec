@@ -1,0 +1,26 @@
+{
+  "name": "@captioneer/core",
+  "version": "0.1.0",
+  "description": "Reference engine for the Captioneer spec: marks rhetorical tells in text, on-device, zero dependencies. Reads the language, never the person.",
+  "type": "module",
+  "license": "MIT",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./sarif": "./sarif.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "sarif.mjs",
+    "README.md"
+  ],
+  "homepage": "https://captioneer.io",
+  "keywords": [
+    "captioneer",
+    "rhetoric",
+    "manipulation-detection",
+    "media-literacy",
+    "on-device"
+  ],
+  "sideEffects": false
+}

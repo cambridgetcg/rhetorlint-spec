@@ -1,0 +1,28 @@
+{
+  "name": "captioneer-spec",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The Captioneer specification: a portable taxonomy of rhetorical tells + a JSON output schema, with a zero-dependency reference engine. Marks manipulation in the words; never reads the person.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://captioneer.io",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test 'test/*.test.mjs'",
+    "demo": "node scripts/demo.mjs"
+  },
+  "keywords": [
+    "rhetoric",
+    "manipulation",
+    "media-literacy",
+    "propaganda-techniques",
+    "text-analysis",
+    "linter",
+    "spec"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

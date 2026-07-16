@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Captioneer · Read the subtext</title>
+<meta name="description" content="Captioneer marks countable rhetorical tells in the words of a passage. Heuristic, on-device, private. No network, no fonts or images loaded from anywhere.">
+<style>
+  /* ============================================================
+     Captioneer explorer — editor's proof sheet.
+     Fully self-contained: system fonts only, no network, no CDNs.
+     Tokens drive both light and dark; family colors are hue-driven.
+     ============================================================ */
+
+  :root {
+    /* --- warm paper / ink neutrals (light) --- */
+    --paper:        #f4efe3;
+    --paper-raise:  #fbf8f0;
+    --paper-sunk:   #eae3d3;
+    --ink:          #262019;
+    --ink-soft:     #5a5044;
+    --ink-faint:    #8a7f6d;
+    --rule:         #d9cfba;
+    --rule-strong:  #c3b79c;
+
+    /* --- one restrained structural accent: proofreader's oxblood --- */
+    --accent:       #a8442f;
+    --accent-soft:  #c8664e;
+    --accent-wash:  #a8442f18;
+    --focus:        #a8442f;
+
+    /* --- highlighter mark tokens (shared per theme) --- */
+    --wash-s: 80%;  --wash-l: 84%;  --wash-a: 0.80;
+    --line-s: 60%;  --line-l: 42%;
+    --swatch-s: 62%; --swatch-l: 46%;
+
+    /* --- typography --- */
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+    --sans:  system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --shadow: 0 1px 0 #ffffff80, 0 12px 30px -18px #2a201540;
+    --radius: 10px;
+
+    color-scheme: light dark;
+  }
+
+  /* dark tokens, applied when the OS prefers dark AND the user hasn't forced light */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:        #17140f;
+      --paper-raise:  #211d16;
+      --paper-sunk:   #100e0a;
+      --ink:          #ece4d3;
+      --ink-soft:     #b7ac97;
+      --ink-faint:    #857b68;
+      --rule:         #342e24;
+      --rule-strong:  #463f31;
+
+      --accent:       #e08a6f;
+      --accent-soft:  #c8664e;
+      --accent-wash:  #e08a6f22;
+      --focus:        #e08a6f;
+
+      --wash-s: 44%;  --wash-l: 30%;  --wash-a: 0.60;
+      --line-s: 58%;  --line-l: 60%;
+      --swatch-s: 55%; --swatch-l: 60%;
+
+      --shadow: 0 1px 0 #ffffff08, 0 16px 34px -18px #00000090;
+    }
+  }
+  /* explicit user toggle always wins */
+  :root[data-theme="dark"] {
+    --paper:        #17140f;
+    --paper-raise:  #211d16;
+    --paper-sunk:   #100e0a;
+    --ink:          #ece4d3;
+    --ink-soft:     #b7ac97;
+    --ink-faint:    #857b68;
+    --rule:         #342e24;
+    --rule-strong:  #463f31;
+
+    --accent:       #e08a6f;
+    --accent-soft:  #c8664e;
+    --accent-wash:  #e08a6f22;
+    --focus:        #e08a6f;
+
+    --wash-s: 44%;  --wash-l: 30%;  --wash-a: 0.60;
+    --line-s: 58%;  --line-l: 60%;
+    --swatch-s: 55%; --swatch-l: 60%;
+
+    --shadow: 0 1px 0 #ffffff08, 0 16px 34px -18px #00000090;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  /* --- 7 family hues (evenly spread, distinguishable, accessible washes) --- */
+  .fam-manipulative-wording  { --h: 45;  }  /* amber   */
+  .fam-simplification        { --h: 130; }  /* green   */
+  .fam-distraction           { --h: 215; }  /* blue    */
+  .fam-attack-on-reputation  { --h: 358; }  /* red     */
+  .fam-justification         { --h: 280; }  /* violet  */
+  .fam-call                  { --h: 320; }  /* magenta */
+  .fam-agency-hiding         { --h: 175; }  /* teal    */
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: clamp(18px, 4vw, 44px) clamp(16px, 4vw, 40px) 72px;
+  }
+
+  a { color: var(--accent); text-underline-offset: 2px; }
+
+  /* ---------- header ---------- */
+  header.masthead { margin-bottom: 26px; }
+  .kicker {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px; margin-bottom: 18px;
+  }
+  .kicker .dot { color: var(--accent); }
+  .kicker .spec {
+    margin-left: auto; border: 1px solid var(--rule-strong);
+    border-radius: 999px; padding: 2px 9px; letter-spacing: .1em;
+  }
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(30px, 5.4vw, 50px);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+  }
+  h1.title .mid { color: var(--accent); font-style: italic; }
+  .lede {
+    font-family: var(--serif);
+    font-size: clamp(16px, 2.2vw, 20px);
+    color: var(--ink-soft);
+    max-width: 60ch; margin: 0;
+  }
+
+  /* ---------- control bar ---------- */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+    margin: 22px 0 6px;
+  }
+  .tabs {
+    display: inline-flex; background: var(--paper-sunk);
+    border: 1px solid var(--rule); border-radius: 999px; padding: 3px;
+  }
+  .tabs button {
+    appearance: none; border: 0; background: transparent; cursor: pointer;
+    font-family: var(--sans); font-size: 14px; font-weight: 600;
+    color: var(--ink-soft); padding: 7px 18px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: background .18s ease, color .18s ease;
+  }
+  .tabs button[aria-selected="true"] {
+    background: var(--paper-raise); color: var(--ink);
+    box-shadow: 0 1px 2px #00000018;
+  }
+  .tabs button .tnum { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+
+  .spring { margin-left: auto; }
+
+  .badge-priv {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12.5px; color: var(--ink-soft);
+    background: var(--paper-sunk); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 5px 12px;
+  }
+  .badge-priv .pip { width: 8px; height: 8px; border-radius: 50%; background: #3f9d63; box-shadow: 0 0 0 3px #3f9d6322; }
+
+  .themebtn {
+    appearance: none; cursor: pointer;
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    color: var(--ink-soft);
+    background: var(--paper-sunk); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 6px 13px;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: color .18s ease;
+  }
+  .themebtn:hover { color: var(--ink); }
+
+  /* ---------- panels ---------- */
+  .panel { display: none; }
+  .panel.on { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .card {
+    background: var(--paper-raise);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: clamp(16px, 2.6vw, 24px);
+  }
+  .card + .card { margin-top: 18px; }
+
+  .grid-read {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  @media (min-width: 900px) {
+    .grid-read { grid-template-columns: 1.15fr .85fr; align-items: start; }
+    .col-strip { grid-column: 1 / -1; }
+  }
+
+  .card h2, .card h3 { font-family: var(--sans); }
+  .sect-label {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--ink-faint);
+    margin: 0 0 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .sect-label::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+  /* input */
+  label.fld { display: block; font-size: 13px; font-weight: 600; color: var(--ink-soft); margin-bottom: 8px; }
+  textarea {
+    width: 100%; min-height: 132px; resize: vertical;
+    font-family: var(--serif); font-size: 17px; line-height: 1.5;
+    color: var(--ink); background: var(--paper);
+    border: 1px solid var(--rule-strong); border-radius: 8px;
+    padding: 13px 14px;
+  }
+  textarea:focus-visible { outline: 3px solid var(--accent-wash); border-color: var(--accent); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+  .chip {
+    appearance: none; cursor: pointer;
+    font-family: var(--sans); font-size: 13px; color: var(--ink-soft);
+    background: var(--paper); border: 1px solid var(--rule-strong);
+    border-radius: 999px; padding: 6px 13px;
+    transition: border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .chip:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .chip[aria-pressed="true"] {
+    background: var(--accent-wash); border-color: var(--accent); color: var(--ink);
+  }
+  .privnote { font-size: 12.5px; color: var(--ink-faint); margin: 10px 0 0; }
+
+  /* density */
+  .density-wrap { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .density-num {
+    font-family: var(--mono); font-weight: 600;
+    font-size: clamp(40px, 8vw, 62px); line-height: .9; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .density-unit { font-size: 13px; color: var(--ink-soft); max-width: 20ch; }
+  .density-unit strong { color: var(--ink); font-family: var(--mono); }
+  .bar {
+    height: 9px; border-radius: 999px; background: var(--paper-sunk);
+    border: 1px solid var(--rule); overflow: hidden; margin-top: 16px;
+  }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-soft), var(--accent)); transition: width .35s ease; }
+  .bar-scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); margin-top: 5px; }
+
+  /* proof (marked reading) */
+  .proof {
+    font-family: var(--serif); font-size: clamp(18px, 2.4vw, 22px); line-height: 1.62;
+    color: var(--ink); white-space: pre-wrap; word-break: break-word;
+    background: var(--paper); border: 1px dashed var(--rule-strong);
+    border-radius: 8px; padding: 16px 18px;
+  }
+  .proof.empty { color: var(--ink-faint); font-style: italic; }
+
+  /* the mark itself — highlighter wash + colored baseline rule */
+  mark {
+    color: inherit;
+    background: hsl(var(--h) var(--wash-s) var(--wash-l) / var(--wash-a));
+    border-bottom: 2px solid hsl(var(--h) var(--line-s) var(--line-l));
+    padding: .04em 0; border-radius: 2px 2px 0 0;
+    cursor: help;
+  }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; }
+  .legend .lg { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-soft); }
+  .swatch { width: 13px; height: 13px; border-radius: 3px;
+            background: hsl(var(--h) var(--swatch-s) var(--swatch-l)); flex: none; }
+
+  /* marks grouped by family */
+  .fam-group { border-top: 1px solid var(--rule); padding-top: 14px; margin-top: 14px; }
+  .fam-group:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+  .fam-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+  .fam-head .swatch { width: 15px; height: 15px; }
+  .fam-head .fam-name { font-weight: 700; font-size: 14.5px; }
+  .fam-head .fam-count { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-left: auto; }
+
+  .mark-row { padding: 9px 0; border-top: 1px dotted var(--rule); }
+  .mark-row:first-of-type { border-top: 0; }
+  .mark-quote { font-family: var(--serif); font-size: 16px; margin-bottom: 5px; }
+  .mark-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 5px; }
+  .rid { font-family: var(--mono); font-size: 11.5px; color: var(--accent); }
+  .tech { font-size: 11px; color: var(--ink-soft); }
+  .lvl {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+    border-radius: 4px; padding: 1px 6px; border: 1px solid var(--rule-strong); color: var(--ink-soft);
+  }
+  .lvl.warning { border-color: var(--accent); color: var(--accent); }
+  .lvl.note { border-color: var(--rule-strong); }
+  .conf { font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); }
+  .mark-note { font-size: 13.5px; color: var(--ink-soft); }
+  .mark-plain { font-size: 13px; color: var(--ink-faint); margin-top: 3px; }
+  .mark-plain b { color: var(--ink-soft); font-weight: 600; }
+
+  .none-msg { color: var(--ink-faint); font-style: italic; font-family: var(--serif); }
+
+  /* strip */
+  .strip-out {
+    font-family: var(--serif); font-size: 18px; line-height: 1.6;
+    background: var(--paper); border: 1px solid var(--rule-strong);
+    border-radius: 8px; padding: 15px 17px; white-space: pre-wrap; word-break: break-word;
+  }
+  .who { font-family: var(--mono); font-size: .78em; color: var(--accent);
+         background: var(--accent-wash); border-radius: 4px; padding: 0 4px; }
+  .strip-legend { font-size: 12.5px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* ---------- LEARN ---------- */
+  .honest {
+    background: var(--accent-wash);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: clamp(16px, 2.6vw, 22px);
+    margin-bottom: 20px;
+  }
+  .honest h2 { margin: 0 0 12px; font-size: 17px; font-family: var(--sans); }
+  .honest ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 10px; }
+  @media (min-width: 720px) { .honest ul { grid-template-columns: 1fr 1fr; } }
+  .honest li { display: flex; gap: 9px; font-size: 14px; color: var(--ink-soft); }
+  .honest li b { color: var(--ink); }
+  .honest li .yn { font-family: var(--mono); font-weight: 700; flex: none; width: 2.6em; }
+  .honest li .yn.no { color: var(--accent); }
+  .honest li .yn.yes { color: #3f9d63; }
+  .honest .foot { font-size: 12.5px; color: var(--ink-faint); margin: 14px 0 0; }
+
+  .learn-fam { margin-top: 16px; }
+  .learn-fam-head {
+    display: flex; align-items: center; gap: 11px;
+    padding-bottom: 10px; border-bottom: 2px solid var(--rule-strong); margin-bottom: 4px;
+  }
+  .learn-fam-head .swatch { width: 18px; height: 18px; }
+  .learn-fam-head h3 { margin: 0; font-size: 18px; font-family: var(--serif); font-weight: 600; }
+  .learn-fam-head .fid { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+  .learn-fam-head .planned {
+    margin-left: auto; font-family: var(--mono); font-size: 10px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-faint);
+    border: 1px dashed var(--rule-strong); border-radius: 4px; padding: 2px 7px;
+  }
+  .fam-desc { font-size: 14px; color: var(--ink-soft); margin: 8px 0 4px; max-width: 70ch; }
+
+  .tell {
+    border: 1px solid var(--rule); border-radius: 9px;
+    padding: 15px 16px; margin-top: 12px; background: var(--paper-raise);
+  }
+  .tell-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .tell-def { font-size: 14.5px; color: var(--ink); margin: 2px 0 12px; }
+  .worked-label, .rewrite-label {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px;
+  }
+  .worked {
+    font-family: var(--serif); font-size: 16.5px; line-height: 1.55;
+    background: var(--paper); border: 1px dashed var(--rule-strong);
+    border-radius: 7px; padding: 11px 13px; margin-bottom: 12px; white-space: pre-wrap;
+  }
+  .rewrite {
+    font-family: var(--serif); font-size: 15px; color: var(--ink-soft);
+    border-left: 3px solid #3f9d63; padding: 2px 0 2px 12px;
+  }
+  .planned-body { font-size: 13.5px; color: var(--ink-faint); font-style: italic; padding: 4px 0 2px; }
+
+  /* ---------- footer ---------- */
+  footer.foot {
+    margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--rule);
+    font-size: 12.5px; color: var(--ink-faint); line-height: 1.7;
+  }
+  footer.foot .prov { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); }
+
+  :focus-visible { outline: 3px solid var(--accent-wash); outline-offset: 2px; border-radius: 4px; }
+  button:focus-visible { outline: 3px solid var(--accent-wash); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="kicker">
+      <span class="dot">&#9679;</span> Captioneer &middot; the learning wing
+      <span class="spec" id="specTag">spec 0.1</span>
+    </div>
+    <h1 class="title">Captioneer <span class="mid">&middot;</span> Read the subtext</h1>
+    <p class="lede">It marks countable rhetorical tells in the <em>words</em> of a passage &mdash; loaded intensifiers, rehearsed contrition, deleted subjects &mdash; and reports how thickly the text is spun. Heuristic. On-device. It never reads the person.</p>
+
+    <div class="controls">
+      <div class="tabs" role="tablist" aria-label="Explorer mode">
+        <button role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">Read <span class="tnum">demo</span></button>
+        <button role="tab" id="tab-learn" aria-controls="panel-learn" aria-selected="false" tabindex="-1">Learn <span class="tnum">wing</span></button>
+      </div>
+      <div class="spring"></div>
+      <span class="badge-priv"><span class="pip" aria-hidden="true"></span> On-device &middot; nothing leaves this page</span>
+      <button class="themebtn" id="themeBtn" aria-label="Change color theme">&#9681; Theme: <span id="themeLbl">System</span></button>
+    </div>
+  </header>
+
+  <!-- ======================= READ ======================= -->
+  <section class="panel on" id="panel-read" role="tabpanel" aria-labelledby="tab-read">
+    <div class="grid-read">
+
+      <div class="card col-input">
+        <p class="sect-label">The passage</p>
+        <label class="fld" for="input">Paste any statement &mdash; a press release, an apology, a talking point</label>
+        <textarea id="input" spellcheck="false" aria-describedby="privnote"></textarea>
+        <div class="chips" role="group" aria-label="Example passages">
+          <button class="chip" data-ex="specimen" aria-pressed="true">The specimen</button>
+          <button class="chip" data-ex="corporate" aria-pressed="false">Corporate non-apology</button>
+          <button class="chip" data-ex="political" aria-pressed="false">Political deflection</button>
+          <button class="chip" data-ex="clean" aria-pressed="false">Clean &amp; honest</button>
+        </div>
+        <p class="privnote" id="privnote">Everything runs in this page. No network requests, no external fonts, images, or scripts &mdash; the engine and rule pack are inlined. Your text is never sent anywhere.</p>
+      </div>
+
+      <div class="card col-density">
+        <p class="sect-label">Density</p>
+        <div class="density-wrap">
+          <div class="density-num" id="dNum">0.0</div>
+          <div class="density-unit">tells per 100 words<br><strong id="dRatio">0 tells / 0 words</strong></div>
+        </div>
+        <div class="bar" aria-hidden="true"><i id="dBar" style="width:0%"></i></div>
+        <div class="bar-scale" aria-hidden="true"><span>0</span><span>15</span><span>30+ per 100</span></div>
+        <div class="legend" id="legend" aria-label="Family colors"></div>
+      </div>
+
+      <div class="card col-proof">
+        <p class="sect-label">Marked reading</p>
+        <div class="proof" id="proof" aria-live="polite"></div>
+      </div>
+
+      <div class="card col-marks">
+        <p class="sect-label">Tells, by family</p>
+        <div id="marks"></div>
+      </div>
+
+      <div class="card col-strip">
+        <p class="sect-label">Strip &mdash; the de-spun text</p>
+        <div class="strip-out" id="strip"></div>
+        <p class="strip-legend">Deterministic, no model: adverbial spin (intensifiers, deniable adverbs) is subtracted and each agentless passive is flagged with <span class="who">[who?]</span>. Verb-phrase hedges are left marked, not paraphrased &mdash; strip subtracts spin, it never rewrites for you.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================= LEARN ======================= -->
+  <section class="panel" id="panel-learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
+    <div class="honest">
+      <h2>How to read this tool honestly</h2>
+      <ul>
+        <li><span class="yn yes">DOES</span><span>Mark tells in the <b>words</b> &mdash; every mark points at a real, visible phrase you can see and check.</span></li>
+        <li><span class="yn no">DOES&nbsp;NOT</span><span>Read the <b>person</b>. It infers no tone, no intent, no deception. A tell is not a lie.</span></li>
+        <li><span class="yn no">DOES&nbsp;NOT</span><span>Judge whether a claim is <b>factually true</b>. That is your job, and the world's &mdash; not a pattern-matcher's.</span></li>
+        <li><span class="yn yes">DOES</span><span>Report <b>confidence as heuristic</b> &mdash; a language-pattern likelihood, never a probability that anyone is lying.</span></li>
+      </ul>
+      <p class="foot">A high density means the language is thickly styled, not that the speaker is dishonest. Honest people use hedges; liars sometimes speak plainly. Captioneer gives you a lens, not a verdict.</p>
+    </div>
+
+    <div class="card">
+      <p class="sect-label">The taxonomy &mdash; families &amp; tells</p>
+      <p class="fam-desc">Seven coarse families: the six SemEval-2023 persuasion parents plus Captioneer's structural <em>agency-hiding</em> extension. This pack (<span class="rid" id="packId">rules-en</span>) ships rules for four of them today; the rest are defined and awaiting rules.</p>
+      <div id="learn"></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p class="prov" id="prov">engine &middot; rules</p>
+    <p>Captioneer marks language patterns. It does not detect lies, read intent, or verify facts. Confidence is <b>heuristic</b>. This page makes no accuracy claims &mdash; it is a reading aid, not a truth machine. Built to run entirely on your device.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+(function () {
+  /* ============================================================
+     1. THE RULE PACK — inlined verbatim from
+        packages/rules-en/rules.json (JS string escapes match JSON's,
+        so regex sources are byte-identical to the Node engine).
+     ============================================================ */
+  const RULES = {
+    "id": "@captioneer/rules-en",
+    "version": "0.1.0",
+    "locale": "en",
+    "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml.",
+    "rules": [
+      {
+        "ruleId": "intensifier.loaded",
+        "family": "manipulative-wording",
+        "technique": "Loaded Language",
+        "type": "lexical",
+        "level": "info",
+        "confidence": 0.55,
+        "note": "an intensifier — turns up the emotional volume without adding fact",
+        "terms": ["extremely", "incredibly", "deeply", "tremendously", "utterly", "wholeheartedly", "profoundly", "massively", "hugely"],
+        "expected": ["(state the fact without the intensifier)"]
+      },
+      {
+        "ruleId": "absolute.universal",
+        "family": "simplification",
+        "technique": "False Dilemma or No Choice",
+        "type": "lexical",
+        "level": "info",
+        "confidence": 0.6,
+        "note": "an absolute — claims more than anyone could actually know",
+        "terms": ["always", "never", "everyone", "no one", "nobody", "everybody", "undeniable", "guaranteed", "without a doubt", "obviously", "clearly", "of course", "there is no question"],
+        "expected": ["(qualify: how often, who exactly, how certain)"]
+      },
+      {
+        "ruleId": "hedge.softener",
+        "family": "manipulative-wording",
+        "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "type": "lexical",
+        "level": "info",
+        "confidence": 0.55,
+        "note": "a hedge — lowers a promise you can later deny",
+        "terms": ["reaching out to", "sort of", "kind of", "we believe", "we feel", "it seems", "to some extent", "somewhat", "if anything", "as it were", "in a sense", "for the most part"],
+        "expected": ["(say the concrete commitment, or drop the claim)"]
+      },
+      {
+        "ruleId": "hedge.deniable",
+        "family": "manipulative-wording",
+        "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "type": "pattern",
+        "level": "info",
+        "confidence": 0.6,
+        "note": "a deniable modal — leaves room to say you never promised",
+        "pattern": "\\b(?:may|might|could)\\s+(?:have\\s+\\w+|be\\s+\\w+|possibly|potentially)\\b|\\b(?:reportedly|allegedly|purportedly)\\b",
+        "expected": ["(state what you know, and what you don't)"]
+      },
+      {
+        "ruleId": "weasel.attribution",
+        "family": "manipulative-wording",
+        "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "type": "pattern",
+        "level": "note",
+        "confidence": 0.65,
+        "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+        "pattern": "\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b",
+        "expected": ["(name the source, or drop the appeal)"]
+      },
+      {
+        "ruleId": "deflection.whataboutism",
+        "family": "distraction",
+        "technique": "Whataboutism",
+        "type": "pattern",
+        "level": "note",
+        "confidence": 0.6,
+        "note": "a deflection — points away from the question just asked",
+        "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let'?s\\s+not\\s+forget|whatabout)\\b",
+        "expected": ["(answer the original question first)"]
+      },
+      {
+        "ruleId": "contrition.rehearsed",
+        "family": "manipulative-wording",
+        "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "type": "pattern",
+        "level": "warning",
+        "confidence": 0.7,
+        "note": "rehearsed contrition — the shape of an apology with the substance removed",
+        "pattern": "\\bwe\\s+take\\s+(?:your\\s+|the\\s+)?[a-z ]{0,24}?\\bseriously\\b|\\bwe\\s+(?:sincerely\\s+)?apologi[sz]e\\s+for\\s+any\\b|\\bwe\\s+are\\s+committed\\s+to\\b|\\bwe\\s+value\\s+your\\b|\\bout\\s+of\\s+an\\s+abundance\\s+of\\s+caution\\b|\\bwe\\s+hear\\s+you\\b",
+        "expected": ["(say the specific thing you did wrong and the specific thing you will do)"]
+      },
+      {
+        "ruleId": "agency-hiding.deleted-subject",
+        "family": "agency-hiding",
+        "technique": "Obfuscation (structural — captioneer extension)",
+        "type": "structural",
+        "detector": "agentless-passive",
+        "level": "warning",
+        "confidence": 0.7,
+        "note": "an agentless passive — who acted is deleted from the sentence",
+        "expected": ["(name who did it: 'I/we + verb')"]
+      }
+    ]
+  };
+
+  /* ============================================================
+     2. THE ENGINE — ported verbatim from packages/core/index.mjs.
+        Same logic, same behavior; only `export` keywords dropped.
+     ============================================================ */
+  const SPEC_VERSION = "0.1";
+  const NAME = "@captioneer/core";
+  const CORE_VERSION = "0.1.0";
+
+  const NOT_PASSIVE = new Set([
+    "tired", "glad", "aware", "worried", "excited", "interested", "scared",
+    "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
+    "dedicated", "committed", "supposed", "used", "based"
+  ]);
+
+  const IRREGULAR_PP =
+    "made|taken|done|given|seen|known|held|shown|drawn|chosen|written|broken|spoken|" +
+    "built|sent|kept|left|lost|found|told|brought|dealt|put|set|paid|felt|met|led|read|" +
+    "hit|cut|hurt|shut|split|spread|cast|cost|let";
+
+  const AGENTLESS_PASSIVE = new RegExp(
+    "\\b(is|are|was|were|been|being|be)\\s+(?:\\w+ly\\s+)?" +
+    "(\\w+(?:ed|en)|" + IRREGULAR_PP + ")\\b" +
+    "(?!\\s+by\\b)",
+    "gi"
+  );
+
+  function escapeRegExp(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function matchesFor(rule, text) {
+    const out = [];
+    if (rule.type === "lexical") {
+      const alt = rule.terms.map(escapeRegExp).join("|");
+      const re = new RegExp("\\b(?:" + alt + ")\\b", "gi");
+      for (const m of text.matchAll(re)) out.push({ index: m.index, length: m[0].length, actual: m[0] });
+    } else if (rule.type === "pattern") {
+      const re = new RegExp(rule.pattern, "gi");
+      for (const m of text.matchAll(re)) {
+        if (m[0].length === 0) continue;
+        out.push({ index: m.index, length: m[0].length, actual: m[0] });
+      }
+    } else if (rule.type === "structural" && rule.detector === "agentless-passive") {
+      for (const m of text.matchAll(AGENTLESS_PASSIVE)) {
+        const participle = (m[2] || "").toLowerCase();
+        if (NOT_PASSIVE.has(participle)) continue;
+        out.push({ index: m.index, length: m[0].length, actual: m[0] });
+      }
+    }
+    return out;
+  }
+
+  function pointAt(text, offset) {
+    let line = 1, last = -1;
+    for (let i = 0; i < offset; i++) {
+      if (text.charCodeAt(i) === 10) { line++; last = i; }
+    }
+    return { line, column: offset - last, offset };
+  }
+
+  function countWords(text) {
+    const m = text.trim().match(/\S+/g);
+    return m ? m.length : 0;
+  }
+
+  const REMOVABLE = new Set(["intensifier.loaded", "hedge.deniable"]);
+
+  function analyze(text, options) {
+    options = options || {};
+    const pack = options.rules;
+    if (!pack || !Array.isArray(pack.rules)) {
+      throw new Error("analyze() needs a rule pack: analyze(text, { rules })");
+    }
+    const marks = [];
+    for (const rule of pack.rules) {
+      for (const hit of matchesFor(rule, text)) {
+        marks.push({
+          ruleId: rule.ruleId,
+          family: rule.family,
+          technique: rule.technique,
+          actual: hit.actual,
+          position: { start: pointAt(text, hit.index), end: pointAt(text, hit.index + hit.length) },
+          note: rule.note,
+          expected: rule.expected || [],
+          confidence: rule.confidence,
+          level: rule.level || "info"
+        });
+      }
+    }
+
+    marks.sort((a, b) => a.position.start.offset - b.position.start.offset ||
+                         a.position.end.offset - b.position.end.offset);
+    const seen = new Set();
+    const deduped = marks.filter((m) => {
+      const key = m.ruleId + ":" + m.position.start.offset + ":" + m.position.end.offset;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const words = countWords(text);
+    const per100 = words ? Math.round((deduped.length / words) * 1000) / 10 : 0;
+
+    let rewrite = null;
+    if (typeof options.rewrite === "function") {
+      rewrite = options.rewrite(text, deduped);
+    }
+
+    return {
+      captioneer: SPEC_VERSION,
+      source: { chars: text.length, words, locale: options.locale || pack.locale || "en" },
+      density: { tells: deduped.length, per100Words: per100 },
+      marks: deduped,
+      strip: strip(text, deduped),
+      rewrite,
+      engine: { name: NAME, version: CORE_VERSION, rules: pack.id + "@" + pack.version }
+    };
+  }
+
+  function strip(text, marks) {
+    const ordered = [...marks].sort((a, b) => b.position.start.offset - a.position.start.offset);
+    let out = text;
+    for (const m of ordered) {
+      const s = m.position.start.offset, e = m.position.end.offset;
+      if (REMOVABLE.has(m.ruleId)) {
+        out = out.slice(0, s) + out.slice(e);
+      } else if (m.ruleId === "agency-hiding.deleted-subject") {
+        out = out.slice(0, s) + "[who?] " + out.slice(s);
+      }
+    }
+    return out
+      .replace(/\s{2,}/g, " ")
+      .replace(/\s+([,.;:!?])/g, "$1")
+      .replace(/,\s*,/g, ",")
+      .replace(/\s+$/gm, "")
+      .trim();
+  }
+
+  /* ============================================================
+     3. PRESENTATION DATA (families, examples, worked cases)
+     ============================================================ */
+  const FAMILIES = [
+    { id: "manipulative-wording", label: "Manipulative wording", planned: false,
+      desc: "Word choices that steer feeling or lower a promise — loaded intensifiers, deniable modals, vague hedges, unnamed authorities, and rehearsed contrition." },
+    { id: "simplification", label: "Simplification", planned: false,
+      desc: "Collapses a messy reality into a clean, unarguable shape — absolutes and false dilemmas that claim more than anyone could know." },
+    { id: "distraction", label: "Distraction", planned: false,
+      desc: "Moves attention off the question that was actually asked." },
+    { id: "attack-on-reputation", label: "Attack on reputation", planned: true,
+      desc: "Targets the person or group instead of the argument — name-calling, labeling, guilt by association." },
+    { id: "justification", label: "Justification", planned: true,
+      desc: "Frames a stance as already justified — appeal to fear, flag-waving, 'we had no choice'." },
+    { id: "call", label: "Call", planned: true,
+      desc: "Pushes the audience to act or feel right now — slogans, 'act now', us-vs-them appeals." },
+    { id: "agency-hiding", label: "Agency-hiding", planned: false,
+      desc: "Deletes who acted — agentless passives where the subject is missing. Captioneer's structural extension to the SemEval taxonomy." }
+  ];
+
+  // One worked example per rule. Each is run through the SAME engine at
+  // render time, so the highlight is genuine (verified to fire its rule).
+  const WORKED = {
+    "intensifier.loaded":            "We are extremely committed to fixing this.",
+    "absolute.universal":            "Everyone knows this is obviously the right call.",
+    "hedge.softener":                "We are reaching out to affected customers.",
+    "hedge.deniable":                "The outage reportedly affected some users.",
+    "weasel.attribution":            "Experts say the new policy will help.",
+    "deflection.whataboutism":       "But what about the other side's record?",
+    "contrition.rehearsed":          "We take your concerns seriously.",
+    "agency-hiding.deleted-subject": "Mistakes were made."
+  };
+
+  const EXAMPLES = {
+    specimen:  "We take your privacy extremely seriously, and regrettably, mistakes were made. We are reaching out to affected users.",
+    corporate: "We hear you. We are committed to your trust, and we sincerely apologize for any inconvenience. Out of an abundance of caution, accounts were suspended and data may have been accessed. We value your business and we take security extremely seriously.",
+    political: "But what about the previous administration? Everyone knows the real issue here is spending. Experts agree that mistakes were made, and critics say nothing will change. The economy was damaged, obviously.",
+    clean:     "I made a mistake. I deleted the wrong file on Tuesday, and I will restore it from backup by Friday."
+  };
+
+  /* ============================================================
+     4. RENDERING
+     ============================================================ */
+  function escapeHtml(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function escapeAttr(s) {
+    return escapeHtml(s).replace(/"/g, "&quot;");
+  }
+  const SEV = { info: 0, note: 1, warning: 2 };
+
+  // Segment the text on every mark boundary so overlapping marks never
+  // break the DOM. Each covered segment becomes a <mark>; where marks
+  // overlap, the more specific (shorter, then more severe) one colors it.
+  function renderMarked(text, marks) {
+    if (!text) return "";
+    if (!marks.length) return escapeHtml(text);
+    const bounds = new Set([0, text.length]);
+    for (const m of marks) { bounds.add(m.position.start.offset); bounds.add(m.position.end.offset); }
+    const pts = [...bounds].filter((o) => o >= 0 && o <= text.length).sort((a, b) => a - b);
+    let html = "";
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      if (b <= a) continue;
+      const seg = text.slice(a, b);
+      const cover = marks.filter((m) => m.position.start.offset <= a && m.position.end.offset >= b);
+      if (!cover.length) { html += escapeHtml(seg); continue; }
+      const primary = cover.slice().sort((x, y) => {
+        const sx = x.position.end.offset - x.position.start.offset;
+        const sy = y.position.end.offset - y.position.start.offset;
+        if (sx !== sy) return sx - sy;
+        return (SEV[y.level] || 0) - (SEV[x.level] || 0);
+      })[0];
+      const title = cover.map((m) => m.ruleId + " — " + (m.note || "")).join(" • ");
+      html += '<mark class="fam-' + primary.family + '" title="' + escapeAttr(title) + '">' +
+              escapeHtml(seg) + "</mark>";
+    }
+    return html;
+  }
+
+  function famLabel(id) {
+    const f = FAMILIES.find((x) => x.id === id);
+    return f ? f.label : id;
+  }
+
+  function renderMarksByFamily(marks) {
+    if (!marks.length) {
+      return '<p class="none-msg">No tells found. If this is a real statement, that is worth noticing — plain, active, source-named language leaves nothing to mark.</p>';
+    }
+    let html = "";
+    for (const fam of FAMILIES) {
+      const inFam = marks.filter((m) => m.family === fam.id);
+      if (!inFam.length) continue;
+      html += '<div class="fam-group">';
+      html += '<div class="fam-head fam-' + fam.id + '">' +
+                '<span class="swatch" aria-hidden="true"></span>' +
+                '<span class="fam-name">' + escapeHtml(fam.label) + '</span>' +
+                '<span class="fam-count">' + inFam.length + (inFam.length === 1 ? " tell" : " tells") + '</span>' +
+              '</div>';
+      for (const m of inFam) {
+        const plain = (m.expected && m.expected.length) ? m.expected[0] : "";
+        html += '<div class="mark-row">' +
+                  '<div class="mark-quote fam-' + fam.id + '"><mark class="fam-' + fam.id + '">' + escapeHtml(m.actual) + '</mark></div>' +
+                  '<div class="mark-meta">' +
+                    '<span class="rid">' + escapeHtml(m.ruleId) + '</span>' +
+                    '<span class="lvl ' + escapeAttr(m.level) + '">' + escapeHtml(m.level) + '</span>' +
+                    '<span class="tech">' + escapeHtml(m.technique || "") + '</span>' +
+                    '<span class="conf">heuristic · ' + Number(m.confidence).toFixed(2) + '</span>' +
+                  '</div>' +
+                  '<div class="mark-note">' + escapeHtml(m.note || "") + '</div>' +
+                  (plain ? '<div class="mark-plain"><b>Plain:</b> ' + escapeHtml(plain) + '</div>' : '') +
+                '</div>';
+      }
+      html += '</div>';
+    }
+    return html;
+  }
+
+  function renderStrip(stripText) {
+    // flag the [who?] tokens the strip inserts
+    return escapeHtml(stripText).replace(/\[who\?\]/g, '<span class="who">[who?]</span>');
+  }
+
+  function buildLegend() {
+    const el = document.getElementById("legend");
+    el.innerHTML = FAMILIES.map((f) =>
+      '<span class="lg fam-' + f.id + '"><span class="swatch" aria-hidden="true"></span>' + escapeHtml(f.label) + '</span>'
+    ).join("");
+  }
+
+  function buildLearn() {
+    const el = document.getElementById("learn");
+    let html = "";
+    for (const fam of FAMILIES) {
+      const rules = RULES.rules.filter((r) => r.family === fam.id);
+      html += '<div class="learn-fam">';
+      html += '<div class="learn-fam-head fam-' + fam.id + '">' +
+                '<span class="swatch" aria-hidden="true"></span>' +
+                '<h3>' + escapeHtml(fam.label) + '</h3>' +
+                '<span class="fid">' + escapeHtml(fam.id) + '</span>' +
+                (fam.planned ? '<span class="planned">planned</span>' : '') +
+              '</div>';
+      html += '<p class="fam-desc">' + escapeHtml(fam.desc) + '</p>';
+
+      if (!rules.length) {
+        html += '<p class="planned-body">Defined in the taxonomy; no rules in ' +
+                escapeHtml(RULES.id + "@" + RULES.version) +
+                ' yet. When Captioneer earns a rule that points at a visible phrase without over-marking, it will land here.</p>';
+      } else {
+        for (const r of rules) {
+          const ex = WORKED[r.ruleId] || "";
+          const res = ex ? analyze(ex, { rules: RULES }) : { marks: [] };
+          const plain = (r.expected && r.expected.length) ? r.expected[0] : "";
+          html += '<div class="tell">' +
+                    '<div class="tell-head">' +
+                      '<span class="rid">' + escapeHtml(r.ruleId) + '</span>' +
+                      '<span class="lvl ' + escapeAttr(r.level || "info") + '">' + escapeHtml(r.level || "info") + '</span>' +
+                      '<span class="tech">' + escapeHtml(r.technique || "") + '</span>' +
+                      '<span class="conf">heuristic · ' + Number(r.confidence).toFixed(2) + '</span>' +
+                    '</div>' +
+                    '<p class="tell-def">' + escapeHtml(cap(r.note || "")) + '.</p>' +
+                    '<p class="worked-label">Worked example</p>' +
+                    '<div class="worked">' + renderMarked(ex, res.marks) + '</div>' +
+                    (plain ? '<p class="rewrite-label">Honest plain rewrite</p>' +
+                             '<div class="rewrite">' + escapeHtml(plain) + '</div>' : '') +
+                  '</div>';
+        }
+      }
+      html += '</div>';
+    }
+    el.innerHTML = html;
+  }
+
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+  /* ============================================================
+     5. READ mode live wiring
+     ============================================================ */
+  const input = document.getElementById("input");
+  const proof = document.getElementById("proof");
+  const dNum = document.getElementById("dNum");
+  const dRatio = document.getElementById("dRatio");
+  const dBar = document.getElementById("dBar");
+  const marksEl = document.getElementById("marks");
+  const stripEl = document.getElementById("strip");
+
+  function update() {
+    const text = input.value;
+    const res = analyze(text, { rules: RULES });
+
+    dNum.textContent = res.density.per100Words.toFixed(1);
+    dRatio.textContent = res.density.tells + (res.density.tells === 1 ? " tell / " : " tells / ") +
+                         res.source.words + (res.source.words === 1 ? " word" : " words");
+    const pct = Math.max(0, Math.min(100, (res.density.per100Words / 30) * 100));
+    dBar.style.width = pct + "%";
+
+    if (text.trim() === "") {
+      proof.className = "proof empty";
+      proof.innerHTML = "Type or pick an example to see the marks.";
+    } else {
+      proof.className = "proof";
+      proof.innerHTML = renderMarked(text, res.marks);
+    }
+
+    marksEl.innerHTML = renderMarksByFamily(res.marks);
+    stripEl.innerHTML = res.strip ? renderStrip(res.strip) : '<span class="none-msg">—</span>';
+
+    document.getElementById("prov").textContent =
+      res.engine.name + "@" + res.engine.version + "  ·  rules " + res.engine.rules + "  ·  spec " + res.captioneer;
+    document.getElementById("specTag").textContent = "spec " + res.captioneer;
+    document.getElementById("packId").textContent = RULES.id;
+  }
+
+  input.addEventListener("input", () => {
+    // typing clears the active example marker
+    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+    update();
+  });
+
+  document.querySelectorAll(".chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const key = chip.getAttribute("data-ex");
+      input.value = EXAMPLES[key] || "";
+      document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+      chip.setAttribute("aria-pressed", "true");
+      update();
+    });
+  });
+
+  /* ============================================================
+     6. Mode tabs
+     ============================================================ */
+  const tabRead = document.getElementById("tab-read");
+  const tabLearn = document.getElementById("tab-learn");
+  const panelRead = document.getElementById("panel-read");
+  const panelLearn = document.getElementById("panel-learn");
+  let learnBuilt = false;
+
+  function setMode(mode) {
+    const read = mode === "read";
+    tabRead.setAttribute("aria-selected", read ? "true" : "false");
+    tabLearn.setAttribute("aria-selected", read ? "false" : "true");
+    tabRead.tabIndex = read ? 0 : -1;
+    tabLearn.tabIndex = read ? -1 : 0;
+    panelRead.classList.toggle("on", read);
+    panelLearn.classList.toggle("on", !read);
+    panelRead.hidden = !read;
+    panelLearn.hidden = read;
+    if (!read && !learnBuilt) { buildLearn(); learnBuilt = true; }
+  }
+  tabRead.addEventListener("click", () => setMode("read"));
+  tabLearn.addEventListener("click", () => setMode("learn"));
+  // arrow-key navigation between tabs
+  [tabRead, tabLearn].forEach((t, i, arr) => {
+    t.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        const next = arr[(i + (e.key === "ArrowRight" ? 1 : arr.length - 1)) % arr.length];
+        next.focus();
+        setMode(next === tabRead ? "read" : "learn");
+      }
+    });
+  });
+
+  /* ============================================================
+     7. Theme toggle (System / Light / Dark). localStorage is local
+        storage only — no network. Guarded for privacy modes.
+     ============================================================ */
+  const themeBtn = document.getElementById("themeBtn");
+  const themeLbl = document.getElementById("themeLbl");
+  const ORDER = ["system", "light", "dark"];
+  const LABELS = { system: "System", light: "Light", dark: "Dark" };
+  let theme = "system";
+  try { theme = localStorage.getItem("captioneer-theme") || "system"; } catch (e) {}
+  if (ORDER.indexOf(theme) === -1) theme = "system";
+
+  function applyTheme() {
+    if (theme === "system") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", theme);
+    themeLbl.textContent = LABELS[theme];
+    themeBtn.setAttribute("aria-label", "Color theme: " + LABELS[theme] + ". Click to change.");
+  }
+  themeBtn.addEventListener("click", () => {
+    theme = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
+    try { localStorage.setItem("captioneer-theme", theme); } catch (e) {}
+    applyTheme();
+  });
+  applyTheme();
+
+  /* ============================================================
+     8. Boot
+     ============================================================ */
+  buildLegend();
+  input.value = EXAMPLES.specimen;
+  update();
+})();
+</script>
+</body>
+</html>
