@@ -15,6 +15,14 @@
     "README.md"
   ],
   "homepage": "https://captioneer.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cambridgetcg/captioneer-spec.git",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "captioneer",
     "rhetoric",

@@ -12,19 +12,24 @@
  *   captioneer --max 8 comms/*.md        # exit 1 if any file exceeds 8 tells/100 words
  */
 import { readFileSync } from "node:fs";
-// Relative imports so the CLI runs from a raw checkout with zero install.
-// (When published to npm, these become the bare specifiers "@captioneer/core"
-// and "@captioneer/core/sarif", declared in this package's dependencies.)
-import { analyze } from "../core/index.mjs";
-import { toSarif } from "../core/sarif.mjs";
+import { createRequire } from "node:module";
 
 const VERSION = "0.1.0";
 
+/* Load dependencies so the CLI works BOTH published (bare specifiers resolve
+   to the installed @captioneer packages) AND from a raw checkout with no
+   install (fall back to the sibling packages). No pre-publish edit needed. */
+async function loadCore() {
+  try { return await import("@captioneer/core"); }
+  catch { return await import("../core/index.mjs"); }
+}
+async function loadSarif() {
+  try { return await import("@captioneer/core/sarif"); }
+  catch { return await import("../core/sarif.mjs"); }
+}
 function loadDefaultRules() {
-  // Resolve @captioneer/rules-en relative to this file so the CLI works
-  // from a checkout as well as an install.
-  const url = new URL("../rules-en/rules.json", import.meta.url);
-  return JSON.parse(readFileSync(url));
+  try { return createRequire(import.meta.url)("@captioneer/rules-en"); }
+  catch { return JSON.parse(readFileSync(new URL("../rules-en/rules.json", import.meta.url))); }
 }
 
 const HELP = `captioneer ${VERSION} — read the subtext
@@ -111,6 +116,9 @@ async function main() {
     process.stderr.write("no input. Pass files or pipe text on stdin. Try --help.\n");
     return 2;
   }
+
+  const { analyze } = await loadCore();
+  const { toSarif } = await loadSarif();
 
   const c = C(o.color && process.stdout.isTTY && !o.json && !o.sarif);
   const results = inputs.map((i) => ({ name: i.name, result: analyze(i.text, { rules }) }));

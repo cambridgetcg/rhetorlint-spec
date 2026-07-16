@@ -16,6 +16,14 @@
     "@captioneer/rules-en": "0.1.0"
   },
   "homepage": "https://captioneer.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cambridgetcg/captioneer-spec.git",
+    "directory": "packages/cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "captioneer",
     "cli",
