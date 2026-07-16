@@ -44,9 +44,12 @@ node scripts/demo.mjs
 ## Use it in code
 
 ```js
+import { createRequire } from "node:module";
 import { analyze } from "@captioneer/core";
 import { toSarif } from "@captioneer/core/sarif";
-import rules from "@captioneer/rules-en" assert { type: "json" };
+
+const require = createRequire(import.meta.url);
+const rules = require("@captioneer/rules-en");
 
 const result = analyze("Mistakes were made.", { rules });
 // -> { captioneer:"0.1", density:{tells:1, per100Words:33.3}, marks:[…], strip:"[who?] Mistakes were made." }
