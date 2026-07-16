@@ -1,5 +1,5 @@
 /**
- * @captioneer/core — a reference implementation of the Captioneer spec.
+ * @rhetorlint/core — a reference implementation of the RhetorLint spec.
  *
  * Marks countable rhetorical tells in the WORDS of a passage, reports a
  * density metric, and produces a deterministic de-spun "strip". It runs
@@ -18,7 +18,7 @@
  */
 
 export const SPEC_VERSION = "0.1";
-const NAME = "@captioneer/core";
+const NAME = "@rhetorlint/core";
 const CORE_VERSION = "0.1.0";
 
 /** Words the -ed/-en passive heuristic should treat as predicate adjectives, not passives. */
@@ -92,7 +92,7 @@ function countWords(text) {
 const REMOVABLE = new Set(["intensifier.loaded", "hedge.deniable"]);
 
 /**
- * analyze(text, options) -> a Captioneer result object (see the spec).
+ * analyze(text, options) -> a RhetorLint result object (see the spec).
  *
  * options:
  *   rules    the rule pack ({ id, version, locale, rules }). Required.
@@ -142,7 +142,7 @@ export function analyze(text, options = {}) {
   }
 
   return {
-    captioneer: SPEC_VERSION,
+    rhetorlint: SPEC_VERSION,
     source: { chars: text.length, words, locale: options.locale || pack.locale || "en" },
     density: { tells: deduped.length, per100Words: per100 },
     marks: deduped,

@@ -1,5 +1,5 @@
 {
-  "id": "@captioneer/rules-en",
+  "id": "@rhetorlint/rules-en",
   "version": "0.1.0",
   "locale": "en",
   "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml.",
@@ -84,7 +84,7 @@
     {
       "ruleId": "agency-hiding.deleted-subject",
       "family": "agency-hiding",
-      "technique": "Obfuscation (structural — captioneer extension)",
+      "technique": "Obfuscation (structural — RhetorLint extension)",
       "type": "structural",
       "detector": "agentless-passive",
       "level": "warning",

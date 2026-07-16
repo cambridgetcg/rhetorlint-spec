@@ -1,4 +1,4 @@
-# The Captioneer Spec
+# The RhetorLint Spec
 
 Two files, language-agnostic. This is the framework; engines are implementations of it.
 
@@ -17,13 +17,13 @@ Every implementation, in any language, emits this one JSON shape:
 
 ```jsonc
 {
-  "captioneer": "0.1",
+  "rhetorlint": "0.1",
   "source":  { "chars": 118, "words": 18, "locale": "en" },
   "density": { "tells": 4, "per100Words": 22.2 },   // the headline metric
   "marks": [{
     "ruleId":   "agency-hiding.deleted-subject",     // family.tell
     "family":   "agency-hiding",                     // one of 7 (6 SemEval parents + agency-hiding)
-    "technique":"Obfuscation (structural — captioneer extension)",
+    "technique":"Obfuscation (structural — RhetorLint extension)",
     "actual":   "were made",                         // the visible phrase
     "position": { "start": { "offset": 60 }, "end": { "offset": 69 } },
     "note":     "an agentless passive — who acted is deleted",
@@ -33,7 +33,7 @@ Every implementation, in any language, emits this one JSON shape:
   }],
   "strip":   "…deterministic de-spun text…",
   "rewrite": null,                                    // only non-null with a model adapter
-  "engine":  { "name": "@captioneer/core", "version": "0.1.0", "rules": "@captioneer/rules-en@0.1.0" }
+  "engine":  { "name": "@rhetorlint/core", "version": "0.1.0", "rules": "@rhetorlint/rules-en@0.1.0" }
 }
 ```
 
@@ -47,8 +47,8 @@ Every implementation, in any language, emits this one JSON shape:
 
 ### Interop
 
-The result is designed to convert cleanly to [SARIF 2.1.0](https://sarifweb.azurewebsites.net/) (see `@captioneer/core/sarif`). It is deliberately *not* [ClaimReview](https://schema.org/ClaimReview): Captioneer analyzes rhetoric in text, it does not rate the truth of a claim. The two are complementary, not the same layer.
+The result is designed to convert cleanly to [SARIF 2.1.0](https://sarifweb.azurewebsites.net/) (see `@rhetorlint/core/sarif`). It is deliberately *not* [ClaimReview](https://schema.org/ClaimReview): RhetorLint analyzes rhetoric in text, it does not rate the truth of a claim. The two are complementary, not the same layer.
 
 ## Versioning
 
-`captioneer` in the output is the spec version (semver). `0.x` may change shapes; `1.0` will freeze the result object and the family enum.
+`rhetorlint` in the output is the spec version (semver). `0.x` may change shapes; `1.0` will freeze the result object and the family enum.

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Captioneer — read the subtext",
+  "name": "RhetorLint — read the subtext",
   "version": "0.1.0",
   "description": "Select text on any page and mark the rhetorical tells — hedges, absolutes, deleted subjects, spin. On-device; nothing leaves your browser.",
   "content_scripts": [
@@ -14,11 +14,11 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Captioneer — mark the selection (Alt+Shift+C)"
+    "default_title": "RhetorLint — mark the selection (Alt+Shift+R)"
   },
   "commands": {
-    "captioneer-run": {
-      "suggested_key": { "default": "Alt+Shift+C" },
+    "rhetorlint-run": {
+      "suggested_key": { "default": "Alt+Shift+R" },
       "description": "Mark the current selection"
     }
   },

@@ -13,11 +13,11 @@ function run(args, input) {
   return spawnSync("node", [CLI, ...args], { input, encoding: "utf8" });
 }
 
-test("stdin + --json emits a valid Captioneer result", () => {
+test("stdin + --json emits a valid RhetorLint result", () => {
   const r = run(["--json"], SPECIMEN);
   assert.equal(r.status, 0);
   const out = JSON.parse(r.stdout);
-  assert.equal(out.captioneer, "0.1");
+  assert.equal(out.rhetorlint, "0.1");
   assert.equal(out.density.tells, 4);
   assert.ok(out.marks.some((m) => m.ruleId === "agency-hiding.deleted-subject"));
 });

@@ -1,5 +1,5 @@
 # ============================================================================
-# captioneer taxonomy — the human-readable core of the spec
+# RhetorLint taxonomy — the human-readable core of the spec
 # ============================================================================
 #
 # This ONE file does two jobs at once:
@@ -18,16 +18,16 @@
 # ----------------------------------------------------------------------------
 # THE REFUSAL STANCE — read this before you read anything else.
 # ----------------------------------------------------------------------------
-# captioneer marks tells in the WORDS. That is all it does.
+# RhetorLint marks tells in the WORDS. That is all it does.
 #   * It does NOT read the person. A tell is a property of the sentence, never a
 #     claim about the speaker's mind, motive, or honesty.
 #   * It does NOT detect lies. A marked passage may be perfectly true; an unmarked
-#     one may be false. captioneer measures how the language is BUILT, not whether
+#     one may be false. RhetorLint measures how the language is BUILT, not whether
 #     the claim is correct.
 #   * `confidence` is a language-pattern likelihood, NOT a probability that anyone
 #     is deceiving you. It errs toward under-marking.
 # Every mark points at a phrase a reader can see and re-read for themselves. If a
-# pattern would require guessing at intent, captioneer leaves it unmarked.
+# pattern would require guessing at intent, RhetorLint leaves it unmarked.
 #
 # ----------------------------------------------------------------------------
 # PROVENANCE — why this is classroom-defensible.
@@ -44,7 +44,7 @@
 #   * SemEval-2023 Task 3 (Piskorski et al.) — re-expanded to the 23 fine / 6
 #     coarse taxonomy this file aligns to.
 #
-# Two families/tells are captioneer's OWN structural extension, NOT in SemEval,
+# Two families/tells are RhetorLint's OWN structural extension, NOT in SemEval,
 # and are labelled as such: the `agency-hiding` family, and the
 # `contrition.rehearsed` tell. Each is mapped to its nearest SemEval kin so the
 # map stays honest.
@@ -133,7 +133,7 @@ families:
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation (unnamed source; cf. Justification › Appeal to Authority for a named one)"
 
       - id: contrition.rehearsed
-        semeval_technique: "(captioneer extension)"
+        semeval_technique: "(RhetorLint extension)"
         # STRUCTURAL EXTENSION — not a SemEval technique. Nearest SemEval kin below.
         what: "The shape of an apology with the substance removed — corporate boilerplate that performs concern without admitting a specific fault or naming a specific fix."
         why_it_works: "It discharges the social debt of an apology while conceding nothing, so the reader's urge to be satisfied is met before any accountability lands."
@@ -141,7 +141,7 @@ families:
           - marked: "We take your security seriously and apologize for any inconvenience"
             tell: "we take your security seriously"
             plain: "We stored passwords in plain text for three years. They are now hashed, and we've hired an external auditor."
-        lineage: "captioneer extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
+        lineage: "RhetorLint extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
 
   # ==========================================================================
   # 2. SIMPLIFICATION  — collapsing a complex reality into one option / cause / certainty
@@ -157,7 +157,7 @@ families:
         semeval_technique: "False Dilemma or No Choice"   # rules-en rule string: "False Dilemma / No Choice"
         # The marked words split two ways: "only option / no choice" is squarely
         # False Dilemma; "obviously / everyone knows / undeniable" also brushes
-        # SemEval's Conversation Killer (thought-terminating). captioneer marks the
+        # SemEval's Conversation Killer (thought-terminating). RhetorLint marks the
         # visible absolute either way.
         what: "An absolute — always / never / everyone / obviously / the only option — that claims more than anyone could know, or flattens the choices to one."
         why_it_works: "A universal can't be argued with in detail, and 'everyone knows' reframes disagreement as ignorance; 'no other choice' simply deletes the alternatives from view."
@@ -201,7 +201,7 @@ families:
     semeval_parent: "Attack on Reputation"
     what: "Undermining the person or group making a claim instead of engaging with the claim itself."
     status: "(no seed rule yet)"
-    why_not_seeded: "Reputation attacks usually need a target and context to be read correctly ('is this a slur or a description?'). That is exactly the intent-modelling captioneer's deterministic, words-only core refuses to do, so these await a carefully-scoped pack."
+    why_not_seeded: "Reputation attacks usually need a target and context to be read correctly ('is this a slur or a description?'). That is exactly the intent-modelling RhetorLint's deterministic, words-only core refuses to do, so these await a carefully-scoped pack."
     semeval_techniques:
       - name: "Name Calling or Labelling"
         what: "Pinning a loaded label on the target so the label does the arguing."
@@ -223,7 +223,7 @@ families:
     semeval_parent: "Justification"
     what: "Backing a claim with an outside appeal — authority, the crowd, shared values, fear, or the flag — in place of evidence."
     status: "(no seed rule yet)"
-    note: "captioneer's weasel.attribution touches SemEval's Appeal to Authority, but files it as a wording tell under manipulative-wording. A dedicated justification pack (crowd, values, fear, flag) is future work."
+    note: "RhetorLint's weasel.attribution touches SemEval's Appeal to Authority, but files it as a wording tell under manipulative-wording. A dedicated justification pack (crowd, values, fear, flag) is future work."
     semeval_techniques:
       - name: "Flag Waving"
         what: "Riding group loyalty or patriotism to carry the claim."
@@ -256,17 +256,17 @@ families:
 
   # ==========================================================================
   # 7. AGENCY-HIDING  — grammar that deletes who did the thing
-  #    CAPTIONEER STRUCTURAL EXTENSION — not a SemEval family.
+  #    RHETORLINT STRUCTURAL EXTENSION — not a SemEval family.
   # ==========================================================================
   - id: agency-hiding
-    semeval_parent: "(captioneer extension — not in SemEval)"
+    semeval_parent: "(RhetorLint extension — not in SemEval)"
     what: "Sentence structure that removes the actor: the harm is described, but who chose it is gone."
-    why_extension: "SemEval's taxonomy is lexical/rhetorical; captioneer adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar, so it earns its own family."
+    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar, so it earns its own family."
     seeded_tells: 1
     tells:
 
       - id: agency-hiding.deleted-subject
-        semeval_technique: "(captioneer extension)"
+        semeval_technique: "(RhetorLint extension)"
         what: "An agentless passive — 'mistakes were made', 'your account was closed' — a sentence whose grammar has no subject, so who acted has been deleted."
         why_it_works: "No actor, no accountability: the harm reads like weather that simply happened rather than a choice a specific someone made."
         examples:
@@ -276,4 +276,4 @@ families:
           - marked: "Your data was shared with partners"
             tell: "was shared"
             plain: "We shared your data with 12 advertising partners."
-        lineage: "captioneer structural extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
+        lineage: "RhetorLint structural extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"

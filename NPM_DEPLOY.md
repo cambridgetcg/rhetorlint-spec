@@ -1,4 +1,4 @@
-# Publishing `@captioneer/*` to npm — a guide for the deploying agent
+# Publishing `@rhetorlint/*` to npm — a guide for the deploying agent
 
 You are on the device that holds the npm org's publish token. Your job: publish
 three packages from this repo to npm, in the right order, and verify them. This
@@ -8,12 +8,12 @@ The three packages that publish (nothing else does):
 
 | order | package | depends on |
 |------|---------|-----------|
-| 1 | `@captioneer/core` | — |
-| 2 | `@captioneer/rules-en` | — |
-| 3 | `@captioneer/cli` | core@0.1.0, rules-en@0.1.0 (must be live first) |
+| 1 | `@rhetorlint/core` | — |
+| 2 | `@rhetorlint/rules-en` | — |
+| 3 | `@rhetorlint/cli` | core@0.1.0, rules-en@0.1.0 (must be live first) |
 
 `apps/explorer` and `apps/widget` are **not** npm packages (they're the site and
-the browser extension). The repo root `captioneer-spec` is `"private": true` and
+the browser extension). The repo root `rhetorlint-spec` is `"private": true` and
 never publishes.
 
 ---
@@ -21,29 +21,24 @@ never publishes.
 ## 0 · Get the exact code
 
 ```bash
-git clone https://github.com/cambridgetcg/captioneer-spec.git   # or: cd captioneer-spec && git pull
-cd captioneer-spec
+git clone https://github.com/cambridgetcg/rhetorlint-spec.git   # or: cd rhetorlint-spec && git pull
+cd rhetorlint-spec
 npm test                           # MUST print: pass 23, fail 0. Do not publish if red.
 ```
 
 ## 1 · Match the scope to the org name  ⚠️ read this before anything else
 
-The packages are named `@captioneer/core`, `@captioneer/rules-en`,
-`@captioneer/cli`. **The `@captioneer` scope must equal the npm org's name.**
+The packages are named `@rhetorlint/core`, `@rhetorlint/rules-en`,
+`@rhetorlint/cli`. **The `@rhetorlint` scope must equal the npm org's name.**
 
-- If you created the org as **`captioneer`** → nothing to change, skip to step 2.
-- If the org has a **different** name (say `@acme`) → rename the scope everywhere:
+- If you created the org as **`rhetorlint`** → nothing to change, skip to step 2.
+- If the org has a **different** name → stop. The scope is part of package
+  manifests, dependencies, imports, runtime metadata, generated browser assets,
+  documentation, and the publisher. Migrate it as one reviewed repository change,
+  rebuild the widget, rerun the full release checks, then commit and push before
+  publishing. Do not patch only the manifests at deploy time.
 
-  ```bash
-  # replace @captioneer with your real @scope across the repo
-  SCOPE=@acme
-  grep -rl '@captioneer/' --include=package.json --include=*.mjs --include=*.md . \
-    | xargs sed -i '' "s|@captioneer/|$SCOPE/|g"     # macOS sed; on Linux use: sed -i
-  npm test                                             # re-run: still 23/23
-  ```
-  Then commit that rename and push, so both devices agree on the scope.
-
-> The command-line binary stays `captioneer` regardless of the scope — that's the
+> The command-line binary stays `rhetorlint` regardless of the scope — that's the
 > `bin` name, independent of the package name.
 
 ## 2 · Authenticate as a publisher in the org
@@ -52,7 +47,7 @@ Use the org's token that lives on this device. Either:
 
 ```bash
 npm login          # interactive, if this device can do a browser/OTP flow
-# — OR — a granular token scoped to @captioneer with write + bypass 2FA:
+# — OR — a granular token scoped to @rhetorlint with write + bypass 2FA:
 npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"   # do NOT commit this
 ```
 
@@ -74,9 +69,9 @@ npm org ls <org-name> 2>/dev/null || true   # you should appear as a member
 ## 3 · Dry-run each package (see exactly what ships)
 
 ```bash
-npm publish --dry-run -w @captioneer/core
-npm publish --dry-run -w @captioneer/rules-en
-npm publish --dry-run -w @captioneer/cli
+npm publish --dry-run -w @rhetorlint/core
+npm publish --dry-run -w @rhetorlint/rules-en
+npm publish --dry-run -w @rhetorlint/cli
 ```
 
 Confirm the tarball contents are only the intended files:
@@ -102,25 +97,25 @@ For a granular token that already has write access plus bypass 2FA, the direct
 equivalent is:
 
 ```bash
-npm publish -w @captioneer/core
-npm publish -w @captioneer/rules-en
+npm publish -w @rhetorlint/core
+npm publish -w @rhetorlint/rules-en
 # only after the two above succeed and are visible:
-npm publish -w @captioneer/cli
+npm publish -w @rhetorlint/cli
 ```
 
-If `npm view @captioneer/core version` doesn't yet return `0.1.0`, wait a few
+If `npm view @rhetorlint/core version` doesn't yet return `0.1.0`, wait a few
 seconds before publishing the CLI (it resolves core + rules-en at install time).
 
 ## 5 · Verify the real install path (the important test)
 
-This proves the published CLI resolves `@captioneer/core` and `@captioneer/rules-en`
+This proves the published CLI resolves `@rhetorlint/core` and `@rhetorlint/rules-en`
 as installed packages — the exact thing the code was written to handle:
 
 ```bash
 cd "$(mktemp -d)" && npm init -y >/dev/null
-npm i @captioneer/cli
-npx captioneer --version                 # -> 0.1.0
-echo "We take your privacy extremely seriously, and mistakes were made." | npx captioneer --json
+npm i @rhetorlint/cli
+npx rhetorlint --version                 # -> 0.1.0
+echo "We take your privacy extremely seriously, and mistakes were made." | npx rhetorlint --json
 # expect: valid JSON with density.tells >= 2 and an "agency-hiding.deleted-subject" mark
 ```
 
@@ -133,8 +128,8 @@ cd -                                     # back to the repo
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
-Then tell Yu: the three package versions now live (`npm view @captioneer/core version`
-etc.) and the install-path check passed. Paste the `npx captioneer` output as proof.
+Then tell Yu: the three package versions now live (`npm view @rhetorlint/core version`
+etc.) and the install-path check passed. Paste the `npx rhetorlint` output as proof.
 
 ---
 
@@ -143,8 +138,8 @@ etc.) and the install-path check passed. Paste the `npx captioneer` output as pr
 - **You cannot re-publish the same version.** If something's wrong after publish,
   bump to `0.1.1` and republish — do not rely on `npm unpublish` (npm blocks it
   after 72h and when anything depends on the package). To warn users off a bad
-  build: `npm deprecate @captioneer/core@0.1.0 "use 0.1.1"`.
-- **Publish order matters** only because `@captioneer/cli` depends on the other
+  build: `npm deprecate @rhetorlint/core@0.1.0 "use 0.1.1"`.
+- **Publish order matters** only because `@rhetorlint/cli` depends on the other
   two. core and rules-en are independent.
 - **Provenance** (optional, nice-to-have): from GitHub Actions with OIDC you can add
   `--provenance` for a verified supply-chain badge. Not needed for this first manual

@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
- * captioneer — read the subtext from the command line.
+ * rhetorlint — read the subtext from the command line.
  *
  * Marks rhetorical tells in text files or stdin, on-device, zero deps.
- * Emits a human report, the Captioneer JSON, or SARIF; can gate CI on a
+ * Emits a human report, the RhetorLint JSON, or SARIF; can gate CI on a
  * spin-density threshold. It reads the words, never the person.
  *
- *   captioneer statement.txt
- *   captioneer --json < speech.md
- *   captioneer --sarif press-release.txt > captioneer.sarif
- *   captioneer --max 8 comms/*.md        # exit 1 if any file exceeds 8 tells/100 words
+ *   rhetorlint statement.txt
+ *   rhetorlint --json < speech.md
+ *   rhetorlint --sarif press-release.txt > rhetorlint.sarif
+ *   rhetorlint --max 8 comms/*.md        # exit 1 if any file exceeds 8 tells/100 words
  */
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -17,31 +17,31 @@ import { createRequire } from "node:module";
 const VERSION = "0.1.0";
 
 /* Load dependencies so the CLI works BOTH published (bare specifiers resolve
-   to the installed @captioneer packages) AND from a raw checkout with no
+   to the installed @rhetorlint packages) AND from a raw checkout with no
    install (fall back to the sibling packages). No pre-publish edit needed. */
 async function loadCore() {
-  try { return await import("@captioneer/core"); }
+  try { return await import("@rhetorlint/core"); }
   catch { return await import("../core/index.mjs"); }
 }
 async function loadSarif() {
-  try { return await import("@captioneer/core/sarif"); }
+  try { return await import("@rhetorlint/core/sarif"); }
   catch { return await import("../core/sarif.mjs"); }
 }
 function loadDefaultRules() {
-  try { return createRequire(import.meta.url)("@captioneer/rules-en"); }
+  try { return createRequire(import.meta.url)("@rhetorlint/rules-en"); }
   catch { return JSON.parse(readFileSync(new URL("../rules-en/rules.json", import.meta.url))); }
 }
 
-const HELP = `captioneer ${VERSION} — read the subtext
+const HELP = `rhetorlint ${VERSION} — read the subtext
 
 Usage:
-  captioneer [options] [files...]        analyze files, or stdin if none
+  rhetorlint [options] [files...]        analyze files, or stdin if none
 
 Options:
-  --json            emit the Captioneer JSON result
+  --json            emit the RhetorLint JSON result
   --sarif           emit SARIF 2.1.0 (for editors / CI / code-scanning)
   --max <n>         exit 1 if tells-per-100-words exceeds n (a CI spin-gate)
-  --rules <path>    use a custom rule pack instead of @captioneer/rules-en
+  --rules <path>    use a custom rule pack instead of @rhetorlint/rules-en
   --quiet           suppress the human report (useful with --max)
   --no-color        disable ANSI color
   -v, --version     print version

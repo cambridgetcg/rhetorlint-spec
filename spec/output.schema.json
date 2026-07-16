@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://captioneer.io/spec/0.1/output.schema.json",
-  "title": "Captioneer Analysis Result",
-  "description": "The result of analyzing a passage of text for rhetorical tells. Captioneer marks countable manipulation in the WORDS; it never claims to read the person, and it never adjudicates whether a claim is factually true.",
+  "$id": "https://raw.githubusercontent.com/cambridgetcg/rhetorlint-spec/main/spec/output.schema.json",
+  "title": "RhetorLint Analysis Result",
+  "description": "The result of analyzing a passage of text for rhetorical tells. RhetorLint marks countable manipulation in the WORDS; it never claims to read the person, and it never adjudicates whether a claim is factually true.",
   "type": "object",
-  "required": ["captioneer", "source", "density", "marks"],
+  "required": ["rhetorlint", "source", "density", "marks"],
   "additionalProperties": false,
   "properties": {
-    "captioneer": {
+    "rhetorlint": {
       "type": "string",
       "description": "Spec/schema version (semver).",
       "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
@@ -67,7 +67,7 @@
         },
         "family": {
           "type": "string",
-          "description": "One coarse family. The six SemEval-2023 parents plus captioneer's structural extension.",
+          "description": "One coarse family. The six SemEval-2023 parents plus RhetorLint's structural extension.",
           "enum": [
             "manipulative-wording",
             "simplification",
@@ -108,7 +108,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "Rule-level confidence. Heuristic — not a probability of deception. Captioneer detects language patterns, not lies."
+          "description": "Rule-level confidence. Heuristic — not a probability of deception. RhetorLint detects language patterns, not lies."
         },
         "level": {
           "type": "string",

@@ -94,7 +94,7 @@ test("analyze() refuses to run without a rule pack", () => {
 test("result carries the shape the output schema requires", () => {
   const r = analyze(SPECIMEN, { rules: RULES });
   for (const key of SCHEMA.required) assert.ok(key in r, `missing required key '${key}'`);
-  assert.equal(r.captioneer, "0.1");
+  assert.equal(r.rhetorlint, "0.1");
   assert.ok(SCHEMA.$defs.mark.properties.family.enum.includes(r.marks[0].family));
   assert.ok(typeof r.engine.rules === "string" && r.engine.rules.includes("@"));
 });

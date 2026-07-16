@@ -24,9 +24,9 @@ fi
 npm test
 
 packages=(
-  '@captioneer/core:packages/core'
-  '@captioneer/rules-en:packages/rules-en'
-  '@captioneer/cli:packages/cli'
+  '@rhetorlint/core:packages/core'
+  '@rhetorlint/rules-en:packages/rules-en'
+  '@rhetorlint/cli:packages/cli'
 )
 
 for entry in "${packages[@]}"; do
@@ -64,4 +64,4 @@ for entry in "${packages[@]}"; do
 done
 
 print
-print "✓ Captioneer npm packages are live. Return to the deploying agent for clean-install verification and tagging."
+print "✓ RhetorLint npm packages are live. Return to the deploying agent for clean-install verification and tagging."

@@ -1,7 +1,7 @@
 {
-  "name": "@captioneer/core",
+  "name": "@rhetorlint/core",
   "version": "0.1.0",
-  "description": "Reference engine for the Captioneer spec: marks rhetorical tells in text, on-device, zero dependencies. Reads the language, never the person.",
+  "description": "Reference engine for the RhetorLint spec: marks rhetorical tells in text, on-device, zero dependencies. Reads the language, never the person.",
   "type": "module",
   "license": "MIT",
   "main": "index.mjs",
@@ -14,17 +14,17 @@
     "sarif.mjs",
     "README.md"
   ],
-  "homepage": "https://captioneer.io",
+  "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cambridgetcg/captioneer-spec.git",
+    "url": "git+https://github.com/cambridgetcg/rhetorlint-spec.git",
     "directory": "packages/core"
   },
   "publishConfig": {
     "access": "public"
   },
   "keywords": [
-    "captioneer",
+    "rhetorlint",
     "rhetoric",
     "manipulation-detection",
     "media-literacy",

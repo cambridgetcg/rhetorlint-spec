@@ -1,7 +1,7 @@
 {
-  "name": "@captioneer/rules-en",
+  "name": "@rhetorlint/rules-en",
   "version": "0.1.0",
-  "description": "English tell-pack for Captioneer: declarative rules for the families of rhetorical manipulation, aligned to the SemEval-2023 persuasion taxonomy.",
+  "description": "English tell-pack for RhetorLint: declarative rules for the families of rhetorical manipulation, aligned to the SemEval-2023 persuasion taxonomy.",
   "type": "module",
   "license": "MIT",
   "main": "rules.json",
@@ -12,17 +12,17 @@
     "rules.json",
     "README.md"
   ],
-  "homepage": "https://captioneer.io",
+  "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cambridgetcg/captioneer-spec.git",
+    "url": "git+https://github.com/cambridgetcg/rhetorlint-spec.git",
     "directory": "packages/rules-en"
   },
   "publishConfig": {
     "access": "public"
   },
   "keywords": [
-    "captioneer",
+    "rhetorlint",
     "rules",
     "rhetoric",
     "propaganda-techniques"

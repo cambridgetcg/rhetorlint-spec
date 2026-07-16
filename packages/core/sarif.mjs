@@ -1,9 +1,9 @@
 /**
- * toSarif(result) — convert a Captioneer result into SARIF 2.1.0.
+ * toSarif(result) — convert a RhetorLint result into SARIF 2.1.0.
  *
  * Lets marks flow into editors, CI, and code-scanning with no bespoke glue.
  * Honest caveat: SARIF has no native slot for the tells-per-100-words density
- * metric, so it rides in run.properties. Captioneer-JSON stays canonical;
+ * metric, so it rides in run.properties. RhetorLint-JSON stays canonical;
  * SARIF is a lossy-but-standard export ("SARIF-convertible", not "-native").
  */
 export function toSarif(result) {
@@ -54,15 +54,15 @@ export function toSarif(result) {
     $schema: "https://json.schemastore.org/sarif-2.1.0.json",
     runs: [{
       tool: { driver: {
-        name: (result.engine && result.engine.name) || "captioneer",
+        name: (result.engine && result.engine.name) || "rhetorlint",
         version: (result.engine && result.engine.version) || "0.0.0",
-        informationUri: "https://captioneer.io",
+        informationUri: "https://github.com/cambridgetcg/rhetorlint-spec",
         rules: [...byRule.values()]
       }},
       results,
       properties: {
         density: result.density,
-        note: "Captioneer marks rhetorical tells in the words; it does not adjudicate factual truth or infer intent."
+        note: "RhetorLint marks rhetorical tells in the words; it does not adjudicate factual truth or infer intent."
       }
     }]
   };

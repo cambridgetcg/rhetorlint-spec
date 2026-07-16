@@ -1,7 +1,7 @@
-/* Captioneer widget panel — the in-page UI.
+/* RhetorLint widget panel — the in-page UI.
  *
  * Depends on `analyze`, `strip` and `RULES` being in scope (the build step
- * prepends the real @captioneer/core engine and the rule pack). It reads the
+ * prepends the real @rhetorlint/core engine and the rule pack). It reads the
  * current text selection, marks the tells, and shows them in a floating panel
  * rendered in a Shadow DOM so no page styles leak in or out.
  *
@@ -86,9 +86,9 @@ const CAP_CSS = `
 `;
 
 function capShow(result, selectedText) {
-  document.getElementById("captioneer-widget-host")?.remove();
+  document.getElementById("rhetorlint-widget-host")?.remove();
   const host = document.createElement("div");
-  host.id = "captioneer-widget-host";
+  host.id = "rhetorlint-widget-host";
   const root = host.attachShadow({ mode: "open" });
   const d = result.density;
   const marksHtml = result.marks.length
@@ -102,9 +102,9 @@ function capShow(result, selectedText) {
     : `<p class="cap-empty">No tells found. The language is doing what it says.</p>`;
 
   root.innerHTML = `<style>${CAP_CSS}</style>
-    <div class="cap-wrap" role="dialog" aria-label="Captioneer reading">
+    <div class="cap-wrap" role="dialog" aria-label="RhetorLint reading">
       <div class="cap-head">
-        <div class="cap-title">Captioneer <small>reads the words, not the person</small></div>
+        <div class="cap-title">RhetorLint <small>reads the words, not the person</small></div>
         <button class="cap-x" aria-label="Close">✕</button>
       </div>
       <div class="cap-body">

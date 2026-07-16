@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Captioneer · Read the subtext</title>
-<meta name="description" content="Captioneer marks countable rhetorical tells in the words of a passage. Heuristic, on-device, private. No network, no fonts or images loaded from anywhere.">
+<title>RhetorLint · Read the subtext</title>
+<meta name="description" content="RhetorLint marks countable rhetorical tells in the words of a passage. Heuristic, on-device, private. No network, no fonts or images loaded from anywhere.">
 <style>
   /* ============================================================
-     Captioneer explorer — editor's proof sheet.
+     RhetorLint explorer — editor's proof sheet.
      Fully self-contained: system fonts only, no network, no CDNs.
      Tokens drive both light and dark; family colors are hue-driven.
      ============================================================ */
@@ -414,10 +414,10 @@
 <div class="wrap">
   <header class="masthead">
     <div class="kicker">
-      <span class="dot">&#9679;</span> Captioneer &middot; the learning wing
+      <span class="dot">&#9679;</span> RhetorLint &middot; the learning wing
       <span class="spec" id="specTag">spec 0.1</span>
     </div>
-    <h1 class="title">Captioneer <span class="mid">&middot;</span> Read the subtext</h1>
+    <h1 class="title">RhetorLint <span class="mid">&middot;</span> Read the subtext</h1>
     <p class="lede">It marks countable rhetorical tells in the <em>words</em> of a passage &mdash; loaded intensifiers, rehearsed contrition, deleted subjects &mdash; and reports how thickly the text is spun. Heuristic. On-device. It never reads the person.</p>
 
     <div class="controls">
@@ -488,19 +488,19 @@
         <li><span class="yn no">DOES&nbsp;NOT</span><span>Judge whether a claim is <b>factually true</b>. That is your job, and the world's &mdash; not a pattern-matcher's.</span></li>
         <li><span class="yn yes">DOES</span><span>Report <b>confidence as heuristic</b> &mdash; a language-pattern likelihood, never a probability that anyone is lying.</span></li>
       </ul>
-      <p class="foot">A high density means the language is thickly styled, not that the speaker is dishonest. Honest people use hedges; liars sometimes speak plainly. Captioneer gives you a lens, not a verdict.</p>
+      <p class="foot">A high density means the language is thickly styled, not that the speaker is dishonest. Honest people use hedges; liars sometimes speak plainly. RhetorLint gives you a lens, not a verdict.</p>
     </div>
 
     <div class="card">
       <p class="sect-label">The taxonomy &mdash; families &amp; tells</p>
-      <p class="fam-desc">Seven coarse families: the six SemEval-2023 persuasion parents plus Captioneer's structural <em>agency-hiding</em> extension. This pack (<span class="rid" id="packId">rules-en</span>) ships rules for four of them today; the rest are defined and awaiting rules.</p>
+      <p class="fam-desc">Seven coarse families: the six SemEval-2023 persuasion parents plus RhetorLint's structural <em>agency-hiding</em> extension. This pack (<span class="rid" id="packId">rules-en</span>) ships rules for four of them today; the rest are defined and awaiting rules.</p>
       <div id="learn"></div>
     </div>
   </section>
 
   <footer class="foot">
     <p class="prov" id="prov">engine &middot; rules</p>
-    <p>Captioneer marks language patterns. It does not detect lies, read intent, or verify facts. Confidence is <b>heuristic</b>. This page makes no accuracy claims &mdash; it is a reading aid, not a truth machine. Built to run entirely on your device.</p>
+    <p>RhetorLint marks language patterns. It does not detect lies, read intent, or verify facts. Confidence is <b>heuristic</b>. This page makes no accuracy claims &mdash; it is a reading aid, not a truth machine. Built to run entirely on your device.</p>
   </footer>
 </div>
 
@@ -513,7 +513,7 @@
         so regex sources are byte-identical to the Node engine).
      ============================================================ */
   const RULES = {
-    "id": "@captioneer/rules-en",
+    "id": "@rhetorlint/rules-en",
     "version": "0.1.0",
     "locale": "en",
     "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml.",
@@ -598,7 +598,7 @@
       {
         "ruleId": "agency-hiding.deleted-subject",
         "family": "agency-hiding",
-        "technique": "Obfuscation (structural — captioneer extension)",
+        "technique": "Obfuscation (structural — RhetorLint extension)",
         "type": "structural",
         "detector": "agentless-passive",
         "level": "warning",
@@ -614,7 +614,7 @@
         Same logic, same behavior; only `export` keywords dropped.
      ============================================================ */
   const SPEC_VERSION = "0.1";
-  const NAME = "@captioneer/core";
+  const NAME = "@rhetorlint/core";
   const CORE_VERSION = "0.1.0";
 
   const NOT_PASSIVE = new Set([
@@ -718,7 +718,7 @@
     }
 
     return {
-      captioneer: SPEC_VERSION,
+      rhetorlint: SPEC_VERSION,
       source: { chars: text.length, words, locale: options.locale || pack.locale || "en" },
       density: { tells: deduped.length, per100Words: per100 },
       marks: deduped,
@@ -764,7 +764,7 @@
     { id: "call", label: "Call", planned: true,
       desc: "Pushes the audience to act or feel right now — slogans, 'act now', us-vs-them appeals." },
     { id: "agency-hiding", label: "Agency-hiding", planned: false,
-      desc: "Deletes who acted — agentless passives where the subject is missing. Captioneer's structural extension to the SemEval taxonomy." }
+      desc: "Deletes who acted — agentless passives where the subject is missing. RhetorLint's structural extension to the SemEval taxonomy." }
   ];
 
   // One worked example per rule. Each is run through the SAME engine at
@@ -894,7 +894,7 @@
       if (!rules.length) {
         html += '<p class="planned-body">Defined in the taxonomy; no rules in ' +
                 escapeHtml(RULES.id + "@" + RULES.version) +
-                ' yet. When Captioneer earns a rule that points at a visible phrase without over-marking, it will land here.</p>';
+                ' yet. When RhetorLint earns a rule that points at a visible phrase without over-marking, it will land here.</p>';
       } else {
         for (const r of rules) {
           const ex = WORKED[r.ruleId] || "";
@@ -955,8 +955,8 @@
     stripEl.innerHTML = res.strip ? renderStrip(res.strip) : '<span class="none-msg">—</span>';
 
     document.getElementById("prov").textContent =
-      res.engine.name + "@" + res.engine.version + "  ·  rules " + res.engine.rules + "  ·  spec " + res.captioneer;
-    document.getElementById("specTag").textContent = "spec " + res.captioneer;
+      res.engine.name + "@" + res.engine.version + "  ·  rules " + res.engine.rules + "  ·  spec " + res.rhetorlint;
+    document.getElementById("specTag").textContent = "spec " + res.rhetorlint;
     document.getElementById("packId").textContent = RULES.id;
   }
 
@@ -1020,7 +1020,7 @@
   const ORDER = ["system", "light", "dark"];
   const LABELS = { system: "System", light: "Light", dark: "Dark" };
   let theme = "system";
-  try { theme = localStorage.getItem("captioneer-theme") || "system"; } catch (e) {}
+  try { theme = localStorage.getItem("rhetorlint-theme") || "system"; } catch (e) {}
   if (ORDER.indexOf(theme) === -1) theme = "system";
 
   function applyTheme() {
@@ -1031,7 +1031,7 @@
   }
   themeBtn.addEventListener("click", () => {
     theme = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
-    try { localStorage.setItem("captioneer-theme", theme); } catch (e) {}
+    try { localStorage.setItem("rhetorlint-theme", theme); } catch (e) {}
     applyTheme();
   });
   applyTheme();

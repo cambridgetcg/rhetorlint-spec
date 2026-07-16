@@ -1,6 +1,6 @@
-# @captioneer/rules-en
+# @rhetorlint/rules-en
 
-The English **tell-pack** for Captioneer: declarative rules for the families of rhetorical manipulation, aligned to the SemEval-2023 persuasion taxonomy. Data, not code — so any engine in any language can read it.
+The English **tell-pack** for RhetorLint: declarative rules for the families of rhetorical manipulation, aligned to the SemEval-2023 persuasion taxonomy. Data, not code — so any engine in any language can read it.
 
 ## Rule shape
 
@@ -8,7 +8,7 @@ The English **tell-pack** for Captioneer: declarative rules for the families of 
 {
   "ruleId": "agency-hiding.deleted-subject",
   "family": "agency-hiding",
-  "technique": "Obfuscation (structural — captioneer extension)",
+  "technique": "Obfuscation (structural — RhetorLint extension)",
   "type": "structural",
   "detector": "agentless-passive",
   "level": "warning",
@@ -26,7 +26,7 @@ The English **tell-pack** for Captioneer: declarative rules for the families of 
 | `pattern` | a regular expression | weasel attribution, whataboutism, rehearsed contrition |
 | `structural` | a named built-in `detector` (currently `agentless-passive`) | agency-hiding |
 
-Simple regex and word-lists cover most families. The structural check-type is what captioneer's deleted-subject / agency-hiding tells need — and the part that wants real grammar awareness over time.
+Simple regex and word-lists cover most families. The structural check-type is what RhetorLint's deleted-subject / agency-hiding tells need — and the part that wants real grammar awareness over time.
 
 ## The seed families
 
