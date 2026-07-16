@@ -90,8 +90,9 @@ scoped packages publish publicly without a flag.)
 ## 4 · Publish — in dependency order
 
 On a trusted interactive device where npm requires write-time 2FA, use the
-checked-in helper. It asks privately for a fresh OTP before each package and
-passes it only through that npm child's environment—not argv or config:
+checked-in helper. It keeps npm attached to the terminal so npm can run the
+account's configured security-key/passkey flow for each package. The helper
+never captures or transports the second factor:
 
 ```bash
 scripts/publish-npm-interactive.zsh

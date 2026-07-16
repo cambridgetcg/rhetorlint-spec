@@ -29,9 +29,6 @@ packages=(
   '@captioneer/cli:packages/cli'
 )
 
-otp=''
-trap 'unset otp' EXIT
-
 for entry in "${packages[@]}"; do
   name=${entry%%:*}
   package_dir=${entry#*:}
@@ -43,17 +40,11 @@ for entry in "${packages[@]}"; do
   fi
 
   print
-  read -r -s "otp?npm OTP for ${name}@${version}: "
-  print
-  if [[ -z "$otp" ]]; then
-    print -u2 "No OTP entered; stopping before ${name}."
-    exit 1
-  fi
-
-  # npm reads OTP from its scoped child environment. It never enters argv,
-  # shell history, a config file, or this repository.
-  npm_config_otp="$otp" npm publish --workspace "$name" --access public
-  unset otp
+  print "Publishing ${name}@${version}. Complete npm's security-key/passkey prompt in the browser."
+  # Keep npm attached to this real terminal so it can run the configured
+  # WebAuthn security-key flow (Touch ID, Face ID, phone passkey, or hardware
+  # key). The helper never captures or transports the second factor.
+  npm publish --workspace "$name" --access public
 
   visible=false
   for attempt in {1..30}; do
