@@ -54,11 +54,16 @@ const result = analyze("Mistakes were made.", { rules });
 const sarif = toSarif(result); // flows into editors, CI, code-scanning
 ```
 
-- **Readers** — an on-device browser widget: select text, see the marks. Nothing leaves your machine.
+- **Readers** — the [browser widget](apps/widget): select text on any page, press **Alt+Shift+C**, see the marks. On-device; nothing leaves your browser. (A zero-install bookmarklet too.)
 - **Developers** — `@captioneer/core` embeds anywhere JS runs (browser, Node, Deno), emits the versioned JSON.
-- **Comms & content teams** — a CLI "spin-check" in CI; SARIF surfaces marks in VS Code and GitHub.
+- **Comms & content teams** — the [`captioneer` CLI](packages/cli) as a spin-check in CI: `captioneer --max 8 comms/*.md` exits non-zero when a file is too thick with spin. `--sarif` surfaces marks in VS Code and GitHub code-scanning.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
+
+```bash
+echo "Mistakes were made." | npm run cli -- --json     # the CLI, on stdin
+npm run build:widget                                    # generate the extension + bookmarklet
+```
 
 ## What it refuses to do
 
@@ -76,8 +81,10 @@ The families map to the SemEval-2023 Task 3 persuasion inventory (Piskorski et a
 spec/            taxonomy.yaml · output.schema.json      the portable core
 packages/core/   index.mjs · sarif.mjs                    the reference engine
 packages/rules-en/ rules.json                             the English tell-pack
+packages/cli/    cli.mjs                                   the CLI (JSON/SARIF, CI spin-gate)
 apps/explorer/   index.html                               the learning wing (self-contained)
-test/            analyze.test.mjs                          proves the engine on real text
+apps/widget/     manifest.json · build.mjs · src/panel.js the browser widget (extension + bookmarklet)
+test/            *.test.mjs                                proves the engine, CLI, and widget build
 scripts/demo.mjs                                           a 20-line taste
 ```
 

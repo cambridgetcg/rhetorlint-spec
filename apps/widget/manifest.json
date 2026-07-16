@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Captioneer — read the subtext",
+  "version": "0.1.0",
+  "description": "Select text on any page and mark the rhetorical tells — hedges, absolutes, deleted subjects, spin. On-device; nothing leaves your browser.",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Captioneer — mark the selection (Alt+Shift+C)"
+  },
+  "commands": {
+    "captioneer-run": {
+      "suggested_key": { "default": "Alt+Shift+C" },
+      "description": "Mark the current selection"
+    }
+  },
+  "permissions": ["activeTab"]
+}

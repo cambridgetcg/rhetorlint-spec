@@ -1,0 +1,27 @@
+{
+  "name": "@captioneer/cli",
+  "version": "0.1.0",
+  "description": "Read the subtext from the command line: mark rhetorical tells in text, emit JSON or SARIF, gate CI on spin density.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "captioneer": "cli.mjs"
+  },
+  "files": [
+    "cli.mjs",
+    "README.md"
+  ],
+  "dependencies": {
+    "@captioneer/core": "0.1.0",
+    "@captioneer/rules-en": "0.1.0"
+  },
+  "homepage": "https://captioneer.io",
+  "keywords": [
+    "captioneer",
+    "cli",
+    "sarif",
+    "rhetoric",
+    "linter",
+    "ci"
+  ]
+}

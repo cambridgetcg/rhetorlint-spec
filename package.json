@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "test": "node --test 'test/*.test.mjs'",
-    "demo": "node scripts/demo.mjs"
+    "demo": "node scripts/demo.mjs",
+    "cli": "node packages/cli/cli.mjs",
+    "build:widget": "node apps/widget/build.mjs"
   },
   "keywords": [
     "rhetoric",
