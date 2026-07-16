@@ -154,10 +154,18 @@ def analyze(text, rules=None, locale=None, rewrite=None):
 
 
 def load_default_rules():
-    """Read the canonical @rhetorlint/rules-en pack from the repo."""
+    """Read the @rhetorlint/rules-en pack.
+
+    In the repo, use the canonical copy (the single source of truth every
+    engine reads). In an installed wheel that copy is absent, so fall back to
+    the bundled mirror shipped alongside this module. A test keeps the two
+    identical, so both paths return the same rules.
+    """
     here = Path(__file__).resolve()
-    candidate = here.parents[2] / "packages" / "rules-en" / "rules.json"
-    return json.loads(candidate.read_text(encoding="utf-8"))
+    canonical = here.parents[2] / "packages" / "rules-en" / "rules.json"
+    bundled = here.parent / "rules_en.json"
+    path = canonical if canonical.exists() else bundled
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _main(argv=None):

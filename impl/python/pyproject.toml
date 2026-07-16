@@ -19,7 +19,10 @@ Repository = "https://github.com/cambridgetcg/rhetorlint-spec"
 rhetorlint = "rhetorlint:_main"
 
 [tool.hatch.build.targets.wheel]
-# Single-module package. PyPI publish (a follow-up) will also bundle rules.json
-# as package data so the wheel is self-contained.
-only-include = ["rhetorlint.py"]
+# Single-module package + its bundled rule pack, so the wheel is self-contained
+# (load_default_rules reads rules_en.json when the repo copy isn't present).
 sources = ["."]
+
+[tool.hatch.build.targets.wheel.force-include]
+"rhetorlint.py" = "rhetorlint.py"
+"rules_en.json" = "rules_en.json"

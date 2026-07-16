@@ -20,3 +20,8 @@ jobs:
           python-version: "3.12"
       - name: cross-engine conformance — the Python engine must match the JS ground truth
         run: python3 impl/python/test_conformance.py
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      - name: cross-engine conformance — the Go engine must match the JS ground truth
+        run: go test ./impl/go/...

@@ -78,20 +78,21 @@ npm run build:widget                                    # generate the extension
 
 The families map to the SemEval-2023 Task 3 persuasion inventory (Piskorski et al. 2023), which descends from Da San Martino et al. 2019 (the Propaganda Techniques Corpus) via SemEval-2020 Task 11. RhetorLint's *structural* tells — deleted subject, agentless passive, rehearsed contrition — are its own extension, mapped to the nearest parent and marked as such.
 
-## Proven portable — two engines, one taxonomy
+## Proven portable — three engines, one taxonomy
 
-The claim that "engines are just implementations of the spec" is not a promise here — it's a test. There are two independent engines, in two languages, that read the **same** rule pack and reproduce the **same** [conformance corpus](conformance) byte for byte:
+The claim that "engines are just implementations of the spec" is not a promise here — it's a test. Three independent engines, in three languages, read the **same** rule pack and reproduce the **same** [conformance corpus](conformance) byte for byte:
 
 | engine | language | conformance |
 |--------|----------|-------------|
 | [`@rhetorlint/core`](packages/core) | JavaScript (browser + Node, zero deps) | `test/conformance.test.mjs` |
-| [`impl/python/rhetorlint.py`](impl/python) | Python (stdlib only) | `impl/python/test_conformance.py` |
+| [`impl/python/rhetorlint.py`](impl/python) | Python (stdlib only) | `python3 impl/python/test_conformance.py` |
+| [`impl/go/rhetorlint.go`](impl/go) | Go (stdlib only) | `go test ./impl/go/...` |
 
 ```bash
-npm run test:conformance    # runs both — 10/10 cases identical across engines
+npm run test:conformance    # 10/10 cases, identical across engines
 ```
 
-`conformance/cases.json` is the ground truth. Point a third engine in any language at it, and you'll know instantly whether it conforms. That's what makes RhetorLint a spec and not just one library.
+`conformance/cases.json` is the ground truth. The Go engine is the sharpest proof: Go's RE2 regex has **no lookahead**, so it can't express the `(?!by)` agent-check the other two use — it reimplements that check in code and *still* produces identical output. That's precisely what a conformance suite is for: it pins the output, not the implementation. Point a fourth engine in any language at `cases.json` and you'll know instantly whether it conforms — which is what makes RhetorLint a spec, not just one library.
 
 ## Layout
 
@@ -102,6 +103,7 @@ packages/core/   index.mjs · sarif.mjs                    the JS reference engi
 packages/rules-en/ rules.json                             the English tell-pack
 packages/cli/    cli.mjs                                   the CLI (JSON/SARIF, CI spin-gate)
 impl/python/     rhetorlint.py                             the Python reference engine
+impl/go/         rhetorlint.go                             the Go reference engine
 apps/explorer/   index.html                               the learning wing (self-contained)
 apps/widget/     manifest.json · build.mjs · src/panel.js the browser widget (extension + bookmarklet)
 test/            *.test.mjs                                proves the engines, CLI, widget, conformance

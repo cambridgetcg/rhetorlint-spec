@@ -31,9 +31,24 @@ def flat(result):
     }
 
 
+def check_bundle():
+    """The bundled rules_en.json (what ships in the wheel) must equal canonical."""
+    canonical = ROOT / "packages" / "rules-en" / "rules.json"
+    bundled = Path(__file__).resolve().parent / "rules_en.json"
+    if not bundled.exists():
+        print("FAIL: impl/python/rules_en.json missing — cp packages/rules-en/rules.json impl/python/")
+        return False
+    if json.loads(bundled.read_text()) != json.loads(canonical.read_text()):
+        print("FAIL: bundled rules_en.json is STALE — cp packages/rules-en/rules.json impl/python/")
+        return False
+    return True
+
+
 def main():
     corpus = json.loads((ROOT / "conformance" / "cases.json").read_text(encoding="utf-8"))
     rules = rhetorlint.load_default_rules()
+    if not check_bundle():
+        return 1
     fails = 0
     for i, case in enumerate(corpus["cases"]):
         got = flat(rhetorlint.analyze(case["input"], rules))
