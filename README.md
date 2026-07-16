@@ -78,16 +78,33 @@ npm run build:widget                                    # generate the extension
 
 The families map to the SemEval-2023 Task 3 persuasion inventory (Piskorski et al. 2023), which descends from Da San Martino et al. 2019 (the Propaganda Techniques Corpus) via SemEval-2020 Task 11. RhetorLint's *structural* tells — deleted subject, agentless passive, rehearsed contrition — are its own extension, mapped to the nearest parent and marked as such.
 
+## Proven portable — two engines, one taxonomy
+
+The claim that "engines are just implementations of the spec" is not a promise here — it's a test. There are two independent engines, in two languages, that read the **same** rule pack and reproduce the **same** [conformance corpus](conformance) byte for byte:
+
+| engine | language | conformance |
+|--------|----------|-------------|
+| [`@rhetorlint/core`](packages/core) | JavaScript (browser + Node, zero deps) | `test/conformance.test.mjs` |
+| [`impl/python/rhetorlint.py`](impl/python) | Python (stdlib only) | `impl/python/test_conformance.py` |
+
+```bash
+npm run test:conformance    # runs both — 10/10 cases identical across engines
+```
+
+`conformance/cases.json` is the ground truth. Point a third engine in any language at it, and you'll know instantly whether it conforms. That's what makes RhetorLint a spec and not just one library.
+
 ## Layout
 
 ```
 spec/            taxonomy.yaml · output.schema.json      the portable core
-packages/core/   index.mjs · sarif.mjs                    the reference engine
+conformance/     cases.json                               the cross-engine ground truth
+packages/core/   index.mjs · sarif.mjs                    the JS reference engine
 packages/rules-en/ rules.json                             the English tell-pack
 packages/cli/    cli.mjs                                   the CLI (JSON/SARIF, CI spin-gate)
+impl/python/     rhetorlint.py                             the Python reference engine
 apps/explorer/   index.html                               the learning wing (self-contained)
 apps/widget/     manifest.json · build.mjs · src/panel.js the browser widget (extension + bookmarklet)
-test/            *.test.mjs                                proves the engine, CLI, and widget build
+test/            *.test.mjs                                proves the engines, CLI, widget, conformance
 scripts/demo.mjs                                           a 20-line taste
 ```
 

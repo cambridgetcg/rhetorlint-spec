@@ -1,0 +1,342 @@
+{
+  "spec": "0.1",
+  "rules": "@rhetorlint/rules-en@0.1.0",
+  "note": "Conformance ground truth, generated from the JS reference engine. Any RhetorLint engine MUST reproduce every case exactly.",
+  "cases": [
+    {
+      "input": "We take your privacy extremely seriously, and regrettably, mistakes were made. We are reaching out to affected users.",
+      "density": {
+        "tells": 4,
+        "per100Words": 22.2
+      },
+      "strip": "We take your privacy seriously, and regrettably, mistakes [who?] were made. We are reaching out to affected users.",
+      "marks": [
+        {
+          "ruleId": "contrition.rehearsed",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "We take your privacy extremely seriously",
+          "start": 0,
+          "end": 40,
+          "note": "rehearsed contrition — the shape of an apology with the substance removed",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(say the specific thing you did wrong and the specific thing you will do)"
+          ]
+        },
+        {
+          "ruleId": "intensifier.loaded",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "extremely",
+          "start": 21,
+          "end": 30,
+          "note": "an intensifier — turns up the emotional volume without adding fact",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(state the fact without the intensifier)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were made",
+          "start": 68,
+          "end": 77,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        },
+        {
+          "ruleId": "hedge.softener",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "reaching out to",
+          "start": 86,
+          "end": 101,
+          "note": "a hedge — lowers a promise you can later deny",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(say the concrete commitment, or drop the claim)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Everyone knows the plan is working, but what about their failures? Studies show we are the best.",
+      "density": {
+        "tells": 3,
+        "per100Words": 17.6
+      },
+      "strip": "Everyone knows the plan is working, but what about their failures? Studies show we are the best.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "Everyone",
+          "start": 0,
+          "end": 8,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        },
+        {
+          "ruleId": "deflection.whataboutism",
+          "family": "distraction",
+          "technique": "Whataboutism",
+          "actual": "but what about",
+          "start": 36,
+          "end": 50,
+          "note": "a deflection — points away from the question just asked",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(answer the original question first)"
+          ]
+        },
+        {
+          "ruleId": "weasel.attribution",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "Studies show",
+          "start": 67,
+          "end": 79,
+          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "confidence": 0.65,
+          "level": "note",
+          "expected": [
+            "(name the source, or drop the appeal)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "I made a mistake and I will fix it by Friday.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "I made a mistake and I will fix it by Friday.",
+      "marks": []
+    },
+    {
+      "input": "The report was written by the committee.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "The report was written by the committee.",
+      "marks": []
+    },
+    {
+      "input": "We were tired and we were committed to the plan.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "We were tired and we were committed to the plan.",
+      "marks": []
+    },
+    {
+      "input": "The system might have possibly failed, allegedly.",
+      "density": {
+        "tells": 2,
+        "per100Words": 28.6
+      },
+      "strip": "The system failed,.",
+      "marks": [
+        {
+          "ruleId": "hedge.deniable",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "might have possibly",
+          "start": 11,
+          "end": 30,
+          "note": "a deniable modal — leaves room to say you never promised",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(state what you know, and what you don't)"
+          ]
+        },
+        {
+          "ruleId": "hedge.deniable",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "allegedly",
+          "start": 39,
+          "end": 48,
+          "note": "a deniable modal — leaves room to say you never promised",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(state what you know, and what you don't)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Mistakes were made and concerns were raised.",
+      "density": {
+        "tells": 2,
+        "per100Words": 28.6
+      },
+      "strip": "Mistakes [who?] were made and concerns [who?] were raised.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were made",
+          "start": 9,
+          "end": 18,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were raised",
+          "start": 32,
+          "end": 43,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "It is widely believed that experts agree.",
+      "density": {
+        "tells": 3,
+        "per100Words": 42.9
+      },
+      "strip": "It [who?] is widely believed that experts agree.",
+      "marks": [
+        {
+          "ruleId": "weasel.attribution",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "It is widely believed",
+          "start": 0,
+          "end": 21,
+          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "confidence": 0.65,
+          "level": "note",
+          "expected": [
+            "(name the source, or drop the appeal)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "is widely believed",
+          "start": 3,
+          "end": 21,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        },
+        {
+          "ruleId": "weasel.attribution",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "experts agree",
+          "start": 27,
+          "end": 40,
+          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "confidence": 0.65,
+          "level": "note",
+          "expected": [
+            "(name the source, or drop the appeal)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "This is obviously the only choice; there is no question.",
+      "density": {
+        "tells": 2,
+        "per100Words": 20
+      },
+      "strip": "This is obviously the only choice; there is no question.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "obviously",
+          "start": 8,
+          "end": 17,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        },
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "there is no question",
+          "start": 35,
+          "end": 55,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "We sincerely apologize for any inconvenience caused.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "We sincerely apologize for any inconvenience caused.",
+      "marks": [
+        {
+          "ruleId": "contrition.rehearsed",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "We sincerely apologize for any",
+          "start": 0,
+          "end": 30,
+          "note": "rehearsed contrition — the shape of an apology with the substance removed",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(say the specific thing you did wrong and the specific thing you will do)"
+          ]
+        }
+      ]
+    }
+  ]
+}
