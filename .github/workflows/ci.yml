@@ -12,6 +12,6 @@ jobs:
         with:
           node-version: 20
       - name: run the reference-engine test suite (zero dependencies)
-        run: node --test 'test/*.test.mjs'
+        run: npm test
       - name: run the demo
         run: node scripts/demo.mjs

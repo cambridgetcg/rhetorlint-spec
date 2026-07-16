@@ -150,7 +150,11 @@ async function main() {
   return 0;
 }
 
-main().then((code) => process.exit(code)).catch((e) => {
+main().then((code) => {
+  // Let stdout/stderr drain before the process exits. A forced process.exit()
+  // truncated larger SARIF payloads on Node 20 when output was piped.
+  process.exitCode = code;
+}).catch((e) => {
   process.stderr.write(String(e && e.stack || e) + "\n");
-  process.exit(2);
+  process.exitCode = 2;
 });

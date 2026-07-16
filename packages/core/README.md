@@ -15,8 +15,11 @@ npm i @captioneer/core @captioneer/rules-en
 Returns a [Captioneer result object](../../spec/output.schema.json).
 
 ```js
+import { createRequire } from "node:module";
 import { analyze } from "@captioneer/core";
-import rules from "@captioneer/rules-en" assert { type: "json" };
+
+const require = createRequire(import.meta.url);
+const rules = require("@captioneer/rules-en");
 
 const r = analyze("Mistakes were made.", { rules });
 r.density;      // { tells: 1, per100Words: 33.3 }

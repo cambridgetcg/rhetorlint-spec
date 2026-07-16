@@ -1,0 +1,54 @@
+# @captioneer/cli
+
+Read the subtext from the command line. Captioneer marks rhetorical tells in
+text, emits human-readable, JSON, or SARIF output, and can gate CI on tell
+density. Analysis runs locally with no model calls, network requests, or
+telemetry.
+
+Captioneer reads the language, never the person. A mark identifies a visible
+language pattern; it does not detect lies, infer intent, or judge whether a
+claim is factually true.
+
+## Install
+
+```bash
+npm install --save-dev @captioneer/cli
+npx captioneer --help
+```
+
+It also works without adding a dependency:
+
+```bash
+npx @captioneer/cli --version
+```
+
+## Use
+
+Analyze files or pipe text on standard input:
+
+```bash
+captioneer statement.txt
+echo "Mistakes were made." | captioneer --json
+captioneer --sarif press-release.txt > captioneer.sarif
+captioneer --max 8 comms/*.md
+```
+
+`--max <n>` exits with status 1 when any input exceeds the specified number of
+tells per 100 words, making it suitable for a CI check. Usage errors exit 2.
+
+| option | effect |
+|---|---|
+| `--json` | emit the canonical Captioneer JSON result |
+| `--sarif` | emit SARIF 2.1.0 for editors and code scanning |
+| `--max <n>` | fail when tell density exceeds the threshold |
+| `--rules <path>` | use a custom JSON rule pack |
+| `--quiet` | suppress the human report |
+| `--no-color` | disable ANSI colour |
+| `--version` | print the CLI version |
+| `--help` | print command help |
+
+The CLI installs `@captioneer/core` and the English rule pack
+`@captioneer/rules-en`. The specification and source are available in the
+[Captioneer repository](https://github.com/cambridgetcg/captioneer-spec).
+
+MIT.

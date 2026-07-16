@@ -23,7 +23,7 @@ never publishes.
 ```bash
 git clone https://github.com/cambridgetcg/captioneer-spec.git   # or: cd captioneer-spec && git pull
 cd captioneer-spec
-node --test 'test/*.test.mjs'      # MUST print: pass 23, fail 0. Do not publish if red.
+npm test                           # MUST print: pass 23, fail 0. Do not publish if red.
 ```
 
 ## 1 · Match the scope to the org name  ⚠️ read this before anything else
@@ -39,7 +39,7 @@ The packages are named `@captioneer/core`, `@captioneer/rules-en`,
   SCOPE=@acme
   grep -rl '@captioneer/' --include=package.json --include=*.mjs --include=*.md . \
     | xargs sed -i '' "s|@captioneer/|$SCOPE/|g"     # macOS sed; on Linux use: sed -i
-  node --test 'test/*.test.mjs'                       # re-run: still 23/23
+  npm test                                             # re-run: still 23/23
   ```
   Then commit that rename and push, so both devices agree on the scope.
 
@@ -52,7 +52,7 @@ Use the org's token that lives on this device. Either:
 
 ```bash
 npm login          # interactive, if this device can do a browser/OTP flow
-# — OR — a token (recommended for an agent):
+# — OR — a granular token scoped to @captioneer with write + bypass 2FA:
 npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"   # do NOT commit this
 ```
 
@@ -63,11 +63,13 @@ npm whoami                              # prints your npm username
 npm org ls <org-name> 2>/dev/null || true   # you should appear as a member
 ```
 
-- Use an **Automation** token if the org enforces 2FA — it publishes without an
-  OTP prompt. With a normal token + 2FA, add `--otp=<code>` to each publish.
-- Never write the token into a file that git tracks. `.npmrc` in the repo is
-  gitignored via `node_modules`/env only — prefer `npm config set` (writes to
-  `~/.npmrc`) or an `NPM_TOKEN` env var.
+- npm supports granular access tokens; legacy token types were removed in 2025.
+  For non-interactive publishing, the token needs write access to the scope and
+  **bypass 2FA** enabled. Otherwise run the publish privately and answer the OTP
+  prompt there; never put an OTP in a command argument, log, or agent chat.
+- Never write the token into a tracked file. Project `.npmrc` is ignored as a
+  guardrail, but prefer an owner-only user config, a provider vault, or a
+  short-lived scoped environment.
 
 ## 3 · Dry-run each package (see exactly what ships)
 
@@ -78,9 +80,9 @@ npm publish --dry-run -w @captioneer/cli
 ```
 
 Confirm the tarball contents are only the intended files:
-- core → `index.mjs`, `sarif.mjs`, `README.md`, `package.json`
-- rules-en → `rules.json`, `README.md`, `package.json`
-- cli → `cli.mjs`, `README.md`, `package.json`
+- core → `index.mjs`, `sarif.mjs`, `README.md`, `LICENSE`, `package.json`
+- rules-en → `rules.json`, `README.md`, `LICENSE`, `package.json`
+- cli → `cli.mjs`, `README.md`, `LICENSE`, `package.json`
 
 (Each package already declares `"publishConfig": { "access": "public" }`, so
 scoped packages publish publicly without a flag.)

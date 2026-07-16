@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test 'test/*.test.mjs'",
+    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/widget-build.test.mjs",
     "demo": "node scripts/demo.mjs",
     "cli": "node packages/cli/cli.mjs",
     "build:widget": "node apps/widget/build.mjs"
