@@ -28,8 +28,12 @@ Use it: select text and press **Alt+Shift+R**, or click the toolbar button. The 
 
 ## What it asks for, and what it doesn't
 
-- Permissions: only `activeTab`. No host data collection, no network, no telemetry.
-- It reads the current **selection** (or, with nothing selected, the visible text) and analyzes it locally.
+- `activeTab` is the only named permission. The manifest also injects the
+  content script on `<all_urls>` so the shortcut works on ordinary pages; the
+  script waits for the shortcut or toolbar action before analyzing text.
+- When activated, it reads the current **selection** or, with nothing selected,
+  up to the first 4,000 characters of visible body text and analyzes that locally.
+- It makes no network request and includes no telemetry or host-data collection.
 - It marks tells in the **words**. It does not read the person, detect lies, or judge whether a claim is factually true.
 
 ## Build
