@@ -10,13 +10,13 @@ Standard library only. No third-party dependencies.
 ## Run
 
 ```bash
-echo "We take your privacy extremely seriously." | go run ./impl/go
+echo "We take your privacy extremely seriously." | go -C impl/go run .
 ```
 
 ## Conformance
 
 ```bash
-go test ./impl/go/...     # 10/10 cases identical to the JS ground truth
+go -C impl/go test ./...  # 10/10 cases identical to the JS ground truth
 ```
 
 ## The RE2 lesson

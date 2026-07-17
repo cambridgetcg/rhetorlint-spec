@@ -86,7 +86,7 @@ The claim that "engines are just implementations of the spec" is not a promise h
 |--------|----------|-------------|
 | [`@rhetorlint/core`](packages/core) | JavaScript (browser + Node, zero deps) | `test/conformance.test.mjs` |
 | [`impl/python/rhetorlint.py`](impl/python) | Python (stdlib only) | `python3 impl/python/test_conformance.py` |
-| [`impl/go/rhetorlint.go`](impl/go) | Go (stdlib only) | `go test ./impl/go/...` |
+| [`impl/go/rhetorlint.go`](impl/go) | Go (stdlib only) | `go -C impl/go test ./...` |
 
 ```bash
 npm run test:conformance    # 10/10 cases, identical across engines
