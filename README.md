@@ -47,6 +47,7 @@ node scripts/demo.mjs
 import { createRequire } from "node:module";
 import { analyze } from "@rhetorlint/core";
 import { toSarif } from "@rhetorlint/core/sarif";
+import { toSignal } from "@rhetorlint/core/signals";
 
 const require = createRequire(import.meta.url);
 const rules = require("@rhetorlint/rules-en");
@@ -55,10 +56,11 @@ const result = analyze("Mistakes were made.", { rules });
 // -> { rhetorlint:"0.1", density:{tells:1, per100Words:33.3}, marks:[…], strip:"[who?] Mistakes were made." }
 
 const sarif = toSarif(result); // flows into editors, CI, code-scanning
+const signal = toSignal(result); // redacted aggregate for explicit agent traces
 ```
 
 - **Readers** — the [browser widget](apps/widget): select text on any page, press **Alt+Shift+R**, see the marks. On-device; nothing leaves your browser. (A zero-install bookmarklet too.)
-- **Developers** — `@rhetorlint/core` embeds anywhere JS runs (browser, Node, Deno), emits the versioned JSON.
+- **Developers** — `@rhetorlint/core` embeds anywhere JS runs (browser, Node, Deno), emits the versioned JSON, and projects explicitly shareable signals without phrase text by default.
 - **Comms & content teams** — the [`rhetorlint` CLI](packages/cli) as a spin-check in CI: `rhetorlint --max 8 comms/*.md` exits non-zero when a file is too thick with spin. `--sarif` surfaces marks in VS Code and GitHub code-scanning.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
@@ -99,7 +101,7 @@ npm run test:conformance    # 10/10 cases, identical across engines
 ```
 spec/            taxonomy.yaml · output.schema.json      the portable core
 conformance/     cases.json                               the cross-engine ground truth
-packages/core/   index.mjs · sarif.mjs                    the JS reference engine
+packages/core/   index.mjs · sarif.mjs · signals.mjs      JS engine + explicit exports
 packages/rules-en/ rules.json                             the English tell-pack
 packages/cli/    cli.mjs                                   the CLI (JSON/SARIF, CI spin-gate)
 impl/python/     rhetorlint.py                             the Python reference engine

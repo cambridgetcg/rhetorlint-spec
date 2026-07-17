@@ -11,6 +11,9 @@ const RULES = JSON.parse(
 const SCHEMA = JSON.parse(
   readFileSync(new URL("../spec/output.schema.json", import.meta.url))
 );
+const CORE_PACKAGE = JSON.parse(
+  readFileSync(new URL("../packages/core/package.json", import.meta.url))
+);
 
 const SPECIMEN =
   "We take your privacy extremely seriously, and regrettably, mistakes were made. " +
@@ -87,6 +90,24 @@ test("an optional rewrite adapter is honored when supplied", () => {
   assert.equal(r.rewrite, "plain truth here");
 });
 
+test("rewrite adapters must return a string synchronously", () => {
+  assert.throws(
+    () => analyze(SPECIMEN, { rules: RULES, rewrite: async () => "later" }),
+    /must return a string synchronously/
+  );
+  assert.throws(
+    () => analyze(SPECIMEN, { rules: RULES, rewrite: () => undefined }),
+    /must return a string/
+  );
+  assert.throws(
+    () => analyze(SPECIMEN, {
+      rules: RULES,
+      rewrite: async () => { throw new Error("adapter failed later"); }
+    }),
+    /must return a string synchronously/
+  );
+});
+
 test("analyze() refuses to run without a rule pack", () => {
   assert.throws(() => analyze("x"), /rule pack/);
 });
@@ -97,6 +118,7 @@ test("result carries the shape the output schema requires", () => {
   assert.equal(r.rhetorlint, "0.1");
   assert.ok(SCHEMA.$defs.mark.properties.family.enum.includes(r.marks[0].family));
   assert.ok(typeof r.engine.rules === "string" && r.engine.rules.includes("@"));
+  assert.equal(r.engine.version, CORE_PACKAGE.version, "engine provenance matches the package");
 });
 
 test("SARIF conversion is well-formed", () => {

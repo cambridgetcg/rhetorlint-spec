@@ -25,7 +25,7 @@
 
 const SPEC_VERSION = "0.1";
 const NAME = "@rhetorlint/core";
-const CORE_VERSION = "0.1.0";
+const CORE_VERSION = "0.1.1";
 
 /** Words the -ed/-en passive heuristic should treat as predicate adjectives, not passives. */
 const NOT_PASSIVE = new Set([
@@ -103,7 +103,7 @@ const REMOVABLE = new Set(["intensifier.loaded", "hedge.deniable"]);
  * options:
  *   rules    the rule pack ({ id, version, locale, rules }). Required.
  *   locale   overrides the reported locale (defaults to the pack's).
- *   rewrite  an optional async/ sync fn(text, marks) -> string. If omitted,
+ *   rewrite  an optional synchronous fn(text, marks) -> string. If omitted,
  *            result.rewrite is null (the core never invents a paraphrase).
  */
 function analyze(text, options = {}) {
@@ -145,6 +145,18 @@ function analyze(text, options = {}) {
   let rewrite = null;
   if (typeof options.rewrite === "function") {
     rewrite = options.rewrite(text, deduped);
+    if (rewrite && typeof rewrite.then === "function") {
+      // The synchronous API rejects thenables, but still owns the Promise it
+      // just received. Consume a later rejection so the guidance error below
+      // cannot turn into an unrelated unhandled-rejection crash.
+      Promise.resolve(rewrite).catch(() => {});
+      throw new TypeError(
+        "analyze() rewrite adapter must return a string synchronously; async adapters are not supported"
+      );
+    }
+    if (typeof rewrite !== "string") {
+      throw new TypeError("analyze() rewrite adapter must return a string");
+    }
   }
 
   return {

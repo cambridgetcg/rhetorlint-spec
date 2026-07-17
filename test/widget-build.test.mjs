@@ -7,6 +7,10 @@ import { fileURLToPath } from "node:url";
 const BUILD = fileURLToPath(new URL("../apps/widget/build.mjs", import.meta.url));
 const CONTENT = fileURLToPath(new URL("../apps/widget/content.js", import.meta.url));
 const BOOKMARKLET = fileURLToPath(new URL("../apps/widget/bookmarklet.html", import.meta.url));
+const EXPLORER = fileURLToPath(new URL("../apps/explorer/index.html", import.meta.url));
+const CORE_PACKAGE = JSON.parse(
+  readFileSync(new URL("../packages/core/package.json", import.meta.url), "utf8")
+);
 
 test("the committed widget artifacts are in sync with their sources (rebuild is a no-op)", () => {
   const contentBefore = readFileSync(CONTENT, "utf8");
@@ -28,4 +32,14 @@ test("the generated content.js embeds the real engine and rules", () => {
   assert.match(src, /e\.key === "R" \|\| e\.key === "r"/, "the advertised Alt+Shift+R hotkey is wired");
   assert.doesNotMatch(src, /captione[e]r/i, "the retired brand is absent");
   assert.doesNotMatch(src, /\bexport\s/, "no stray ES export keyword survived inlining");
+});
+
+test("the explorer copy declares the current engine and rewrite boundary", () => {
+  const src = readFileSync(EXPLORER, "utf8");
+  assert.ok(
+    src.includes(`const CORE_VERSION = "${CORE_PACKAGE.version}"`),
+    "explorer provenance must match the core package"
+  );
+  assert.match(src, /async adapters are not supported/);
+  assert.match(src, /rewrite adapter must return a string/);
 });

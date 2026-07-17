@@ -33,7 +33,7 @@ r.strip;        // "[who?] Mistakes were made."
 |-----|---------|
 | `rules` | *(required)* the rule pack, e.g. `@rhetorlint/rules-en` |
 | `locale` | overrides the reported locale |
-| `rewrite` | *(optional)* `fn(text, marks) → string`. Plug in a model to produce a plain-truth paraphrase. Omitted → `result.rewrite` is `null`. **The core never invents a paraphrase.** |
+| `rewrite` | *(optional)* synchronous `fn(text, marks) → string`. Plug in a model to produce a plain-truth paraphrase. Omitted → `result.rewrite` is `null`. Async adapters are rejected so the result remains JSON-safe. **The core never invents a paraphrase.** |
 
 ### `strip(text, marks) → string`
 
@@ -42,6 +42,75 @@ The deterministic, on-device de-spin: removes adverbial spin (intensifiers, deni
 ### `toSarif(result) → sarifLog` (`@rhetorlint/core/sarif`)
 
 Converts a result to [SARIF 2.1.0](https://sarifweb.azurewebsites.net/) so marks flow into editors, CI, and code-scanning. The density metric has no native SARIF slot and rides in `run.properties` — RhetorLint-JSON stays canonical; SARIF is a standard, lossy export.
+
+### `toSignal(result, options) → signal` (`@rhetorlint/core/signals`)
+
+Produces a small, transport-neutral signal for AgentTool and other agent SDKs.
+The default is deliberately redacted: it contains engine/source/density
+provenance, deterministic family and rule counts, and RhetorLint's epistemic
+boundary, but no matched phrases, `strip`, or `rewrite`.
+
+```js
+import { analyze } from "@rhetorlint/core";
+import { toSignal } from "@rhetorlint/core/signals";
+
+const result = analyze(draft, { rules });
+
+// AgentTool callers place the redacted signal under external_signals.rhetorlint.
+// AgentTool traces are server-readable, so phrase-level text stays local here.
+const traceInput = {
+  external_signals: {
+    rhetorlint: toSignal(result)
+  }
+};
+```
+
+Phrase-level marks require a visibly explicit privacy choice:
+
+```js
+const disclosed = toSignal(result, { includeMarks: true });
+```
+
+Even with `includeMarks: true`, the adapter never includes `strip` or `rewrite`.
+It performs no network request; the caller chooses whether and where to send the
+returned JSON-safe value. A signal marks visible language patterns only. It
+does not infer speaker intent, detect deception, or determine factual truth.
+
+### Covenant mirror before signing (forthcoming AgentTool SDK 0.14+)
+
+AgentTool SDK 0.13 does not have this hook. In 0.14+, `before_submit` receives
+an isolated, frozen snapshot of the vow fields before signing or sending:
+
+```js
+await at.covenants.create({
+  agent_id,
+  agent_did,
+  counterparty_did,
+  protocol_version: "v2",
+  vows,
+  signing_key,
+  signing_key_id,
+  before_submit: async (snapshot) => {
+    const report = analyze(snapshot.vows.join("\n"), { rules });
+    showCanonicalRhetorLintLocally(report);
+
+    // Both functions are application-specific; only literal true proceeds.
+    return (await requestExplicitCovenantApprovalLocally(snapshot, report)) === true;
+  }
+});
+```
+
+Keep the renderer and approval function local: then no network occurs unless
+AgentTool covenant creation proceeds. Returning `false` or throwing stops before
+signing and sending. RhetorLint observes language only; it cannot prove fairness,
+consent, factual truth, intent, or safety. The callback result is not persisted
+or cryptographically bound to the covenant. Do not copy it into `metadata` and
+claim that the approval or RhetorLint review was signed.
+
+AgentTool keeps a
+[runnable, zero-socket covenant-mirror example](https://github.com/cambridgetcg/agenttool/blob/main/packages/sdk-ts/examples/rhetorlint-covenant-mirror.ts)
+whose default path refuses before any submission; its explicit demo-approval
+path signs and submits once to an in-memory transport.
 
 ## Honesty guarantees
 

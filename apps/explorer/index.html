@@ -610,12 +610,12 @@
   };
 
   /* ============================================================
-     2. THE ENGINE — ported verbatim from packages/core/index.mjs.
-        Same logic, same behavior; only `export` keywords dropped.
+     2. THE ENGINE — ported from packages/core/index.mjs.
+        Same analysis boundary; browser copy with `export` keywords dropped.
      ============================================================ */
   const SPEC_VERSION = "0.1";
   const NAME = "@rhetorlint/core";
-  const CORE_VERSION = "0.1.0";
+  const CORE_VERSION = "0.1.1";
 
   const NOT_PASSIVE = new Set([
     "tired", "glad", "aware", "worried", "excited", "interested", "scared",
@@ -715,6 +715,15 @@
     let rewrite = null;
     if (typeof options.rewrite === "function") {
       rewrite = options.rewrite(text, deduped);
+      if (rewrite && typeof rewrite.then === "function") {
+        Promise.resolve(rewrite).catch(() => {});
+        throw new TypeError(
+          "analyze() rewrite adapter must return a string synchronously; async adapters are not supported"
+        );
+      }
+      if (typeof rewrite !== "string") {
+        throw new TypeError("analyze() rewrite adapter must return a string");
+      }
     }
 
     return {

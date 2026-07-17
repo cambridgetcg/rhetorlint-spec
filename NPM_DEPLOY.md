@@ -1,8 +1,10 @@
 # Publishing `@rhetorlint/*` to npm — a guide for the deploying agent
 
 You are on the device that holds the npm org's publish token. Your job: publish
-three packages from this repo to npm, in the right order, and verify them. This
-guide is self-contained — follow it top to bottom.
+each reviewed workspace whose manifest carries a new version, in dependency
+order, and verify it. The first release may include all three packages; a later
+patch may include only one. This guide is self-contained — follow it top to
+bottom.
 
 The three packages that publish (nothing else does):
 
@@ -23,8 +25,14 @@ never publishes.
 ```bash
 git clone https://github.com/cambridgetcg/rhetorlint-spec.git   # or: cd rhetorlint-spec && git pull
 cd rhetorlint-spec
-npm test                           # MUST print: pass 23, fail 0. Do not publish if red.
+npm test                           # MUST finish with fail 0. Do not publish if red.
 ```
+
+For the coordinated core 0.1.1 integration, land the AgentTool source change
+first and verify that the covenant-mirror link in `packages/core/README.md`
+resolves on AgentTool's `main` branch. The example is documentation, not a
+runtime dependency, but publishing the core README first would create a dead
+link.
 
 ## 1 · Match the scope to the org name  ⚠️ read this before anything else
 
@@ -75,7 +83,7 @@ npm publish --dry-run -w @rhetorlint/cli
 ```
 
 Confirm the tarball contents are only the intended files:
-- core → `index.mjs`, `sarif.mjs`, `README.md`, `LICENSE`, `package.json`
+- core → `index.mjs`, `sarif.mjs`, `signals.mjs`, their `.d.ts` files, `README.md`, `LICENSE`, `package.json`
 - rules-en → `rules.json`, `README.md`, `LICENSE`, `package.json`
 - cli → `cli.mjs`, `README.md`, `LICENSE`, `package.json`
 
@@ -93,18 +101,18 @@ never captures or transports the second factor:
 scripts/publish-npm-interactive.zsh
 ```
 
-For a granular token that already has write access plus bypass 2FA, the direct
-equivalent is:
+The helper checks each exact workspace version and skips versions that are
+already registry-installable. This matters for a core-only patch such as
+`@rhetorlint/core@0.1.1`: unchanged `rules-en@0.1.0` and `cli@0.1.0` must not be
+republished. For a granular token with write access plus bypass 2FA, the direct
+command for that patch is:
 
 ```bash
 npm publish -w @rhetorlint/core
-npm publish -w @rhetorlint/rules-en
-# only after the two above succeed and are visible:
-npm publish -w @rhetorlint/cli
 ```
 
-If `npm view @rhetorlint/core version` doesn't yet return `0.1.0`, wait a few
-seconds before publishing the CLI (it resolves core + rules-en at install time).
+Only publish another workspace when its own manifest has a new reviewed
+version. npm versions are immutable.
 
 ## 5 · Verify the real install path (the important test)
 
@@ -117,6 +125,10 @@ npm i @rhetorlint/cli
 npx rhetorlint --version                 # -> 0.1.0
 echo "We take your privacy extremely seriously, and mistakes were made." | npx rhetorlint --json
 # expect: valid JSON with density.tells >= 2 and an "agency-hiding.deleted-subject" mark
+
+# For the 0.1.1 core patch, also prove the new subpath from a clean install:
+npm i @rhetorlint/core@0.1.1 @rhetorlint/rules-en@0.1.0
+node --input-type=module -e 'import { analyze } from "@rhetorlint/core"; import { toSignal } from "@rhetorlint/core/signals"; import rules from "@rhetorlint/rules-en" with { type: "json" }; const signal = toSignal(analyze("Mistakes were made.", { rules })); if (signal.marks || signal.schema !== "rhetorlint.signal/0.1") process.exit(1)'
 ```
 
 If that JSON comes back correct, the deploy is good.
@@ -125,20 +137,23 @@ If that JSON comes back correct, the deploy is good.
 
 ```bash
 cd -                                     # back to the repo
-git tag v0.1.0 && git push origin v0.1.0
+core_version=$(node -p "require('./packages/core/package.json').version")
+git tag "v${core_version}" && git push origin "v${core_version}"
 ```
 
-Then tell Yu: the three package versions now live (`npm view @rhetorlint/core version`
-etc.) and the install-path check passed. Paste the `npx rhetorlint` output as proof.
+Then report the exact package versions that were published and verified (`npm
+view @rhetorlint/core version`, etc.). Do not imply unchanged workspaces were
+republished. Include the relevant clean-install output as proof.
 
 ---
 
 ## Caveats (short)
 
-- **You cannot re-publish the same version.** If something's wrong after publish,
-  bump to `0.1.1` and republish — do not rely on `npm unpublish` (npm blocks it
-  after 72h and when anything depends on the package). To warn users off a bad
-  build: `npm deprecate @rhetorlint/core@0.1.0 "use 0.1.1"`.
+- **You cannot re-publish the same version.** If something is wrong after
+  publishing 0.1.1, bump to a new patch such as `0.1.2`; do not rely on
+  `npm unpublish` (npm blocks it after 72h and when anything depends on the
+  package). To warn users off a bad build, deprecate that exact version and name
+  the reviewed replacement.
 - **Publish order matters** only because `@rhetorlint/cli` depends on the other
   two. core and rules-en are independent.
 - **Provenance** (optional, nice-to-have): from GitHub Actions with OIDC you can add
