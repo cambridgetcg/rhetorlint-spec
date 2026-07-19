@@ -33,7 +33,7 @@ Every implementation, in any language, emits this one JSON shape:
   }],
   "strip":   "…deterministic de-spun text…",
   "rewrite": null,                                    // only non-null with a model adapter
-  "engine":  { "name": "@rhetorlint/core", "version": "0.1.0", "rules": "@rhetorlint/rules-en@0.1.0" }
+  "engine":  { "name": "@rhetorlint/core", "version": "0.1.1", "rules": "@rhetorlint/rules-en@0.1.0" }
 }
 ```
 

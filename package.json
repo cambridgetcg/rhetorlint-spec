@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/widget-build.test.mjs test/conformance.test.mjs",
+    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/conformance.test.mjs test/package-types.test.mjs test/signals.test.mjs test/widget-build.test.mjs",
     "test:conformance": "node --test test/conformance.test.mjs && python3 impl/python/test_conformance.py",
     "demo": "node scripts/demo.mjs",
     "cli": "node packages/cli/cli.mjs",

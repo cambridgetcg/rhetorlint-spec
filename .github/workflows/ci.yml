@@ -24,4 +24,5 @@ jobs:
         with:
           go-version: "1.21"
       - name: cross-engine conformance — the Go engine must match the JS ground truth
-        run: go test ./impl/go/...
+        working-directory: impl/go
+        run: go test ./...

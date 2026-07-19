@@ -1,17 +1,32 @@
 {
   "name": "@rhetorlint/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reference engine for the RhetorLint spec: marks rhetorical tells in text, on-device, zero dependencies. Reads the language, never the person.",
   "type": "module",
   "license": "MIT",
   "main": "index.mjs",
+  "types": "index.d.ts",
   "exports": {
-    ".": "./index.mjs",
-    "./sarif": "./sarif.mjs"
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.mjs"
+    },
+    "./sarif": {
+      "types": "./sarif.d.ts",
+      "default": "./sarif.mjs"
+    },
+    "./signals": {
+      "types": "./signals.d.ts",
+      "default": "./signals.mjs"
+    }
   },
   "files": [
     "index.mjs",
+    "index.d.ts",
     "sarif.mjs",
+    "sarif.d.ts",
+    "signals.mjs",
+    "signals.d.ts",
     "README.md"
   ],
   "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",
