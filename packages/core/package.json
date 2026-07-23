@@ -1,6 +1,6 @@
 {
   "name": "@rhetorlint/core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Reference engine for the RhetorLint spec: marks rhetorical tells in text, on-device, zero dependencies. Reads the language, never the person.",
   "type": "module",
   "license": "MIT",

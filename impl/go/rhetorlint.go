@@ -29,11 +29,15 @@ import (
 
 const specVersion = "0.1"
 
+// Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
+// would otherwise swallow, and "often" so bare "is often" never reads passive.
 var notPassive = map[string]bool{
 	"tired": true, "glad": true, "aware": true, "worried": true, "excited": true,
 	"interested": true, "scared": true, "bored": true, "pleased": true, "married": true,
 	"gifted": true, "talented": true, "detailed": true, "limited": true, "dedicated": true,
 	"committed": true, "supposed": true, "used": true, "based": true,
+	"open": true, "even": true, "sudden": true, "seven": true, "ten": true,
+	"eleven": true, "golden": true, "wooden": true, "often": true,
 }
 
 const irregularPP = `made|taken|done|given|seen|known|held|shown|drawn|chosen|written|broken|spoken|` +
@@ -41,27 +45,29 @@ const irregularPP = `made|taken|done|given|seen|known|held|shown|drawn|chosen|wr
 	`hit|cut|hurt|shut|split|spread|cast|cost|let`
 
 // RE2 has no lookahead, so the "not followed by 'by <agent>'" rule is applied
-// in code after this matches the be-verb + participle.
+// in code after this matches the be-verb + participle. The by-phrase may sit
+// past a particle or adverb ("carried out collectively by the network").
 var agentlessPassive = regexp.MustCompile(
-	`(?i)\b(is|are|was|were|been|being|be)\s+(?:\w+ly\s+)?(\w+(?:ed|en)|` + irregularPP + `)\b`)
-var byFollows = regexp.MustCompile(`(?i)^\s+by\b`)
+	`(?i)\b(is|are|was|were|been|being|be)\s+(?:(?:\w+ly|often|never|always|still|already)\s+)?(\w+(?:ed|en)|` + irregularPP + `)\b`)
+var byFollows = regexp.MustCompile(`(?i)^\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b`)
 
 var removable = map[string]bool{"intensifier.loaded": true, "hedge.deniable": true}
 
 // Rule mirrors one entry of rules.json. Fields not relevant to a rule's type
 // are simply absent in the JSON and stay at their zero value.
 type Rule struct {
-	RuleID     string   `json:"ruleId"`
-	Family     string   `json:"family"`
-	Technique  string   `json:"technique"`
-	Type       string   `json:"type"`
-	Detector   string   `json:"detector"`
-	Level      string   `json:"level"`
-	Confidence float64  `json:"confidence"`
-	Note       string   `json:"note"`
-	Terms      []string `json:"terms"`
-	Pattern    string   `json:"pattern"`
-	Expected   []string `json:"expected"`
+	RuleID        string   `json:"ruleId"`
+	Family        string   `json:"family"`
+	Technique     string   `json:"technique"`
+	Type          string   `json:"type"`
+	Detector      string   `json:"detector"`
+	Level         string   `json:"level"`
+	Confidence    float64  `json:"confidence"`
+	Note          string   `json:"note"`
+	Terms         []string `json:"terms"`
+	Pattern       string   `json:"pattern"`
+	CaseSensitive bool     `json:"caseSensitive"`
+	Expected      []string `json:"expected"`
 }
 
 type RulePack struct {
@@ -137,7 +143,12 @@ func matchesFor(rule Rule, text string) []hit {
 	case rule.Type == "pattern":
 		re, ok := patternCache[rule.RuleID]
 		if !ok {
-			re = regexp.MustCompile(`(?i)` + rule.Pattern)
+			// Case-insensitive unless the rule opts out (e.g. ALL-CAPS shouting).
+			flags := `(?i)`
+			if rule.CaseSensitive {
+				flags = ``
+			}
+			re = regexp.MustCompile(flags + rule.Pattern)
 			patternCache[rule.RuleID] = re
 		}
 		for _, loc := range re.FindAllStringIndex(text, -1) {
@@ -244,7 +255,7 @@ func Analyze(text string, pack RulePack) Result {
 	r.Strip = Strip(text, deduped)
 	r.Rewrite = nil
 	r.Engine.Name = "rhetorlint (go)"
-	r.Engine.Version = "0.1.0"
+	r.Engine.Version = "0.1.1"
 	r.Engine.Rules = pack.ID + "@" + pack.Version
 	return r
 }

@@ -19,13 +19,16 @@
 
 export const SPEC_VERSION = "0.1";
 const NAME = "@rhetorlint/core";
-const CORE_VERSION = "0.1.1";
+const CORE_VERSION = "0.1.2";
 
-/** Words the -ed/-en passive heuristic should treat as predicate adjectives, not passives. */
+/** Words the -ed/-en passive heuristic should treat as predicate adjectives, not passives.
+ *  Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern would
+ *  otherwise swallow, and "often" so the bare "is often" never reads as a passive. */
 const NOT_PASSIVE = new Set([
   "tired", "glad", "aware", "worried", "excited", "interested", "scared",
   "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
-  "dedicated", "committed", "supposed", "used", "based"
+  "dedicated", "committed", "supposed", "used", "based",
+  "open", "even", "sudden", "seven", "ten", "eleven", "golden", "wooden", "often"
 ]);
 
 /** Irregular past participles the "\w+ed|\w+en" pattern would otherwise miss. */
@@ -35,10 +38,12 @@ const IRREGULAR_PP =
   "hit|cut|hurt|shut|split|spread|cast|cost|let";
 
 const AGENTLESS_PASSIVE = new RegExp(
-  // be-verb  (+ optional adverb)  + participle  NOT followed by "by <agent>"
-  "\\b(is|are|was|were|been|being|be)\\s+(?:\\w+ly\\s+)?" +
+  // be-verb  (+ optional adverb, -ly or a common frequency word)  + participle,
+  // NOT followed by "by <agent>" — where the by-phrase may sit past a particle
+  // or adverb ("carried out collectively by the network" still names the agent).
+  "\\b(is|are|was|were|been|being|be)\\s+(?:(?:\\w+ly|often|never|always|still|already)\\s+)?" +
   "(\\w+(?:ed|en)|" + IRREGULAR_PP + ")\\b" +
-  "(?!\\s+by\\b)",
+  "(?!\\s+(?:(?:\\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\\s+)*by\\b)",
   "gi"
 );
 
@@ -54,7 +59,9 @@ function matchesFor(rule, text) {
     const re = new RegExp("\\b(?:" + alt + ")\\b", "gi");
     for (const m of text.matchAll(re)) out.push({ index: m.index, length: m[0].length, actual: m[0] });
   } else if (rule.type === "pattern") {
-    const re = new RegExp(rule.pattern, "gi");
+    // Patterns match case-insensitively unless the rule opts out — a rule whose
+    // whole point is letter case (ALL-CAPS shouting) sets caseSensitive: true.
+    const re = new RegExp(rule.pattern, rule.caseSensitive ? "g" : "gi");
     for (const m of text.matchAll(re)) {
       if (m[0].length === 0) continue;
       out.push({ index: m.index, length: m[0].length, actual: m[0] });

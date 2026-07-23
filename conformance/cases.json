@@ -1,6 +1,6 @@
 {
   "spec": "0.1",
-  "rules": "@rhetorlint/rules-en@0.1.0",
+  "rules": "@rhetorlint/rules-en@0.1.1",
   "note": "Conformance ground truth, generated from the JS reference engine. Any RhetorLint engine MUST reproduce every case exactly.",
   "cases": [
     {
@@ -334,6 +334,180 @@
           "level": "warning",
           "expected": [
             "(say the specific thing you did wrong and the specific thing you will do)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "ACT NOW: this offer is gone forever. Limited time, absolutely free, no strings attached.",
+      "density": {
+        "tells": 6,
+        "per100Words": 42.9
+      },
+      "strip": "ACT NOW: this offer is gone forever. Limited time, absolutely free, no strings attached.",
+      "marks": [
+        {
+          "ruleId": "urgency.appeal-to-time",
+          "family": "call",
+          "technique": "Appeal to Time",
+          "actual": "ACT NOW",
+          "start": 0,
+          "end": 7,
+          "note": "manufactured urgency — pressure to act before you can weigh it",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(state the real deadline and what actually happens after it, or drop the clock)"
+          ]
+        },
+        {
+          "ruleId": "shouting.caps",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "ACT NOW",
+          "start": 0,
+          "end": 7,
+          "note": "sustained ALL-CAPS — volume standing in for argument",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(make the point in sentence case; let the facts carry the emphasis)"
+          ]
+        },
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "forever",
+          "start": 28,
+          "end": 35,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        },
+        {
+          "ruleId": "urgency.appeal-to-time",
+          "family": "call",
+          "technique": "Appeal to Time",
+          "actual": "Limited time",
+          "start": 37,
+          "end": 49,
+          "note": "manufactured urgency — pressure to act before you can weigh it",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(state the real deadline and what actually happens after it, or drop the clock)"
+          ]
+        },
+        {
+          "ruleId": "lure.free-offer",
+          "family": "manipulative-wording",
+          "technique": "Exaggeration or Minimisation",
+          "actual": "absolutely free",
+          "start": 51,
+          "end": 66,
+          "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(state the price, the terms, and what is actually included)"
+          ]
+        },
+        {
+          "ruleId": "lure.free-offer",
+          "family": "manipulative-wording",
+          "technique": "Exaggeration or Minimisation",
+          "actual": "no strings attached",
+          "start": 68,
+          "end": 87,
+          "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(state the price, the terms, and what is actually included)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The door is open and the fee is ten USD.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "The door is open and the fee is ten USD.",
+      "marks": []
+    },
+    {
+      "input": "The issuing of coins is carried out collectively by the network.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "The issuing of coins is carried out collectively by the network.",
+      "marks": []
+    },
+    {
+      "input": "Shipments are often delayed.",
+      "density": {
+        "tells": 1,
+        "per100Words": 25
+      },
+      "strip": "Shipments [who?] are often delayed.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "are often delayed",
+          "start": 10,
+          "end": 27,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "It works every time, without exception.",
+      "density": {
+        "tells": 2,
+        "per100Words": 33.3
+      },
+      "strip": "It works every time, without exception.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "every time",
+          "start": 9,
+          "end": 19,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        },
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "without exception",
+          "start": 21,
+          "end": 38,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
           ]
         }
       ]

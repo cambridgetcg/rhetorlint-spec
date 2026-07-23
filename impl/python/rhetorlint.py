@@ -22,13 +22,16 @@ from pathlib import Path
 
 SPEC_VERSION = "0.1"
 NAME = "rhetorlint (python)"
-CORE_VERSION = "0.1.0"
+CORE_VERSION = "0.1.1"
 
 # Words the -ed/-en passive heuristic should treat as predicate adjectives.
+# Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
+# would otherwise swallow, and "often" so bare "is often" never reads passive.
 NOT_PASSIVE = {
     "tired", "glad", "aware", "worried", "excited", "interested", "scared",
     "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
     "dedicated", "committed", "supposed", "used", "based",
+    "open", "even", "sudden", "seven", "ten", "eleven", "golden", "wooden", "often",
 }
 
 # Irregular past participles the "\w+ed|\w+en" pattern would otherwise miss.
@@ -38,11 +41,13 @@ _IRREGULAR_PP = (
     "hit|cut|hurt|shut|split|spread|cast|cost|let"
 )
 
-# be-verb (+ optional adverb) + participle, NOT followed by "by <agent>".
+# be-verb (+ optional adverb, -ly or a common frequency word) + participle,
+# NOT followed by "by <agent>" — the by-phrase may sit past a particle or
+# adverb ("carried out collectively by the network" still names the agent).
 AGENTLESS_PASSIVE = re.compile(
-    r"\b(is|are|was|were|been|being|be)\s+(?:\w+ly\s+)?"
+    r"\b(is|are|was|were|been|being|be)\s+(?:(?:\w+ly|often|never|always|still|already)\s+)?"
     r"(\w+(?:ed|en)|" + _IRREGULAR_PP + r")\b"
-    r"(?!\s+by\b)",
+    r"(?!\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b)",
     re.IGNORECASE,
 )
 
@@ -60,7 +65,8 @@ def _matches_for(rule, text):
         for m in rx.finditer(text):
             out.append((m.start(), len(m.group(0)), m.group(0)))
     elif kind == "pattern":
-        rx = re.compile(rule["pattern"], re.IGNORECASE)
+        # Case-insensitive unless the rule opts out (e.g. ALL-CAPS shouting).
+        rx = re.compile(rule["pattern"], 0 if rule.get("caseSensitive") else re.IGNORECASE)
         for m in rx.finditer(text):
             if len(m.group(0)) == 0:
                 continue

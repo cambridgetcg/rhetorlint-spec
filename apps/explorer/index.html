@@ -514,9 +514,9 @@
      ============================================================ */
   const RULES = {
     "id": "@rhetorlint/rules-en",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "locale": "en",
-    "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml.",
+    "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true (engines at core>=0.1.2 honour it; older engines fall back to case-insensitive, which only widens matches for such rules).",
     "rules": [
       {
         "ruleId": "intensifier.loaded",
@@ -526,8 +526,20 @@
         "level": "info",
         "confidence": 0.55,
         "note": "an intensifier — turns up the emotional volume without adding fact",
-        "terms": ["extremely", "incredibly", "deeply", "tremendously", "utterly", "wholeheartedly", "profoundly", "massively", "hugely"],
-        "expected": ["(state the fact without the intensifier)"]
+        "terms": [
+          "extremely",
+          "incredibly",
+          "deeply",
+          "tremendously",
+          "utterly",
+          "wholeheartedly",
+          "profoundly",
+          "massively",
+          "hugely"
+        ],
+        "expected": [
+          "(state the fact without the intensifier)"
+        ]
       },
       {
         "ruleId": "absolute.universal",
@@ -537,8 +549,28 @@
         "level": "info",
         "confidence": 0.6,
         "note": "an absolute — claims more than anyone could actually know",
-        "terms": ["always", "never", "everyone", "no one", "nobody", "everybody", "undeniable", "guaranteed", "without a doubt", "obviously", "clearly", "of course", "there is no question"],
-        "expected": ["(qualify: how often, who exactly, how certain)"]
+        "terms": [
+          "always",
+          "never",
+          "everyone",
+          "no one",
+          "nobody",
+          "everybody",
+          "undeniable",
+          "guaranteed",
+          "without a doubt",
+          "obviously",
+          "clearly",
+          "of course",
+          "there is no question",
+          "forever",
+          "every time",
+          "without exception",
+          "no exceptions"
+        ],
+        "expected": [
+          "(qualify: how often, who exactly, how certain)"
+        ]
       },
       {
         "ruleId": "hedge.softener",
@@ -548,8 +580,23 @@
         "level": "info",
         "confidence": 0.55,
         "note": "a hedge — lowers a promise you can later deny",
-        "terms": ["reaching out to", "sort of", "kind of", "we believe", "we feel", "it seems", "to some extent", "somewhat", "if anything", "as it were", "in a sense", "for the most part"],
-        "expected": ["(say the concrete commitment, or drop the claim)"]
+        "terms": [
+          "reaching out to",
+          "sort of",
+          "kind of",
+          "we believe",
+          "we feel",
+          "it seems",
+          "to some extent",
+          "somewhat",
+          "if anything",
+          "as it were",
+          "in a sense",
+          "for the most part"
+        ],
+        "expected": [
+          "(say the concrete commitment, or drop the claim)"
+        ]
       },
       {
         "ruleId": "hedge.deniable",
@@ -560,7 +607,9 @@
         "confidence": 0.6,
         "note": "a deniable modal — leaves room to say you never promised",
         "pattern": "\\b(?:may|might|could)\\s+(?:have\\s+\\w+|be\\s+\\w+|possibly|potentially)\\b|\\b(?:reportedly|allegedly|purportedly)\\b",
-        "expected": ["(state what you know, and what you don't)"]
+        "expected": [
+          "(state what you know, and what you don't)"
+        ]
       },
       {
         "ruleId": "weasel.attribution",
@@ -571,7 +620,9 @@
         "confidence": 0.65,
         "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
         "pattern": "\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b",
-        "expected": ["(name the source, or drop the appeal)"]
+        "expected": [
+          "(name the source, or drop the appeal)"
+        ]
       },
       {
         "ruleId": "deflection.whataboutism",
@@ -582,7 +633,9 @@
         "confidence": 0.6,
         "note": "a deflection — points away from the question just asked",
         "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let'?s\\s+not\\s+forget|whatabout)\\b",
-        "expected": ["(answer the original question first)"]
+        "expected": [
+          "(answer the original question first)"
+        ]
       },
       {
         "ruleId": "contrition.rehearsed",
@@ -593,7 +646,49 @@
         "confidence": 0.7,
         "note": "rehearsed contrition — the shape of an apology with the substance removed",
         "pattern": "\\bwe\\s+take\\s+(?:your\\s+|the\\s+)?[a-z ]{0,24}?\\bseriously\\b|\\bwe\\s+(?:sincerely\\s+)?apologi[sz]e\\s+for\\s+any\\b|\\bwe\\s+are\\s+committed\\s+to\\b|\\bwe\\s+value\\s+your\\b|\\bout\\s+of\\s+an\\s+abundance\\s+of\\s+caution\\b|\\bwe\\s+hear\\s+you\\b",
-        "expected": ["(say the specific thing you did wrong and the specific thing you will do)"]
+        "expected": [
+          "(say the specific thing you did wrong and the specific thing you will do)"
+        ]
+      },
+      {
+        "ruleId": "lure.free-offer",
+        "family": "manipulative-wording",
+        "technique": "Exaggeration or Minimisation",
+        "type": "pattern",
+        "level": "info",
+        "confidence": 0.55,
+        "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
+        "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[- ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
+        "expected": [
+          "(state the price, the terms, and what is actually included)"
+        ]
+      },
+      {
+        "ruleId": "urgency.appeal-to-time",
+        "family": "call",
+        "technique": "Appeal to Time",
+        "type": "pattern",
+        "level": "note",
+        "confidence": 0.6,
+        "note": "manufactured urgency — pressure to act before you can weigh it",
+        "pattern": "\\b(?:act\\s+now|act\\s+fast|don'?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it'?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
+        "expected": [
+          "(state the real deadline and what actually happens after it, or drop the clock)"
+        ]
+      },
+      {
+        "ruleId": "shouting.caps",
+        "family": "manipulative-wording",
+        "technique": "Loaded Language",
+        "type": "pattern",
+        "caseSensitive": true,
+        "level": "info",
+        "confidence": 0.6,
+        "note": "sustained ALL-CAPS — volume standing in for argument",
+        "pattern": "\\b[A-Z]{3,}(?:\\s+[A-Z]{3,})+\\b",
+        "expected": [
+          "(make the point in sentence case; let the facts carry the emphasis)"
+        ]
       },
       {
         "ruleId": "agency-hiding.deleted-subject",
@@ -604,7 +699,9 @@
         "level": "warning",
         "confidence": 0.7,
         "note": "an agentless passive — who acted is deleted from the sentence",
-        "expected": ["(name who did it: 'I/we + verb')"]
+        "expected": [
+          "(name who did it: 'I/we + verb')"
+        ]
       }
     ]
   };
@@ -615,12 +712,13 @@
      ============================================================ */
   const SPEC_VERSION = "0.1";
   const NAME = "@rhetorlint/core";
-  const CORE_VERSION = "0.1.1";
+  const CORE_VERSION = "0.1.2";
 
   const NOT_PASSIVE = new Set([
     "tired", "glad", "aware", "worried", "excited", "interested", "scared",
     "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
-    "dedicated", "committed", "supposed", "used", "based"
+    "dedicated", "committed", "supposed", "used", "based",
+    "open", "even", "sudden", "seven", "ten", "eleven", "golden", "wooden", "often"
   ]);
 
   const IRREGULAR_PP =
@@ -629,9 +727,9 @@
     "hit|cut|hurt|shut|split|spread|cast|cost|let";
 
   const AGENTLESS_PASSIVE = new RegExp(
-    "\\b(is|are|was|were|been|being|be)\\s+(?:\\w+ly\\s+)?" +
+    "\\b(is|are|was|were|been|being|be)\\s+(?:(?:\\w+ly|often|never|always|still|already)\\s+)?" +
     "(\\w+(?:ed|en)|" + IRREGULAR_PP + ")\\b" +
-    "(?!\\s+by\\b)",
+    "(?!\\s+(?:(?:\\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\\s+)*by\\b)",
     "gi"
   );
 
@@ -646,7 +744,7 @@
       const re = new RegExp("\\b(?:" + alt + ")\\b", "gi");
       for (const m of text.matchAll(re)) out.push({ index: m.index, length: m[0].length, actual: m[0] });
     } else if (rule.type === "pattern") {
-      const re = new RegExp(rule.pattern, "gi");
+      const re = new RegExp(rule.pattern, rule.caseSensitive ? "g" : "gi");
       for (const m of text.matchAll(re)) {
         if (m[0].length === 0) continue;
         out.push({ index: m.index, length: m[0].length, actual: m[0] });

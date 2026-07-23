@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "rhetorlint"
-version = "0.1.0"
+version = "0.1.1"
 description = "Reference Python engine for the RhetorLint spec: mark rhetorical tells in the words, on-device, zero dependencies."
 readme = "README.md"
 requires-python = ">=3.8"

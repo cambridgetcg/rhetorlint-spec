@@ -71,8 +71,8 @@ families:
   - id: manipulative-wording
     semeval_parent: "Manipulative Wording"
     what: "Word choices that move your feelings or blur your grip on a promise, separately from whatever facts are (or aren't) present."
-    seeded_tells: 5
-    semeval_siblings_not_yet_seeded: ["Repetition", "Exaggeration or Minimisation"]
+    seeded_tells: 7
+    semeval_siblings_not_yet_seeded: ["Repetition"]
     tells:
 
       - id: intensifier.loaded
@@ -131,6 +131,29 @@ families:
             tell: "Studies show"
             plain: "One internal study (n=30, unpublished) showed a 5% improvement."
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation (unnamed source; cf. Justification › Appeal to Authority for a named one)"
+
+      - id: lure.free-offer
+        semeval_technique: "Exaggeration or Minimisation"
+        what: "A free-offer lure — 'absolutely free', 'no strings attached', 'everything you need' — wording that minimises the cost or inflates the bundle to rush the yes."
+        why_it_works: "'Free' switches off price scrutiny: with nothing apparently at stake, the reader stops asking what is actually being traded — attention, data, a later upsell."
+        examples:
+          - marked: "Get started absolutely free, no strings attached"
+            tell: "absolutely free"
+            plain: "The starter tier costs nothing; paid tiers begin at $9/month, and we email you about them."
+          - marked: "Everything you need to launch your business"
+            tell: "everything you need"
+            plain: "Includes hosting and a template. You still need a domain, a payment account, and content."
+        lineage: "SemEval-2023 · Manipulative Wording › Exaggeration or Minimisation"
+
+      - id: shouting.caps
+        semeval_technique: "Loaded Language"
+        what: "Sustained ALL-CAPS — two or more consecutive shouted words, volume standing in for argument. (The one case-sensitive rule in the pack: its whole tell IS the letter case.)"
+        why_it_works: "Typographic shouting manufactures urgency and importance the sentence never argues for; the reader's alarm response fires before their reading response does."
+        examples:
+          - marked: "LIMITED TIME OFFER for our members"
+            tell: "LIMITED TIME OFFER"
+            plain: "This price is available until 31 March."
+        lineage: "SemEval-2023 · Manipulative Wording › Loaded Language"
 
       - id: contrition.rehearsed
         semeval_technique: "(RhetorLint extension)"
@@ -239,19 +262,31 @@ families:
 
   # ==========================================================================
   # 6. CALL  — pushing you toward an action or shutting thought down
-  #    (no seed rule yet)
   # ==========================================================================
   - id: call
     semeval_parent: "Call"
     what: "Driving you to act now, or closing the topic down, rather than letting you weigh it."
-    status: "(no seed rule yet)"
-    semeval_techniques:
+    seeded_tells: 1
+    semeval_siblings_not_yet_seeded: ["Slogans", "Conversation Killer"]
+    tells:
+
+      - id: urgency.appeal-to-time
+        semeval_technique: "Appeal to Time"
+        what: "Manufactured urgency — 'act now', 'limited time', 'last chance' — pressure to decide before you can weigh the decision."
+        why_it_works: "A ticking clock converts deliberation into loss-aversion: the cost of thinking feels like the cost of missing out, so the thinking gets skipped."
+        examples:
+          - marked: "Act now — this offer won't last!"
+            tell: "Act now"
+            plain: "The discount ends 31 March; the product does not."
+          - marked: "Last chance to lock in this rate"
+            tell: "Last chance"
+            plain: "We raise rates on 1 April. Existing customers keep their current rate for 12 months."
+        lineage: "SemEval-2023 · Call › Appeal to Time"
+    semeval_techniques_not_yet_seeded:
       - name: "Slogans"
         what: "A short, catchy phrase that substitutes for an argument."
       - name: "Conversation Killer"
         what: "A thought-terminating cliché ('it is what it is') that ends the discussion."
-      - name: "Appeal to Time"
-        what: "Manufacturing urgency ('act now', 'the time is now') to short-circuit deliberation."
     lineage: "SemEval-2023 · Call (3 fine techniques)"
 
   # ==========================================================================

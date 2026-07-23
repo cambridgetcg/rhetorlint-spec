@@ -68,6 +68,8 @@ export interface RhetorLintLexicalRule extends RhetorLintRuleBase {
 export interface RhetorLintPatternRule extends RhetorLintRuleBase {
   type: "pattern";
   pattern: string;
+  /** Patterns match case-insensitively unless this is true (e.g. ALL-CAPS shouting). */
+  caseSensitive?: boolean;
 }
 
 export interface RhetorLintAgentlessPassiveRule extends RhetorLintRuleBase {

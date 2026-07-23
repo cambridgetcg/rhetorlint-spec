@@ -1,8 +1,8 @@
 {
   "id": "@rhetorlint/rules-en",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "locale": "en",
-  "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml.",
+  "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true (engines at core>=0.1.2 honour it; older engines fall back to case-insensitive, which only widens matches for such rules).",
   "rules": [
     {
       "ruleId": "intensifier.loaded",
@@ -23,7 +23,7 @@
       "level": "info",
       "confidence": 0.6,
       "note": "an absolute — claims more than anyone could actually know",
-      "terms": ["always", "never", "everyone", "no one", "nobody", "everybody", "undeniable", "guaranteed", "without a doubt", "obviously", "clearly", "of course", "there is no question"],
+      "terms": ["always", "never", "everyone", "no one", "nobody", "everybody", "undeniable", "guaranteed", "without a doubt", "obviously", "clearly", "of course", "there is no question", "forever", "every time", "without exception", "no exceptions"],
       "expected": ["(qualify: how often, who exactly, how certain)"]
     },
     {
@@ -80,6 +80,40 @@
       "note": "rehearsed contrition — the shape of an apology with the substance removed",
       "pattern": "\\bwe\\s+take\\s+(?:your\\s+|the\\s+)?[a-z ]{0,24}?\\bseriously\\b|\\bwe\\s+(?:sincerely\\s+)?apologi[sz]e\\s+for\\s+any\\b|\\bwe\\s+are\\s+committed\\s+to\\b|\\bwe\\s+value\\s+your\\b|\\bout\\s+of\\s+an\\s+abundance\\s+of\\s+caution\\b|\\bwe\\s+hear\\s+you\\b",
       "expected": ["(say the specific thing you did wrong and the specific thing you will do)"]
+    },
+    {
+      "ruleId": "lure.free-offer",
+      "family": "manipulative-wording",
+      "technique": "Exaggeration or Minimisation",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.55,
+      "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
+      "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[- ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
+      "expected": ["(state the price, the terms, and what is actually included)"]
+    },
+    {
+      "ruleId": "urgency.appeal-to-time",
+      "family": "call",
+      "technique": "Appeal to Time",
+      "type": "pattern",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "manufactured urgency — pressure to act before you can weigh it",
+      "pattern": "\\b(?:act\\s+now|act\\s+fast|don'?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it'?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
+      "expected": ["(state the real deadline and what actually happens after it, or drop the clock)"]
+    },
+    {
+      "ruleId": "shouting.caps",
+      "family": "manipulative-wording",
+      "technique": "Loaded Language",
+      "type": "pattern",
+      "caseSensitive": true,
+      "level": "info",
+      "confidence": 0.6,
+      "note": "sustained ALL-CAPS — volume standing in for argument",
+      "pattern": "\\b[A-Z]{3,}(?:\\s+[A-Z]{3,})+\\b",
+      "expected": ["(make the point in sentence case; let the facts carry the emphasis)"]
     },
     {
       "ruleId": "agency-hiding.deleted-subject",
