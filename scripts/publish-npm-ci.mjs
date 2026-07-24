@@ -17,6 +17,7 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { setTimeout as sleep } from 'node:timers/promises'
+import { fileURLToPath } from 'node:url'
 
 const PACKAGES = [
   { name: '@rhetorlint/core', dir: 'packages/core' },
@@ -26,9 +27,10 @@ const PACKAGES = [
 
 const DRY_RUN = process.env.DRY_RUN === 'true'
 
-function npm(args, { quiet = false } = {}) {
+function npm(args, { quiet = false, cwd } = {}) {
   return execFileSync('npm', args, {
     encoding: 'utf8',
+    cwd,
     stdio: quiet ? ['ignore', 'pipe', 'pipe'] : ['ignore', 'inherit', 'inherit'],
   })
 }
@@ -78,7 +80,12 @@ for (const { name, dir } of PACKAGES) {
   }
 
   console.log(`\nPublishing ${name}@${version} via trusted publishing…`)
-  npm(['publish', '--workspace', name, '--access', 'public', '--provenance'])
+  // From inside the package directory, not `--workspace` from the root: npm's
+  // OIDC token exchange only runs for the package it believes it is publishing,
+  // and under `--workspace` that is the (private) root — the exchange is
+  // skipped, no credential is found, and npm dies with ENEEDAUTH as though
+  // trusted publishing were not configured at all.
+  npm(['publish', '--access', 'public', '--provenance'], { cwd: fileURLToPath(new URL(`../${dir}`, import.meta.url)) })
 
   let installable = false
   for (let attempt = 0; attempt < 30; attempt += 1) {

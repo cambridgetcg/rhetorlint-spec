@@ -54,13 +54,14 @@ jobs:
   publish:
     needs: verify
     runs-on: ubuntu-latest
-    # NOTE: deliberately no `environment:`. npm's trusted-publisher config must
-    # match the OIDC token's claims exactly, and a publisher registered without
-    # an environment will reject a token that carries one (npm reports this as
-    # ENEEDAUTH, as though no credential existed at all). If you want the
-    # human-approval gate back, add `environment: npm-release` here AND set the
-    # same environment name on all three packages at npmjs.com — both sides or
-    # neither.
+    # The environment is load-bearing: NPM_DEPLOY.md's one-time setup registers
+    # the trusted publisher on npmjs.com WITH environment `npm-release`, and
+    # npm's claim-matching is exact — both sides name it or neither does. The
+    # ENEEDAUTH that prompted dropping it was never the environment: publishing
+    # a workspace with `--workspace` from the root skips the OIDC exchange
+    # entirely (see scripts/publish-npm-ci.mjs, which now publishes from inside
+    # each package directory).
+    environment: npm-release
     permissions:
       contents: read
       id-token: write # npm Trusted Publishing (OIDC) + provenance attestation
