@@ -54,9 +54,17 @@ jobs:
   publish:
     needs: verify
     runs-on: ubuntu-latest
-    # DIAGNOSTIC (2026-07-24): temporarily unset while we determine which side
-    # of the environment claim is mismatched. Restore to `environment:
-    # npm-release` the moment we know, and make NPM_DEPLOY.md say the truth.
+    # Restored after the 2026-07-24 diagnostic: runs with and without this
+    # line failed IDENTICALLY ("OIDC token exchange error - package not
+    # found"), so the environment claim is not the variable — a package
+    # simply has no trusted-publisher record until a human registers one for
+    # THAT package (per-package, never per-scope). Keeping it costs nothing
+    # and buys the optional human-approval gate on the GitHub side.
+    #
+    # Still unproven end to end: no release has yet completed an OIDC
+    # exchange. core 0.1.2 and rules-en 0.1.1 went out by hand. The first
+    # package whose publisher is genuinely registered will settle it.
+    environment: npm-release
     permissions:
       contents: read
       id-token: write # npm Trusted Publishing (OIDC) + provenance attestation

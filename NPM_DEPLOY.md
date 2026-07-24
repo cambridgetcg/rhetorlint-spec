@@ -67,6 +67,24 @@ Trusted publishing has to be told which workflow to trust. On npmjs.com, for
 Until that is configured the publish job fails closed — it cannot fall back to
 a token, because there is none. Nothing reaches the registry unauthenticated.
 
+**It is per package, and npm will not tell you which one you missed.** Every
+misconfiguration — no entry, wrong owner case, full workflow path instead of
+the bare filename — surfaces as the same bare `ENEEDAUTH: This command
+requires you to be logged in`, because npm swallows the real reason at default
+loglevel (npm/cli#9088). The publish script therefore forces `--loglevel
+verbose`; read the `npm verbose oidc` line, which names the actual rejection:
+
+```
+npm verbose oidc Failed token exchange request with body message:
+  OIDC token exchange error - package not found
+```
+
+That exact message means **this package has no trusted-publisher record** —
+not that the workflow, the environment, or the token is wrong. Measured on
+2026-07-24: identical runs with and without `environment:` produced it, so
+the environment is not what it is complaining about. Register the missing
+package and re-run; the script skips whatever is already live.
+
 The `npm-release` environment also gives you a second lever: add required
 reviewers to it in GitHub repo settings and every automated publish waits for a
 human approval click. Recommended, and the reason the job names an environment
