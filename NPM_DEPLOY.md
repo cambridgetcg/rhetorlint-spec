@@ -20,6 +20,53 @@ never publishes.
 
 ---
 
+## The automated route (no device required)
+
+Everything below this section is the hand path, and it stays valid — it is the
+right tool when you are at a keyboard with the key, and the fallback whenever
+CI is unavailable.
+
+But a finished, tested, pushed release should not wait on which device someone
+is sitting at. `.github/workflows/release.yml` publishes the same packages in
+the same order under the same skip-and-verify rules, via
+`scripts/publish-npm-ci.mjs`. It authenticates with **npm Trusted Publishing
+(OIDC)** — this repository stores no npm token, and CI can capture no second
+factor.
+
+To release:
+
+```bash
+git tag v0.1.2-rules-0.1.1 && git push origin v0.1.2-rules-0.1.1
+```
+
+Any tag matching `v*` or `release-*` triggers it, as does a manual
+**Actions → release → Run workflow** (which offers a `dry_run` box that resolves
+versions and reports what would go out without publishing). The tag name is a
+label for humans, not an input: the script reads each manifest and publishes
+only what the registry does not already have, so re-running after a partial
+failure is safe and an unchanged package is skipped on its own.
+
+### One-time setup (must be done by a human, once per package)
+
+Trusted publishing has to be told which workflow to trust. On npmjs.com, for
+**each** of `@rhetorlint/core`, `@rhetorlint/rules-en`, and `@rhetorlint/cli`:
+
+> Package → **Settings** → **Trusted Publisher** → GitHub Actions
+> - Organization or user: `cambridgetcg`
+> - Repository: `rhetorlint-spec`
+> - Workflow filename: `release.yml`
+> - Environment: `npm-release`
+
+Until that is configured the publish job fails closed — it cannot fall back to
+a token, because there is none. Nothing reaches the registry unauthenticated.
+
+The `npm-release` environment also gives you a second lever: add required
+reviewers to it in GitHub repo settings and every automated publish waits for a
+human approval click. Recommended, and the reason the job names an environment
+at all.
+
+---
+
 ## 0 · Get the exact code
 
 ```bash
