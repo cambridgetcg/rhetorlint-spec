@@ -54,13 +54,13 @@ jobs:
   publish:
     needs: verify
     runs-on: ubuntu-latest
-    # The environment is load-bearing: NPM_DEPLOY.md's one-time setup registers
-    # the trusted publisher on npmjs.com WITH environment `npm-release`, and
-    # npm's claim-matching is exact — both sides name it or neither does. The
-    # ENEEDAUTH that prompted dropping it was never the environment: publishing
-    # a workspace with `--workspace` from the root skips the OIDC exchange
-    # entirely (see scripts/publish-npm-ci.mjs, which now publishes from inside
-    # each package directory).
+    # The environment matches NPM_DEPLOY.md's one-time setup, which registers
+    # the trusted publisher on npmjs.com WITH environment `npm-release` —
+    # npm's claim-matching is exact, so both sides name it or neither does.
+    # When the exchange is rejected anyway, npm says only ENEEDAUTH: the real
+    # reason (which claim mismatched, or no publisher entry for that package)
+    # appears solely in the `npm verbose oidc` lines the publish script now
+    # forces on (npm/cli#9088). Read those before changing anything here.
     environment: npm-release
     permissions:
       contents: read

@@ -80,12 +80,16 @@ for (const { name, dir } of PACKAGES) {
   }
 
   console.log(`\nPublishing ${name}@${version} via trusted publishing…`)
-  // From inside the package directory, not `--workspace` from the root: npm's
-  // OIDC token exchange only runs for the package it believes it is publishing,
-  // and under `--workspace` that is the (private) root — the exchange is
-  // skipped, no credential is found, and npm dies with ENEEDAUTH as though
-  // trusted publishing were not configured at all.
-  npm(['publish', '--access', 'public', '--provenance'], { cwd: fileURLToPath(new URL(`../${dir}`, import.meta.url)) })
+  // --loglevel verbose is load-bearing, not decoration: npm's OIDC token
+  // exchange fails SILENTLY at default loglevel (npm/cli#9088) and falls
+  // through to a generic ENEEDAUTH that names no cause. The `npm verbose
+  // oidc` lines are the only place the registry's actual rejection — a
+  // publisher-config mismatch, a missing per-package publisher entry, an
+  // environment claim on one side only — becomes visible.
+  // Publishing from inside the package directory matches the shape the
+  // interactive script verifies; `--workspace` from the root would also
+  // exchange correctly (npm ≥ 11.5.1 runs oidc() per workspace manifest).
+  npm(['publish', '--access', 'public', '--provenance', '--loglevel', 'verbose'], { cwd: fileURLToPath(new URL(`../${dir}`, import.meta.url)) })
 
   let installable = false
   for (let attempt = 0; attempt < 30; attempt += 1) {
