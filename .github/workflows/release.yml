@@ -54,7 +54,13 @@ jobs:
   publish:
     needs: verify
     runs-on: ubuntu-latest
-    environment: npm-release
+    # NOTE: deliberately no `environment:`. npm's trusted-publisher config must
+    # match the OIDC token's claims exactly, and a publisher registered without
+    # an environment will reject a token that carries one (npm reports this as
+    # ENEEDAUTH, as though no credential existed at all). If you want the
+    # human-approval gate back, add `environment: npm-release` here AND set the
+    # same environment name on all three packages at npmjs.com — both sides or
+    # neither.
     permissions:
       contents: read
       id-token: write # npm Trusted Publishing (OIDC) + provenance attestation
