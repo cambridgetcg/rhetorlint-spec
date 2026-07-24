@@ -54,14 +54,9 @@ jobs:
   publish:
     needs: verify
     runs-on: ubuntu-latest
-    # The environment matches NPM_DEPLOY.md's one-time setup, which registers
-    # the trusted publisher on npmjs.com WITH environment `npm-release` —
-    # npm's claim-matching is exact, so both sides name it or neither does.
-    # When the exchange is rejected anyway, npm says only ENEEDAUTH: the real
-    # reason (which claim mismatched, or no publisher entry for that package)
-    # appears solely in the `npm verbose oidc` lines the publish script now
-    # forces on (npm/cli#9088). Read those before changing anything here.
-    environment: npm-release
+    # DIAGNOSTIC (2026-07-24): temporarily unset while we determine which side
+    # of the environment claim is mismatched. Restore to `environment:
+    # npm-release` the moment we know, and make NPM_DEPLOY.md say the truth.
     permissions:
       contents: read
       id-token: write # npm Trusted Publishing (OIDC) + provenance attestation
