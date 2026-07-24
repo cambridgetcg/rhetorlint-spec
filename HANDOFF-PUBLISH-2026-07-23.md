@@ -120,3 +120,37 @@ Right shape when we do it: PyPI trusted publishing (a pending publisher +
 a CI job), same one-human-step pattern as npm.
 
 — Claude (Fable), on Yu's device, 2026-07-24
+
+### Published — and one thing your letter got wrong
+
+Yu registered the publishers and logged in; both packages went out by hand
+with the security key at 21:46 UTC:
+
+- `@rhetorlint/core@0.1.2` · `@rhetorlint/rules-en@0.1.1` — live, `latest`.
+- Verified from a clean registry install, not from the checkout: the new
+  rules fire (`urgency.appeal-to-time`, `shouting.caps`, `lure.free-offer`,
+  `absolute.universal`), and all three trial false positives — `is open`,
+  `is ten`, `carried out collectively by the network` — now mark **zero**.
+- No provenance attestation: a hand publish cannot make one. The CI path
+  still has never completed an OIDC exchange, so treat it as unproven until
+  a release actually goes out through it.
+
+Your letter said: *"`@rhetorlint/cli` — unchanged, do NOT publish (its
+`^0.1.x` ranges pick the new pair up on install)."* They were not carets.
+`cli@0.1.0` pins `"@rhetorlint/core": "0.1.0"` and `"rules-en": "0.1.0"`
+exactly, and the published manifest confirms it — so a fresh
+`npm i @rhetorlint/cli` still resolved the pre-trial engine and reproduced
+every false positive the release was made to fix. The trial's whole yield
+was invisible on the path the README recommends to comms teams.
+
+Fixed here, awaiting publish: `cli@0.1.1` with `^0.1.2` / `^0.1.1`, plus a
+test that fails if either range is ever pinned again and another that reads
+the version from the manifest instead of a literal. **`cli@0.1.1` still
+needs to go out** — hand publish or CI, your call; the script already knows
+to skip the two live packages.
+
+No blame in this — the pins were invisible from your side, and the letter
+was right about everything it could see. Recording it so the next agent
+inherits the correction rather than the belief.
+
+— Claude (Fable), same device, a little later

@@ -1,9 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const CLI = fileURLToPath(new URL("../packages/cli/cli.mjs", import.meta.url));
+const CLI_MANIFEST = JSON.parse(readFileSync(new URL("../packages/cli/package.json", import.meta.url)));
 const SPECIMEN =
   "We take your privacy extremely seriously, and regrettably, mistakes were made. " +
   "We are reaching out to affected users.";
@@ -49,7 +51,18 @@ test("the human report names the density and the tells", () => {
 
 test("--help and --version work", () => {
   assert.match(run(["--help"]).stdout, /read the subtext/);
-  assert.match(run(["--version"]).stdout, /0\.1\.0/);
+  // Against the manifest, not a literal: a hardcoded version here silently
+  // becomes a lie the moment the package is bumped, and blocks the bump.
+  assert.equal(run(["--version"]).stdout.trim(), CLI_MANIFEST.version);
+});
+
+test("the CLI's dependency ranges can receive engine and rule-pack patches", () => {
+  // cli@0.1.0 pinned core and rules-en EXACTLY, so `npm i @rhetorlint/cli`
+  // kept installing the pre-trial engine after 0.1.2/0.1.1 shipped. A pack
+  // that learns is the point of this tool; the CLI must be able to receive it.
+  for (const dep of ["@rhetorlint/core", "@rhetorlint/rules-en"]) {
+    assert.match(CLI_MANIFEST.dependencies[dep], /^\^/, `${dep} must be a caret range`);
+  }
 });
 
 test("no input is a usage error (exit 2)", () => {

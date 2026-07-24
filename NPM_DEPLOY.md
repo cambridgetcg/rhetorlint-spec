@@ -12,7 +12,14 @@ The three packages that publish (nothing else does):
 |------|---------|-----------|
 | 1 | `@rhetorlint/core` | — |
 | 2 | `@rhetorlint/rules-en` | — |
-| 3 | `@rhetorlint/cli` | core@0.1.0, rules-en@0.1.0 (must be live first) |
+| 3 | `@rhetorlint/cli` | `^0.1.2` core, `^0.1.1` rules-en (must be live first) |
+
+> The CLI's ranges are carets on purpose, and it was not always so: `cli@0.1.0`
+> shipped with **exact** pins, so every `npm i @rhetorlint/cli` kept installing
+> the pre-trial engine even after core 0.1.2 and rules-en 0.1.1 were live. A rule
+> pack that improves is the whole point of this tool; the CLI must be allowed to
+> receive those improvements. Keep them carets, and re-release the CLI whenever
+> a floor rises (an engine feature the CLI's own output depends on).
 
 `apps/explorer` and `apps/widget` are **not** npm packages (they're the site and
 the browser extension). The repo root `rhetorlint-spec` is `"private": true` and
@@ -169,7 +176,8 @@ as installed packages — the exact thing the code was written to handle:
 ```bash
 cd "$(mktemp -d)" && npm init -y >/dev/null
 npm i @rhetorlint/cli
-npx rhetorlint --version                 # -> 0.1.0
+npx rhetorlint --version                 # -> 0.1.1
+npm ls --all                             # core MUST resolve >= 0.1.2, rules-en >= 0.1.1
 echo "We take your privacy extremely seriously, and mistakes were made." | npx rhetorlint --json
 # expect: valid JSON with density.tells >= 2 and an "agency-hiding.deleted-subject" mark
 
