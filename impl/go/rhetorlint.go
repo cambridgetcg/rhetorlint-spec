@@ -83,12 +83,20 @@ type Point struct {
 	Offset int `json:"offset"`
 }
 
+// Every field carries an explicit json tag: the wire names are the contract in
+// spec/output.schema.json, which sets additionalProperties:false, so an exported
+// Go name leaking through (Start, End) makes the whole document invalid. No
+// omitempty anywhere either — a mark at offset 0 is a real mark, and a required
+// field that vanishes when it is zero fails the schema.
 type Mark struct {
-	RuleID     string   `json:"ruleId"`
-	Family     string   `json:"family"`
-	Technique  string   `json:"technique"`
-	Actual     string   `json:"actual"`
-	Position   struct{ Start, End Point } `json:"position"`
+	RuleID    string `json:"ruleId"`
+	Family    string `json:"family"`
+	Technique string `json:"technique"`
+	Actual    string `json:"actual"`
+	Position  struct {
+		Start Point `json:"start"`
+		End   Point `json:"end"`
+	} `json:"position"`
 	Note       string   `json:"note"`
 	Expected   []string `json:"expected"`
 	Confidence float64  `json:"confidence"`
@@ -106,10 +114,10 @@ type Result struct {
 		Tells       int     `json:"tells"`
 		Per100Words float64 `json:"per100Words"`
 	} `json:"density"`
-	Marks  []Mark  `json:"marks"`
-	Strip  string  `json:"strip"`
+	Marks   []Mark  `json:"marks"`
+	Strip   string  `json:"strip"`
 	Rewrite *string `json:"rewrite"`
-	Engine struct {
+	Engine  struct {
 		Name    string `json:"name"`
 		Version string `json:"version"`
 		Rules   string `json:"rules"`

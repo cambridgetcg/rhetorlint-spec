@@ -174,44 +174,103 @@ scripts/publish-npm-interactive.zsh
 ```
 
 The helper checks each exact workspace version and skips versions that are
-already registry-installable. This matters for a core-only patch such as
-`@rhetorlint/core@0.1.1`: unchanged `rules-en@0.1.0` and `cli@0.1.0` must not be
-republished. For a granular token with write access plus bypass 2FA, the direct
-command for that patch is:
+already registry-installable, so a release that moves one workspace does not
+republish the other two — a republish is refused, not merged. For a granular
+token with write access plus bypass 2FA, publish only the workspaces whose
+manifest carries a new reviewed version, in the table's order:
 
 ```bash
-npm publish -w @rhetorlint/core
+npm publish -w @rhetorlint/rules-en    # only if its version moved
+npm publish -w @rhetorlint/cli         # last of the three, always
 ```
-
-Only publish another workspace when its own manifest has a new reviewed
-version. npm versions are immutable.
 
 ## 5 · Verify the real install path (the important test)
 
 This proves the published CLI resolves `@rhetorlint/core` and `@rhetorlint/rules-en`
-as installed packages — the exact thing the code was written to handle:
+as installed packages — the exact thing the code was written to handle.
+
+Read the versions out of the manifests rather than typing them. Hardcoded
+versions are how this step came to validate a superseded pair while reporting
+success:
 
 ```bash
-cd "$(mktemp -d)" && npm init -y >/dev/null
-npm i @rhetorlint/cli
-npx rhetorlint --version                 # -> 0.1.1
-npm ls --all                             # core MUST resolve >= 0.1.2, rules-en >= 0.1.1
-echo "We take your privacy extremely seriously, and mistakes were made." | npx rhetorlint --json
-# expect: valid JSON with density.tells >= 2 and an "agency-hiding.deleted-subject" mark
+core_v=$(node -p "require('$PWD/packages/core/package.json').version")
+rules_v=$(node -p "require('$PWD/packages/rules-en/package.json').version")
+cli_v=$(node -p "require('$PWD/packages/cli/package.json').version")
 
-# For the 0.1.1 core patch, also prove the new subpath from a clean install:
-npm i @rhetorlint/core@0.1.1 @rhetorlint/rules-en@0.1.0
-node --input-type=module -e 'import { analyze } from "@rhetorlint/core"; import { toSignal } from "@rhetorlint/core/signals"; import rules from "@rhetorlint/rules-en" with { type: "json" }; const signal = toSignal(analyze("Mistakes were made.", { rules })); if (signal.marks || signal.schema !== "rhetorlint.signal/0.1") process.exit(1)'
+cd "$(mktemp -d)" && npm init -y >/dev/null
+npm i "@rhetorlint/cli@$cli_v"
+npx rhetorlint --version                 # -> the cli version you just published
+npm ls --all                             # core and rules-en MUST resolve to $core_v / $rules_v
+echo "We take your privacy extremely seriously, and mistakes were made." | npx rhetorlint --json
+# expect: valid JSON with density.tells >= 2, an "agency-hiding.deleted-subject" mark,
+# and engine.rules reading "@rhetorlint/rules-en@$rules_v"
 ```
 
-If that JSON comes back correct, the deploy is good.
+Then prove the engine and the pack from a clean install — the subpath exports,
+that the rules added in this release actually fire, and that the three phrases
+the trial turned up as false positives still mark **nothing**. Under-marking is
+the doctrine: a rule that cannot be evaluated correctly marks nothing at all,
+so a false positive is a release-blocking defect and an unfired new rule is
+only the pack not shipping.
+
+```bash
+npm i "@rhetorlint/core@$core_v" "@rhetorlint/rules-en@$rules_v"
+node --input-type=module -e '
+import { analyze } from "@rhetorlint/core"
+import { toSignal } from "@rhetorlint/core/signals"
+import rules from "@rhetorlint/rules-en" with { type: "json" }
+const fired = t => new Set(analyze(t, { rules }).marks.map(m => m.ruleId))
+const loud = fired("The FREE OFFER is absolutely free — ACT NOW, limited time only.")
+for (const id of ["lure.free-offer", "urgency.appeal-to-time", "shouting.caps"]) {
+  if (!loud.has(id)) { console.error("MISSING " + id); process.exit(1) }
+}
+for (const quiet of ["The shop is open.", "The count is ten.", "The work was carried out collectively by the network."]) {
+  const marks = analyze(quiet, { rules }).marks
+  if (marks.length) { console.error("FALSE POSITIVE on " + JSON.stringify(quiet) + ": " + marks.map(m => m.ruleId)); process.exit(1) }
+}
+const signal = toSignal(analyze("Mistakes were made.", { rules }))
+if (signal.marks || signal.schema !== "rhetorlint.signal/0.1") process.exit(1)
+console.log("engine + pack verified: the new rules fire, the trial false positives stay silent")
+'
+```
+
+The second loop is the one that catches a stale engine, and it is worth knowing
+why. Measured against `core@0.1.1` + `rules-en@0.1.1`, all three phrases mark:
+the old engine still reads `is open` / `is ten` as agentless passives, and it
+ignores `caseSensitive`, so `shouting.caps` widens to case-insensitive and
+matches any two ordinary words in a row — `The shop`. Both were fixed in core
+0.1.2. If those lines mark anything, the CLI resolved an engine older than the
+one this release ships. The deploy is good when both blocks come back clean.
 
 ## 6 · Tag the release and report back
 
+⚠ **This step is not inert.** `.github/workflows/release.yml` triggers on `v*`
+and on `release-*`. Pushing either tag starts the automated publish, which
+offers **every** manifest in the repo to the registry — including workspaces you
+did not just publish by hand. After a complete hand release that run is a no-op,
+because the script skips whatever is already live. After a partial one it
+publishes the remainder, unattended, from whatever the manifests currently hold.
+Decide which of those you want before you push:
+
+- **Let it finish the release.** Push the `v*` tag. Put required reviewers on
+  the `npm-release` environment first if you want a human between the tag and
+  the registry.
+- **Record the release only.** Use a tag name matching neither pattern.
+
 ```bash
 cd -                                     # back to the repo
-core_version=$(node -p "require('./packages/core/package.json').version")
-git tag "v${core_version}" && git push origin "v${core_version}"
+core_v=$(node -p "require('./packages/core/package.json').version")
+rules_v=$(node -p "require('./packages/rules-en/package.json').version")
+tag="v${core_v}-rules-${rules_v}"        # the convention already on the repo:
+                                         # core's version alone is not unique, because
+                                         # a rules-only release leaves it unchanged
+
+# fires release.yml:
+git tag "$tag" && git push origin "$tag"
+
+# — or, to mark the commit without starting a publish:
+git tag "hand-$tag" && git push origin "hand-$tag"
 ```
 
 Then report the exact package versions that were published and verified (`npm

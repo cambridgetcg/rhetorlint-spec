@@ -1,6 +1,6 @@
 {
   "spec": "0.1",
-  "rules": "@rhetorlint/rules-en@0.1.1",
+  "rules": "@rhetorlint/rules-en@0.1.2",
   "note": "Conformance ground truth, generated from the JS reference engine. Any RhetorLint engine MUST reproduce every case exactly.",
   "cases": [
     {

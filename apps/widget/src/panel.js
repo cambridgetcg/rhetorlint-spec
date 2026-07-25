@@ -115,7 +115,7 @@ function capShow(result, selectedText) {
         <div class="cap-read">${capMarkup(selectedText, result.marks)}</div>
         ${marksHtml}
         ${result.marks.length ? `<div class="cap-strip"><div class="k">strip · spin removed, hidden agents flagged</div><div class="v">${capEscape(result.strip)}</div></div>` : ""}
-        <div class="cap-foot">On-device · nothing you selected left this page.</div>
+        <div class="cap-foot">On-device · nothing you selected left this page.<br>${capEscape(result.engine.name + "@" + result.engine.version)} · ${capEscape(result.engine.rules)}</div>
       </div>
     </div>`;
   root.querySelector(".cap-x").addEventListener("click", () => host.remove());

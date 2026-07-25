@@ -22,6 +22,15 @@ on:
         type: boolean
         default: false
 
+# One release at a time. Two tags pushed together would otherwise run two
+# publish jobs against the same versions, and whichever lost the race would see
+# a duplicate-version 403 for work it thought was its own. Queued, never
+# cancelled: a publish stopped midway leaves the registry holding some of the
+# three packages and not the others, and npm versions are immutable.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -80,8 +89,12 @@ jobs:
         with:
           node-version: 22
       # Trusted publishing needs npm >= 11.5.1; Node 22 still ships npm 10.
+      # Pinned to the 11 line rather than `latest`: this job holds id-token:
+      # write, and an unpinned install means the same commit publishes under
+      # whichever npm major happens to be current on the day it runs. The
+      # caret keeps patches to the OIDC exchange, not a new major's semantics.
       - name: install an npm new enough to publish without a token
-        run: npm install -g npm@latest && npm --version
+        run: npm install -g "npm@^11.5.1" && npm --version
       - name: publish the packages the registry does not have yet
         env:
           DRY_RUN: ${{ inputs.dry_run }}

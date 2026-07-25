@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "RhetorLint — read the subtext",
-  "version": "0.1.0",
-  "description": "Select text on any page and mark the rhetorical tells — hedges, absolutes, deleted subjects, spin. On-device; nothing leaves your browser.",
+  "version": "0.1.1",
+  "description": "Select text on any page and mark the rhetorical tells — hedges, absolutes, deleted subjects, manufactured urgency, spin. On-device; nothing leaves your browser.",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

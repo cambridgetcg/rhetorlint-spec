@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { analyze, strip } from "../packages/core/index.mjs";
 import { toSarif } from "../packages/core/sarif.mjs";
+import { validate } from "./helpers/schema-validator.mjs";
 
 const RULES = JSON.parse(
   readFileSync(new URL("../packages/rules-en/rules.json", import.meta.url))
@@ -114,9 +115,12 @@ test("analyze() refuses to run without a rule pack", () => {
 
 test("result carries the shape the output schema requires", () => {
   const r = analyze(SPECIMEN, { rules: RULES });
-  for (const key of SCHEMA.required) assert.ok(key in r, `missing required key '${key}'`);
+  assert.deepEqual(
+    validate(r, SCHEMA),
+    [],
+    "the published schema is the contract; a result that violates it is a broken release"
+  );
   assert.equal(r.rhetorlint, "0.1");
-  assert.ok(SCHEMA.$defs.mark.properties.family.enum.includes(r.marks[0].family));
   assert.ok(typeof r.engine.rules === "string" && r.engine.rules.includes("@"));
   assert.equal(r.engine.version, CORE_PACKAGE.version, "engine provenance matches the package");
 });

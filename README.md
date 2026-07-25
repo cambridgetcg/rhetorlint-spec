@@ -16,7 +16,7 @@ The durable asset is **data + a schema**, not any one engine — the lesson of V
 |-------|-----------|
 | **`spec/`** | The language-agnostic core. [`taxonomy.yaml`](spec/taxonomy.yaml) — the families of tells, aligned to the SemEval-2023 persuasion taxonomy, readable as a syllabus. [`output.schema.json`](spec/output.schema.json) — the one result object every implementation emits. |
 | **`@rhetorlint/core`** | A browser-first, zero-dependency JS reference engine that implements the spec. Runs fully on-device. |
-| **`@rhetorlint/rules-en`** | The English tell-pack as declarative rules — compiled into the engine *and* readable by any future Python/Go/Rust engine. |
+| **`@rhetorlint/rules-en`** | The English tell-pack as declarative rules — compiled into the JS engine *and* read unchanged by the Python and Go engines in [`impl/`](impl). |
 
 The taxonomy is the framework, the curriculum, and the moat — all at once.
 
@@ -39,6 +39,11 @@ node scripts/demo.mjs
       an agentless passive — who acted is deleted from the sentence
   · [manipulative-wording]  "reaching out to"
       a hedge — lowers a promise you can later deny
+
+  strip (deterministic, on-device):
+  We take your privacy seriously, and regrettably, mistakes [who?] were made. We are reaching out to affected users.
+
+  SARIF export: 4 results
 ```
 
 ## Use it in code
@@ -53,7 +58,8 @@ const require = createRequire(import.meta.url);
 const rules = require("@rhetorlint/rules-en");
 
 const result = analyze("Mistakes were made.", { rules });
-// -> { rhetorlint:"0.1", density:{tells:1, per100Words:33.3}, marks:[…], strip:"[who?] Mistakes were made." }
+// -> { rhetorlint:"0.1", density:{tells:1, per100Words:33.3}, marks:[…], strip:"Mistakes [who?] were made." }
+// the [who?] marker sits at the passive span it questions, not at the start of the sentence
 
 const sarif = toSarif(result); // flows into editors, CI, code-scanning
 const signal = toSignal(result); // redacted aggregate for explicit agent traces
@@ -78,11 +84,11 @@ npm run build:widget                                    # generate the extension
 
 ## Taxonomy lineage
 
-The families map to the SemEval-2023 Task 3 persuasion inventory (Piskorski et al. 2023), which descends from Da San Martino et al. 2019 (the Propaganda Techniques Corpus) via SemEval-2020 Task 11. RhetorLint's *structural* tells — deleted subject, agentless passive, rehearsed contrition — are its own extension, mapped to the nearest parent and marked as such.
+The families map to the SemEval-2023 Task 3 persuasion inventory (Piskorski et al. 2023), which descends from Da San Martino et al. 2019 (the Propaganda Techniques Corpus) via SemEval-2020 Task 11. One family is RhetorLint's own: **agency-hiding**, the agentless passive, structural where SemEval is lexical. Its technique label carries the words "RhetorLint extension" on the wire, so a researcher grouping marks by `technique` drops it rather than silently counting it as SemEval's. `contrition.rehearsed` is the opposite case — RhetorLint's pattern, SemEval's technique, shipping the Obfuscation label verbatim; group by `ruleId` to see it on its own.
 
 ## Proven portable — three engines, one taxonomy
 
-The claim that "engines are just implementations of the spec" is not a promise here — it's a test. Three independent engines, in three languages, read the **same** rule pack and reproduce the **same** [conformance corpus](conformance) byte for byte:
+The claim that "engines are just implementations of the spec" is not a promise here — it's a test. Three independent engines, in three languages, read the **same** rule pack and reproduce the **same** [conformance corpus](conformance) — every mark, every offset, every density, every `strip`, value for value:
 
 | engine | language | conformance |
 |--------|----------|-------------|
@@ -91,8 +97,11 @@ The claim that "engines are just implementations of the spec" is not a promise h
 | [`impl/go/rhetorlint.go`](impl/go) | Go (stdlib only) | `go -C impl/go test ./...` |
 
 ```bash
-npm run test:conformance    # 10/10 cases, identical across engines
+npm run test:conformance     # 15/15 cases — JS and Python only
+go -C impl/go test ./...     # the third engine; CI runs all three on every push
 ```
+
+Agreement is on **values**, not on serialised bytes: the same density that JS and Go write as `"per100Words": 25` Python writes as `25.0`, because that is what each language's JSON encoder does with a whole-numbered float. The suites compare parsed values, which is the only comparison a spec can fairly demand across languages. Offsets agree over the corpus because the corpus is ASCII; [`conformance/README.md`](conformance/README.md) sets out exactly where non-ASCII input parts the engines.
 
 `conformance/cases.json` is the ground truth. The Go engine is the sharpest proof: Go's RE2 regex has **no lookahead**, so it can't express the `(?!by)` agent-check the other two use — it reimplements that check in code and *still* produces identical output. That's precisely what a conformance suite is for: it pins the output, not the implementation. Point a fourth engine in any language at `cases.json` and you'll know instantly whether it conforms — which is what makes RhetorLint a spec, not just one library.
 
@@ -114,6 +123,6 @@ scripts/demo.mjs                                           a 20-line taste
 
 ## Status
 
-`0.1` — a seed. It marks eight tell families honestly and under-marks by design. The hard, unfinished work is the structural check-type (agency-hiding beyond simple passive needs real grammar awareness). Contributions of tell families and locales welcome once the contribution guide lands.
+`0.1` — a seed. The taxonomy carries seven families; five of them ship at least one rule, eleven rules in all, and the two unseeded families (attack-on-reputation, justification) stay unseeded until they can be marked without guessing at intent. It under-marks by design. The hard, unfinished work is the structural check-type (agency-hiding beyond simple passive needs real grammar awareness). Contributions of tell families and locales welcome once the contribution guide lands.
 
 MIT (engine + rules) · CC-BY-SA-4.0 (taxonomy corpus).

@@ -13,7 +13,7 @@
   ],
   "dependencies": {
     "@rhetorlint/core": "^0.1.2",
-    "@rhetorlint/rules-en": "^0.1.1"
+    "@rhetorlint/rules-en": "^0.1.2"
   },
   "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",
   "repository": {

@@ -3,9 +3,11 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { validate } from "./helpers/schema-validator.mjs";
 
 const CLI = fileURLToPath(new URL("../packages/cli/cli.mjs", import.meta.url));
 const CLI_MANIFEST = JSON.parse(readFileSync(new URL("../packages/cli/package.json", import.meta.url)));
+const SCHEMA = JSON.parse(readFileSync(new URL("../spec/output.schema.json", import.meta.url)));
 const SPECIMEN =
   "We take your privacy extremely seriously, and regrettably, mistakes were made. " +
   "We are reaching out to affected users.";
@@ -22,6 +24,10 @@ test("stdin + --json emits a valid RhetorLint result", () => {
   assert.equal(out.rhetorlint, "0.1");
   assert.equal(out.density.tells, 4);
   assert.ok(out.marks.some((m) => m.ruleId === "agency-hiding.deleted-subject"));
+  // What the CLI prints is the surface anyone else parses, so it answers to
+  // the published schema and not merely to the engine that produced it.
+  assert.deepEqual(validate(out, SCHEMA), []);
+  assert.deepEqual(validate(JSON.parse(run(["--json"], CLEAN).stdout), SCHEMA), []);
 });
 
 test("--sarif emits well-formed SARIF", () => {

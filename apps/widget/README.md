@@ -39,3 +39,5 @@ Use it: select text and press **Alt+Shift+R**, or click the toolbar button. The 
 ## Build
 
 `content.js` and `bookmarklet.html` are generated — do not edit them by hand. Edit the panel UI in [`src/panel.js`](src/panel.js) or the engine in `packages/core`, then rerun `node apps/widget/build.mjs`. A test (`test/widget-build.test.mjs`) fails if the committed `content.js` is out of sync.
+
+The `version` in [`manifest.json`](manifest.json) is the only signal a side-loaded install gets that the bundle changed: bump it whenever the inlined engine or rule pack does, or a reader keeps an old build and no way to notice. The exact engine and pack are printed at the foot of the panel on every run.

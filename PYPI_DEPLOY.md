@@ -14,8 +14,12 @@ Unlike npm, **PyPI has one flat namespace and no scopes** — the package name
 ```bash
 git clone https://github.com/cambridgetcg/rhetorlint-spec.git   # or: cd rhetorlint-spec && git pull
 cd rhetorlint-spec
-python3 impl/python/test_conformance.py     # MUST print: 10/10 cases identical (and the bundle guard passes)
+python3 impl/python/test_conformance.py     # MUST print: python conformance: 15/15 cases identical to the ground truth
 ```
+
+The count is the size of the corpus, not a target — it rises as cases are added.
+Read it as `N/N` with no `FAIL` lines above it, and abort only on a mismatch or
+on the bundle guard.
 
 If the bundle guard complains that `rules_en.json` is stale, resync it and re-run:
 
@@ -46,9 +50,13 @@ python3 -m pip install --upgrade build twine hatchling
 
 ## 3 · Build the wheel + sdist
 
+The filenames carry the version from `[project].version` in
+`impl/python/pyproject.toml`, so read it rather than assuming:
+
 ```bash
 cd impl/python
-python3 -m build          # writes dist/rhetorlint-0.1.0-py3-none-any.whl and .tar.gz
+py_v=$(python3 -c "import tomllib,pathlib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+python3 -m build          # writes dist/rhetorlint-$py_v-py3-none-any.whl and dist/rhetorlint-$py_v.tar.gz
 ```
 
 Confirm the wheel bundles the rules (this is what makes it work without the repo):
@@ -99,15 +107,21 @@ Then tell Yu: `pip install rhetorlint` works and the JSON output is correct;
 paste it as proof. Optionally tag the release:
 
 ```bash
-cd - && git tag py-v0.1.0 && git push origin py-v0.1.0
+cd -                                     # back to the repo root
+py_v=$(python3 -c "import tomllib,pathlib; print(tomllib.loads(pathlib.Path('impl/python/pyproject.toml').read_text())['project']['version'])")
+git tag "py-v${py_v}" && git push origin "py-v${py_v}"
 ```
+
+`py-v*` matches neither of `.github/workflows/release.yml`'s tag triggers (`v*`,
+`release-*`), so it records the release without starting the npm publish job.
+Keep the prefix.
 
 ---
 
 ## Caveats (short)
 
 - **A version can't be re-uploaded.** If something's wrong after publish, bump
-  to `0.1.1` in `pyproject.toml` and rebuild — do not rely on delete. You can
+  the patch in `pyproject.toml` and rebuild — do not rely on delete. You can
   `yank` a bad release (hides it from new installs, keeps it for pinned deps).
 - **Use an API token, scoped to this project if possible.** Username is the
   literal `__token__`; password is the `pypi-...` token string. Prefer the

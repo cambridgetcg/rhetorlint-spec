@@ -1,8 +1,8 @@
 {
   "id": "@rhetorlint/rules-en",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "locale": "en",
-  "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true (engines at core>=0.1.2 honour it; older engines fall back to case-insensitive, which only widens matches for such rules).",
+  "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.",
   "rules": [
     {
       "ruleId": "intensifier.loaded",
@@ -109,10 +109,11 @@
       "technique": "Loaded Language",
       "type": "pattern",
       "caseSensitive": true,
+      "minEngine": "0.1.2",
       "level": "info",
       "confidence": 0.6,
       "note": "sustained ALL-CAPS — volume standing in for argument",
-      "pattern": "\\b[A-Z]{3,}(?:\\s+[A-Z]{3,})+\\b",
+      "pattern": "\\b[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z](?:\\s+[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z])+\\b",
       "expected": ["(make the point in sentence case; let the facts carry the emphasis)"]
     },
     {

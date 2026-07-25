@@ -44,19 +44,31 @@
 #   * SemEval-2023 Task 3 (Piskorski et al.) — re-expanded to the 23 fine / 6
 #     coarse taxonomy this file aligns to.
 #
-# Two families/tells are RhetorLint's OWN structural extension, NOT in SemEval,
-# and are labelled as such: the `agency-hiding` family, and the
-# `contrition.rehearsed` tell. Each is mapped to its nearest SemEval kin so the
-# map stays honest.
+# ONE family is RhetorLint's OWN structural extension, NOT in SemEval: the
+# `agency-hiding` family and its single tell. It is mapped to its nearest SemEval
+# kin so the map stays honest, and the label it puts on the wire says so out
+# loud — "Obfuscation (structural — RhetorLint extension)" — so a researcher
+# grouping marks by `technique` can never mistake it for a SemEval technique.
 #
-# NOTE ON VERBATIM LABELS: `semeval_technique` values are the technique names as
-# published by the SemEval-2023 Task 3 organizers. Where a compiled rule pack
-# spells the same label with different punctuation (e.g. rules-en writes "False
-# Dilemma / No Choice" for SemEval's "False Dilemma or No Choice", and
-# "Obfuscation, Intentional Vagueness, Confusion" for the organizers' "Obfuscation
-# - vagueness or confusion"), the divergence is flagged inline. Verbatim labels
-# were confirmed against the organizers' task page and the ACL 2023 paper; none
-# were invented.
+# `contrition.rehearsed` is a different case and the difference matters. The
+# PATTERN is RhetorLint's; the TECHNIQUE is not. SemEval has no fine technique
+# for rehearsed corporate contrition, so the rule is filed under the nearest one
+# that does exist and ships that label verbatim. Consequence, stated plainly:
+# grouping output by `technique` folds this tell in with the other Obfuscation
+# tells — correct against SemEval, but it disappears as a category. Group by
+# `ruleId` to see it on its own.
+#
+# NOTE ON VERBATIM LABELS: `semeval_technique` holds the technique names as
+# published by the SemEval-2023 Task 3 organizers — and, for the one structural
+# tell SemEval has no technique for, the suffixed label RhetorLint emits in their
+# place. Either way the value is the string the compiled packs put on the wire,
+# character for character: packages/rules-en/rules.json respells none of them, so
+# a mark's `technique` joins straight back to this file. One label is normalised
+# here and in the packs alike: the organizers' page writes "Obfuscation -
+# vagueness or confusion" where this taxonomy writes "Obfuscation, Intentional
+# Vagueness, Confusion". That single string is the one a researcher must map back
+# before joining RhetorLint output to a SemEval corpus. Labels were confirmed
+# against the organizers' task page and the ACL 2023 paper; none were invented.
 # ============================================================================
 
 version: "0.1"
@@ -156,15 +168,19 @@ families:
         lineage: "SemEval-2023 · Manipulative Wording › Loaded Language"
 
       - id: contrition.rehearsed
-        semeval_technique: "(RhetorLint extension)"
-        # STRUCTURAL EXTENSION — not a SemEval technique. Nearest SemEval kin below.
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        # RhetorLint-AUTHORED PATTERN, EXISTING SemEval TECHNIQUE. SemEval names no
+        # technique for rehearsed contrition, so the rule ships the label of its
+        # nearest kin rather than inventing one — which keeps `technique` joinable
+        # to a SemEval corpus at the cost of hiding this tell inside the
+        # Obfuscation bucket. Group by `ruleId` to recover it.
         what: "The shape of an apology with the substance removed — corporate boilerplate that performs concern without admitting a specific fault or naming a specific fix."
         why_it_works: "It discharges the social debt of an apology while conceding nothing, so the reader's urge to be satisfied is met before any accountability lands."
         examples:
           - marked: "We take your security seriously and apologize for any inconvenience"
             tell: "we take your security seriously"
             plain: "We stored passwords in plain text for three years. They are now hashed, and we've hired an external auditor."
-        lineage: "RhetorLint extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (RhetorLint-authored pattern under a SemEval technique)"
 
   # ==========================================================================
   # 2. SIMPLIFICATION  — collapsing a complex reality into one option / cause / certainty
@@ -177,7 +193,7 @@ families:
     tells:
 
       - id: absolute.universal
-        semeval_technique: "False Dilemma or No Choice"   # rules-en rule string: "False Dilemma / No Choice"
+        semeval_technique: "False Dilemma or No Choice"
         # The marked words split two ways: "only option / no choice" is squarely
         # False Dilemma; "obviously / everyone knows / undeniable" also brushes
         # SemEval's Conversation Killer (thought-terminating). RhetorLint marks the
@@ -301,7 +317,10 @@ families:
     tells:
 
       - id: agency-hiding.deleted-subject
-        semeval_technique: "(RhetorLint extension)"
+        semeval_technique: "Obfuscation (structural — RhetorLint extension)"
+        # NOT a SemEval technique. The parenthesis is load-bearing: it keeps the
+        # label off SemEval's Obfuscation bucket, so a technique-level join to a
+        # SemEval corpus drops this tell rather than silently absorbing it.
         what: "An agentless passive — 'mistakes were made', 'your account was closed' — a sentence whose grammar has no subject, so who acted has been deleted."
         why_it_works: "No actor, no accountability: the harm reads like weather that simply happened rather than a choice a specific someone made."
         examples:

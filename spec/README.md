@@ -13,29 +13,33 @@ That is the highest-leverage decision in the framework: the cross-language artif
 
 ## [`output.schema.json`](output.schema.json) — the result object
 
-Every implementation, in any language, emits this one JSON shape:
+Every implementation, in any language, emits this one JSON shape. Analyzing the demo passage — *"We take your privacy extremely seriously, and regrettably, mistakes were made. We are reaching out to affected users."* — returns exactly this, with three of the four marks elided for length; `node scripts/demo.mjs` prints the whole object.
 
 ```jsonc
 {
   "rhetorlint": "0.1",
-  "source":  { "chars": 118, "words": 18, "locale": "en" },
+  "source":  { "chars": 117, "words": 18, "locale": "en" },
   "density": { "tells": 4, "per100Words": 22.2 },   // the headline metric
   "marks": [{
     "ruleId":   "agency-hiding.deleted-subject",     // family.tell
     "family":   "agency-hiding",                     // one of 7 (6 SemEval parents + agency-hiding)
     "technique":"Obfuscation (structural — RhetorLint extension)",
     "actual":   "were made",                         // the visible phrase
-    "position": { "start": { "offset": 60 }, "end": { "offset": 69 } },
-    "note":     "an agentless passive — who acted is deleted",
-    "expected": ["(name who did it)"],
+    "position": { "start": { "line": 1, "column": 69, "offset": 68 },
+                  "end":   { "line": 1, "column": 78, "offset": 77 } },
+    "note":     "an agentless passive — who acted is deleted from the sentence",
+    "expected": ["(name who did it: 'I/we + verb')"],
     "confidence": 0.7,                                // heuristic, NOT a lie probability
     "level":    "warning"
   }],
-  "strip":   "…deterministic de-spun text…",
+  "strip":   "We take your privacy seriously, and regrettably, mistakes [who?] were made. We are reaching out to affected users.",
   "rewrite": null,                                    // only non-null with a model adapter
-  "engine":  { "name": "@rhetorlint/core", "version": "0.1.1", "rules": "@rhetorlint/rules-en@0.1.0" }
+  // `rules` is the pack's own `version` field verbatim; the engine hard-codes nothing
+  "engine":  { "name": "@rhetorlint/core", "version": "0.1.2", "rules": "@rhetorlint/rules-en@0.1.2" }
 }
 ```
+
+`line` and `column` are optional; `offset` is not. An engine that emits only `offset` still conforms.
 
 ### Invariants an implementation MUST hold
 

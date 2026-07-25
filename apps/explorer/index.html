@@ -493,7 +493,7 @@
 
     <div class="card">
       <p class="sect-label">The taxonomy &mdash; families &amp; tells</p>
-      <p class="fam-desc">Seven coarse families: the six SemEval-2023 persuasion parents plus RhetorLint's structural <em>agency-hiding</em> extension. This pack (<span class="rid" id="packId">rules-en</span>) ships rules for four of them today; the rest are defined and awaiting rules.</p>
+      <p class="fam-desc">Seven coarse families: the six SemEval-2023 persuasion parents plus RhetorLint's structural <em>agency-hiding</em> extension. This pack (<span class="rid" id="packId">rules-en</span>) ships <span id="packRules">11</span> rules across <span id="packFams">5</span> of them today; the rest are defined and awaiting rules.</p>
       <div id="learn"></div>
     </div>
   </section>
@@ -514,9 +514,9 @@
      ============================================================ */
   const RULES = {
     "id": "@rhetorlint/rules-en",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "locale": "en",
-    "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true (engines at core>=0.1.2 honour it; older engines fall back to case-insensitive, which only widens matches for such rules).",
+    "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.",
     "rules": [
       {
         "ruleId": "intensifier.loaded",
@@ -682,10 +682,11 @@
         "technique": "Loaded Language",
         "type": "pattern",
         "caseSensitive": true,
+        "minEngine": "0.1.2",
         "level": "info",
         "confidence": 0.6,
         "note": "sustained ALL-CAPS — volume standing in for argument",
-        "pattern": "\\b[A-Z]{3,}(?:\\s+[A-Z]{3,})+\\b",
+        "pattern": "\\b[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z](?:\\s+[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z])+\\b",
         "expected": [
           "(make the point in sentence case; let the facts carry the emphasis)"
         ]
@@ -774,8 +775,7 @@
 
   const REMOVABLE = new Set(["intensifier.loaded", "hedge.deniable"]);
 
-  function analyze(text, options) {
-    options = options || {};
+  function analyze(text, options = {}) {
     const pack = options.rules;
     if (!pack || !Array.isArray(pack.rules)) {
       throw new Error("analyze() needs a rule pack: analyze(text, { rules })");
@@ -857,22 +857,27 @@
   /* ============================================================
      3. PRESENTATION DATA (families, examples, worked cases)
      ============================================================ */
+  // The seven families of the taxonomy. Whether one counts as planned is read
+  // off the pack at render time, never hand-flagged here — a family cannot keep
+  // a "planned" badge after a rule lands in it.
   const FAMILIES = [
-    { id: "manipulative-wording", label: "Manipulative wording", planned: false,
+    { id: "manipulative-wording", label: "Manipulative wording",
       desc: "Word choices that steer feeling or lower a promise — loaded intensifiers, deniable modals, vague hedges, unnamed authorities, and rehearsed contrition." },
-    { id: "simplification", label: "Simplification", planned: false,
+    { id: "simplification", label: "Simplification",
       desc: "Collapses a messy reality into a clean, unarguable shape — absolutes and false dilemmas that claim more than anyone could know." },
-    { id: "distraction", label: "Distraction", planned: false,
+    { id: "distraction", label: "Distraction",
       desc: "Moves attention off the question that was actually asked." },
-    { id: "attack-on-reputation", label: "Attack on reputation", planned: true,
+    { id: "attack-on-reputation", label: "Attack on reputation",
       desc: "Targets the person or group instead of the argument — name-calling, labeling, guilt by association." },
-    { id: "justification", label: "Justification", planned: true,
+    { id: "justification", label: "Justification",
       desc: "Frames a stance as already justified — appeal to fear, flag-waving, 'we had no choice'." },
-    { id: "call", label: "Call", planned: true,
-      desc: "Pushes the audience to act or feel right now — slogans, 'act now', us-vs-them appeals." },
-    { id: "agency-hiding", label: "Agency-hiding", planned: false,
+    { id: "call", label: "Call",
+      desc: "Pushes the audience to act or feel right now — manufactured urgency, slogans, us-vs-them appeals." },
+    { id: "agency-hiding", label: "Agency-hiding",
       desc: "Deletes who acted — agentless passives where the subject is missing. RhetorLint's structural extension to the SemEval taxonomy." }
   ];
+
+  const rulesInFamily = (id) => RULES.rules.filter((r) => r.family === id);
 
   // One worked example per rule. Each is run through the SAME engine at
   // render time, so the highlight is genuine (verified to fire its rule).
@@ -884,6 +889,9 @@
     "weasel.attribution":            "Experts say the new policy will help.",
     "deflection.whataboutism":       "But what about the other side's record?",
     "contrition.rehearsed":          "We take your concerns seriously.",
+    "lure.free-offer":               "Your first month is absolutely free.",
+    "urgency.appeal-to-time":        "Act now, this is your last chance.",
+    "shouting.caps":                 "READ THIS CAREFULLY before you sign anything.",
     "agency-hiding.deleted-subject": "Mistakes were made."
   };
 
@@ -977,6 +985,15 @@
     return escapeHtml(stripText).replace(/\[who\?\]/g, '<span class="who">[who?]</span>');
   }
 
+  // The taxonomy copy quotes the pack rather than restating it, so the counts
+  // it prints cannot outrun the rules the page actually ships.
+  function stampPack() {
+    document.getElementById("packId").textContent = RULES.id;
+    document.getElementById("packRules").textContent = RULES.rules.length;
+    document.getElementById("packFams").textContent =
+      FAMILIES.filter((f) => rulesInFamily(f.id).length).length;
+  }
+
   function buildLegend() {
     const el = document.getElementById("legend");
     el.innerHTML = FAMILIES.map((f) =>
@@ -988,13 +1005,13 @@
     const el = document.getElementById("learn");
     let html = "";
     for (const fam of FAMILIES) {
-      const rules = RULES.rules.filter((r) => r.family === fam.id);
+      const rules = rulesInFamily(fam.id);
       html += '<div class="learn-fam">';
       html += '<div class="learn-fam-head fam-' + fam.id + '">' +
                 '<span class="swatch" aria-hidden="true"></span>' +
                 '<h3>' + escapeHtml(fam.label) + '</h3>' +
                 '<span class="fid">' + escapeHtml(fam.id) + '</span>' +
-                (fam.planned ? '<span class="planned">planned</span>' : '') +
+                (rules.length ? '' : '<span class="planned">planned</span>') +
               '</div>';
       html += '<p class="fam-desc">' + escapeHtml(fam.desc) + '</p>';
 
@@ -1064,7 +1081,6 @@
     document.getElementById("prov").textContent =
       res.engine.name + "@" + res.engine.version + "  ·  rules " + res.engine.rules + "  ·  spec " + res.rhetorlint;
     document.getElementById("specTag").textContent = "spec " + res.rhetorlint;
-    document.getElementById("packId").textContent = RULES.id;
   }
 
   input.addEventListener("input", () => {
@@ -1146,6 +1162,7 @@
   /* ============================================================
      8. Boot
      ============================================================ */
+  stampPack();
   buildLegend();
   input.value = EXAMPLES.specimen;
   update();
