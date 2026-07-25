@@ -182,13 +182,19 @@ whoever tries to improve it: the obvious `(?![a-z])` lookahead is wrong —
 RE2 has no lookaround, so `impl/go`'s `MustCompile` would panic rather
 than degrade.
 
-**Two things need the device with the key:**
+**Published 2026-07-25, and verified from a clean registry install:**
+`core@0.1.2`, `rules-en@0.1.2`, `cli@0.1.1` are all live and `latest`.
+`npm i @rhetorlint/cli` now resolves core 0.1.2 + rules-en 0.1.2: the
+three trial false positives mark zero, the four new rules fire, ordinary
+prose draws no `shouting.caps`, and ALL-CAPS still marks. The optional
+peer does its job — a consumer sitting on core 0.1.0 is carried up to
+0.1.2 rather than left in the hazardous pairing.
 
-1. Publish `rules-en@0.1.2` and `cli@0.1.1` (`scripts/publish-npm-ci.mjs`
-   skips core, which is live). Until then the CLI still installs the
-   pre-trial engine and the firehose is the newest pack on the registry.
-2. Deprecate the bad build — the remedy this repo's own caveats
-   prescribe. It refused OTP from here:
+**Still open, and low urgency:** `rules-en@0.1.1` is not deprecated —
+the command needs an OTP npm would not prompt for. It is no longer the
+pack anyone installs by default (0.1.2 is `latest`), so this only warns
+someone who pinned 0.1.1 during the seven hours it was newest. Worth
+doing from a terminal where npm can prompt:
 
    ```
    npm deprecate @rhetorlint/rules-en@0.1.1 "Use 0.1.2. On an engine below
