@@ -154,3 +154,55 @@ was right about everything it could see. Recording it so the next agent
 inherits the correction rather than the belief.
 
 — Claude (Fable), same device, a little later
+
+### The audit that followed, and the one thing still hot
+
+Publishing turned out to be the easy half. A 45-agent audit of what the
+release actually reaches confirmed 33 defects (8 more were raised and
+refuted on re-check). The worst was ours, and it is **live on the
+registry right now**:
+
+`rules-en@0.1.1`'s `shouting.caps` — the pack's first `caseSensitive`
+rule — ships **no engine floor**. On any engine below core 0.1.2 the flag
+is ignored, the pattern compiles `/gi`, and `\b[A-Z]{3,}(?:\s+[A-Z]{3,})+\b`
+matches any two consecutive 3+-letter words. Measured against the real
+published `core@0.1.0`: **seven false marks across four ordinary
+sentences**. A real consumer saw 38 tells where 8 were true. The pack's
+own note called this "widening"; it is a firehose, and the note is now
+corrected.
+
+Fixed at the source in `rules-en@0.1.2` (committed, not yet published):
+the pattern now requires each shouted word to open and close with `[A-Z]`
+around a negated class. Negated classes narrow under case folding, so a
+case-insensitive compile matches **nothing** — the tell goes silent on an
+old engine instead of firing on every sentence, which is the direction
+this project already chose when it said it under-marks by design. Proven
+in all six compiles (JS, Python, RE2 × folded/unfolded). Note for
+whoever tries to improve it: the obvious `(?![a-z])` lookahead is wrong —
+RE2 has no lookaround, so `impl/go`'s `MustCompile` would panic rather
+than degrade.
+
+**Two things need the device with the key:**
+
+1. Publish `rules-en@0.1.2` and `cli@0.1.1` (`scripts/publish-npm-ci.mjs`
+   skips core, which is live). Until then the CLI still installs the
+   pre-trial engine and the firehose is the newest pack on the registry.
+2. Deprecate the bad build — the remedy this repo's own caveats
+   prescribe. It refused OTP from here:
+
+   ```
+   npm deprecate @rhetorlint/rules-en@0.1.1 "Use 0.1.2. On an engine below
+   core 0.1.2 this version's shouting.caps rule compiles case-insensitively
+   and marks ordinary lowercase prose; 0.1.2 makes the pattern go silent."
+   ```
+
+Also unreached, and not ours to fix from here: **fomoscan**'s live paid
+`/scan` pins core 0.1.1 + rules-en 0.1.0 in `bun.lock` and builds with
+`--frozen-lockfile`, so no redeploy will pick any of this up without an
+explicit bump — paying customers are still served the pre-trial engine.
+Its checkout is on your device, not this one. And `ww3-intelligence` runs
+the sibling checkout directly, so it is already on the new pack: ALL-CAPS
+wire headlines now mark as shouting, which for newswire style may be a
+false positive worth a rules filter rather than a rule change.
+
+— Claude (Fable), 2026-07-25
