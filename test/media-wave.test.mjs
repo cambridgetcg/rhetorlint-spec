@@ -160,3 +160,37 @@ test("weasel.attribution's described-as branch requires the crowd quantifier", (
     "Economists Reinhart and Rogoff argue the opposite.",              // named authorities — no adjacency match
   ]) assert.equal(idsFor(t).includes("weasel.attribution"), false, t);
 });
+
+// --- attribution.doubt-verb (first seed of attack-on-reputation) ---
+test("attribution.doubt-verb marks claimed/insisted that", () => {
+  assert.deepEqual(spansOf("The minister claimed that the figures were audited.", "attribution.doubt-verb"), ["claimed that"]);
+  assert.deepEqual(spansOf("He insisted that nothing was wrong.", "attribution.doubt-verb"), ["insisted that"]);
+  assert.deepEqual(spansOf("They claim that the tests passed.", "attribution.doubt-verb"), ["They claim that"]);
+});
+test("attribution.doubt-verb refuses factives, praise idioms, and term-of-art senses", () => {
+  for (const t of [
+    "He conceded that his rival had a point.",           // factive — cut
+    "The hotel boasts that every room has a sea view.",  // praise idiom — cut (narrower verdict shipped)
+    "The patent claims a hinge mechanism.",              // noun/term-of-art
+    "The policy insists that guests wear masks.",        // demand sense — present tense is pronoun-guarded
+    "Claims that are filed late are void.",
+  ]) assert.equal(idsFor(t).includes("attribution.doubt-verb"), false, t);
+});
+test("the tense seam is pinned: present collective goes to weasel, past to doubt-verb", () => {
+  assert.deepEqual(idsFor("Sources claim that the deal is dead.").sort(), ["weasel.attribution"]);
+  assert.deepEqual(idsFor("Sources claimed that the deal is dead.").sort(), ["attribution.doubt-verb"]);
+});
+
+// --- distancing.doubt-marker (second seed) ---
+test("distancing.doubt-marker marks the writer's distancing word", () => {
+  assert.deepEqual(spansOf("We won't be lectured by these so-called experts.", "distancing.doubt-marker"), ["so-called"]);
+  assert.deepEqual(spansOf("The self-styled prophet drew a crowd.", "distancing.doubt-marker"), ["self-styled"]);
+  assert.deepEqual(spansOf("A quote unquote independent review.", "distancing.doubt-marker"), ["quote unquote"]);
+});
+test("distancing.doubt-marker leaves neutral promotion reporting alone", () => {
+  for (const t of [
+    "The drug was touted as a breakthrough.",   // 'touted as' cut — weasel-shaped, neutral in journalism
+    "A highly touted prospect joined the club.",
+    "Would-be buyers lined up outside.",        // 'would-be' never seeded
+  ]) assert.equal(idsFor(t).includes("distancing.doubt-marker"), false, t);
+});
