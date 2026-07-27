@@ -65,7 +65,7 @@ const sarif = toSarif(result); // flows into editors, CI, code-scanning
 const signal = toSignal(result); // redacted aggregate for explicit agent traces
 ```
 
-- **Readers** — the [browser widget](apps/widget): select text on any page, press **Alt+Shift+R**, see the marks. On-device; nothing leaves your browser. (A zero-install bookmarklet too.)
+- **Readers** — zero install: [**paste any text into the explorer**](https://cambridgetcg.github.io/rhetorlint-spec/) or [drag the bookmarklet](https://cambridgetcg.github.io/rhetorlint-spec/bookmarklet.html) to your bar. Or the [browser widget](apps/widget): select text on any page, press **Alt+Shift+R**, see the marks. All of it on-device; nothing leaves your browser.
 - **Developers** — `@rhetorlint/core` embeds anywhere JS runs (browser, Node, Deno), emits the versioned JSON, and projects explicitly shareable signals without phrase text by default.
 - **Comms & content teams** — the [`rhetorlint` CLI](packages/cli) as a spin-check in CI: `rhetorlint --max 8 comms/*.md` exits non-zero when a file is too thick with spin. `--sarif` surfaces marks in VS Code and GitHub code-scanning.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
@@ -123,6 +123,6 @@ scripts/demo.mjs                                           a 20-line taste
 
 ## Status
 
-`0.1` — a seed. The taxonomy carries seven families; five of them ship at least one rule, eleven rules in all, and the two unseeded families (attack-on-reputation, justification) stay unseeded until they can be marked without guessing at intent. It under-marks by design. The hard, unfinished work is the structural check-type (agency-hiding beyond simple passive needs real grammar awareness). Contributions of tell families and locales welcome once the contribution guide lands.
+`0.2` — the seed, plus the media wave. The taxonomy carries seven families; six of them ship at least one rule, twenty-two rules in all. The 2026-07 media wave taught the pack the newsroom's own tells — anonymous-source formulas, combat framing, institutional euphemism, exoneration formulas, question-frame insinuation, implicative shortfalls, stance markers, factive and doubt-casting attribution, puffery, and distancing sneers — every rule adversarially reviewed and measured at zero false positives on a live-headline corpus before it shipped. attack-on-reputation now carries its first two carefully-scoped seeds (the mark lands on the writer's own operator word, never on an inferred target); justification stays unseeded until it can be marked without guessing at intent. It still under-marks by design. The hard, unfinished work is the structural check-type (agency-hiding beyond simple passive needs real grammar awareness). Contributions of tell families and locales welcome once the contribution guide lands.
 
 MIT (engine + rules) · CC-BY-SA-4.0 (taxonomy corpus).

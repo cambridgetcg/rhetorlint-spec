@@ -1,0 +1,44 @@
+name: pages
+
+# The People Door. The explorer IS the paste-a-text people page — it just
+# never had a URL. Serve it as the site root, with the bookmarklet beside it.
+# Everything stays on-device in the visitor's browser; this workflow only
+# copies two already-committed, self-contained files.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/explorer/index.html"
+      - "apps/widget/bookmarklet.html"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: assemble the door
+        run: |
+          mkdir -p _site
+          cp apps/explorer/index.html _site/index.html
+          cp apps/widget/bookmarklet.html _site/bookmarklet.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

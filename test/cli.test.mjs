@@ -71,6 +71,20 @@ test("the CLI's dependency ranges can receive engine and rule-pack patches", () 
   }
 });
 
+test("the CLI's caret ranges actually reach the in-repo pack", () => {
+  // ^0.1.2 does NOT admit 0.2.0: for 0.x, caret pins the minor. A range that
+  // cannot resolve the pack in this repo re-creates the 2026-07-24 incident
+  // in its minor-bump form — carets alone were not enough.
+  const RULES_PACK = JSON.parse(readFileSync(new URL("../packages/rules-en/rules.json", import.meta.url)));
+  const range = CLI_MANIFEST.dependencies["@rhetorlint/rules-en"];
+  const [maj, min, pat] = range.replace(/^\^/, "").split(".").map(Number);
+  const [pMaj, pMin, pPat] = RULES_PACK.version.split(".").map(Number);
+  assert.ok(
+    maj === pMaj && min === pMin && pPat >= pat,
+    `${range} cannot resolve rules-en@${RULES_PACK.version} — bump the CLI's range with the pack`
+  );
+});
+
 test("no input is a usage error (exit 2)", () => {
   const r = run([], "");
   assert.equal(r.status, 2);

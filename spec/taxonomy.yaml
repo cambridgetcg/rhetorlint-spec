@@ -83,7 +83,7 @@ families:
   - id: manipulative-wording
     semeval_parent: "Manipulative Wording"
     what: "Word choices that move your feelings or blur your grip on a promise, separately from whatever facts are (or aren't) present."
-    seeded_tells: 7
+    seeded_tells: 16
     semeval_siblings_not_yet_seeded: ["Repetition"]
     tells:
 
@@ -182,6 +182,123 @@ families:
             plain: "We stored passwords in plain text for three years. They are now hashed, and we've hired an external auditor."
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (RhetorLint-authored pattern under a SemEval technique)"
 
+      - id: sourcing.anonymous
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        what: "An anonymous-source descriptor — 'people familiar with the matter', 'a source close to' — the fact rides on someone the reader cannot identify, count, or check."
+        why_it_works: "Borrowed testimony without a witness: the formula sounds like sourcing discipline while removing every handle a reader could use to weigh the source."
+        examples:
+          - marked: "People familiar with the matter said the deal was dead."
+            tell: "People familiar with the matter"
+            plain: "Two executives who attended the board meeting said the deal was dead."
+          - marked: "A source close to the campaign confirmed the shake-up."
+            tell: "A source close to"
+            plain: "The campaign's deputy manager confirmed the shake-up."
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (disclosure phrases like 'on condition of anonymity' are deliberately NOT marked — they are the transparency, not the vagueness)"
+
+      - id: combat.attack-verb
+        semeval_technique: "Loaded Language"
+        what: "Combat framing — 'rips into', 'lashes out at', 'sparks outrage' — wording that stages a disagreement as an attack scene; the violence lives in the verb, not in any reported act."
+        why_it_works: "The fight arrives before the content does: the reader's conflict response fires on the staging, and whatever was actually said is received as a blow rather than a statement."
+        examples:
+          - marked: "The senator ripped into the ruling."
+            tell: "ripped into"
+            plain: "The senator said the ruling misread the statute, citing two precedents."
+          - marked: "The ad sparked outrage online."
+            tell: "sparked outrage"
+            plain: "Within a day, 14,000 posts criticised the ad; the network pulled it."
+        lineage: "SemEval-2023 · Manipulative Wording › Loaded Language (bare 'slams' and 'blasts' — headline journalism's favourites — are deliberately NOT seeded: their literal senses cannot be screened from the words alone)"
+
+      - id: euphemism.institutional
+        semeval_technique: "Exaggeration or Minimisation"
+        what: "An institutional euphemism — 'collateral damage', 'enhanced interrogation', 'workforce reduction' — a fixed administrative phrase standing where the plain event would be."
+        why_it_works: "The phrase cools the event before the reader can feel it: administrative vocabulary files a harm under procedure, and the reaction that plain words would earn never arrives."
+        examples:
+          - marked: "The strike caused collateral damage in two villages."
+            tell: "collateral damage"
+            plain: "The strike killed nine civilians in two villages."
+          - marked: "The company announced a workforce reduction."
+            tell: "workforce reduction"
+            plain: "The company dismissed 1,200 employees."
+        lineage: "SemEval-2023 · Manipulative Wording › Exaggeration or Minimisation (deliberately NOT seeded: 'extraordinary rendition' and 'pacification campaign' — the standard accountability and historiographic referring terms; 'black site(s)' — exposé vocabulary that dramatizes rather than cools; 'kinetic military action' — survives mostly as ironic mention; 'negative patient outcome' — dominant register is outcomes research)"
+
+      - id: exoneration.formula
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        what: "An exonerative formula — 'an officer-involved shooting', 'an altercation ensued', 'shots rang out' — the deed is in the sentence but the doer is not, without a single passive verb for the structural detector to catch."
+        why_it_works: "The deed-noun's grammar requires a doer the words never supply, so the harm reads like weather: something that occurred rather than something someone did."
+        examples:
+          - marked: "An officer-involved shooting occurred at dawn."
+            tell: "officer-involved shooting"
+            plain: "An officer shot a 24-year-old man at dawn."
+          - marked: "An altercation ensued and a bystander was hurt."
+            tell: "altercation ensued"
+            plain: "The guard shoved the vendor, and a bystander was knocked down."
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (RhetorLint-authored pattern under a SemEval technique — the contrition.rehearsed precedent; structural kin: agency-hiding.deleted-subject. Seedable only where a deed-noun demands a doer; 'died in police custody' is deliberately NOT marked — intransitive 'died' states a death, not a deed, and marking it would presume an act the sentence never states)"
+
+      - id: insinuation.raises-questions
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        what: "A question-frame — 'raises serious questions about', 'questions swirl around' — the words assert that questions or doubts exist while the asker and the question itself are deleted."
+        why_it_works: "An accusation with no accuser and no claim: nothing specific is stated, so nothing specific can be answered, while the shadow of the unstated question does the arguing."
+        examples:
+          - marked: "The filing raises serious questions about the timeline."
+            tell: "raises serious questions about"
+            plain: "The filing shows the contract was signed two weeks before the vote; the auditor asks whether the board knew."
+          - marked: "Questions swirled around the campaign's finances."
+            tell: "Questions swirled around"
+            plain: "Three donors asked the campaign to explain a $2m transfer; it has not yet done so."
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (the loaded adjective is mandatory — bare or 'new' question-raising is neutral temporal reporting, and 'questions remain' is honest open-state reporting; both deliberately unmarked)"
+
+      - id: implicative.shortfall
+        semeval_technique: "Loaded Language"
+        what: "An implicative shortfall — 'failed to comment', 'refused to confirm', 'didn't even bother to' — the verb presupposes a duty went unmet; the neutral report is 'did not comment'."
+        why_it_works: "The verdict rides inside the verb: 'failed' smuggles in the premise that commenting was owed, so the subject arrives pre-judged before any fact is weighed. The mark is subject-blind — it fires on 'I failed to mention the move' too, where the presupposition is the same."
+        examples:
+          - marked: "The minister failed to mention the audit."
+            tell: "failed to mention"
+            plain: "The minister did not mention the audit."
+          - marked: "The agency refused to confirm the number."
+            tell: "refused to confirm"
+            plain: "The agency declined to confirm the number."
+        lineage: "SemEval-2023 · Manipulative Wording › Loaded Language (RhetorLint-authored pattern under a SemEval technique; 'refused to deny' — the strongest of the class — awaits its own verification wave)"
+
+      - id: editorializing.stance
+        semeval_technique: "Loaded Language"
+        what: "An editorializing stance marker — 'tellingly', 'make no mistake', 'it should be noted' — instructs the reader how to judge the fact before the fact arrives."
+        why_it_works: "The judgment is installed ahead of the evidence: by the time the fact lands, the reader has already been told what kind of fact it is."
+        examples:
+          - marked: "Tellingly, he skipped the hearing."
+            tell: "Tellingly"
+            plain: "He skipped the hearing; his office says he was in Brussels."
+          - marked: "Make no mistake, this changes everything."
+            tell: "Make no mistake"
+            plain: "This changes the filing deadline and the fee schedule; the rest of the rules stand."
+        lineage: "SemEval-2023 · Manipulative Wording › Loaded Language ('curiously' is deliberately NOT seeded — its manner sense is not stance at all; 'conveniently' and 'predictably' await a sentence-initial pattern rule)"
+
+      - id: attribution.factive
+        semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        what: "A factive attribution — 'revealed that', 'pointed out that', 'debunked' — a said-substitute whose verb presupposes the attributed claim is true, endorsing it inside what reads as neutral reporting."
+        why_it_works: "The endorsement is invisible because it wears reporting's clothes: 'revealed that X' asserts X while seeming only to attribute it, so the outlet's verdict arrives disguised as someone else's words."
+        examples:
+          - marked: "The memo revealed that the audit was shelved."
+            tell: "revealed that"
+            plain: "The memo said the audit was shelved; the auditor disputes this."
+          - marked: "The paper debunked the claim."
+            tell: "debunked"
+            plain: "The paper published a rebuttal; the original authors stand by their data."
+        lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (debunk/refute are success verbs and do NOT presuppose under negation; present-tense 'reveals that' is deliberately NOT marked — the plot-summary and document-description registers use it literally)"
+
+      - id: puffery.peacock
+        semeval_technique: "Exaggeration or Minimisation"
+        what: "A puffery epithet — 'world-class', 'award-winning', 'visionary' — the praise sits in the adjective, not in a checkable fact."
+        why_it_works: "Status is conferred, not demonstrated: the epithet carries the conclusion of an argument that never appears, and repetition across copy makes it feel established."
+        examples:
+          - marked: "A world-class team of visionary engineers."
+            tell: "world-class"
+            plain: "The team's compiler holds the SPEC benchmark record; two members are IEEE fellows."
+          - marked: "The award-winning series returns."
+            tell: "award-winning"
+            plain: "The series, which won the 2025 Peabody, returns."
+        lineage: "SemEval-2023 · Manipulative Wording › Exaggeration or Minimisation ('legendary' is deliberately NOT seeded — its literal mythological register dominates; known noise: academic 'state-of-the-art accuracy')"
+
   # ==========================================================================
   # 2. SIMPLIFICATION  — collapsing a complex reality into one option / cause / certainty
   # ==========================================================================
@@ -234,25 +351,59 @@ families:
 
   # ==========================================================================
   # 4. ATTACK ON REPUTATION  — going after the person or group, not the claim
-  #    (no seed rule yet — shown so the curriculum map is complete)
+  #    First seeds landed 2026-07: two tells that clear a deliberately narrow bar.
   # ==========================================================================
   - id: attack-on-reputation
     semeval_parent: "Attack on Reputation"
     what: "Undermining the person or group making a claim instead of engaging with the claim itself."
-    status: "(no seed rule yet)"
-    why_not_seeded: "Reputation attacks usually need a target and context to be read correctly ('is this a slur or a description?'). That is exactly the intent-modelling RhetorLint's deterministic, words-only core refuses to do, so these await a carefully-scoped pack."
-    semeval_techniques:
+    seeded_tells: 2
+    why_seeding_is_narrow: >
+      Reputation attacks usually need a target and context to be read correctly
+      ('is this a slur or a description?') — that is intent-modelling the
+      words-only core refuses, so bare loaded labels ('regime', 'militants')
+      stay unmarked forever. The two seeded tells clear a narrower bar the
+      family text always promised to wait for: the mark lands on the WRITER'S
+      OWN visible operator word (a distancing marker, a doubt-casting verb),
+      and the pattern guarantees a target is grammatically present. The reader
+      can re-read the operator; nothing about the target is inferred.
+    tells:
+
+      - id: attribution.doubt-verb
+        semeval_technique: "Doubt"
+        what: "A doubt-casting attribution verb — 'said' reports the speech; 'claimed that' / 'insisted that' ship a verdict on the speaker inside the report. Reuters and AP style guidance both warn that 'claim' suggests the writer doubts the speaker."
+        why_it_works: "The doubt is priced into the grammar of the report itself: the reader receives the speaker pre-discounted, without any stated reason to discount them — and swapping in 'said' loses nothing but the verdict."
+        examples:
+          - marked: "The minister claimed that the figures were audited."
+            tell: "claimed that"
+            plain: "The minister said the figures were audited; the auditor's office declined to confirm."
+          - marked: "He insisted that nothing was wrong."
+            tell: "insisted that"
+            plain: "Asked three times, he said nothing was wrong."
+        lineage: "SemEval-2023 · Attack on Reputation › Doubt (deliberate misses, recorded: 'conceded/admitted that' — factive admissions where 'said' would delete a true fact; 'boasts/brags that' — praise idiom for venues and products; legal term-of-art 'a lawsuit claiming that' remains a documented residual leak)"
+
+      - id: distancing.doubt-marker
+        semeval_technique: "Doubt"
+        what: "A doubt marker — 'so-called', 'self-styled', 'quote unquote' — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute."
+        why_it_works: "The sneer pre-loads the verdict: the reader receives the writer's judgment of the title before — or instead of — any argument for it."
+        examples:
+          - marked: "We won't be lectured by these so-called experts."
+            tell: "so-called"
+            plain: "The panel disagrees with us; here is where their analysis and ours diverge."
+          - marked: "The self-styled prophet drew a crowd."
+            tell: "self-styled"
+            plain: "He calls himself a prophet; no congregation has ordained him."
+        lineage: "SemEval-2023 · Attack on Reputation › Doubt (typographic scare quotes are the sneer this rule REFUSES — deterministic text cannot tell citation from sneer; 'so-called' is the speakable form of scare quotes and is where the words-only line lands. Technical 'so-called' = 'known as' is the priced-in false positive; 'touted as' and 'billed as' are deliberately NOT seeded — neutral promotion-reporting verbs)"
+
+    semeval_techniques_not_yet_seeded:
       - name: "Name Calling or Labelling"
         what: "Pinning a loaded label on the target so the label does the arguing."
       - name: "Guilt by Association"
         what: "Tarring a target by tying them to a disliked group or figure."
-      - name: "Doubt"
-        what: "Casting doubt on someone's credibility or sincerity without evidence."
       - name: "Appeal to Hypocrisy"
         what: "Dismissing an argument by charging the arguer with inconsistency."
       - name: "Questioning the Reputation"
-        what: "Undercutting a target's standing so their claims are pre-discounted."
-    lineage: "SemEval-2023 · Attack on Reputation (5 fine techniques)"
+        what: "Undercutting a target's standing so their claims are pre-discounted. (implicative.shortfall touches this but files as a wording tell under manipulative-wording — the weasel.attribution precedent.)"
+    lineage: "SemEval-2023 · Attack on Reputation (5 fine techniques; Doubt seeded ×2, the others await their own carefully-scoped bar)"
 
   # ==========================================================================
   # 5. JUSTIFICATION  — propping a claim on an external appeal instead of evidence

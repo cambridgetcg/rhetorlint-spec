@@ -1,6 +1,6 @@
 {
   "id": "@rhetorlint/rules-en",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "locale": "en",
   "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.",
   "rules": [
@@ -56,7 +56,7 @@
       "level": "note",
       "confidence": 0.65,
       "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
-      "pattern": "\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b",
+      "pattern": "\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|observers?|commentators?|economists?|historians?|scholars?|pundits?|reports|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests|warn|warns|warned|fear|feared|note|noted|predict|predicts|predicted|caution|cautioned)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b|\\bit\\s+is\\s+often\\s+(?:said|reported)\\b|\\b(?:is|are|was|were)\\s+widely\\s+(?:regarded|described|seen|considered)\\s+as\\b|\\b(?:has|have)\\s+been\\s+(?:widely|often|repeatedly|variously)\\s+described\\s+as\\b",
       "expected": ["(name the source, or drop the appeal)"]
     },
     {
@@ -126,6 +126,127 @@
       "confidence": 0.7,
       "note": "an agentless passive — who acted is deleted from the sentence",
       "expected": ["(name who did it: 'I/we + verb')"]
+    },
+    {
+      "ruleId": "euphemism.institutional",
+      "family": "manipulative-wording",
+      "technique": "Exaggeration or Minimisation",
+      "type": "lexical",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "an institutional euphemism — a fixed administrative phrase standing where the plain event would be",
+      "terms": ["collateral damage", "enhanced interrogation", "surgical strike", "surgical strikes", "workforce reduction", "workforce reductions"],
+      "expected": ["(name the plain event in plain words: what happened, to whom)"]
+    },
+    {
+      "ruleId": "editorializing.stance",
+      "family": "manipulative-wording",
+      "technique": "Loaded Language",
+      "type": "lexical",
+      "level": "info",
+      "confidence": 0.6,
+      "note": "an editorializing stance marker — instructs the reader how to judge the fact before the fact arrives",
+      "terms": ["it should be noted", "it is worth noting", "it's worth noting", "it is important to note", "it's important to note", "needless to say", "tellingly", "unsurprisingly", "in a stunning move", "in a bizarre twist", "in a shocking turn", "make no mistake"],
+      "expected": ["(delete the stance word; state the fact and let the reader weigh it)"]
+    },
+    {
+      "ruleId": "attribution.doubt-verb",
+      "family": "attack-on-reputation",
+      "technique": "Doubt",
+      "type": "pattern",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "a doubt-casting attribution verb — 'said' reports the speech; 'claimed that' / 'insisted that' ship a verdict on the speaker inside the report",
+      "pattern": "\\b(?:claim(?:ed|ing)|insist(?:ed|ing))\\s+that\\b|\\b(?:he|she|it|they)\\s+(?:claims?|insists?)\\s+that\\b",
+      "expected": ["(swap in 'said' — report the words and let the reader judge them)"]
+    },
+    {
+      "ruleId": "distancing.doubt-marker",
+      "family": "attack-on-reputation",
+      "technique": "Doubt",
+      "type": "lexical",
+      "level": "info",
+      "confidence": 0.55,
+      "note": "a doubt marker — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute (technical 'so-called' = 'known as' is the known false positive; 'allegedly/purportedly' belong to hedge.deniable)",
+      "terms": ["so-called", "self-styled", "self-proclaimed", "self-appointed", "self-anointed", "styles himself as", "styles herself as", "styles itself as", "styles themselves as", "quote-unquote", "quote unquote"],
+      "expected": ["(argue the dispute: say who holds the title, who contests it, and why — or accept the label)"]
+    },
+    {
+      "ruleId": "attribution.factive",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.5,
+      "note": "a factive attribution — a said-substitute whose verb presupposes the attributed claim is true, endorsing it inside what reads as neutral reporting",
+      "pattern": "\\brevealed\\s+that\\b|\\bpoint(?:s|ed)\\s+out\\s+that\\b|\\bdebunk(?:s|ed)\\b|\\brefut(?:es|ed)\\b",
+      "expected": ["(attribute neutrally — 'said', 'stated', 'disputed' — or assert the fact in your own voice with the evidence that earns it)"]
+    },
+    {
+      "ruleId": "implicative.shortfall",
+      "family": "manipulative-wording",
+      "technique": "Loaded Language",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.55,
+      "note": "an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')",
+      "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n'?t)\\s+(?:even\\s+)?bother\\s+to\\b",
+      "expected": ["(report the event without the verdict: 'did not comment', 'declined to say')"]
+    },
+    {
+      "ruleId": "sourcing.anonymous",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.6,
+      "note": "an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check",
+      "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[- ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
+      "expected": ["(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"]
+    },
+    {
+      "ruleId": "combat.attack-verb",
+      "family": "manipulative-wording",
+      "technique": "Loaded Language",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.55,
+      "note": "combat framing — wording that stages a disagreement as an attack scene; the violence lives in the verb, not in any reported act",
+      "pattern": "\\b(?:rip|rips|ripped|ripping)\\s+into\\b|\\b(?:lash|lashes|lashed|lashing)\\s+out\\s+at\\b|\\b(?:hit|hits|hitting)\\s+(?:out|back)\\s+at\\b|\\b(?:fire|fires|fired|firing)\\s+back\\s+at\\b|\\b(?:clap|claps|clapped|clapping)\\s+back\\s+at\\b|\\b(?:spark|sparks|sparked|sparking)\\s+(?:outrage|fury|backlash)\\b",
+      "expected": ["(report the speech act: said, criticized, responded — and quote what was actually said)"]
+    },
+    {
+      "ruleId": "exoneration.formula",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "note",
+      "confidence": 0.7,
+      "note": "an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)",
+      "pattern": "\\b(?:officer|police|deputy|trooper)[- ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[- ]of[- ]force\\s+incidents?\\b",
+      "expected": ["(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"]
+    },
+    {
+      "ruleId": "insinuation.raises-questions",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "a question-frame — the words assert that questions or doubts exist while the asker and the question itself are deleted",
+      "pattern": "\\brais(?:es|ed|ing|e)\\s+(?:serious|troubling|disturbing|grave)\\s+(?:questions?|doubts?)\\s+(?:about|over)\\b|\\bquestions\\s+(?:linger(?:s|ed|ing)?|swirl(?:s|ed|ing)?)\\s+(?:about|over|around)\\b",
+      "expected": ["(state the actual question and who is asking it, or make the claim outright)"]
+    },
+    {
+      "ruleId": "puffery.peacock",
+      "family": "manipulative-wording",
+      "technique": "Exaggeration or Minimisation",
+      "type": "lexical",
+      "level": "info",
+      "confidence": 0.5,
+      "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
+      "terms": ["world-class", "critically acclaimed", "award-winning", "renowned", "famed", "storied", "visionary", "cutting-edge", "game-changing", "state-of-the-art", "best-in-class", "iconic"],
+      "expected": ["(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"]
     }
   ]
 }

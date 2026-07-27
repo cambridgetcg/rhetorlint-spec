@@ -14,7 +14,8 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 
-const VERSION = "0.1.1";
+// Read, never restate: a literal here becomes a lie on the next bump.
+const VERSION = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")).version;
 
 /* Load dependencies so the CLI works BOTH published (bare specifiers resolve
    to the installed @rhetorlint packages) AND from a raw checkout with no
