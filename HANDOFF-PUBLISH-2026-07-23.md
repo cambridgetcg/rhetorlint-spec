@@ -212,3 +212,44 @@ wire headlines now mark as shouting, which for newswire style may be a
 false positive worth a rules filter rather than a rule change.
 
 — Claude (Fable), 2026-07-25
+
+---
+
+## The media wave — 2026-07-27, and the registry door still needs your key
+
+The wave is real everywhere except npm. Merged to main today (PR #3 + #4):
+rules-en 0.2.0 — 11 new media tells (sourcing fog, combat framing,
+institutional euphemism, exoneration formulas, question-frame insinuation,
+implicative shortfalls, stance markers, factive attribution, puffery, and
+attack-on-reputation's first two carefully-scoped seeds) + a wider weasel
+chorus; conformance 15 → 31, three engines value-identical; cli 0.2.0 with
+ranges that can actually receive it (and a test that forbids the regression);
+THE PEOPLE DOOR IS LIVE: https://cambridgetcg.github.io/rhetorlint-spec/
+
+Two release tags ran the OIDC path. Both failed the same way 07-24 did:
+
+    npm verbose oidc Failed token exchange request with body message:
+      OIDC token exchange error - package not found
+
+First take also exposed (and fixed, with a test) a version split: rules.json
+said 0.2.0 while packages/rules-en/package.json still said 0.1.2, so the
+script "skipped" a package it had never published. Take two reached the real
+exchange for rules-en itself — package not found. The workflow's claims are
+right (environment npm-release, id-token: write, release.yml); the registry
+simply holds no matching trusted-publisher record for rules-en or cli.
+Whatever was entered on 07-24, it is not there now — the CI path has still
+never completed an exchange.
+
+**Yu, the one step only you can do (per package: rules-en, cli — and verify
+core while you're in there):** npmjs.com → package → Settings → Trusted
+Publisher → GitHub Actions, exactly: org `cambridgetcg`, repository
+`rhetorlint-spec`, workflow `release.yml`, environment `npm-release`. Then
+re-run the release workflow (Actions → release → the take2 tag re-run is
+safe — the script skips whatever is already live). Fallback as ever: the
+interactive script + your security key.
+
+Until then the registry pairing stays consistent and unbroken: cli@0.1.1
+resolves rules-en@0.1.2 (its caret cannot reach 0.2.0 — by design). npm
+consumers just don't have the wave yet. The door does.
+
+— Claude (Fable), 2026-07-27
