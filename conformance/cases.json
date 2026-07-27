@@ -1,6 +1,6 @@
 {
   "spec": "0.1",
-  "rules": "@rhetorlint/rules-en@0.1.2",
+  "rules": "@rhetorlint/rules-en@0.2.0",
   "note": "Conformance ground truth, generated from the JS reference engine. Any RhetorLint engine MUST reproduce every case exactly.",
   "cases": [
     {
@@ -508,6 +508,502 @@
           "level": "info",
           "expected": [
             "(qualify: how often, who exactly, how certain)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "People familiar with the matter said the merger was dead.",
+      "density": {
+        "tells": 1,
+        "per100Words": 10
+      },
+      "strip": "People familiar with the matter said the merger was dead.",
+      "marks": [
+        {
+          "ruleId": "sourcing.anonymous",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "People familiar with the matter",
+          "start": 0,
+          "end": 31,
+          "note": "an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The senator ripped into the ruling and sparked outrage online.",
+      "density": {
+        "tells": 2,
+        "per100Words": 20
+      },
+      "strip": "The senator ripped into the ruling and sparked outrage online.",
+      "marks": [
+        {
+          "ruleId": "combat.attack-verb",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "ripped into",
+          "start": 12,
+          "end": 23,
+          "note": "combat framing — wording that stages a disagreement as an attack scene; the violence lives in the verb, not in any reported act",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(report the speech act: said, criticized, responded — and quote what was actually said)"
+          ]
+        },
+        {
+          "ruleId": "combat.attack-verb",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "sparked outrage",
+          "start": 39,
+          "end": 54,
+          "note": "combat framing — wording that stages a disagreement as an attack scene; the violence lives in the verb, not in any reported act",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(report the speech act: said, criticized, responded — and quote what was actually said)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The strike caused collateral damage in two villages.",
+      "density": {
+        "tells": 1,
+        "per100Words": 12.5
+      },
+      "strip": "The strike caused collateral damage in two villages.",
+      "marks": [
+        {
+          "ruleId": "euphemism.institutional",
+          "family": "manipulative-wording",
+          "technique": "Exaggeration or Minimisation",
+          "actual": "collateral damage",
+          "start": 18,
+          "end": 35,
+          "note": "an institutional euphemism — a fixed administrative phrase standing where the plain event would be",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name the plain event in plain words: what happened, to whom)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "An officer-involved shooting occurred at dawn; an altercation ensued.",
+      "density": {
+        "tells": 2,
+        "per100Words": 22.2
+      },
+      "strip": "An officer-involved shooting occurred at dawn; an altercation ensued.",
+      "marks": [
+        {
+          "ruleId": "exoneration.formula",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "officer-involved shooting",
+          "start": 3,
+          "end": 28,
+          "note": "an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)",
+          "confidence": 0.7,
+          "level": "note",
+          "expected": [
+            "(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"
+          ]
+        },
+        {
+          "ruleId": "exoneration.formula",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "altercation ensued",
+          "start": 50,
+          "end": 68,
+          "note": "an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)",
+          "confidence": 0.7,
+          "level": "note",
+          "expected": [
+            "(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The filing raises serious questions about the timeline.",
+      "density": {
+        "tells": 1,
+        "per100Words": 12.5
+      },
+      "strip": "The filing raises serious questions about the timeline.",
+      "marks": [
+        {
+          "ruleId": "insinuation.raises-questions",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "raises serious questions about",
+          "start": 11,
+          "end": 41,
+          "note": "a question-frame — the words assert that questions or doubts exist while the asker and the question itself are deleted",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(state the actual question and who is asking it, or make the claim outright)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The minister failed to mention the audit.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "The minister failed to mention the audit.",
+      "marks": [
+        {
+          "ruleId": "implicative.shortfall",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "failed to mention",
+          "start": 13,
+          "end": 30,
+          "note": "an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(report the event without the verdict: 'did not comment', 'declined to say')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Tellingly, the report was released on a Friday.",
+      "density": {
+        "tells": 2,
+        "per100Words": 25
+      },
+      "strip": "Tellingly, the report [who?] was released on a Friday.",
+      "marks": [
+        {
+          "ruleId": "editorializing.stance",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "Tellingly",
+          "start": 0,
+          "end": 9,
+          "note": "an editorializing stance marker — instructs the reader how to judge the fact before the fact arrives",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(delete the stance word; state the fact and let the reader weigh it)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "was released",
+          "start": 22,
+          "end": 34,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The memo revealed that the audit was shelved.",
+      "density": {
+        "tells": 2,
+        "per100Words": 25
+      },
+      "strip": "The memo revealed that the audit [who?] was shelved.",
+      "marks": [
+        {
+          "ruleId": "attribution.factive",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "revealed that",
+          "start": 9,
+          "end": 22,
+          "note": "a factive attribution — a said-substitute whose verb presupposes the attributed claim is true, endorsing it inside what reads as neutral reporting",
+          "confidence": 0.5,
+          "level": "info",
+          "expected": [
+            "(attribute neutrally — 'said', 'stated', 'disputed' — or assert the fact in your own voice with the evidence that earns it)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "was shelved",
+          "start": 33,
+          "end": 44,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "A world-class team of visionary engineers.",
+      "density": {
+        "tells": 2,
+        "per100Words": 33.3
+      },
+      "strip": "A world-class team of visionary engineers.",
+      "marks": [
+        {
+          "ruleId": "puffery.peacock",
+          "family": "manipulative-wording",
+          "technique": "Exaggeration or Minimisation",
+          "actual": "world-class",
+          "start": 2,
+          "end": 13,
+          "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
+          "confidence": 0.5,
+          "level": "info",
+          "expected": [
+            "(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"
+          ]
+        },
+        {
+          "ruleId": "puffery.peacock",
+          "family": "manipulative-wording",
+          "technique": "Exaggeration or Minimisation",
+          "actual": "visionary",
+          "start": 22,
+          "end": 31,
+          "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
+          "confidence": 0.5,
+          "level": "info",
+          "expected": [
+            "(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The minister claimed that the figures were audited.",
+      "density": {
+        "tells": 2,
+        "per100Words": 25
+      },
+      "strip": "The minister claimed that the figures [who?] were audited.",
+      "marks": [
+        {
+          "ruleId": "attribution.doubt-verb",
+          "family": "attack-on-reputation",
+          "technique": "Doubt",
+          "actual": "claimed that",
+          "start": 13,
+          "end": 25,
+          "note": "a doubt-casting attribution verb — 'said' reports the speech; 'claimed that' / 'insisted that' ship a verdict on the speaker inside the report",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(swap in 'said' — report the words and let the reader judge them)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were audited",
+          "start": 38,
+          "end": 50,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "We won't be lectured by these so-called experts.",
+      "density": {
+        "tells": 1,
+        "per100Words": 12.5
+      },
+      "strip": "We won't be lectured by these so-called experts.",
+      "marks": [
+        {
+          "ruleId": "distancing.doubt-marker",
+          "family": "attack-on-reputation",
+          "technique": "Doubt",
+          "actual": "so-called",
+          "start": 30,
+          "end": 39,
+          "note": "a doubt marker — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute (technical 'so-called' = 'known as' is the known false positive; 'allegedly/purportedly' belong to hedge.deniable)",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(argue the dispute: say who holds the title, who contests it, and why — or accept the label)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Sources claim that the deal is dead.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "Sources claim that the deal is dead.",
+      "marks": [
+        {
+          "ruleId": "weasel.attribution",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "Sources claim",
+          "start": 0,
+          "end": 13,
+          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "confidence": 0.65,
+          "level": "note",
+          "expected": [
+            "(name the source, or drop the appeal)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Sources claimed that the deal is dead.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "Sources claimed that the deal is dead.",
+      "marks": [
+        {
+          "ruleId": "attribution.doubt-verb",
+          "family": "attack-on-reputation",
+          "technique": "Doubt",
+          "actual": "claimed that",
+          "start": 8,
+          "end": 20,
+          "note": "a doubt-casting attribution verb — 'said' reports the speech; 'claimed that' / 'insisted that' ship a verdict on the speaker inside the report",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(swap in 'said' — report the words and let the reader judge them)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The plan has been widely described as a visionary gamble.",
+      "density": {
+        "tells": 3,
+        "per100Words": 30
+      },
+      "strip": "The plan has [who?] been widely described as a visionary gamble.",
+      "marks": [
+        {
+          "ruleId": "weasel.attribution",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "has been widely described as",
+          "start": 9,
+          "end": 37,
+          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "confidence": 0.65,
+          "level": "note",
+          "expected": [
+            "(name the source, or drop the appeal)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "been widely described",
+          "start": 13,
+          "end": 34,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        },
+        {
+          "ruleId": "puffery.peacock",
+          "family": "manipulative-wording",
+          "technique": "Exaggeration or Minimisation",
+          "actual": "visionary",
+          "start": 40,
+          "end": 49,
+          "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
+          "confidence": 0.5,
+          "level": "info",
+          "expected": [
+            "(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Experts noted that inflation slowed.",
+      "density": {
+        "tells": 1,
+        "per100Words": 20
+      },
+      "strip": "Experts noted that inflation slowed.",
+      "marks": [
+        {
+          "ruleId": "weasel.attribution",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "Experts noted",
+          "start": 0,
+          "end": 13,
+          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "confidence": 0.65,
+          "level": "note",
+          "expected": [
+            "(name the source, or drop the appeal)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "The startup has been described as the next big thing by Forbes.",
+      "density": {
+        "tells": 1,
+        "per100Words": 8.3
+      },
+      "strip": "The startup has [who?] been described as the next big thing by Forbes.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "been described",
+          "start": 16,
+          "end": 30,
+          "note": "an agentless passive — who acted is deleted from the sentence",
+          "confidence": 0.7,
+          "level": "warning",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
           ]
         }
       ]
