@@ -43,3 +43,17 @@ test("the explorer copy declares the current engine and rewrite boundary", () =>
   assert.match(src, /async adapters are not supported/);
   assert.match(src, /rewrite adapter must return a string/);
 });
+
+test("the explorer's hand-inlined pack matches the canonical pack", () => {
+  // The explorer is the public door; its RULES block is synced by hand.
+  // Version alone can lie, so hold it to the rule count too.
+  const src = readFileSync(EXPLORER, "utf8");
+  const RULES_PACKAGE = JSON.parse(readFileSync(new URL("../packages/rules-en/rules.json", import.meta.url)));
+  assert.ok(
+    src.includes(`"version": "${RULES_PACKAGE.version}"`),
+    `explorer inlines a stale pack — re-sync apps/explorer/index.html to rules-en@${RULES_PACKAGE.version}`
+  );
+  for (const r of RULES_PACKAGE.rules) {
+    assert.ok(src.includes(`"${r.ruleId}"`), `explorer pack is missing ${r.ruleId}`);
+  }
+});
