@@ -31,6 +31,16 @@ test("media-wave rules carry no warning level and no engine-floor fields", () =>
   }
 });
 
+test("the pack's two version declarations tell one truth", () => {
+  // rules.json carries the pack-data version; package.json carries the npm
+  // version. The 0.2.0 release shipped a wave whose data said 0.2.0 while
+  // the manifest said 0.1.2 — so the release workflow "skipped" a package
+  // it had never published. Two declarations, one truth, enforced.
+  const manifest = JSON.parse(readFileSync(new URL("../packages/rules-en/package.json", import.meta.url)));
+  assert.equal(manifest.version, pack.version,
+    `packages/rules-en/package.json@${manifest.version} != rules.json@${pack.version} — bump them together`);
+});
+
 test("once the wave lands, it lands whole", () => {
   const present = MEDIA_WAVE_RULE_IDS.filter((id) => pack.rules.some((r) => r.ruleId === id));
   assert.ok(present.length === 0 || present.length === MEDIA_WAVE_RULE_IDS.length,
