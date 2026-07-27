@@ -126,6 +126,39 @@
       "confidence": 0.7,
       "note": "an agentless passive — who acted is deleted from the sentence",
       "expected": ["(name who did it: 'I/we + verb')"]
+    },
+    {
+      "ruleId": "euphemism.institutional",
+      "family": "manipulative-wording",
+      "technique": "Exaggeration or Minimisation",
+      "type": "lexical",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "an institutional euphemism — a fixed administrative phrase standing where the plain event would be",
+      "terms": ["collateral damage", "enhanced interrogation", "surgical strike", "surgical strikes", "workforce reduction", "workforce reductions"],
+      "expected": ["(name the plain event in plain words: what happened, to whom)"]
+    },
+    {
+      "ruleId": "editorializing.stance",
+      "family": "manipulative-wording",
+      "technique": "Loaded Language",
+      "type": "lexical",
+      "level": "info",
+      "confidence": 0.6,
+      "note": "an editorializing stance marker — instructs the reader how to judge the fact before the fact arrives",
+      "terms": ["it should be noted", "it is worth noting", "it's worth noting", "it is important to note", "it's important to note", "needless to say", "tellingly", "unsurprisingly", "in a stunning move", "in a bizarre twist", "in a shocking turn", "make no mistake"],
+      "expected": ["(delete the stance word; state the fact and let the reader weigh it)"]
+    },
+    {
+      "ruleId": "puffery.peacock",
+      "family": "manipulative-wording",
+      "technique": "Exaggeration or Minimisation",
+      "type": "lexical",
+      "level": "info",
+      "confidence": 0.5,
+      "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
+      "terms": ["world-class", "critically acclaimed", "award-winning", "renowned", "famed", "storied", "visionary", "cutting-edge", "game-changing", "state-of-the-art", "best-in-class", "iconic"],
+      "expected": ["(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"]
     }
   ]
 }
