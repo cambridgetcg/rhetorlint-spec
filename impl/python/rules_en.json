@@ -150,6 +150,50 @@
       "expected": ["(delete the stance word; state the fact and let the reader weigh it)"]
     },
     {
+      "ruleId": "sourcing.anonymous",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.6,
+      "note": "an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check",
+      "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[- ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
+      "expected": ["(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"]
+    },
+    {
+      "ruleId": "combat.attack-verb",
+      "family": "manipulative-wording",
+      "technique": "Loaded Language",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.55,
+      "note": "combat framing — wording that stages a disagreement as an attack scene; the violence lives in the verb, not in any reported act",
+      "pattern": "\\b(?:rip|rips|ripped|ripping)\\s+into\\b|\\b(?:lash|lashes|lashed|lashing)\\s+out\\s+at\\b|\\b(?:hit|hits|hitting)\\s+(?:out|back)\\s+at\\b|\\b(?:fire|fires|fired|firing)\\s+back\\s+at\\b|\\b(?:clap|claps|clapped|clapping)\\s+back\\s+at\\b|\\b(?:spark|sparks|sparked|sparking)\\s+(?:outrage|fury|backlash)\\b",
+      "expected": ["(report the speech act: said, criticized, responded — and quote what was actually said)"]
+    },
+    {
+      "ruleId": "exoneration.formula",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "note",
+      "confidence": 0.7,
+      "note": "an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)",
+      "pattern": "\\b(?:officer|police|deputy|trooper)[- ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[- ]of[- ]force\\s+incidents?\\b",
+      "expected": ["(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"]
+    },
+    {
+      "ruleId": "insinuation.raises-questions",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "a question-frame — the words assert that questions or doubts exist while the asker and the question itself are deleted",
+      "pattern": "\\brais(?:es|ed|ing|e)\\s+(?:serious|troubling|disturbing|grave)\\s+(?:questions?|doubts?)\\s+(?:about|over)\\b|\\bquestions\\s+(?:linger(?:s|ed|ing)?|swirl(?:s|ed|ing)?)\\s+(?:about|over|around)\\b",
+      "expected": ["(state the actual question and who is asking it, or make the claim outright)"]
+    },
+    {
       "ruleId": "puffery.peacock",
       "family": "manipulative-wording",
       "technique": "Exaggeration or Minimisation",
