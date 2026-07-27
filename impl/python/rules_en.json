@@ -56,7 +56,7 @@
       "level": "note",
       "confidence": 0.65,
       "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
-      "pattern": "\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b",
+      "pattern": "\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|observers?|commentators?|economists?|historians?|scholars?|pundits?|reports|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests|warn|warns|warned|fear|feared|note|noted|predict|predicts|predicted|caution|cautioned)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b|\\bit\\s+is\\s+often\\s+(?:said|reported)\\b|\\b(?:is|are|was|were)\\s+widely\\s+(?:regarded|described|seen|considered)\\s+as\\b|\\b(?:has|have)\\s+been\\s+(?:widely|often|repeatedly|variously)\\s+described\\s+as\\b",
       "expected": ["(name the source, or drop the appeal)"]
     },
     {
@@ -148,6 +148,28 @@
       "note": "an editorializing stance marker — instructs the reader how to judge the fact before the fact arrives",
       "terms": ["it should be noted", "it is worth noting", "it's worth noting", "it is important to note", "it's important to note", "needless to say", "tellingly", "unsurprisingly", "in a stunning move", "in a bizarre twist", "in a shocking turn", "make no mistake"],
       "expected": ["(delete the stance word; state the fact and let the reader weigh it)"]
+    },
+    {
+      "ruleId": "attribution.factive",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.5,
+      "note": "a factive attribution — a said-substitute whose verb presupposes the attributed claim is true, endorsing it inside what reads as neutral reporting",
+      "pattern": "\\brevealed\\s+that\\b|\\bpoint(?:s|ed)\\s+out\\s+that\\b|\\bdebunk(?:s|ed)\\b|\\brefut(?:es|ed)\\b",
+      "expected": ["(attribute neutrally — 'said', 'stated', 'disputed' — or assert the fact in your own voice with the evidence that earns it)"]
+    },
+    {
+      "ruleId": "implicative.shortfall",
+      "family": "manipulative-wording",
+      "technique": "Loaded Language",
+      "type": "pattern",
+      "level": "info",
+      "confidence": 0.55,
+      "note": "an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')",
+      "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n'?t)\\s+(?:even\\s+)?bother\\s+to\\b",
+      "expected": ["(report the event without the verdict: 'did not comment', 'declined to say')"]
     },
     {
       "ruleId": "sourcing.anonymous",

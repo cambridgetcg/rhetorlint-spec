@@ -115,3 +115,48 @@ test("insinuation.raises-questions leaves honest signposting alone", () => {
     "Residents raised concerns about the noise.",                        // 'concerns' deliberately unseeded
   ]) assert.equal(idsFor(t).includes("insinuation.raises-questions"), false, t);
 });
+
+// --- attribution.factive ---
+test("attribution.factive marks the endorsement verb", () => {
+  assert.deepEqual(spansOf("The memo revealed that the audit was shelved.", "attribution.factive"), ["revealed that"]);
+  assert.deepEqual(spansOf("She pointed out that the data was stale.", "attribution.factive"), ["pointed out that"]);
+  assert.deepEqual(spansOf("The paper debunked the claim.", "attribution.factive"), ["debunked"]);
+});
+test("attribution.factive refuses first-person confession and plot registers", () => {
+  for (const t of [
+    "The novel's final chapter reveals that the letters were forged.", // present-tense branch cut (measured FP)
+    "I want to set the record straight about what happened.",           // branch cut
+    "The pandemic laid bare the inequalities in the system.",           // branch cut
+    "Both sides made clear that they wanted a deal.",                   // branch cut
+  ]) assert.equal(idsFor(t).includes("attribution.factive"), false, t);
+});
+
+// --- implicative.shortfall ---
+test("implicative.shortfall marks the unmet-duty verb", () => {
+  assert.deepEqual(spansOf("The minister failed to mention the audit.", "implicative.shortfall"), ["failed to mention"]);
+  assert.deepEqual(spansOf("The agency refused to confirm the number.", "implicative.shortfall"), ["refused to confirm"]);
+  assert.deepEqual(spansOf("They didn't even bother to call.", "implicative.shortfall"), ["didn't even bother to"]);
+});
+test("implicative.shortfall never marks honest contrition", () => {
+  for (const t of [
+    "We failed to respond to your ticket, and we are sorry.",   // respond cut from the fail-branch
+    "We failed to disclose the breach for three weeks.",        // disclose cut
+    "He did not comment on the case.",                          // the neutral form
+    "She declined to comment.",
+  ]) assert.equal(idsFor(t).includes("implicative.shortfall"), false, t);
+});
+
+// --- weasel.attribution growth ---
+test("weasel.attribution now hears the wider newsroom chorus", () => {
+  assert.deepEqual(spansOf("Observers warn the truce is fragile.", "weasel.attribution"), ["Observers warn"]);
+  assert.deepEqual(spansOf("Economists predict a shallow recession.", "weasel.attribution"), ["Economists predict"]);
+  assert.deepEqual(spansOf("It is often said that markets hate surprises.", "weasel.attribution"), ["It is often said"]);
+  assert.deepEqual(spansOf("He is widely regarded as the favourite.", "weasel.attribution"), ["is widely regarded as"]);
+  assert.deepEqual(spansOf("The plan has been widely described as a gamble.", "weasel.attribution"), ["has been widely described as"]);
+});
+test("weasel.attribution's described-as branch requires the crowd quantifier", () => {
+  for (const t of [
+    "The startup has been described as 'the next Stripe' by Forbes.",  // named describer — guard holds
+    "Economists Reinhart and Rogoff argue the opposite.",              // named authorities — no adjacency match
+  ]) assert.equal(idsFor(t).includes("weasel.attribution"), false, t);
+});
