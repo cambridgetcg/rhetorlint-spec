@@ -6,6 +6,13 @@ RhetorLint marks countable rhetorical tells in the *words*: a deleted subject th
 
 This repository is the **open RhetorLint framework**: a specification you can implement in any language, plus a zero-dependency reference engine.
 
+> **Canon note:** RhetorLint is the portable implementation profile of
+> [Open Lens](https://github.com/cambridgetcg/open-lens) — the canonical
+> framework of this family (Apache-2.0 engine + CC-BY-SA-4.0 lexicon +
+> CC-BY-4.0 research corpus, live reader at
+> [captioneer.io](https://captioneer.io)). Same SemEval-2023 alignment; one
+> framework, two engines. Choosing where to start? Start at Open Lens.
+
 > A real "lie detector" reads a person and returns a verdict. There is no such thing — decades of research say body language, micro-expressions, and voice "stress" don't reliably reveal deception. So RhetorLint reads the one place manipulation actually leaves a trace: the language.
 
 ## The shape (open the method, not the app)
