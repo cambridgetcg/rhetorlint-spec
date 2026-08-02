@@ -12,11 +12,12 @@ const text =
 const r = analyze(text, { rules });
 
 console.log("\n  " + text + "\n");
-console.log("  density:", r.density.tells, "tells /", r.source.words, "words =", r.density.per100Words, "per 100 words\n");
+console.log("  density:", r.density.tells, "markers /", r.source.words, "words =", r.density.per100Words, "per 100 words\n");
 for (const m of r.marks) {
-  console.log(`  · [${m.family}]  "${m.actual}"`);
+  console.log(`  · ${m.displayName} [${m.taxonomyMappingStatus}]  "${m.actual}"`);
+  console.log(`      legacy id ${m.ruleId}`);
   console.log(`      ${m.note}`);
 }
-console.log("\n  strip (deterministic, on-device):");
+console.log("\n  counterfactual (deterministic, on-device):");
 console.log("  " + r.strip + "\n");
 console.log("  SARIF export:", toSarif(r).runs[0].results.length, "results\n");

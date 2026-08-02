@@ -2,8 +2,8 @@
 
 A third reference engine for the [RhetorLint spec](../../spec), in Go. Reads the
 **same** rule pack (`packages/rules-en/rules.json`) and reproduces the **same**
-[conformance corpus](../../conformance) as the JavaScript and Python engines —
-byte for byte on ASCII/BMP text.
+[reference corpus](../../conformance) as the JavaScript and Python engines by
+parsed value over ASCII input.
 
 Standard library only. No third-party dependencies.
 
@@ -16,7 +16,7 @@ echo "We take your privacy extremely seriously." | go -C impl/go run .
 ## Conformance
 
 ```bash
-go -C impl/go test ./...  # 15/15 cases identical to the JS ground truth
+go -C impl/go test ./...  # 15/15 cases match the JS reference outputs
 ```
 
 ## The RE2 lesson
@@ -30,12 +30,15 @@ if so. Same result, different mechanism — which is exactly the kind of thing a
 conformance suite is for: it proves the *output* is identical even when the
 *implementation* can't be.
 
-Offsets here are **byte** offsets (Go strings are UTF-8). For ASCII/BMP text
-they equal the JS (UTF-16) and Python (code-point) offsets; the corpus is ASCII.
+Offsets here are **byte** offsets (Go strings are UTF-8). They equal the JS
+(UTF-16) and Python (code-point) offsets only for ASCII input; the corpus is ASCII.
 See [`../../conformance/README.md`](../../conformance/README.md).
 
 ## Guarantees (identical to the other engines)
 
-Marks point at visible text; no person-reading; no truth-score; no fabricated
-rewrite (`rewrite` is `null`); `confidence` is a heuristic language-pattern
-likelihood, never a probability of deception.
+Marks point at visible text; only the span and position are direct
+observations. Current marks carry a neutral display name,
+candidate/context-required classification status, and taxonomy mapping status.
+There is no person-reading, recipient-effect finding, truth-score, or fabricated
+rewrite (`rewrite` is `null`). `confidence` is an uncalibrated, author-assigned
+match weight, never a probability of intent, effect, deception, or truth.

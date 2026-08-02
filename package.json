@@ -2,7 +2,7 @@
   "name": "rhetorlint-spec",
   "version": "0.1.0",
   "private": true,
-  "description": "The RhetorLint specification: a portable taxonomy of rhetorical tells + a JSON output schema, with a zero-dependency reference engine. Marks manipulation in the words; never reads the person.",
+  "description": "A substrate-neutral framework for visible rhetorical markers, contestable effect hypotheses, and verification questions, with zero-dependency reference engines.",
   "type": "module",
   "license": "MIT",
   "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",
@@ -10,15 +10,19 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/conformance.test.mjs test/package-types.test.mjs test/schema.test.mjs test/signals.test.mjs test/widget-build.test.mjs",
+    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/conformance.test.mjs test/epistemic-boundaries.test.mjs test/explorer.test.mjs test/inquiry.test.mjs test/package-types.test.mjs test/schema.test.mjs test/signals.test.mjs test/widget-build.test.mjs",
     "test:conformance": "node --test test/conformance.test.mjs && python3 impl/python/test_conformance.py",
+    "update:conformance": "node scripts/update-conformance.mjs",
+    "update:explorer": "node scripts/update-explorer.mjs",
     "demo": "node scripts/demo.mjs",
     "cli": "node packages/cli/cli.mjs",
     "build:widget": "node apps/widget/build.mjs"
   },
   "keywords": [
     "rhetoric",
-    "manipulation",
+    "rhetorical-effects",
+    "truth-seeking",
+    "agents",
     "media-literacy",
     "propaganda-techniques",
     "text-analysis",

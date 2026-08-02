@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "RhetorLint — read the subtext",
-  "version": "0.1.1",
-  "description": "Select text on any page and mark the rhetorical tells — hedges, absolutes, deleted subjects, manufactured urgency, spin. On-device; nothing leaves your browser.",
+  "name": "RhetorLint — inspect rhetorical patterns",
+  "version": "0.1.2",
+  "description": "Inspect rhetorical patterns in selected text. Markers do not prove intent, effects, deception, or truth. Analysis stays on-device.",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

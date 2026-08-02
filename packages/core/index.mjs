@@ -1,8 +1,8 @@
 /**
  * @rhetorlint/core — a reference implementation of the RhetorLint spec.
  *
- * Marks countable rhetorical tells in the WORDS of a passage, reports a
- * density metric, and produces a deterministic de-spun "strip". It runs
+ * Marks configured rhetorical patterns in the WORDS of a passage, reports a
+ * density metric, and produces a deterministic counterfactual "strip". It runs
  * fully on-device with zero dependencies.
  *
  * What it refuses to do, by design:
@@ -11,15 +11,16 @@
  *   - It does not fabricate a paraphrase. `rewrite` is left null unless an
  *     optional model adapter is supplied; the core only marks and strips.
  *
- * Every mark points at a real, visible phrase. Confidence is a heuristic
- * language-pattern likelihood, never a probability that anyone is lying.
+ * Every mark points at a real, visible phrase. Confidence is an uncalibrated,
+ * author-assigned match weight, never a probability of intent, effect, or truth.
  *
  * Spec: ../../spec/output.schema.json   Version: 0.1
  */
 
 export const SPEC_VERSION = "0.1";
 const NAME = "@rhetorlint/core";
-const CORE_VERSION = "0.1.2";
+const CORE_VERSION = "0.1.3";
+const CLASSIFICATION_STATUS = "rule-pack-candidate-context-required";
 
 /** Words the -ed/-en passive heuristic should treat as predicate adjectives, not passives.
  *  Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern would
@@ -91,12 +92,12 @@ function countWords(text) {
 }
 
 /**
- * The ruleIds whose phrases `strip` may remove without breaking grammar.
- * Deliberately conservative: only adverbial spin (intensifiers, deniable
- * adverbs) is subtracted. Verb-phrase hedges and structural tells are left
- * MARKED for the reader to judge — strip subtracts spin, it never paraphrases.
+ * The ruleIds whose phrases `strip` may remove as an explicit counterfactual.
+ * Deliberately conservative: only standalone lexical intensifiers are removed.
+ * Modality, attribution, verb-phrase hedges, and structural markers stay intact
+ * because deleting them can change truth conditions or break grammar.
  */
-const REMOVABLE = new Set(["intensifier.loaded", "hedge.deniable"]);
+const REMOVABLE = new Set(["intensifier.loaded"]);
 
 /**
  * analyze(text, options) -> a RhetorLint result object (see the spec).
@@ -117,8 +118,11 @@ export function analyze(text, options = {}) {
     for (const hit of matchesFor(rule, text)) {
       marks.push({
         ruleId: rule.ruleId,
+        displayName: rule.displayName,
         family: rule.family,
         technique: rule.technique,
+        classificationStatus: CLASSIFICATION_STATUS,
+        taxonomyMappingStatus: rule.taxonomyMappingStatus,
         actual: hit.actual,
         position: { start: pointAt(text, hit.index), end: pointAt(text, hit.index + hit.length) },
         note: rule.note,
@@ -172,11 +176,11 @@ export function analyze(text, options = {}) {
 }
 
 /**
- * strip(text, marks) -> deterministic de-spun text.
+ * strip(text, marks) -> deterministic reduction-and-annotation counterfactual.
  *
- * Removes hedge and intensifier phrases and flags each agentless passive
- * with a visible [who?]. No model, no paraphrase — it only subtracts spin
- * and points at what was hidden, so a reader can see the difference.
+ * Removes lexical intensifiers and flags each passive with an omitted agent
+ * using [who?]. No model and no paraphrase. This is a reading aid, not a
+ * meaning-preserving or truth-preserving rewrite.
  */
 export function strip(text, marks) {
   // Apply right-to-left so earlier offsets stay valid as we splice.

@@ -12,12 +12,15 @@ export const SIGNAL_SCHEMA = "rhetorlint.signal/0.1";
 const BOUNDARY_DOES_NOT = [
   "infer-speaker-intent",
   "detect-deception",
+  "establish-recipient-effects",
   "determine-factual-truth"
 ];
 
 const BOUNDARY_NOTE =
-  "RhetorLint marks visible language patterns. It does not infer speaker intent, " +
-  "detect deception, or determine whether a claim is factually true.";
+  "RhetorLint records surface-linked rule matches. Only matched spans and positions " +
+  "are direct observations; rule and family labels are candidate classifications. " +
+  "It does not infer speaker intent, detect deception, establish an effect on a " +
+  "recipient, or determine whether a claim is factually true.";
 
 function requireObject(value, name) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -76,6 +79,19 @@ function copyMark(value, index) {
   };
 
   optionalString(copy, "technique", mark.technique, `${name}.technique`);
+  optionalString(copy, "displayName", mark.displayName, `${name}.displayName`);
+  optionalString(
+    copy,
+    "classificationStatus",
+    mark.classificationStatus,
+    `${name}.classificationStatus`
+  );
+  optionalString(
+    copy,
+    "taxonomyMappingStatus",
+    mark.taxonomyMappingStatus,
+    `${name}.taxonomyMappingStatus`
+  );
   optionalString(copy, "note", mark.note, `${name}.note`);
   optionalString(copy, "level", mark.level, `${name}.level`);
 
@@ -135,7 +151,8 @@ export function toSignal(result, options = {}) {
     schema: SIGNAL_SCHEMA,
     kind: "rhetorlint.analysis",
     boundary: {
-      observes: "visible-language-patterns",
+      observes: "surface-linked-rule-matches",
+      classification: "rule-pack-candidate-context-required",
       doesNot: [...BOUNDARY_DOES_NOT],
       note: BOUNDARY_NOTE
     },

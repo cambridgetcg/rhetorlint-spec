@@ -1,7 +1,7 @@
 {
   "spec": "0.1",
-  "rules": "@rhetorlint/rules-en@0.1.2",
-  "note": "Conformance ground truth, generated from the JS reference engine. Any RhetorLint engine MUST reproduce every case exactly.",
+  "rules": "@rhetorlint/rules-en@0.1.3",
+  "note": "Reference expected outputs generated from the JavaScript engine. Conformance proves reproduction of these values, not semantic validity or factual truth.",
   "cases": [
     {
       "input": "We take your privacy extremely seriously, and regrettably, mistakes were made. We are reaching out to affected users.",
@@ -13,58 +13,70 @@
       "marks": [
         {
           "ruleId": "contrition.rehearsed",
+          "displayName": "stock contrition phrase",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "We take your privacy extremely seriously",
           "start": 0,
           "end": 40,
-          "note": "rehearsed contrition — the shape of an apology with the substance removed",
+          "note": "a stock contrition phrase — the matched phrase names no specific act or remedy",
           "confidence": 0.7,
-          "level": "warning",
+          "level": "info",
           "expected": [
-            "(say the specific thing you did wrong and the specific thing you will do)"
+            "(name the actor, act, impact, remedy, and evidence where known)"
           ]
         },
         {
           "ruleId": "intensifier.loaded",
+          "displayName": "intensifier",
           "family": "manipulative-wording",
           "technique": "Loaded Language",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "aligned-candidate",
           "actual": "extremely",
           "start": 21,
           "end": 30,
-          "note": "an intensifier — turns up the emotional volume without adding fact",
+          "note": "an intensifier — adds emphasis without adding evidence",
           "confidence": 0.55,
           "level": "info",
           "expected": [
-            "(state the fact without the intensifier)"
+            "(state the evidence without the intensifier)"
           ]
         },
         {
           "ruleId": "agency-hiding.deleted-subject",
+          "displayName": "passive with omitted semantic agent",
           "family": "agency-hiding",
           "technique": "Obfuscation (structural — RhetorLint extension)",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "rhetorlint-extension",
           "actual": "were made",
           "start": 68,
           "end": 77,
-          "note": "an agentless passive — who acted is deleted from the sentence",
+          "note": "a passive construction with an omitted agent — this phrase does not name who performed the action",
           "confidence": 0.7,
-          "level": "warning",
+          "level": "info",
           "expected": [
-            "(name who did it: 'I/we + verb')"
+            "(name the actor if known, or state that the actor is unknown)"
           ]
         },
         {
           "ruleId": "hedge.softener",
+          "displayName": "qualifier or distancing phrase",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "reaching out to",
           "start": 86,
           "end": 101,
-          "note": "a hedge — lowers a promise you can later deny",
+          "note": "a qualifier or distancing phrase — leaves the commitment less specific",
           "confidence": 0.55,
           "level": "info",
           "expected": [
-            "(say the concrete commitment, or drop the claim)"
+            "(state the concrete commitment or uncertainty)"
           ]
         }
       ]
@@ -79,44 +91,53 @@
       "marks": [
         {
           "ruleId": "absolute.universal",
+          "displayName": "absolute or certainty cue",
           "family": "simplification",
           "technique": "False Dilemma or No Choice",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "Everyone",
           "start": 0,
           "end": 8,
-          "note": "an absolute — claims more than anyone could actually know",
+          "note": "an absolute quantifier or certainty cue — states an unrestricted scope",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(qualify: how often, who exactly, how certain)"
+            "(state the domain, known exceptions, and basis for certainty)"
           ]
         },
         {
           "ruleId": "deflection.whataboutism",
+          "displayName": "comparison or topic-shift cue",
           "family": "distraction",
           "technique": "Whataboutism",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "aligned-candidate",
           "actual": "but what about",
           "start": 36,
           "end": 50,
-          "note": "a deflection — points away from the question just asked",
+          "note": "a comparison or topic-shift cue — interpretation depends on the prior question",
           "confidence": 0.6,
           "level": "note",
           "expected": [
-            "(answer the original question first)"
+            "(state the prior question and explain the comparison's relevance)"
           ]
         },
         {
           "ruleId": "weasel.attribution",
+          "displayName": "unnamed-source attribution",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "Studies show",
           "start": 67,
           "end": 79,
-          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "note": "an unnamed-source attribution — this phrase does not identify the source",
           "confidence": 0.65,
           "level": "note",
           "expected": [
-            "(name the source, or drop the appeal)"
+            "(name the source and evidence, or mark the source as unknown)"
           ]
         }
       ]
@@ -154,34 +175,40 @@
         "tells": 2,
         "per100Words": 28.6
       },
-      "strip": "The system failed,.",
+      "strip": "The system might have possibly failed, allegedly.",
       "marks": [
         {
           "ruleId": "hedge.deniable",
+          "displayName": "epistemic modal or attribution cue",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "might have possibly",
           "start": 11,
           "end": 30,
-          "note": "a deniable modal — leaves room to say you never promised",
+          "note": "an epistemic modal or attribution cue — marks possibility or qualified sourcing",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(state what you know, and what you don't)"
+            "(state what is known, possible, and still unverified)"
           ]
         },
         {
           "ruleId": "hedge.deniable",
+          "displayName": "epistemic modal or attribution cue",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "allegedly",
           "start": 39,
           "end": 48,
-          "note": "a deniable modal — leaves room to say you never promised",
+          "note": "an epistemic modal or attribution cue — marks possibility or qualified sourcing",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(state what you know, and what you don't)"
+            "(state what is known, possible, and still unverified)"
           ]
         }
       ]
@@ -196,30 +223,36 @@
       "marks": [
         {
           "ruleId": "agency-hiding.deleted-subject",
+          "displayName": "passive with omitted semantic agent",
           "family": "agency-hiding",
           "technique": "Obfuscation (structural — RhetorLint extension)",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "rhetorlint-extension",
           "actual": "were made",
           "start": 9,
           "end": 18,
-          "note": "an agentless passive — who acted is deleted from the sentence",
+          "note": "a passive construction with an omitted agent — this phrase does not name who performed the action",
           "confidence": 0.7,
-          "level": "warning",
+          "level": "info",
           "expected": [
-            "(name who did it: 'I/we + verb')"
+            "(name the actor if known, or state that the actor is unknown)"
           ]
         },
         {
           "ruleId": "agency-hiding.deleted-subject",
+          "displayName": "passive with omitted semantic agent",
           "family": "agency-hiding",
           "technique": "Obfuscation (structural — RhetorLint extension)",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "rhetorlint-extension",
           "actual": "were raised",
           "start": 32,
           "end": 43,
-          "note": "an agentless passive — who acted is deleted from the sentence",
+          "note": "a passive construction with an omitted agent — this phrase does not name who performed the action",
           "confidence": 0.7,
-          "level": "warning",
+          "level": "info",
           "expected": [
-            "(name who did it: 'I/we + verb')"
+            "(name the actor if known, or state that the actor is unknown)"
           ]
         }
       ]
@@ -234,44 +267,53 @@
       "marks": [
         {
           "ruleId": "weasel.attribution",
+          "displayName": "unnamed-source attribution",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "It is widely believed",
           "start": 0,
           "end": 21,
-          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "note": "an unnamed-source attribution — this phrase does not identify the source",
           "confidence": 0.65,
           "level": "note",
           "expected": [
-            "(name the source, or drop the appeal)"
+            "(name the source and evidence, or mark the source as unknown)"
           ]
         },
         {
           "ruleId": "agency-hiding.deleted-subject",
+          "displayName": "passive with omitted semantic agent",
           "family": "agency-hiding",
           "technique": "Obfuscation (structural — RhetorLint extension)",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "rhetorlint-extension",
           "actual": "is widely believed",
           "start": 3,
           "end": 21,
-          "note": "an agentless passive — who acted is deleted from the sentence",
+          "note": "a passive construction with an omitted agent — this phrase does not name who performed the action",
           "confidence": 0.7,
-          "level": "warning",
+          "level": "info",
           "expected": [
-            "(name who did it: 'I/we + verb')"
+            "(name the actor if known, or state that the actor is unknown)"
           ]
         },
         {
           "ruleId": "weasel.attribution",
+          "displayName": "unnamed-source attribution",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "experts agree",
           "start": 27,
           "end": 40,
-          "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+          "note": "an unnamed-source attribution — this phrase does not identify the source",
           "confidence": 0.65,
           "level": "note",
           "expected": [
-            "(name the source, or drop the appeal)"
+            "(name the source and evidence, or mark the source as unknown)"
           ]
         }
       ]
@@ -286,30 +328,36 @@
       "marks": [
         {
           "ruleId": "absolute.universal",
+          "displayName": "absolute or certainty cue",
           "family": "simplification",
           "technique": "False Dilemma or No Choice",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "obviously",
           "start": 8,
           "end": 17,
-          "note": "an absolute — claims more than anyone could actually know",
+          "note": "an absolute quantifier or certainty cue — states an unrestricted scope",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(qualify: how often, who exactly, how certain)"
+            "(state the domain, known exceptions, and basis for certainty)"
           ]
         },
         {
           "ruleId": "absolute.universal",
+          "displayName": "absolute or certainty cue",
           "family": "simplification",
           "technique": "False Dilemma or No Choice",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "there is no question",
           "start": 35,
           "end": 55,
-          "note": "an absolute — claims more than anyone could actually know",
+          "note": "an absolute quantifier or certainty cue — states an unrestricted scope",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(qualify: how often, who exactly, how certain)"
+            "(state the domain, known exceptions, and basis for certainty)"
           ]
         }
       ]
@@ -324,16 +372,19 @@
       "marks": [
         {
           "ruleId": "contrition.rehearsed",
+          "displayName": "stock contrition phrase",
           "family": "manipulative-wording",
           "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "We sincerely apologize for any",
           "start": 0,
           "end": 30,
-          "note": "rehearsed contrition — the shape of an apology with the substance removed",
+          "note": "a stock contrition phrase — the matched phrase names no specific act or remedy",
           "confidence": 0.7,
-          "level": "warning",
+          "level": "info",
           "expected": [
-            "(say the specific thing you did wrong and the specific thing you will do)"
+            "(name the actor, act, impact, remedy, and evidence where known)"
           ]
         }
       ]
@@ -348,86 +399,104 @@
       "marks": [
         {
           "ruleId": "urgency.appeal-to-time",
+          "displayName": "time-pressure cue",
           "family": "call",
           "technique": "Appeal to Time",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "aligned-candidate",
           "actual": "ACT NOW",
           "start": 0,
           "end": 7,
-          "note": "manufactured urgency — pressure to act before you can weigh it",
+          "note": "a time-pressure cue — calls for action or foregrounds a deadline",
           "confidence": 0.6,
           "level": "note",
           "expected": [
-            "(state the real deadline and what actually happens after it, or drop the clock)"
+            "(state the verified deadline, reason for urgency, and consequence of waiting)"
           ]
         },
         {
           "ruleId": "shouting.caps",
+          "displayName": "sustained all-caps",
           "family": "manipulative-wording",
           "technique": "Loaded Language",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "ACT NOW",
           "start": 0,
           "end": 7,
-          "note": "sustained ALL-CAPS — volume standing in for argument",
+          "note": "sustained ALL-CAPS — typographic emphasis",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(make the point in sentence case; let the facts carry the emphasis)"
+            "(compare the same wording in sentence case)"
           ]
         },
         {
           "ruleId": "absolute.universal",
+          "displayName": "absolute or certainty cue",
           "family": "simplification",
           "technique": "False Dilemma or No Choice",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "forever",
           "start": 28,
           "end": 35,
-          "note": "an absolute — claims more than anyone could actually know",
+          "note": "an absolute quantifier or certainty cue — states an unrestricted scope",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(qualify: how often, who exactly, how certain)"
+            "(state the domain, known exceptions, and basis for certainty)"
           ]
         },
         {
           "ruleId": "urgency.appeal-to-time",
+          "displayName": "time-pressure cue",
           "family": "call",
           "technique": "Appeal to Time",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "aligned-candidate",
           "actual": "Limited time",
           "start": 37,
           "end": 49,
-          "note": "manufactured urgency — pressure to act before you can weigh it",
+          "note": "a time-pressure cue — calls for action or foregrounds a deadline",
           "confidence": 0.6,
           "level": "note",
           "expected": [
-            "(state the real deadline and what actually happens after it, or drop the clock)"
+            "(state the verified deadline, reason for urgency, and consequence of waiting)"
           ]
         },
         {
           "ruleId": "lure.free-offer",
+          "displayName": "zero-cost or all-inclusive claim",
           "family": "manipulative-wording",
           "technique": "Exaggeration or Minimisation",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "aligned-candidate",
           "actual": "absolutely free",
           "start": 51,
           "end": 66,
-          "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
+          "note": "a zero-cost or all-inclusive claim — terms and non-price costs are absent from the matched phrase",
           "confidence": 0.55,
           "level": "info",
           "expected": [
-            "(state the price, the terms, and what is actually included)"
+            "(state the price, terms, included scope, and non-price exchanges)"
           ]
         },
         {
           "ruleId": "lure.free-offer",
+          "displayName": "zero-cost or all-inclusive claim",
           "family": "manipulative-wording",
           "technique": "Exaggeration or Minimisation",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "aligned-candidate",
           "actual": "no strings attached",
           "start": 68,
           "end": 87,
-          "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
+          "note": "a zero-cost or all-inclusive claim — terms and non-price costs are absent from the matched phrase",
           "confidence": 0.55,
           "level": "info",
           "expected": [
-            "(state the price, the terms, and what is actually included)"
+            "(state the price, terms, included scope, and non-price exchanges)"
           ]
         }
       ]
@@ -460,16 +529,19 @@
       "marks": [
         {
           "ruleId": "agency-hiding.deleted-subject",
+          "displayName": "passive with omitted semantic agent",
           "family": "agency-hiding",
           "technique": "Obfuscation (structural — RhetorLint extension)",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "rhetorlint-extension",
           "actual": "are often delayed",
           "start": 10,
           "end": 27,
-          "note": "an agentless passive — who acted is deleted from the sentence",
+          "note": "a passive construction with an omitted agent — this phrase does not name who performed the action",
           "confidence": 0.7,
-          "level": "warning",
+          "level": "info",
           "expected": [
-            "(name who did it: 'I/we + verb')"
+            "(name the actor if known, or state that the actor is unknown)"
           ]
         }
       ]
@@ -484,30 +556,36 @@
       "marks": [
         {
           "ruleId": "absolute.universal",
+          "displayName": "absolute or certainty cue",
           "family": "simplification",
           "technique": "False Dilemma or No Choice",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "every time",
           "start": 9,
           "end": 19,
-          "note": "an absolute — claims more than anyone could actually know",
+          "note": "an absolute quantifier or certainty cue — states an unrestricted scope",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(qualify: how often, who exactly, how certain)"
+            "(state the domain, known exceptions, and basis for certainty)"
           ]
         },
         {
           "ruleId": "absolute.universal",
+          "displayName": "absolute or certainty cue",
           "family": "simplification",
           "technique": "False Dilemma or No Choice",
+          "classificationStatus": "rule-pack-candidate-context-required",
+          "taxonomyMappingStatus": "approximate-candidate",
           "actual": "without exception",
           "start": 21,
           "end": 38,
-          "note": "an absolute — claims more than anyone could actually know",
+          "note": "an absolute quantifier or certainty cue — states an unrestricted scope",
           "confidence": 0.6,
           "level": "info",
           "expected": [
-            "(qualify: how often, who exactly, how certain)"
+            "(state the domain, known exceptions, and basis for certainty)"
           ]
         }
       ]

@@ -2,7 +2,7 @@
 """Cross-engine conformance test for the Python engine.
 
 Asserts that impl/python/rhetorlint.py reproduces every case in
-conformance/cases.json (the ground truth generated from the JS reference
+conformance/cases.json (the expected outputs generated from the JS reference
 engine). If this passes in both languages, the two engines agree — the
 taxonomy is genuinely portable.
 
@@ -23,7 +23,10 @@ def flat(result):
         "density": result["density"],
         "strip": result["strip"],
         "marks": [{
-            "ruleId": m["ruleId"], "family": m["family"], "technique": m["technique"],
+            "ruleId": m["ruleId"], "displayName": m["displayName"],
+            "family": m["family"], "technique": m["technique"],
+            "classificationStatus": m["classificationStatus"],
+            "taxonomyMappingStatus": m["taxonomyMappingStatus"],
             "actual": m["actual"], "start": m["position"]["start"]["offset"],
             "end": m["position"]["end"]["offset"], "note": m["note"],
             "confidence": m["confidence"], "level": m["level"], "expected": m["expected"],
@@ -65,9 +68,9 @@ def main():
                 print(f"  want   {[(m['ruleId'], m['start'], m['end']) for m in want['marks']]}")
     total = len(corpus["cases"])
     if fails:
-        print(f"\n{fails}/{total} cases FAILED — the Python engine diverges from the spec ground truth")
+        print(f"\n{fails}/{total} cases FAILED — the Python engine diverges from the reference outputs")
         return 1
-    print(f"python conformance: {total}/{total} cases identical to the ground truth")
+    print(f"python conformance: {total}/{total} cases match the reference outputs")
     return 0
 
 

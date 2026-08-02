@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>RhetorLint · Read the subtext</title>
-<meta name="description" content="RhetorLint marks countable rhetorical tells in the words of a passage. Heuristic, on-device, private. No network, no fonts or images loaded from anywhere.">
+<title>RhetorLint · Inspect rhetoric, frame effect tests, ask verification questions</title>
+<meta name="description" content="RhetorLint marks configured rhetorical patterns and helps form testable effect hypotheses and verification questions. On-device; no network, external fonts, or images.">
 <style>
   /* ============================================================
      RhetorLint explorer — editor's proof sheet.
@@ -378,8 +378,9 @@
     padding: 15px 16px; margin-top: 12px; background: var(--paper-raise);
   }
   .tell-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .display-name { font-size: 13px; color: var(--ink); font-weight: 700; }
   .tell-def { font-size: 14.5px; color: var(--ink); margin: 2px 0 12px; }
-  .worked-label, .rewrite-label {
+  .worked-label, .rewrite-label, .effect-label, .probe-label {
     font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
     text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px;
   }
@@ -392,6 +393,15 @@
     font-family: var(--serif); font-size: 15px; color: var(--ink-soft);
     border-left: 3px solid #3f9d63; padding: 2px 0 2px 12px;
   }
+  .effect, .probe {
+    font-size: 13.5px; line-height: 1.55; color: var(--ink-soft);
+    border-left: 3px solid var(--accent); padding: 3px 0 3px 12px;
+    margin-bottom: 12px;
+  }
+  .effect p, .probe p { margin: 3px 0; }
+  .effect b, .probe b { color: var(--ink); font-weight: 650; }
+  .effect .effect-id { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+  .probe { border-left-color: #3f9d63; }
   .planned-body { font-size: 13.5px; color: var(--ink-faint); font-style: italic; padding: 4px 0 2px; }
 
   /* ---------- footer ---------- */
@@ -417,8 +427,8 @@
       <span class="dot">&#9679;</span> RhetorLint &middot; the learning wing
       <span class="spec" id="specTag">spec 0.1</span>
     </div>
-    <h1 class="title">RhetorLint <span class="mid">&middot;</span> Read the subtext</h1>
-    <p class="lede">It marks countable rhetorical tells in the <em>words</em> of a passage &mdash; loaded intensifiers, rehearsed contrition, deleted subjects &mdash; and reports how thickly the text is spun. Heuristic. On-device. It never reads the person.</p>
+    <h1 class="title">RhetorLint <span class="mid">&middot;</span> Inspect rhetorical patterns</h1>
+    <p class="lede">It marks configured, visible patterns in the <em>words</em> of a passage and reports their density. A marker can prompt an effect hypothesis or verification question; it does not reveal intent, prove an effect on a recipient, or decide truth.</p>
 
     <div class="controls">
       <div class="tabs" role="tablist" aria-label="Explorer mode">
@@ -443,7 +453,7 @@
           <button class="chip" data-ex="specimen" aria-pressed="true">The specimen</button>
           <button class="chip" data-ex="corporate" aria-pressed="false">Corporate non-apology</button>
           <button class="chip" data-ex="political" aria-pressed="false">Political deflection</button>
-          <button class="chip" data-ex="clean" aria-pressed="false">Clean &amp; honest</button>
+          <button class="chip" data-ex="clean" aria-pressed="false">Direct account</button>
         </div>
         <p class="privnote" id="privnote">Everything runs in this page. No network requests, no external fonts, images, or scripts &mdash; the engine and rule pack are inlined. Your text is never sent anywhere.</p>
       </div>
@@ -452,7 +462,7 @@
         <p class="sect-label">Density</p>
         <div class="density-wrap">
           <div class="density-num" id="dNum">0.0</div>
-          <div class="density-unit">tells per 100 words<br><strong id="dRatio">0 tells / 0 words</strong></div>
+          <div class="density-unit">markers per 100 words<br><strong id="dRatio">0 markers / 0 words</strong></div>
         </div>
         <div class="bar" aria-hidden="true"><i id="dBar" style="width:0%"></i></div>
         <div class="bar-scale" aria-hidden="true"><span>0</span><span>15</span><span>30+ per 100</span></div>
@@ -465,14 +475,14 @@
       </div>
 
       <div class="card col-marks">
-        <p class="sect-label">Tells, by family</p>
+        <p class="sect-label">Markers, by family</p>
         <div id="marks"></div>
       </div>
 
       <div class="card col-strip">
-        <p class="sect-label">Strip &mdash; the de-spun text</p>
+        <p class="sect-label">Counterfactual transform</p>
         <div class="strip-out" id="strip"></div>
-        <p class="strip-legend">Deterministic, no model: adverbial spin (intensifiers, deniable adverbs) is subtracted and each agentless passive is flagged with <span class="who">[who?]</span>. Verb-phrase hedges are left marked, not paraphrased &mdash; strip subtracts spin, it never rewrites for you.</p>
+        <p class="strip-legend">Deterministic, no model: lexical intensifiers are removed and passives with omitted agents are flagged with <span class="who">[who?]</span>. Modality and attribution stay intact. This makes a comparison variant; it is not guaranteed to preserve meaning or truth.</p>
       </div>
 
     </div>
@@ -481,18 +491,19 @@
   <!-- ======================= LEARN ======================= -->
   <section class="panel" id="panel-learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
     <div class="honest">
-      <h2>How to read this tool honestly</h2>
+      <h2>How to read this tool within its limits</h2>
       <ul>
-        <li><span class="yn yes">DOES</span><span>Mark tells in the <b>words</b> &mdash; every mark points at a real, visible phrase you can see and check.</span></li>
-        <li><span class="yn no">DOES&nbsp;NOT</span><span>Read the <b>person</b>. It infers no tone, no intent, no deception. A tell is not a lie.</span></li>
+        <li><span class="yn yes">DOES</span><span>Mark configured patterns in the <b>words</b> &mdash; every mark points at a real, visible phrase you can see and check.</span></li>
+        <li><span class="yn no">DOES&nbsp;NOT</span><span>Read the <b>person</b>. It infers no tone, no intent, no deception. A marker is not a finding.</span></li>
         <li><span class="yn no">DOES&nbsp;NOT</span><span>Judge whether a claim is <b>factually true</b>. That is your job, and the world's &mdash; not a pattern-matcher's.</span></li>
-        <li><span class="yn yes">DOES</span><span>Report <b>confidence as heuristic</b> &mdash; a language-pattern likelihood, never a probability that anyone is lying.</span></li>
+        <li><span class="yn no">DOES&nbsp;NOT</span><span>Prove an <b>effect on a recipient</b>. Effect descriptions are hypotheses until tested for a declared context and substrate.</span></li>
+        <li><span class="yn yes">DOES</span><span>Report an <b>uncalibrated rule weight</b> in the legacy <code>confidence</code> field &mdash; never a probability of intent, effect, deception, or truth.</span></li>
       </ul>
-      <p class="foot">A high density means the language is thickly styled, not that the speaker is dishonest. Honest people use hedges; liars sometimes speak plainly. RhetorLint gives you a lens, not a verdict.</p>
+      <p class="foot">Density is only a count from the configured pack. A high or low value does not establish intent, effect, deception, harm, or truth. RhetorLint gives you observations and questions, not a verdict.</p>
     </div>
 
     <div class="card">
-      <p class="sect-label">The taxonomy &mdash; families &amp; tells</p>
+      <p class="sect-label">The taxonomy &mdash; families &amp; markers</p>
       <p class="fam-desc">Seven coarse families: the six SemEval-2023 persuasion parents plus RhetorLint's structural <em>agency-hiding</em> extension. This pack (<span class="rid" id="packId">rules-en</span>) ships <span id="packRules">11</span> rules across <span id="packFams">5</span> of them today; the rest are defined and awaiting rules.</p>
       <div id="learn"></div>
     </div>
@@ -500,7 +511,7 @@
 
   <footer class="foot">
     <p class="prov" id="prov">engine &middot; rules</p>
-    <p>RhetorLint marks language patterns. It does not detect lies, read intent, or verify facts. Confidence is <b>heuristic</b>. This page makes no accuracy claims &mdash; it is a reading aid, not a truth machine. Built to run entirely on your device.</p>
+    <p>RhetorLint marks configured language patterns. It does not detect lies, read intent, establish recipient effects, or verify facts. Density and the legacy <b>confidence</b> field are not governance or truth scores. Built to run entirely on your device.</p>
   </footer>
 </div>
 
@@ -508,24 +519,27 @@
 "use strict";
 (function () {
   /* ============================================================
-     1. THE RULE PACK — inlined verbatim from
-        packages/rules-en/rules.json (JS string escapes match JSON's,
-        so regex sources are byte-identical to the Node engine).
+     1. THE RULE PACK — generated from packages/rules-en/rules.json.
+        Run `npm run update:explorer` after changing the canonical pack.
+        The full inquiry metadata stays available to this standalone page.
      ============================================================ */
+  /* BEGIN GENERATED EXPLORER RULES */
   const RULES = {
     "id": "@rhetorlint/rules-en",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "locale": "en",
-    "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.",
+    "note": "Seed English marker pack. Each rule points at a visible phrase and errs toward under-marking. Rule IDs and family/technique labels are candidate interpretations, not contextual findings; taxonomyMappingStatus distinguishes an aligned candidate, an approximate candidate, and a RhetorLint extension. Confidence is an uncalibrated, author-assigned pattern-match weight, NOT a probability of intent, effect, deception, or truth. Effect hypotheses are contestable prompts with applicability conditions, alternative readings, and observable measures; verification probes are questions, not verdicts. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the marker goes silent instead of firing on every sentence.",
     "rules": [
       {
         "ruleId": "intensifier.loaded",
+        "displayName": "intensifier",
         "family": "manipulative-wording",
         "technique": "Loaded Language",
+        "taxonomyMappingStatus": "aligned-candidate",
         "type": "lexical",
         "level": "info",
         "confidence": 0.55,
-        "note": "an intensifier — turns up the emotional volume without adding fact",
+        "note": "an intensifier — adds emphasis without adding evidence",
         "terms": [
           "extremely",
           "incredibly",
@@ -538,17 +552,48 @@
           "hugely"
         ],
         "expected": [
-          "(state the fact without the intensifier)"
+          "(state the evidence without the intensifier)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "lexical-salience.amplify",
+            "dimension": "salience",
+            "operation": "amplify",
+            "description": "May increase attention to, recall of, or expressed certainty in the adjacent claim without changing its evidence.",
+            "conditions": [
+              "The recipient treats the intensifier as informative emphasis rather than conventional style."
+            ],
+            "alternatives": [
+              "The emphasis may be proportionate, quoted, ironic, or conventional in the surrounding genre."
+            ],
+            "measures": [
+              "claim-confidence change across a minimal pair",
+              "evidence-request rate",
+              "recall or prioritisation"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "intensifier.compare-evidence-demand",
+            "question": "Does removing only the intensifier change confidence, attention, or requests for evidence under the same task conditions?",
+            "evidenceNeeded": [
+              "paired responses to claim-equivalent variants",
+              "declared recipient substrate and run conditions"
+            ]
+          }
         ]
       },
       {
         "ruleId": "absolute.universal",
+        "displayName": "absolute or certainty cue",
         "family": "simplification",
         "technique": "False Dilemma or No Choice",
+        "taxonomyMappingStatus": "approximate-candidate",
         "type": "lexical",
         "level": "info",
         "confidence": 0.6,
-        "note": "an absolute — claims more than anyone could actually know",
+        "note": "an absolute quantifier or certainty cue — states an unrestricted scope",
         "terms": [
           "always",
           "never",
@@ -569,17 +614,49 @@
           "no exceptions"
         ],
         "expected": [
-          "(qualify: how often, who exactly, how certain)"
+          "(state the domain, known exceptions, and basis for certainty)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "alternative-space.narrow",
+            "dimension": "alternative-space",
+            "operation": "narrow",
+            "description": "May reduce the number of alternatives or exceptions a recipient considers.",
+            "conditions": [
+              "The phrase describes a contestable empirical claim rather than a rule, definition, invariant, or safety requirement."
+            ],
+            "alternatives": [
+              "The universal may accurately state a scoped invariant, policy, quotation, or precautionary requirement."
+            ],
+            "measures": [
+              "alternatives enumerated",
+              "exceptions requested",
+              "scope preserved in claim extraction"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "absolute.test-scope",
+            "question": "What domain does the universal cover, what exceptions are known, and what evidence supports that scope?",
+            "evidenceNeeded": [
+              "explicit domain definition",
+              "exception search or counterexamples",
+              "source evidence for the universal claim"
+            ]
+          }
         ]
       },
       {
         "ruleId": "hedge.softener",
+        "displayName": "qualifier or distancing phrase",
         "family": "manipulative-wording",
         "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "taxonomyMappingStatus": "approximate-candidate",
         "type": "lexical",
         "level": "info",
         "confidence": 0.55,
-        "note": "a hedge — lowers a promise you can later deny",
+        "note": "a qualifier or distancing phrase — leaves the commitment less specific",
         "terms": [
           "reaching out to",
           "sort of",
@@ -595,117 +672,403 @@
           "for the most part"
         ],
         "expected": [
-          "(say the concrete commitment, or drop the claim)"
+          "(state the concrete commitment or uncertainty)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "commitment-specificity.reduce",
+            "dimension": "commitment-specificity",
+            "operation": "reduce",
+            "description": "May lead recipients to extract a weaker or less specific commitment from the sentence.",
+            "conditions": [
+              "The phrase modifies a promise, obligation, action, or factual assertion."
+            ],
+            "alternatives": [
+              "The phrase may accurately communicate uncertainty, approximation, politeness, or a process already defined nearby."
+            ],
+            "measures": [
+              "obligations extracted",
+              "deadline or actor specificity",
+              "follow-up questions requested"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "softener.identify-commitment",
+            "question": "What concrete action, actor, deadline, or uncertainty does the surrounding context establish?",
+            "evidenceNeeded": [
+              "nearby commitments and qualifications",
+              "operational records or policy defining the action"
+            ]
+          }
         ]
       },
       {
         "ruleId": "hedge.deniable",
+        "displayName": "epistemic modal or attribution cue",
         "family": "manipulative-wording",
         "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "taxonomyMappingStatus": "approximate-candidate",
         "type": "pattern",
         "level": "info",
         "confidence": 0.6,
-        "note": "a deniable modal — leaves room to say you never promised",
+        "note": "an epistemic modal or attribution cue — marks possibility or qualified sourcing",
         "pattern": "\\b(?:may|might|could)\\s+(?:have\\s+\\w+|be\\s+\\w+|possibly|potentially)\\b|\\b(?:reportedly|allegedly|purportedly)\\b",
         "expected": [
-          "(state what you know, and what you don't)"
+          "(state what is known, possible, and still unverified)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "claim-certainty.qualify",
+            "dimension": "claim-certainty",
+            "operation": "qualify",
+            "description": "May cause a recipient to treat the proposition as possible or attributed rather than established.",
+            "conditions": [
+              "The modal scopes the proposition the recipient is evaluating."
+            ],
+            "alternatives": [
+              "The qualification may be epistemically necessary in scientific, legal, safety, or incomplete-information contexts."
+            ],
+            "measures": [
+              "extracted certainty level",
+              "hypotheses retained",
+              "requests for evidence supporting each possibility"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "modal.trace-uncertainty",
+            "question": "What evidence supports the possibility, and what evidence would resolve the stated uncertainty?",
+            "evidenceNeeded": [
+              "source of the attribution or uncertainty",
+              "observations that distinguish the live hypotheses"
+            ]
+          }
         ]
       },
       {
         "ruleId": "weasel.attribution",
+        "displayName": "unnamed-source attribution",
         "family": "manipulative-wording",
         "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "taxonomyMappingStatus": "approximate-candidate",
         "type": "pattern",
         "level": "note",
         "confidence": 0.65,
-        "note": "an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)",
+        "note": "an unnamed-source attribution — this phrase does not identify the source",
         "pattern": "\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b",
         "expected": [
-          "(name the source, or drop the appeal)"
+          "(name the source and evidence, or mark the source as unknown)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "source-traceability.reduce",
+            "dimension": "source-traceability",
+            "operation": "reduce",
+            "description": "May make it harder for a recipient to inspect the authority, sample, or evidence behind the attributed claim.",
+            "conditions": [
+              "No checkable source is named in nearby text or linked provenance."
+            ],
+            "alternatives": [
+              "The source may be supplied elsewhere, omitted for brevity, or refer to genuinely shared background knowledge."
+            ],
+            "measures": [
+              "source requests",
+              "successful provenance resolution",
+              "confidence before and after source disclosure"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "attribution.resolve-source",
+            "question": "Which source makes this claim, and what evidence and method does that source provide?",
+            "evidenceNeeded": [
+              "named source",
+              "retrievable citation or dataset",
+              "method and scope of the cited evidence"
+            ]
+          }
         ]
       },
       {
         "ruleId": "deflection.whataboutism",
+        "displayName": "comparison or topic-shift cue",
         "family": "distraction",
         "technique": "Whataboutism",
+        "taxonomyMappingStatus": "aligned-candidate",
         "type": "pattern",
         "level": "note",
         "confidence": 0.6,
-        "note": "a deflection — points away from the question just asked",
+        "note": "a comparison or topic-shift cue — interpretation depends on the prior question",
         "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let'?s\\s+not\\s+forget|whatabout)\\b",
         "expected": [
-          "(answer the original question first)"
+          "(state the prior question and explain the comparison's relevance)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "dialogue-attention.redirect",
+            "dimension": "dialogue-attention",
+            "operation": "redirect",
+            "description": "May redirect a recipient from a prior question to a comparison or different issue.",
+            "conditions": [
+              "The phrase occurs in a response and the proposed comparison does not answer the prior question."
+            ],
+            "alternatives": [
+              "It may introduce a relevant control, request missing context, or ask a legitimate independent question."
+            ],
+            "measures": [
+              "which question the response answers",
+              "attention allocated by topic",
+              "unresolved prior claims"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "topic-shift.recover-context",
+            "question": "What was the prior question, does this comparison answer it, and is the comparison independently relevant?",
+            "evidenceNeeded": [
+              "preceding dialogue or document context",
+              "explicit relevance relation between the two issues"
+            ]
+          }
         ]
       },
       {
         "ruleId": "contrition.rehearsed",
+        "displayName": "stock contrition phrase",
         "family": "manipulative-wording",
         "technique": "Obfuscation, Intentional Vagueness, Confusion",
+        "taxonomyMappingStatus": "approximate-candidate",
         "type": "pattern",
-        "level": "warning",
+        "level": "info",
         "confidence": 0.7,
-        "note": "rehearsed contrition — the shape of an apology with the substance removed",
+        "note": "a stock contrition phrase — the matched phrase names no specific act or remedy",
         "pattern": "\\bwe\\s+take\\s+(?:your\\s+|the\\s+)?[a-z ]{0,24}?\\bseriously\\b|\\bwe\\s+(?:sincerely\\s+)?apologi[sz]e\\s+for\\s+any\\b|\\bwe\\s+are\\s+committed\\s+to\\b|\\bwe\\s+value\\s+your\\b|\\bout\\s+of\\s+an\\s+abundance\\s+of\\s+caution\\b|\\bwe\\s+hear\\s+you\\b",
         "expected": [
-          "(say the specific thing you did wrong and the specific thing you will do)"
+          "(name the actor, act, impact, remedy, and evidence where known)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "accountability-specificity.reduce",
+            "dimension": "accountability-specificity",
+            "operation": "reduce",
+            "description": "May let a recipient recognise the form of contrition while extracting little about the actor, act, impact, or remedy.",
+            "conditions": [
+              "The surrounding statement lacks specific accountability information."
+            ],
+            "alternatives": [
+              "The phrase may express genuine care and the missing specifics may appear elsewhere in the statement."
+            ],
+            "measures": [
+              "actor, act, impact, and remedy extracted",
+              "follow-up accountability questions",
+              "remedy verification"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "contrition.locate-specifics",
+            "question": "Where does the statement identify what happened, who acted, who was affected, and what remedy is verifiably underway?",
+            "evidenceNeeded": [
+              "specific incident account",
+              "named responsibility",
+              "affected-scope data",
+              "evidence of remediation"
+            ]
+          }
         ]
       },
       {
         "ruleId": "lure.free-offer",
+        "displayName": "zero-cost or all-inclusive claim",
         "family": "manipulative-wording",
         "technique": "Exaggeration or Minimisation",
+        "taxonomyMappingStatus": "aligned-candidate",
         "type": "pattern",
         "level": "info",
         "confidence": 0.55,
-        "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
+        "note": "a zero-cost or all-inclusive claim — terms and non-price costs are absent from the matched phrase",
         "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[- ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
         "expected": [
-          "(state the price, the terms, and what is actually included)"
+          "(state the price, terms, included scope, and non-price exchanges)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "offer-scrutiny.reduce",
+            "dimension": "offer-scrutiny",
+            "operation": "reduce",
+            "description": "May reduce attention to conditions, future charges, data exchange, attention costs, or exclusions.",
+            "conditions": [
+              "The offer has material conditions or exchanges not visible beside the claim."
+            ],
+            "alternatives": [
+              "The offer may genuinely have no price or obligation and may disclose complete terms nearby."
+            ],
+            "measures": [
+              "terms and exclusions requested",
+              "non-price exchanges identified",
+              "decision change after full disclosure"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "free-offer.inspect-terms",
+            "question": "What price, conditions, exclusions, later charges, data uses, or other exchanges accompany the offer?",
+            "evidenceNeeded": [
+              "complete offer terms",
+              "billing schedule",
+              "data and cancellation policies",
+              "included and excluded features"
+            ]
+          }
         ]
       },
       {
         "ruleId": "urgency.appeal-to-time",
+        "displayName": "time-pressure cue",
         "family": "call",
         "technique": "Appeal to Time",
+        "taxonomyMappingStatus": "aligned-candidate",
         "type": "pattern",
         "level": "note",
         "confidence": 0.6,
-        "note": "manufactured urgency — pressure to act before you can weigh it",
+        "note": "a time-pressure cue — calls for action or foregrounds a deadline",
         "pattern": "\\b(?:act\\s+now|act\\s+fast|don'?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it'?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
         "expected": [
-          "(state the real deadline and what actually happens after it, or drop the clock)"
+          "(state the verified deadline, reason for urgency, and consequence of waiting)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "deliberation-time.compress",
+            "dimension": "deliberation-time",
+            "operation": "compress",
+            "description": "May cause a recipient to prioritise immediate action over verification or comparison.",
+            "conditions": [
+              "The deadline or emergency has not already been independently verified by the recipient."
+            ],
+            "alternatives": [
+              "The cue may communicate a genuine emergency, safety instruction, or externally fixed deadline.",
+              "The phrase may be quoted, mentioned, or used as an example rather than directed at the recipient."
+            ],
+            "measures": [
+              "verification steps before action",
+              "action latency",
+              "alternatives compared"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "urgency.verify-deadline",
+            "question": "What independently verifiable deadline or hazard exists, and what actually happens if action waits?",
+            "evidenceNeeded": [
+              "authoritative deadline or hazard source",
+              "consequence of delay",
+              "available safe deliberation time"
+            ]
+          }
         ]
       },
       {
         "ruleId": "shouting.caps",
+        "displayName": "sustained all-caps",
         "family": "manipulative-wording",
         "technique": "Loaded Language",
+        "taxonomyMappingStatus": "approximate-candidate",
         "type": "pattern",
         "caseSensitive": true,
         "minEngine": "0.1.2",
         "level": "info",
         "confidence": 0.6,
-        "note": "sustained ALL-CAPS — volume standing in for argument",
+        "note": "sustained ALL-CAPS — typographic emphasis",
         "pattern": "\\b[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z](?:\\s+[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z])+\\b",
         "expected": [
-          "(make the point in sentence case; let the facts carry the emphasis)"
+          "(compare the same wording in sentence case)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "typographic-salience.amplify",
+            "dimension": "typographic-salience",
+            "operation": "amplify",
+            "description": "May increase visual priority, perceived urgency, or recall without changing the proposition.",
+            "conditions": [
+              "The capitals function as emphasis rather than an acronym, heading convention, accessibility choice, code, or quotation."
+            ],
+            "alternatives": [
+              "The capitals may be conventional formatting or a proportionate emergency cue."
+            ],
+            "measures": [
+              "first-attended span",
+              "priority ranking",
+              "response difference against a case-only variant"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "caps.compare-case",
+            "question": "Does changing only letter case alter prioritisation, urgency, or the evidence requested?",
+            "evidenceNeeded": [
+              "paired responses to case-only variants",
+              "declared display and accessibility conditions"
+            ]
+          }
         ]
       },
       {
         "ruleId": "agency-hiding.deleted-subject",
+        "displayName": "passive with omitted semantic agent",
         "family": "agency-hiding",
         "technique": "Obfuscation (structural — RhetorLint extension)",
+        "taxonomyMappingStatus": "rhetorlint-extension",
         "type": "structural",
         "detector": "agentless-passive",
-        "level": "warning",
+        "level": "info",
         "confidence": 0.7,
-        "note": "an agentless passive — who acted is deleted from the sentence",
+        "note": "a passive construction with an omitted agent — this phrase does not name who performed the action",
         "expected": [
-          "(name who did it: 'I/we + verb')"
+          "(name the actor if known, or state that the actor is unknown)"
+        ],
+        "effectHypotheses": [
+          {
+            "id": "actor-attribution.reduce",
+            "dimension": "actor-attribution",
+            "operation": "reduce",
+            "description": "May make actor identification or responsibility attribution harder for a recipient.",
+            "conditions": [
+              "The actor is not named nearby or already known, and actor attribution matters to the task."
+            ],
+            "alternatives": [
+              "The actor may be unknown, irrelevant, named elsewhere, or conventionally omitted in scientific or process-focused prose."
+            ],
+            "measures": [
+              "actor identified",
+              "responsibility assignment",
+              "requests for provenance about who acted"
+            ]
+          }
+        ],
+        "verificationProbes": [
+          {
+            "id": "passive.identify-actor",
+            "question": "Who performed the action, is that actor known, and what evidence supports the attribution?",
+            "evidenceNeeded": [
+              "nearby grammatical or discourse context",
+              "records identifying the actor",
+              "explicit acknowledgement when the actor is unknown"
+            ]
+          }
         ]
       }
     ]
   };
+  /* END GENERATED EXPLORER RULES */
 
   /* ============================================================
      2. THE ENGINE — ported from packages/core/index.mjs.
@@ -713,7 +1076,7 @@
      ============================================================ */
   const SPEC_VERSION = "0.1";
   const NAME = "@rhetorlint/core";
-  const CORE_VERSION = "0.1.2";
+  const CORE_VERSION = "0.1.3";
 
   const NOT_PASSIVE = new Set([
     "tired", "glad", "aware", "worried", "excited", "interested", "scared",
@@ -773,7 +1136,7 @@
     return m ? m.length : 0;
   }
 
-  const REMOVABLE = new Set(["intensifier.loaded", "hedge.deniable"]);
+  const REMOVABLE = new Set(["intensifier.loaded"]);
 
   function analyze(text, options = {}) {
     const pack = options.rules;
@@ -785,8 +1148,11 @@
       for (const hit of matchesFor(rule, text)) {
         marks.push({
           ruleId: rule.ruleId,
+          displayName: rule.displayName,
           family: rule.family,
           technique: rule.technique,
+          classificationStatus: "rule-pack-candidate-context-required",
+          taxonomyMappingStatus: rule.taxonomyMappingStatus,
           actual: hit.actual,
           position: { start: pointAt(text, hit.index), end: pointAt(text, hit.index + hit.length) },
           note: rule.note,
@@ -861,20 +1227,20 @@
   // off the pack at render time, never hand-flagged here — a family cannot keep
   // a "planned" badge after a rule lands in it.
   const FAMILIES = [
-    { id: "manipulative-wording", label: "Manipulative wording",
-      desc: "Word choices that steer feeling or lower a promise — loaded intensifiers, deniable modals, vague hedges, unnamed authorities, and rehearsed contrition." },
-    { id: "simplification", label: "Simplification",
-      desc: "Collapses a messy reality into a clean, unarguable shape — absolutes and false dilemmas that claim more than anyone could know." },
-    { id: "distraction", label: "Distraction",
-      desc: "Moves attention off the question that was actually asked." },
-    { id: "attack-on-reputation", label: "Attack on reputation",
-      desc: "Targets the person or group instead of the argument — name-calling, labeling, guilt by association." },
-    { id: "justification", label: "Justification",
-      desc: "Frames a stance as already justified — appeal to fear, flag-waving, 'we had no choice'." },
-    { id: "call", label: "Call",
-      desc: "Pushes the audience to act or feel right now — manufactured urgency, slogans, us-vs-them appeals." },
-    { id: "agency-hiding", label: "Agency-hiding",
-      desc: "Deletes who acted — agentless passives where the subject is missing. RhetorLint's structural extension to the SemEval taxonomy." }
+    { id: "manipulative-wording", label: "Lexical framing markers",
+      desc: "Configured lexical patterns for emphasis, scope, modality, attribution, offers, and contrition. Their effects depend on recipient and context." },
+    { id: "simplification", label: "Scope & alternatives",
+      desc: "Patterns that state unrestricted scope or narrow alternatives. Test whether exceptions or options remain visible to a recipient." },
+    { id: "distraction", label: "Topic shifts & comparisons",
+      desc: "Patterns associated with a change of topic. Compare the prior question and resulting focus before treating the shift as distraction." },
+    { id: "attack-on-reputation", label: "Person/group targeting",
+      desc: "Language about a person or group rather than the proposition at issue. Its relevance and effect require context." },
+    { id: "justification", label: "External appeals",
+      desc: "Patterns that present a stance with an asserted basis, such as fear, affiliation, or necessity. Inspect the basis independently." },
+    { id: "call", label: "Action & deadline cues",
+      desc: "Action and deadline cues. Verify the deadline or hazard and test whether the wording changes deliberation." },
+    { id: "agency-hiding", label: "Omitted-agent structures",
+      desc: "Passives with an omitted semantic agent. Omission may be conventional or task-relevant; verify the actor when it matters. RhetorLint's structural extension to the SemEval taxonomy." }
   ];
 
   const rulesInFamily = (id) => RULES.rules.filter((r) => r.family === id);
@@ -949,7 +1315,7 @@
 
   function renderMarksByFamily(marks) {
     if (!marks.length) {
-      return '<p class="none-msg">No tells found. If this is a real statement, that is worth noticing — plain, active, source-named language leaves nothing to mark.</p>';
+      return '<p class="none-msg">No configured patterns detected. This says nothing by itself about the passage’s truth, intent, effects, or safety.</p>';
     }
     let html = "";
     for (const fam of FAMILIES) {
@@ -959,20 +1325,22 @@
       html += '<div class="fam-head fam-' + fam.id + '">' +
                 '<span class="swatch" aria-hidden="true"></span>' +
                 '<span class="fam-name">' + escapeHtml(fam.label) + '</span>' +
-                '<span class="fam-count">' + inFam.length + (inFam.length === 1 ? " tell" : " tells") + '</span>' +
+                '<span class="fam-count">' + inFam.length + (inFam.length === 1 ? " marker" : " markers") + '</span>' +
               '</div>';
       for (const m of inFam) {
         const plain = (m.expected && m.expected.length) ? m.expected[0] : "";
         html += '<div class="mark-row">' +
                   '<div class="mark-quote fam-' + fam.id + '"><mark class="fam-' + fam.id + '">' + escapeHtml(m.actual) + '</mark></div>' +
                   '<div class="mark-meta">' +
+                    '<span class="display-name">' + escapeHtml(m.displayName || "configured marker") + '</span>' +
                     '<span class="rid">' + escapeHtml(m.ruleId) + '</span>' +
                     '<span class="lvl ' + escapeAttr(m.level) + '">' + escapeHtml(m.level) + '</span>' +
                     '<span class="tech">' + escapeHtml(m.technique || "") + '</span>' +
-                    '<span class="conf">heuristic · ' + Number(m.confidence).toFixed(2) + '</span>' +
+                    '<span class="conf">' + escapeHtml(m.taxonomyMappingStatus || "candidate") + '</span>' +
+                    '<span class="conf">rule weight · ' + Number(m.confidence).toFixed(2) + '</span>' +
                   '</div>' +
                   '<div class="mark-note">' + escapeHtml(m.note || "") + '</div>' +
-                  (plain ? '<div class="mark-plain"><b>Plain:</b> ' + escapeHtml(plain) + '</div>' : '') +
+                  (plain ? '<div class="mark-plain"><b>Prompt:</b> ' + escapeHtml(plain) + '</div>' : '') +
                 '</div>';
       }
       html += '</div>';
@@ -1024,17 +1392,35 @@
           const ex = WORKED[r.ruleId] || "";
           const res = ex ? analyze(ex, { rules: RULES }) : { marks: [] };
           const plain = (r.expected && r.expected.length) ? r.expected[0] : "";
+          const hypothesis = r.effectHypotheses && r.effectHypotheses[0];
+          const probe = r.verificationProbes && r.verificationProbes[0];
           html += '<div class="tell">' +
                     '<div class="tell-head">' +
+                      '<span class="display-name">' + escapeHtml(r.displayName || "configured marker") + '</span>' +
                       '<span class="rid">' + escapeHtml(r.ruleId) + '</span>' +
                       '<span class="lvl ' + escapeAttr(r.level || "info") + '">' + escapeHtml(r.level || "info") + '</span>' +
                       '<span class="tech">' + escapeHtml(r.technique || "") + '</span>' +
-                      '<span class="conf">heuristic · ' + Number(r.confidence).toFixed(2) + '</span>' +
+                      '<span class="conf">' + escapeHtml(r.taxonomyMappingStatus || "candidate") + '</span>' +
+                      '<span class="conf">rule weight · ' + Number(r.confidence).toFixed(2) + '</span>' +
                     '</div>' +
                     '<p class="tell-def">' + escapeHtml(cap(r.note || "")) + '.</p>' +
                     '<p class="worked-label">Worked example</p>' +
                     '<div class="worked">' + renderMarked(ex, res.marks) + '</div>' +
-                    (plain ? '<p class="rewrite-label">Honest plain rewrite</p>' +
+                    (hypothesis ? '<p class="effect-label">Contestable effect hypothesis</p>' +
+                      '<div class="effect">' +
+                        '<p><span class="effect-id">' + escapeHtml(hypothesis.id) + ' · ' +
+                          escapeHtml(hypothesis.dimension + " / " + hypothesis.operation) + '</span></p>' +
+                        '<p><b>Possible effect:</b> ' + escapeHtml(hypothesis.description) + '</p>' +
+                        '<p><b>Applies when:</b> ' + escapeHtml(hypothesis.conditions.join(" ")) + '</p>' +
+                        '<p><b>Alternative readings:</b> ' + escapeHtml(hypothesis.alternatives.join(" ")) + '</p>' +
+                        '<p><b>Observable measures:</b> ' + escapeHtml(hypothesis.measures.join(" · ")) + '</p>' +
+                      '</div>' : '') +
+                    (probe ? '<p class="probe-label">Verification probe</p>' +
+                      '<div class="probe">' +
+                        '<p><b>' + escapeHtml(probe.question) + '</b></p>' +
+                        '<p>Evidence needed: ' + escapeHtml(probe.evidenceNeeded.join(" · ")) + '</p>' +
+                      '</div>' : '') +
+                    (plain ? '<p class="rewrite-label">Candidate clarity prompt</p>' +
                              '<div class="rewrite">' + escapeHtml(plain) + '</div>' : '') +
                   '</div>';
         }
@@ -1062,7 +1448,7 @@
     const res = analyze(text, { rules: RULES });
 
     dNum.textContent = res.density.per100Words.toFixed(1);
-    dRatio.textContent = res.density.tells + (res.density.tells === 1 ? " tell / " : " tells / ") +
+    dRatio.textContent = res.density.tells + (res.density.tells === 1 ? " marker / " : " markers / ") +
                          res.source.words + (res.source.words === 1 ? " word" : " words");
     const pct = Math.max(0, Math.min(100, (res.density.per100Words / 30) * 100));
     dBar.style.width = pct + "%";

@@ -1,4 +1,9 @@
 export type RhetorLintLevel = "info" | "note" | "warning";
+export type RhetorLintTaxonomyMappingStatus =
+  | "aligned-candidate"
+  | "approximate-candidate"
+  | "rhetorlint-extension";
+export type RhetorLintNonEmptyArray<T> = [T, ...T[]];
 
 export interface RhetorLintPoint {
   line?: number;
@@ -13,8 +18,11 @@ export interface RhetorLintPosition {
 
 export interface RhetorLintMark {
   ruleId: string;
+  displayName?: string;
   family: string;
   technique?: string;
+  classificationStatus: "rule-pack-candidate-context-required";
+  taxonomyMappingStatus?: RhetorLintTaxonomyMappingStatus;
   actual: string;
   position: RhetorLintPosition;
   note?: string;
@@ -40,6 +48,22 @@ export interface RhetorLintEngine {
   rules?: string;
 }
 
+export interface RhetorLintEffectHypothesis {
+  id: string;
+  dimension: string;
+  operation: string;
+  description: string;
+  conditions: RhetorLintNonEmptyArray<string>;
+  alternatives: RhetorLintNonEmptyArray<string>;
+  measures: RhetorLintNonEmptyArray<string>;
+}
+
+export interface RhetorLintVerificationProbe {
+  id: string;
+  question: string;
+  evidenceNeeded: RhetorLintNonEmptyArray<string>;
+}
+
 export interface RhetorLintResult {
   rhetorlint: string;
   source: RhetorLintSource;
@@ -52,12 +76,16 @@ export interface RhetorLintResult {
 
 export interface RhetorLintRuleBase {
   ruleId: string;
+  displayName?: string;
   family: string;
   technique?: string;
+  taxonomyMappingStatus?: RhetorLintTaxonomyMappingStatus;
   note?: string;
   expected?: string[];
   confidence?: number;
   level?: RhetorLintLevel;
+  effectHypotheses?: RhetorLintNonEmptyArray<RhetorLintEffectHypothesis>;
+  verificationProbes?: RhetorLintNonEmptyArray<RhetorLintVerificationProbe>;
 }
 
 export interface RhetorLintLexicalRule extends RhetorLintRuleBase {

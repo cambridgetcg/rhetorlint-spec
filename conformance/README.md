@@ -1,13 +1,14 @@
 # Conformance
 
-`cases.json` is the ground truth. **Any engine that claims to implement
-RhetorLint must reproduce every case in it exactly** — same marks, same
-character offsets, same density, same `strip`.
+`cases.json` contains reference expected outputs generated from the JavaScript
+engine. **Any engine claiming ASCII reference conformance must reproduce every
+case by parsed value**—the same marks, offsets, density, and `strip`.
 
-This is what makes RhetorLint a *spec* and not just one library: three engines
-in three languages read the same rule pack and reproduce this corpus value for
-value. Add a fourth engine in any language, point it at this file, and you'll
-know immediately whether it conforms.
+This proves that three implementations reproduce the chosen reference
+behaviour. It does not establish that a match is contextually valid, an
+interpretation is correct, an effect occurred, or a factual claim is true.
+Those require separate semantic evaluation, recipient-specific effect evidence,
+and external fact evidence.
 
 ## How it's checked
 
@@ -17,9 +18,9 @@ know immediately whether it conforms.
 | Python (`impl/python/rhetorlint.py`) | `impl/python/test_conformance.py` | `python3 impl/python/test_conformance.py` |
 | Go (`impl/go/rhetorlint.go`) | `impl/go/rhetorlint_test.go` | `go -C impl/go test ./...` |
 
-All three run in CI; `npm run test:conformance` runs the first two. The JS
-engine also regenerates the corpus (it's the reference), so if the engine and
-the fixture ever disagree, the JS test fails first.
+All three run in CI; `npm run test:conformance` runs the first two. Regenerate
+the fixture deliberately with `npm run update:conformance`. The JS test fails
+if the committed reference and engine diverge.
 
 Comparison is on parsed **values**, not on serialised bytes. Each language's
 JSON encoder writes a whole-numbered density its own way — Python emits
@@ -34,9 +35,13 @@ demand otherwise across languages.
   "density": { "tells": 2, "per100Words": 28.6 },
   "strip":   "Mistakes [who?] were made and concerns [who?] were raised.",
   "marks": [
-    { "ruleId": "agency-hiding.deleted-subject", "family": "agency-hiding",
-      "technique": "…", "actual": "were made", "start": 9, "end": 18,
-      "note": "…", "confidence": 0.7, "level": "warning", "expected": ["…"] }
+    { "ruleId": "agency-hiding.deleted-subject",
+      "displayName": "passive with omitted semantic agent",
+      "family": "agency-hiding", "technique": "…",
+      "classificationStatus": "rule-pack-candidate-context-required",
+      "taxonomyMappingStatus": "rhetorlint-extension",
+      "actual": "were made", "start": 9, "end": 18,
+      "note": "…", "confidence": 0.7, "level": "info", "expected": ["…"] }
     // the second mark — "were raised", 32–43 — elided here; the real case carries both
   ]
 }
@@ -46,7 +51,7 @@ Marks in a case are flattened: `start` and `end` sit on the mark, not inside a
 `position` object. That is a fixture convenience, not the output shape — an
 engine emits the nested `position` of `spec/output.schema.json`.
 
-## Known portability caveats (honest)
+## Known portability caveats
 
 The corpus is ASCII and **conformance is defined over ASCII input**. Outside
 that, the three engines part in two independent ways. Neither is fixed. If you
@@ -90,8 +95,9 @@ together — that `K` is U+212A KELVIN SIGN. Python folds it to `k` and counts i
 as a word character; JS folds nothing outside ASCII; Go folds the letter but its
 ASCII `\b` then refuses the boundary.
 
-Under-marking is the doctrine, so JS and Go fail in the safe direction here. But
-failing safe is not agreeing, and it means no locale pack with non-ASCII
-orthography can be conformance-tested until the spec pins matching semantics as
-well as offsets. Do not read the ASCII corpus as evidence that these engines
-agree on French, Turkish, or Greek. They do not.
+JS and Go under-match these examples, but under-matching is not universally
+“safe”: a missed marker can matter to a consumer. More importantly, they do not
+agree, and no locale pack with non-ASCII orthography can be conformance-tested
+until the spec pins matching semantics as well as offsets. Do not read the ASCII
+corpus as evidence that these engines agree on French, Turkish, or Greek. They
+do not.

@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 /**
- * rhetorlint — read the subtext from the command line.
+ * rhetorlint — inspect rhetorical patterns from the command line.
  *
- * Marks rhetorical tells in text files or stdin, on-device, zero deps.
+ * Marks configured rhetorical patterns in text files or stdin, on-device, zero deps.
  * Emits a human report, the RhetorLint JSON, or SARIF; can gate CI on a
- * spin-density threshold. It reads the words, never the person.
+ * configured marker-density threshold. It reads the words, never the person.
  *
  *   rhetorlint statement.txt
  *   rhetorlint --json < speech.md
  *   rhetorlint --sarif press-release.txt > rhetorlint.sarif
- *   rhetorlint --max 8 comms/*.md        # exit 1 if any file exceeds 8 tells/100 words
+ *   rhetorlint --max 8 comms/*.md        # exit 1 if any file exceeds 8 markers/100 words
  */
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 
-const VERSION = "0.1.1";
+const VERSION = "0.1.2";
 
 /* Load dependencies so the CLI works BOTH published (bare specifiers resolve
    to the installed @rhetorlint packages) AND from a raw checkout with no
@@ -32,7 +32,7 @@ function loadDefaultRules() {
   catch { return JSON.parse(readFileSync(new URL("../rules-en/rules.json", import.meta.url))); }
 }
 
-const HELP = `rhetorlint ${VERSION} — read the subtext
+const HELP = `rhetorlint ${VERSION} — inspect rhetorical patterns
 
 Usage:
   rhetorlint [options] [files...]        analyze files, or stdin if none
@@ -40,15 +40,16 @@ Usage:
 Options:
   --json            emit the RhetorLint JSON result
   --sarif           emit SARIF 2.1.0 (for editors / CI / code-scanning)
-  --max <n>         exit 1 if tells-per-100-words exceeds n (a CI spin-gate)
+  --max <n>         exit 1 if configured markers per 100 words exceeds n
   --rules <path>    use a custom rule pack instead of @rhetorlint/rules-en
   --quiet           suppress the human report (useful with --max)
   --no-color        disable ANSI color
   -v, --version     print version
   -h, --help        print this help
 
-It marks manipulation in the words. It does not read the person, detect lies,
-or judge whether a claim is factually true.`;
+It marks configured patterns in the words. It does not establish intent,
+recipient effects, deception, or factual truth. Density is pack- and
+length-dependent; do not use it alone for high-stakes or binding decisions.`;
 
 function parseArgs(argv) {
   const o = { files: [], json: false, sarif: false, max: null, rules: null, quiet: false, color: true };
@@ -74,20 +75,20 @@ function readStdin() {
 
 const C = (on) => on
   ? { dim: (s) => `\x1b[2m${s}\x1b[0m`, bold: (s) => `\x1b[1m${s}\x1b[0m`,
-      mark: (s) => `\x1b[43m\x1b[30m${s}\x1b[0m`, red: (s) => `\x1b[31m${s}\x1b[0m`,
-      cyan: (s) => `\x1b[36m${s}\x1b[0m`, green: (s) => `\x1b[32m${s}\x1b[0m` }
+      mark: (s) => `\x1b[43m\x1b[30m${s}\x1b[0m` }
   : new Proxy({}, { get: () => (s) => s });
 
 function report(name, result, c) {
   const d = result.density;
-  const band = d.per100Words >= 15 ? c.red : d.per100Words >= 6 ? c.cyan : c.green;
   const lines = [];
   lines.push("");
   lines.push(c.bold(name));
-  lines.push(`  ${band(d.tells + " tells")} ${c.dim("/")} ${result.source.words} words ${c.dim("=")} ${band(d.per100Words + " per 100")}`);
+  lines.push(`  ${c.bold(d.tells + " markers")} ${c.dim("/")} ${result.source.words} words ${c.dim("=")} ${c.bold(d.per100Words + " per 100")}`);
   if (result.marks.length) lines.push("");
   for (const m of result.marks) {
-    lines.push(`  ${c.mark(" " + m.actual + " ")}  ${c.dim(m.ruleId)}`);
+    const label = (m.displayName || "configured marker") +
+      ` · ${m.taxonomyMappingStatus || "candidate"} · legacy id ${m.ruleId}`;
+    lines.push(`  ${c.mark(" " + m.actual + " ")}  ${c.dim(label)}`);
     lines.push(`    ${c.dim(m.note)}`);
   }
   return lines.join("\n");
@@ -136,12 +137,12 @@ async function main() {
     process.stdout.write(results.map((r) => report(r.name, r.result, c)).join("\n") + "\n");
   }
 
-  // CI gate: fail if any file is too thick with spin.
+  // Caller-defined marker-density policy; not a truth, intent, or harm score.
   if (o.max != null && Number.isFinite(o.max)) {
     const over = results.filter((r) => r.result.density.per100Words > o.max);
     if (over.length) {
       if (!o.json && !o.sarif) {
-        process.stderr.write(`\n${over.length} file(s) over ${o.max} tells/100 words:\n`);
+        process.stderr.write(`\n${over.length} file(s) over ${o.max} markers/100 words:\n`);
         for (const r of over) process.stderr.write(`  ${r.name}: ${r.result.density.per100Words}\n`);
       }
       return 1;

@@ -33,9 +33,15 @@ test("the default signal is an aggregate with no phrase or rewrite disclosure", 
   assert.notEqual(signal.source, analyzed.source, "source provenance is cloned");
   assert.notEqual(signal.density, analyzed.density, "density provenance is cloned");
   assert.notEqual(signal.engine, analyzed.engine, "engine provenance is cloned");
+  assert.equal(signal.boundary.observes, "surface-linked-rule-matches");
+  assert.equal(
+    signal.boundary.classification,
+    "rule-pack-candidate-context-required"
+  );
   assert.deepEqual(signal.boundary.doesNot, [
     "infer-speaker-intent",
     "detect-deception",
+    "establish-recipient-effects",
     "determine-factual-truth"
   ]);
   assert.deepEqual(JSON.parse(json), signal, "the signal round-trips through JSON");

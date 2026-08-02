@@ -14,10 +14,12 @@ export interface RhetorLintSignalCount {
 }
 
 export interface RhetorLintSignalBoundary {
-  observes: "visible-language-patterns";
+  observes: "surface-linked-rule-matches";
+  classification: "rule-pack-candidate-context-required";
   doesNot: [
     "infer-speaker-intent",
     "detect-deception",
+    "establish-recipient-effects",
     "determine-factual-truth"
   ];
   note: string;

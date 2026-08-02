@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/cambridgetcg/rhetorlint-spec/main/spec/output.schema.json",
   "title": "RhetorLint Analysis Result",
-  "description": "The result of analyzing a passage of text for rhetorical tells. RhetorLint marks countable manipulation in the WORDS; it never claims to read the person, and it never adjudicates whether a claim is factually true.",
+  "description": "The result of analyzing a passage for configured, visible rhetorical patterns. A mark combines an observed span and position with rule-pack-authored classification and review fields. Those interpretations are not findings about intent, recipient effect, deception, or factual truth.",
   "type": "object",
   "required": ["rhetorlint", "source", "density", "marks"],
   "additionalProperties": false,
@@ -24,7 +24,7 @@
     },
     "density": {
       "type": "object",
-      "description": "The headline metric: how thickly the text is marked.",
+      "description": "A count of configured matches, raw and normalized by passage length. It is not a truth, effect, harm, intent, or quality score.",
       "required": ["tells", "per100Words"],
       "additionalProperties": false,
       "properties": {
@@ -38,11 +38,11 @@
     },
     "strip": {
       "type": "string",
-      "description": "Deterministic de-spun version: adverbial spin (intensifiers, deniable adverbs) removed and agentless passives flagged with [who?]. Verb-phrase hedges and other tells are left marked, not paraphrased. On-device, no model required."
+      "description": "Deterministic reduction-and-annotation counterfactual: lexical intensifiers removed and passives with omitted agents flagged with [who?]. Modality, attribution, and verb-phrase hedges stay intact. This is not guaranteed to preserve meaning or factual truth. On-device; no model required."
     },
     "rewrite": {
       "type": ["string", "null"],
-      "description": "OPTIONAL plain-truth paraphrase. Requires a pluggable model adapter; null when only the deterministic core ran. Never fabricate this in the core."
+      "description": "OPTIONAL caller-supplied model rewrite. Null when only the deterministic core ran. The core does not verify its meaning, provenance, factual support, or truth."
     },
     "engine": {
       "type": "object",
@@ -62,12 +62,16 @@
       "properties": {
         "ruleId": {
           "type": "string",
-          "description": "family.tell — the verbatim taxonomy label, e.g. 'agency-hiding.deleted-subject'.",
+          "description": "Legacy family.tell identifier for the configured rule, e.g. 'agency-hiding.deleted-subject'. Its name is not a contextual verdict.",
           "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Neutral rule-pack-authored display label. Legacy rule IDs may contain historical interpretive terms; consumers should prefer this field in prose."
         },
         "family": {
           "type": "string",
-          "description": "One coarse family. The six SemEval-2023 parents plus RhetorLint's structural extension.",
+          "description": "Rule-pack-authored candidate taxonomy family: six SemEval-2023 parents plus RhetorLint's structural extension. A match does not establish that the family interpretation applies in context.",
           "enum": [
             "manipulative-wording",
             "simplification",
@@ -80,7 +84,17 @@
         },
         "technique": {
           "type": "string",
-          "description": "Fine-grained technique label, aligned verbatim to SemEval-2023 (Piskorski et al.) where one maps, e.g. 'Loaded Language', 'Obfuscation, Intentional Vagueness, Confusion', 'False Dilemma / No Choice', 'Whataboutism'."
+          "description": "Rule-pack-authored candidate technique/lineage label, aligned verbatim to SemEval-2023 where one maps. It is not a contextual classification finding."
+        },
+        "classificationStatus": {
+          "type": "string",
+          "enum": ["rule-pack-candidate-context-required"],
+          "description": "Machine-readable status for the ruleId/family/technique/note/expected classification fields. Current engines emit it; it is optional only so older 0.1 results remain schema-valid."
+        },
+        "taxonomyMappingStatus": {
+          "type": "string",
+          "enum": ["aligned-candidate", "approximate-candidate", "rhetorlint-extension"],
+          "description": "Relationship between the rule concept and its taxonomy technique label. Candidate values still require contextual evaluation and are not classification findings."
         },
         "actual": {
           "type": "string",
@@ -97,23 +111,23 @@
         },
         "note": {
           "type": "string",
-          "description": "A one-line, phrase-level explanation of what the language is doing. Describes the WORDS, not the speaker's intent."
+          "description": "A one-line description of the matched surface pattern. It must not assert speaker intent or a recipient effect."
         },
         "expected": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Suggested plain-truth phrasing(s) for this mark."
+          "description": "Candidate clarity prompt(s) for human or agent review. They are not verified replacements and may not preserve meaning."
         },
         "confidence": {
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "Rule-level confidence. Heuristic — not a probability of deception. RhetorLint detects language patterns, not lies."
+          "description": "Uncalibrated, author-assigned rule-match weight. Not a probability of intent, recipient effect, deception, or truth."
         },
         "level": {
           "type": "string",
           "enum": ["info", "note", "warning"],
-          "description": "Severity band. Maps to SARIF result.level. Default 'info' — a mark is an observation, not an accusation."
+          "description": "Rule-authored review/display band mapped to SARIF result.level. It is not a severity estimate for conduct, effect, deception, harm, or falsehood."
         }
       }
     },

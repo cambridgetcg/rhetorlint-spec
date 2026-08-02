@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/cambridgetcg/rhetorlint-spec/main/spec/inquiry.schema.json",
+  "title": "RhetorLint Inquiry",
+  "description": "A portable projection that links surface spans and rule-pack candidate classifications to rule-pack-authored effect hypotheses and verification questions. Its intended epistemic boundary is declared but not semantically machine-verified; it records neither observed recipient effects nor factual-truth verdicts.",
+  "type": "object",
+  "required": ["schema", "kind", "boundary", "assurance", "sourceAccess", "rhetorlint", "engine", "rules", "metadataFingerprint", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["rhetorlint.inquiry/0.1"]
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["rhetorlint.inquiry"]
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "assurance": {
+      "$ref": "#/$defs/assurance"
+    },
+    "sourceAccess": {
+      "$ref": "#/$defs/sourceAccess"
+    },
+    "rhetorlint": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
+    },
+    "engine": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "rules": { "type": "string" }
+      }
+    },
+    "rules": {
+      "type": "string",
+      "description": "Rule-pack id and version used to resolve the inquiry metadata."
+    },
+    "metadataFingerprint": {
+      "type": "string",
+      "pattern": "^fnv1a64:[0-9a-f]{16}$",
+      "description": "Deterministic fingerprint of the joined inquiry metadata, sorted by rule ID. It supports change detection and reproducibility; FNV-1a is not collision-resistant and does not authenticate the pack."
+    },
+    "sourceRef": {
+      "type": "string",
+      "description": "Optional opaque, unverified reference supplied by the caller. RhetorLint does not derive it from private text or prove that it resolves to the analyzed source."
+    },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "boundary": {
+      "type": "object",
+      "required": ["observation", "classification", "interpretation", "effects", "truth"],
+      "additionalProperties": false,
+      "properties": {
+        "observation": {
+          "type": "string",
+          "enum": ["span-and-position-only"]
+        },
+        "classification": {
+          "type": "string",
+          "enum": ["rule-pack-candidate-context-required"]
+        },
+        "interpretation": {
+          "type": "string",
+          "enum": ["hypotheses-not-findings"]
+        },
+        "effects": {
+          "type": "string",
+          "enum": ["recipient-specific-evidence-required"]
+        },
+        "truth": {
+          "type": "string",
+          "enum": ["questions-not-verdicts"]
+        }
+      }
+    },
+    "assurance": {
+      "type": "object",
+      "required": ["metadataSource", "boundary", "fingerprintUse", "analysisPackBinding"],
+      "additionalProperties": false,
+      "properties": {
+        "metadataSource": {
+          "type": "string",
+          "enum": ["caller-supplied-rule-pack"]
+        },
+        "boundary": {
+          "type": "string",
+          "enum": ["declared-not-semantically-verified"]
+        },
+        "fingerprintUse": {
+          "type": "string",
+          "enum": ["change-detection-not-authentication"]
+        },
+        "analysisPackBinding": {
+          "type": "string",
+          "enum": ["id-version-and-matched-family-only", "matched-family-only"]
+        }
+      }
+    },
+    "sourceAccess": {
+      "type": "object",
+      "required": ["source", "reference", "markedPhrases"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["not-included"]
+        },
+        "reference": {
+          "type": "string",
+          "enum": ["none", "caller-supplied-unverified"]
+        },
+        "markedPhrases": {
+          "type": "string",
+          "enum": ["omitted", "disclosed"]
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["markRef", "effectHypotheses", "verificationProbes"],
+      "additionalProperties": false,
+      "properties": {
+        "markRef": { "$ref": "#/$defs/markRef" },
+        "actual": {
+          "type": "string",
+          "description": "Explicitly disclosed marked phrase; absent by default."
+        },
+        "effectHypotheses": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/effectHypothesis" }
+        },
+        "verificationProbes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/verificationProbe" }
+        }
+      }
+    },
+    "markRef": {
+      "type": "object",
+      "required": ["ruleId", "displayName", "family", "classificationStatus", "taxonomyMappingStatus", "position"],
+      "additionalProperties": false,
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$"
+        },
+        "displayName": { "type": "string" },
+        "family": { "type": "string" },
+        "classificationStatus": {
+          "type": "string",
+          "enum": ["rule-pack-candidate-context-required"]
+        },
+        "taxonomyMappingStatus": {
+          "type": "string",
+          "enum": ["aligned-candidate", "approximate-candidate", "rhetorlint-extension"]
+        },
+        "position": { "$ref": "#/$defs/position" }
+      }
+    },
+    "effectHypothesis": {
+      "type": "object",
+      "required": ["id", "dimension", "operation", "description", "conditions", "alternatives", "measures"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$"
+        },
+        "dimension": { "type": "string" },
+        "operation": { "type": "string" },
+        "description": {
+          "type": "string",
+          "description": "A candidate effect stated with modality, never a finding about a recipient."
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "alternatives": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "measures": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "verificationProbe": {
+      "type": "object",
+      "required": ["id", "question", "evidenceNeeded"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$"
+        },
+        "question": { "type": "string" },
+        "evidenceNeeded": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "position": {
+      "type": "object",
+      "required": ["start", "end"],
+      "additionalProperties": false,
+      "properties": {
+        "start": { "$ref": "#/$defs/point" },
+        "end": { "$ref": "#/$defs/point" }
+      }
+    },
+    "point": {
+      "type": "object",
+      "required": ["offset"],
+      "additionalProperties": false,
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 },
+        "offset": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

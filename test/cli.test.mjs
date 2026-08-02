@@ -43,20 +43,20 @@ test("--max gates CI: over threshold exits 1", () => {
   assert.equal(r.status, 1, "specimen is ~22/100, over the limit of 8");
 });
 
-test("--max gates CI: clean text passes with exit 0", () => {
+test("--max gates CI: text outside the configured patterns passes with exit 0", () => {
   const r = run(["--max", "8", "--quiet"], CLEAN);
-  assert.equal(r.status, 0, "clean active text has 0 tells");
+  assert.equal(r.status, 0, "the configured pack emits 0 markers for this text");
 });
 
-test("the human report names the density and the tells", () => {
+test("the human report names the density and the markers", () => {
   const r = run(["--no-color"], SPECIMEN);
   assert.equal(r.status, 0);
-  assert.match(r.stdout, /4 tells/);
+  assert.match(r.stdout, /4 markers/);
   assert.match(r.stdout, /were made/);
 });
 
 test("--help and --version work", () => {
-  assert.match(run(["--help"]).stdout, /read the subtext/);
+  assert.match(run(["--help"]).stdout, /inspect rhetorical patterns/);
   // Against the manifest, not a literal: a hardcoded version here silently
   // becomes a lie the moment the package is bumped, and blocks the bump.
   assert.equal(run(["--version"]).stdout.trim(), CLI_MANIFEST.version);

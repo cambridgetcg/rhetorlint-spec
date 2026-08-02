@@ -22,7 +22,7 @@ test("every public core export has a shipped type entrypoint", () => {
 });
 
 test("subpath declarations use the consumer-resolvable self-package import", () => {
-  for (const subpath of ["./sarif", "./signals"]) {
+  for (const subpath of ["./sarif", "./signals", "./inquiry"]) {
     const declarationPath = CORE_PACKAGE.exports[subpath].types;
     const declaration = readFileSync(new URL(declarationPath, CORE_ROOT), "utf8");
     assert.match(declaration, /from "@rhetorlint\/core"/);
@@ -32,4 +32,31 @@ test("subpath declarations use the consumer-resolvable self-package import", () 
       `${declarationPath} must not use a relative .mjs import: NodeNext looks for index.d.mts`
     );
   }
+});
+
+test("inquiry declarations preserve the schema's non-empty metadata contract", () => {
+  const coreDeclaration = readFileSync(
+    new URL(CORE_PACKAGE.exports["."].types, CORE_ROOT),
+    "utf8"
+  );
+  const declaration = readFileSync(
+    new URL(CORE_PACKAGE.exports["./inquiry"].types, CORE_ROOT),
+    "utf8"
+  );
+  assert.match(coreDeclaration, /type RhetorLintNonEmptyArray<T> = \[T, \.\.\.T\[\]\]/);
+  for (const field of ["conditions", "alternatives", "measures", "evidenceNeeded"]) {
+    assert.match(
+      coreDeclaration,
+      new RegExp(`${field}: RhetorLintNonEmptyArray<string>`)
+    );
+  }
+  assert.match(declaration, /type RhetorLintNonEmptyArray<T> = \[T, \.\.\.T\[\]\]/);
+  assert.match(
+    declaration,
+    /effectHypotheses: RhetorLintNonEmptyArray<RhetorLintEffectHypothesis>/
+  );
+  assert.match(
+    declaration,
+    /verificationProbes: RhetorLintNonEmptyArray<RhetorLintVerificationProbe>/
+  );
 });

@@ -1,6 +1,6 @@
 # RhetorLint widget
 
-Select text on any web page and mark the rhetorical tells — right where you're reading. On-device: nothing you select ever leaves your browser.
+Select text on any web page and inspect configured rhetorical patterns — right where you're reading. On-device: nothing you select ever leaves your browser.
 
 Two ways to run it, one engine (the real `@rhetorlint/core`, inlined at build time so it never drifts).
 
@@ -11,7 +11,7 @@ node apps/widget/build.mjs        # generates bookmarklet.html
 open apps/widget/bookmarklet.html # then drag the button to your bookmarks bar
 ```
 
-Select text on any page, click the bookmark. A panel shows the density, the marked phrases, and the deterministic `strip`. (Some sites with a strict Content-Security-Policy block bookmarklets — use the extension there.)
+Select text on any page, click the bookmark. A panel shows the density, the marked phrases, and the deterministic `strip` counterfactual. That transform is not meaning- or truth-preserving. (Some sites with a strict Content-Security-Policy block bookmarklets — use the extension there.)
 
 ## The extension (Chrome / Edge / Brave / Firefox)
 
@@ -34,7 +34,8 @@ Use it: select text and press **Alt+Shift+R**, or click the toolbar button. The 
 - When activated, it reads the current **selection** or, with nothing selected,
   up to the first 4,000 characters of visible body text and analyzes that locally.
 - It makes no network request and includes no telemetry or host-data collection.
-- It marks tells in the **words**. It does not read the person, detect lies, or judge whether a claim is factually true.
+- It marks configured patterns in the **words**. It does not read the person, detect lies, prove recipient effects, or judge whether a claim is factually true.
+- It presents each match with a neutral display name and candidate/approximate/extension mapping status; the legacy rule ID remains a join key, not a verdict.
 
 ## Build
 

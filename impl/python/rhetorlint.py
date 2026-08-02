@@ -7,7 +7,7 @@ A second engine, in a second language, that reads the *same* rule pack
 exist is to prove the framework's claim: the taxonomy is the portable asset;
 engines are just implementations of it.
 
-Zero third-party dependencies (standard library only). It marks tells in the
+Zero third-party dependencies (standard library only). It marks configured patterns in the
 words; it does not read the person, detect lies, or judge factual truth.
 
 Conformance: this engine must reproduce every case in conformance/cases.json.
@@ -22,7 +22,7 @@ from pathlib import Path
 
 SPEC_VERSION = "0.1"
 NAME = "rhetorlint (python)"
-CORE_VERSION = "0.1.1"
+CORE_VERSION = "0.1.2"
 
 # Words the -ed/-en passive heuristic should treat as predicate adjectives.
 # Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
@@ -51,8 +51,9 @@ AGENTLESS_PASSIVE = re.compile(
     re.IGNORECASE,
 )
 
-# The ruleIds whose phrases `strip` may remove without breaking grammar.
-REMOVABLE = {"intensifier.loaded", "hedge.deniable"}
+# Only standalone lexical intensifiers are removed. Deleting modality or
+# attribution can change truth conditions or break grammar.
+REMOVABLE = {"intensifier.loaded"}
 
 
 def _matches_for(rule, text):
@@ -99,7 +100,7 @@ def _js_round(x):
 
 
 def strip(text, marks):
-    """Deterministic de-spun text: subtract adverbial spin, flag hidden agents."""
+    """Reduction-and-annotation counterfactual; not a truth-preserving rewrite."""
     ordered = sorted(marks, key=lambda m: m["position"]["start"]["offset"], reverse=True)
     out = text
     for m in ordered:
@@ -126,8 +127,11 @@ def analyze(text, rules=None, locale=None, rewrite=None):
         for index, length, actual in _matches_for(rule, text):
             marks.append({
                 "ruleId": rule["ruleId"],
+                "displayName": rule.get("displayName"),
                 "family": rule["family"],
                 "technique": rule.get("technique"),
+                "classificationStatus": "rule-pack-candidate-context-required",
+                "taxonomyMappingStatus": rule.get("taxonomyMappingStatus"),
                 "actual": actual,
                 "position": {"start": _point_at(text, index), "end": _point_at(text, index + length)},
                 "note": rule.get("note"),
@@ -162,7 +166,7 @@ def analyze(text, rules=None, locale=None, rewrite=None):
 def load_default_rules():
     """Read the @rhetorlint/rules-en pack.
 
-    In the repo, use the canonical copy (the single source of truth every
+    In the repo, use the canonical rule-pack copy that every
     engine reads). In an installed wheel that copy is absent, so fall back to
     the bundled mirror shipped alongside this module. A test keeps the two
     identical, so both paths return the same rules.

@@ -20,14 +20,14 @@ const SPECIMEN =
   "We take your privacy extremely seriously, and regrettably, mistakes were made. " +
   "We are reaching out to affected users.";
 
-test("the specimen fires the expected families of tells", () => {
+test("the specimen fires the expected families of configured markers", () => {
   const r = analyze(SPECIMEN, { rules: RULES });
   const ids = r.marks.map((m) => m.ruleId);
   assert.ok(ids.includes("intensifier.loaded"), "should mark the intensifier 'extremely'");
   assert.ok(ids.includes("contrition.rehearsed"), "should mark 'we take ... seriously'");
   assert.ok(ids.includes("agency-hiding.deleted-subject"), "should mark 'were made'");
   assert.ok(ids.includes("hedge.softener"), "should mark 'reaching out to'");
-  assert.ok(r.density.tells >= 4, "at least four tells");
+  assert.ok(r.density.tells >= 4, "at least four markers");
   assert.ok(r.density.per100Words > 0);
 });
 
@@ -48,7 +48,7 @@ test("the deleted-subject mark catches the agentless passive", () => {
   assert.equal(dm.family, "agency-hiding");
 });
 
-test("strip subtracts adverbial spin and flags the hidden agent, without breaking grammar", () => {
+test("strip removes lexical intensifiers and flags an omitted agent", () => {
   const r = analyze(SPECIMEN, { rules: RULES });
   assert.ok(!/extremely/.test(r.strip), "intensifier removed");
   assert.ok(/\[who\?\]/.test(r.strip), "agentless passive flagged with [who?]");
@@ -57,15 +57,17 @@ test("strip subtracts adverbial spin and flags the hidden agent, without breakin
   assert.ok(!/\s{2,}/.test(r.strip), "no double spaces left at removal seams");
 });
 
-test("stripping a deniable adverb is grammar-safe", () => {
+test("strip preserves attribution and modality because removing them changes meaning", () => {
   const r = analyze("The outage reportedly affected some users.", { rules: RULES });
-  assert.ok(!/reportedly/.test(r.strip), "'reportedly' removed");
+  assert.equal(r.strip, "The outage reportedly affected some users.");
+  const modal = analyze("The server may have failed because the disk is full.", { rules: RULES });
+  assert.equal(modal.strip, "The server may have failed because the disk is full.");
 });
 
-test("an honest, active sentence produces zero tells", () => {
+test("an active sentence outside the configured patterns produces zero marks", () => {
   const clean = "I made a mistake and I will fix it by Friday.";
   const r = analyze(clean, { rules: RULES });
-  assert.equal(r.density.tells, 0, `clean text should have no marks, got: ${JSON.stringify(r.marks.map(m=>m.actual))}`);
+  assert.equal(r.density.tells, 0, `text should have no marks, got: ${JSON.stringify(r.marks.map(m=>m.actual))}`);
 });
 
 test("the 'by <agent>' escape prevents a false passive flag", () => {
@@ -87,8 +89,8 @@ test("the core never fabricates a rewrite", () => {
 });
 
 test("an optional rewrite adapter is honored when supplied", () => {
-  const r = analyze(SPECIMEN, { rules: RULES, rewrite: () => "plain truth here" });
-  assert.equal(r.rewrite, "plain truth here");
+  const r = analyze(SPECIMEN, { rules: RULES, rewrite: () => "caller supplied rewrite" });
+  assert.equal(r.rewrite, "caller supplied rewrite");
 });
 
 test("rewrite adapters must return a string synchronously", () => {
@@ -135,6 +137,7 @@ test("SARIF conversion is well-formed", () => {
   for (const res of run.results) {
     assert.ok(["note", "warning", "error", "none"].includes(res.level));
     assert.ok(res.locations[0].physicalLocation.region.charOffset >= 0);
+    assert.ok(!Object.hasOwn(res, "fixes"), "candidate prompts are not verified auto-fixes");
   }
   assert.deepEqual(run.properties.density, r.density);
 });

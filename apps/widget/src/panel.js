@@ -2,7 +2,7 @@
  *
  * Depends on `analyze`, `strip` and `RULES` being in scope (the build step
  * prepends the real @rhetorlint/core engine and the rule pack). It reads the
- * current text selection, marks the tells, and shows them in a floating panel
+ * current text selection, marks configured patterns, and shows them in a floating panel
  * rendered in a Shadow DOM so no page styles leak in or out.
  *
  * Everything runs on-device. Nothing the reader selects ever leaves the page.
@@ -43,8 +43,6 @@ function capMarkup(text, marks) {
   return html;
 }
 
-function capBand(v) { return v >= 15 ? "hot" : v >= 6 ? "warm" : "cool"; }
-
 const CAP_CSS = `
 :host{ all: initial; }
 .cap-wrap{ position: fixed; right: 18px; bottom: 18px; z-index: 2147483647;
@@ -64,8 +62,6 @@ const CAP_CSS = `
 .cap-density{ display:flex; align-items:baseline; gap:.5rem; margin-bottom:.7rem;
   font-variant-numeric:tabular-nums; }
 .cap-num{ font-size:1.7rem; font-weight:700; font-family:ui-monospace, Menlo, monospace; }
-.cap-num.hot{ color:#b1442f; } .cap-num.warm{ color:#a6742a; } .cap-num.cool{ color:#2f7a52; }
-@media (prefers-color-scheme: dark){ .cap-num.hot{color:#e0765d;} .cap-num.warm{color:#d4a24e;} .cap-num.cool{color:#5fbd8a;} }
 .cap-den-lbl{ opacity:.6; font-size:.82rem; }
 .cap-read{ font-family:"Iowan Old Style", Palatino, Georgia, serif; font-size:1.02rem; line-height:1.7;
   background:#fff; border:1px solid #e4dcc9; border-radius:6px; padding:.7rem .8rem; margin-bottom:.8rem; }
@@ -96,25 +92,26 @@ function capShow(result, selectedText) {
         const hue = CAP_FAMILY_HUE[m.family] ?? 41;
         return `<div class="cap-mark">
           <span class="cap-swatch" style="background:hsl(${hue},60%,50%)"></span>
-          <div><div class="phrase">${capEscape(m.actual)} <span class="rid">${capEscape(m.ruleId)}</span></div>
+          <div><div class="phrase">${capEscape(m.actual)}</div>
+          <div class="rid">${capEscape(m.displayName || "configured marker")} · ${capEscape(m.taxonomyMappingStatus || "candidate")} · legacy id ${capEscape(m.ruleId)}</div>
           <div class="note">${capEscape(m.note)}</div></div></div>`;
       }).join("")
-    : `<p class="cap-empty">No tells found. The language is doing what it says.</p>`;
+    : `<p class="cap-empty">No configured patterns detected. This does not establish truth, intent, or safety.</p>`;
 
   root.innerHTML = `<style>${CAP_CSS}</style>
     <div class="cap-wrap" role="dialog" aria-label="RhetorLint reading">
       <div class="cap-head">
-        <div class="cap-title">RhetorLint <small>reads the words, not the person</small></div>
+        <div class="cap-title">RhetorLint <small>inspects visible patterns</small></div>
         <button class="cap-x" aria-label="Close">✕</button>
       </div>
       <div class="cap-body">
         <div class="cap-density">
-          <span class="cap-num ${capBand(d.per100Words)}">${d.per100Words}</span>
-          <span class="cap-den-lbl">tells per 100 words · ${d.tells} in ${result.source.words}</span>
+          <span class="cap-num">${d.per100Words}</span>
+          <span class="cap-den-lbl">markers per 100 words · ${d.tells} in ${result.source.words}</span>
         </div>
         <div class="cap-read">${capMarkup(selectedText, result.marks)}</div>
         ${marksHtml}
-        ${result.marks.length ? `<div class="cap-strip"><div class="k">strip · spin removed, hidden agents flagged</div><div class="v">${capEscape(result.strip)}</div></div>` : ""}
+        ${result.marks.length ? `<div class="cap-strip"><div class="k">counterfactual · intensifiers removed, omitted agents flagged · not meaning- or truth-preserving</div><div class="v">${capEscape(result.strip)}</div></div>` : ""}
         <div class="cap-foot">On-device · nothing you selected left this page.<br>${capEscape(result.engine.name + "@" + result.engine.version)} · ${capEscape(result.engine.rules)}</div>
       </div>
     </div>`;

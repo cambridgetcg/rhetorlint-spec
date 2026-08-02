@@ -2,7 +2,7 @@
  * toSarif(result) — convert a RhetorLint result into SARIF 2.1.0.
  *
  * Lets marks flow into editors, CI, and code-scanning with no bespoke glue.
- * Honest caveat: SARIF has no native slot for the tells-per-100-words density
+ * Format caveat: SARIF has no native slot for the markers-per-100-words density
  * metric, so it rides in run.properties. RhetorLint-JSON stays canonical;
  * SARIF is a lossy-but-standard export ("SARIF-convertible", not "-native").
  */
@@ -12,9 +12,15 @@ export function toSarif(result) {
     if (!byRule.has(m.ruleId)) {
       byRule.set(m.ruleId, {
         id: m.ruleId,
-        name: m.ruleId.replace(/[.-]/g, "_"),
+        name: (m.displayName || m.ruleId).replace(/[^A-Za-z0-9_]+/g, "_"),
         shortDescription: { text: m.note || m.ruleId },
-        properties: { family: m.family, technique: m.technique || null }
+        properties: {
+          family: m.family,
+          displayName: m.displayName || null,
+          technique: m.technique || null,
+          classificationStatus: m.classificationStatus || "rule-pack-candidate-context-required",
+          taxonomyMappingStatus: m.taxonomyMappingStatus || null
+        }
       });
     }
   }
@@ -39,14 +45,14 @@ export function toSarif(result) {
         }
       }
     }],
-    properties: { family: m.family, technique: m.technique || null, confidence: m.confidence },
-    ...(m.expected && m.expected.length
-      ? { fixes: [{ description: { text: "plain-truth phrasing" },
-          artifactChanges: [{ artifactLocation: { uri: "source" },
-            replacements: [{ deletedRegion: { charOffset: m.position.start.offset,
-              charLength: m.position.end.offset - m.position.start.offset },
-              insertedContent: { text: m.expected[0] } }] }] }] }
-      : {})
+    properties: {
+      family: m.family,
+      displayName: m.displayName || null,
+      technique: m.technique || null,
+      classificationStatus: m.classificationStatus || "rule-pack-candidate-context-required",
+      taxonomyMappingStatus: m.taxonomyMappingStatus || null,
+      confidence: m.confidence
+    }
   }));
 
   return {
@@ -62,7 +68,7 @@ export function toSarif(result) {
       results,
       properties: {
         density: result.density,
-        note: "RhetorLint marks rhetorical tells in the words; it does not adjudicate factual truth or infer intent."
+        note: "RhetorLint marks visible language patterns; it does not establish intent, recipient effects, or factual truth. Candidate wording prompts are not emitted as auto-fixes."
       }
     }]
   };

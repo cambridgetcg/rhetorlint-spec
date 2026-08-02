@@ -2,15 +2,15 @@
 //
 // A third engine, in a third language, that reads the same rule pack
 // (packages/rules-en/rules.json) and reproduces the same conformance corpus
-// as the JavaScript and Python engines — byte for byte on BMP/ASCII text.
+// as the JavaScript and Python engines by parsed value over the ASCII corpus.
 // Its only reason to exist is to prove the taxonomy is portable.
 //
 // Note on offsets: Go strings are byte sequences, so positions are byte
-// offsets. For ASCII/BMP text these equal the JS (UTF-16) and Python
-// (code-point) offsets; the conformance corpus is ASCII. See
-// conformance/README.md for the astral-character caveat.
+// offsets. They equal the JS (UTF-16) and Python (code-point) offsets only for
+// ASCII input; the conformance corpus is ASCII. See conformance/README.md for
+// the full Unicode caveat.
 //
-// Zero third-party dependencies (standard library only). It marks tells in
+// Zero third-party dependencies (standard library only). It marks configured patterns in
 // the words; it does not read the person, detect lies, or judge factual truth.
 package main
 
@@ -51,23 +51,25 @@ var agentlessPassive = regexp.MustCompile(
 	`(?i)\b(is|are|was|were|been|being|be)\s+(?:(?:\w+ly|often|never|always|still|already)\s+)?(\w+(?:ed|en)|` + irregularPP + `)\b`)
 var byFollows = regexp.MustCompile(`(?i)^\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b`)
 
-var removable = map[string]bool{"intensifier.loaded": true, "hedge.deniable": true}
+var removable = map[string]bool{"intensifier.loaded": true}
 
 // Rule mirrors one entry of rules.json. Fields not relevant to a rule's type
 // are simply absent in the JSON and stay at their zero value.
 type Rule struct {
-	RuleID        string   `json:"ruleId"`
-	Family        string   `json:"family"`
-	Technique     string   `json:"technique"`
-	Type          string   `json:"type"`
-	Detector      string   `json:"detector"`
-	Level         string   `json:"level"`
-	Confidence    float64  `json:"confidence"`
-	Note          string   `json:"note"`
-	Terms         []string `json:"terms"`
-	Pattern       string   `json:"pattern"`
-	CaseSensitive bool     `json:"caseSensitive"`
-	Expected      []string `json:"expected"`
+	RuleID                string   `json:"ruleId"`
+	DisplayName           string   `json:"displayName"`
+	Family                string   `json:"family"`
+	Technique             string   `json:"technique"`
+	TaxonomyMappingStatus string   `json:"taxonomyMappingStatus"`
+	Type                  string   `json:"type"`
+	Detector              string   `json:"detector"`
+	Level                 string   `json:"level"`
+	Confidence            float64  `json:"confidence"`
+	Note                  string   `json:"note"`
+	Terms                 []string `json:"terms"`
+	Pattern               string   `json:"pattern"`
+	CaseSensitive         bool     `json:"caseSensitive"`
+	Expected              []string `json:"expected"`
 }
 
 type RulePack struct {
@@ -89,11 +91,14 @@ type Point struct {
 // omitempty anywhere either — a mark at offset 0 is a real mark, and a required
 // field that vanishes when it is zero fails the schema.
 type Mark struct {
-	RuleID    string `json:"ruleId"`
-	Family    string `json:"family"`
-	Technique string `json:"technique"`
-	Actual    string `json:"actual"`
-	Position  struct {
+	RuleID                string `json:"ruleId"`
+	DisplayName           string `json:"displayName"`
+	Family                string `json:"family"`
+	Technique             string `json:"technique"`
+	ClassificationStatus  string `json:"classificationStatus"`
+	TaxonomyMappingStatus string `json:"taxonomyMappingStatus"`
+	Actual                string `json:"actual"`
+	Position              struct {
 		Start Point `json:"start"`
 		End   Point `json:"end"`
 	} `json:"position"`
@@ -197,15 +202,18 @@ func countWords(text string) int { return len(strings.Fields(text)) }
 // jsRound matches JavaScript Math.round: round half toward +infinity.
 func jsRound(x float64) float64 { return math.Floor(x + 0.5) }
 
-// Analyze marks the rhetorical tells in text using the given rule pack.
+// Analyze marks configured rhetorical patterns in text using the given rule pack.
 func Analyze(text string, pack RulePack) Result {
 	var marks []Mark
 	for _, rule := range pack.Rules {
 		for _, h := range matchesFor(rule, text) {
 			var mk Mark
 			mk.RuleID = rule.RuleID
+			mk.DisplayName = rule.DisplayName
 			mk.Family = rule.Family
 			mk.Technique = rule.Technique
+			mk.ClassificationStatus = "rule-pack-candidate-context-required"
+			mk.TaxonomyMappingStatus = rule.TaxonomyMappingStatus
 			mk.Actual = h.actual
 			mk.Position.Start = pointAt(text, h.index)
 			mk.Position.End = pointAt(text, h.index+h.length)
@@ -263,7 +271,7 @@ func Analyze(text string, pack RulePack) Result {
 	r.Strip = Strip(text, deduped)
 	r.Rewrite = nil
 	r.Engine.Name = "rhetorlint (go)"
-	r.Engine.Version = "0.1.1"
+	r.Engine.Version = "0.1.2"
 	r.Engine.Rules = pack.ID + "@" + pack.Version
 	return r
 }
@@ -273,8 +281,9 @@ var reSpaceBeforePunct = regexp.MustCompile(`\s+([,.;:!?])`)
 var reDoubleComma = regexp.MustCompile(`,\s*,`)
 var reTrailingWS = regexp.MustCompile(`(?m)\s+$`)
 
-// Strip returns the deterministic de-spun text: adverbial spin removed,
-// agentless passives flagged [who?]. It subtracts spin; it never paraphrases.
+// Strip returns a reduction-and-annotation counterfactual: lexical
+// intensifiers removed and passives with omitted agents flagged [who?].
+// It is not a meaning-preserving or truth-preserving rewrite.
 func Strip(text string, marks []Mark) string {
 	ordered := make([]Mark, len(marks))
 	copy(ordered, marks)

@@ -19,14 +19,16 @@ function flat(r) {
     density: r.density,
     strip: r.strip,
     marks: r.marks.map((m) => ({
-      ruleId: m.ruleId, family: m.family, technique: m.technique, actual: m.actual,
+      ruleId: m.ruleId, displayName: m.displayName, family: m.family,
+      technique: m.technique, classificationStatus: m.classificationStatus,
+      taxonomyMappingStatus: m.taxonomyMappingStatus, actual: m.actual,
       start: m.position.start.offset, end: m.position.end.offset,
       note: m.note, confidence: m.confidence, level: m.level, expected: m.expected
     }))
   };
 }
 
-// The JS reference engine must reproduce its own committed ground truth,
+// The JS reference engine must reproduce its committed expected outputs,
 // so the corpus can't silently drift from the engine (or vice versa).
 for (const [i, c] of corpus.cases.entries()) {
   test(`conformance case ${i}: ${c.input.slice(0, 40)}`, () => {
@@ -35,7 +37,7 @@ for (const [i, c] of corpus.cases.entries()) {
   });
 }
 
-// The corpus is the cross-engine ground truth. An expectation that violates
+// The corpus is the cross-engine reference fixture. An expectation that violates
 // the published schema would teach three engines to agree on illegal output,
 // so each case is held to the contract as well as to the JS engine.
 for (const [i, c] of corpus.cases.entries()) {
@@ -57,5 +59,5 @@ test("the corpus is non-trivial (guards against an empty fixture)", () => {
   );
   assert.ok(corpus.cases.length >= 8);
   assert.ok(corpus.cases.some((c) => c.density.tells > 0));
-  assert.ok(corpus.cases.some((c) => c.density.tells === 0), "includes clean controls");
+  assert.ok(corpus.cases.some((c) => c.density.tells === 0), "includes zero-marker controls");
 });

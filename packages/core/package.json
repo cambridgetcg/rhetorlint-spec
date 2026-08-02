@@ -1,7 +1,7 @@
 {
   "name": "@rhetorlint/core",
-  "version": "0.1.2",
-  "description": "Reference engine for the RhetorLint spec: marks rhetorical tells in text, on-device, zero dependencies. Reads the language, never the person.",
+  "version": "0.1.3",
+  "description": "Reference engine for the RhetorLint spec: marks visible rhetorical patterns and projects testable inquiry prompts, on-device and zero-dependency.",
   "type": "module",
   "license": "MIT",
   "main": "index.mjs",
@@ -18,6 +18,10 @@
     "./signals": {
       "types": "./signals.d.ts",
       "default": "./signals.mjs"
+    },
+    "./inquiry": {
+      "types": "./inquiry.d.ts",
+      "default": "./inquiry.mjs"
     }
   },
   "files": [
@@ -27,6 +31,8 @@
     "sarif.d.ts",
     "signals.mjs",
     "signals.d.ts",
+    "inquiry.mjs",
+    "inquiry.d.ts",
     "README.md"
   ],
   "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",
@@ -41,7 +47,9 @@
   "keywords": [
     "rhetorlint",
     "rhetoric",
-    "manipulation-detection",
+    "rhetorical-effects",
+    "truth-seeking",
+    "agents",
     "media-literacy",
     "on-device"
   ],

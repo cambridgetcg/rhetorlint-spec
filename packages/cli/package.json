@@ -1,7 +1,7 @@
 {
   "name": "@rhetorlint/cli",
-  "version": "0.1.1",
-  "description": "Read the subtext from the command line: mark rhetorical tells in text, emit JSON or SARIF, gate CI on spin density.",
+  "version": "0.1.2",
+  "description": "Inspect configured rhetorical patterns from the command line; emit JSON or SARIF and apply caller-defined marker-density policies.",
   "type": "module",
   "license": "MIT",
   "bin": {
@@ -12,8 +12,8 @@
     "README.md"
   ],
   "dependencies": {
-    "@rhetorlint/core": "^0.1.2",
-    "@rhetorlint/rules-en": "^0.1.2"
+    "@rhetorlint/core": "^0.1.3",
+    "@rhetorlint/rules-en": "^0.1.3"
   },
   "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",
   "repository": {

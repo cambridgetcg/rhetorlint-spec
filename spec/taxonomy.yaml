@@ -4,33 +4,37 @@
 #
 # This ONE file does two jobs at once:
 #
-#   1. PORTABLE TAXONOMY (engines read it).  It is the source of truth that the
+#   1. PORTABLE TAXONOMY (engines read it).  It is the canonical catalogue that
 #      per-locale rule packs compile against.  Every `id` under `tells` matches a
 #      ruleId in packages/rules-*/rules.json; every `family` matches the fixed
 #      enum in spec/output.schema.json.  Change a family or a rule id here and the
 #      compiled packs change with it.
 #
 #   2. SYLLABUS (learners read it).  It is the curriculum for the learning wing.
-#      Each `tell` is one lesson: what the pattern is, WHY it works on a reader
-#      (the teachable mechanism), a realistic marked example, and an honest plain
-#      rewrite.  Read top to bottom and you have learned to spot the tells yourself.
+#      Each marker is one lesson: the visible pattern, a CONTESTABLE hypothesis
+#      about a possible effect, applicability limits, and an evidence question.
 #
 # ----------------------------------------------------------------------------
 # THE REFUSAL STANCE — read this before you read anything else.
 # ----------------------------------------------------------------------------
-# RhetorLint marks tells in the WORDS. That is all it does.
-#   * It does NOT read the person. A tell is a property of the sentence, never a
-#     claim about the speaker's mind, motive, or honesty.
+# RhetorLint marks configured patterns in the WORDS. The matched span and
+# position are surface observations; the rule ID, family, technique, note, and
+# review fields are versioned rule-pack interpretations.
+#   * It does NOT read the person. No marker field may become a claim about the
+#     speaker's mind, motive, or honesty.
 #   * It does NOT detect lies. A marked passage may be perfectly true; an unmarked
 #     one may be false. RhetorLint measures how the language is BUILT, not whether
 #     the claim is correct.
-#   * `confidence` is a language-pattern likelihood, NOT a probability that anyone
-#     is deceiving you. It errs toward under-marking.
-# Every mark points at a phrase a reader can see and re-read for themselves. If a
-# pattern would require guessing at intent, RhetorLint leaves it unmarked.
+#   * An `effect_hypothesis` is a question to test for a declared recipient,
+#     substrate, task, and context. It is NOT evidence that an effect occurred.
+#   * `confidence` is an uncalibrated, author-assigned match weight, NOT a
+#     probability of intent, effect, deception, or truth.
+# Every mark points at a phrase a reader can see and re-read for themselves. A
+# match can be benign, quoted, conventional, necessary, or contextually wrong.
+# Alternative readings and disagreement stay live.
 #
 # ----------------------------------------------------------------------------
-# PROVENANCE — why this is classroom-defensible.
+# PROVENANCE — label lineage, not matcher or effect validation.
 # ----------------------------------------------------------------------------
 # The six coarse families are the six coarse persuasion strategies of
 # SemEval-2023 Task 3 (Piskorski, Stefanovitch, Da San Martino & Nakov, 2023;
@@ -68,7 +72,13 @@
 # vagueness or confusion" where this taxonomy writes "Obfuscation, Intentional
 # Vagueness, Confusion". That single string is the one a researcher must map back
 # before joining RhetorLint output to a SemEval corpus. Labels were confirmed
-# against the organizers' task page and the ACL 2023 paper; none were invented.
+# against the organizers' task page and the ACL 2023 paper. The lineage does not
+# validate RhetorLint's regexes, generic-domain interpretations, or effects.
+#
+# `mapping_status` describes only the relationship between a RhetorLint rule
+# concept and this lineage: `aligned-candidate`, `approximate-candidate`, or
+# `rhetorlint-extension`. Both candidate values still require context; neither
+# says that a particular matched use instantiates the named technique.
 # ============================================================================
 
 version: "0.1"
@@ -82,104 +92,125 @@ families:
   # ==========================================================================
   - id: manipulative-wording
     semeval_parent: "Manipulative Wording"
-    what: "Word choices that move your feelings or blur your grip on a promise, separately from whatever facts are (or aren't) present."
+    what: "Word choices that can alter emphasis, specificity, attribution, or framing separately from whatever facts are (or aren't) present."
     seeded_tells: 7
     semeval_siblings_not_yet_seeded: ["Repetition"]
     tells:
 
       - id: intensifier.loaded
+        display_name: "intensifier"
         semeval_technique: "Loaded Language"
-        what: "An intensifier — an adverb or adjective that turns up the emotional volume without adding a single fact."
-        why_it_works: "Emotional charge is read as evidence: the reader feels a certainty the words never actually earned."
+        mapping_status: "aligned-candidate"
+        what: "An intensifier — an adverb or adjective that adds emphasis without adding evidence."
+        effect_hypothesis: "May increase attention, recall, or expressed certainty when a recipient treats the emphasis as informative."
+        verification_probe: "Does removing only the intensifier change confidence, attention, or evidence requests under the same task conditions?"
         examples:
           - marked: "We take your privacy extremely seriously"
-            tell: "extremely"
-            plain: "We encrypt your messages end-to-end and never sell them."
+            marker: "extremely"
+            verification_prompt: "What observable practices and evidence support the stated degree of seriousness?"
           - marked: "This is a hugely successful program"
-            tell: "hugely"
-            plain: "The program served 1,200 people last year."
+            marker: "hugely"
+            verification_prompt: "Which outcome measure defines success, and what result was observed?"
         lineage: "SemEval-2023 · Manipulative Wording › Loaded Language"
 
       - id: hedge.softener
+        display_name: "qualifier or distancing phrase"
         semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"   # organizers' page: "Obfuscation - vagueness or confusion"
-        what: "A soft qualifier that lowers a promise so it can quietly be denied later."
-        why_it_works: "It sounds like a commitment while committing to nothing; challenged, the speaker just points back at the hedge."
+        mapping_status: "approximate-candidate"
+        what: "A qualifier or distancing phrase that can leave a commitment less specific."
+        effect_hypothesis: "May lead recipients to extract a weaker commitment when the phrase modifies a promise, obligation, action, or factual assertion."
+        verification_probe: "What concrete action, actor, deadline, or uncertainty does the surrounding context establish?"
         examples:
           - marked: "We believe this will fix the issue for most people"
-            tell: "We believe"
-            plain: "This fixes the login bug. It does not fix the sync bug."
+            marker: "We believe"
+            verification_prompt: "Which issue is expected to be fixed, for whom, and what evidence supports that expectation?"
           - marked: "We're reaching out to some affected users"
-            tell: "reaching out to"
-            plain: "We emailed the 4,000 users whose records leaked."
+            marker: "reaching out to"
+            verification_prompt: "Which users were contacted, by what channel, and when?"
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
 
       - id: hedge.deniable
+        display_name: "epistemic modal or attribution cue"
         semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
-        what: "A deniable modal — may / might / could + verb, or reportedly / allegedly — that leaves room to say you never actually promised."
-        why_it_works: "The modal manufactures plausible deniability: the claim was floated, never made, so no one can be held to it."
+        mapping_status: "approximate-candidate"
+        what: "An epistemic modal or attribution cue — may / might / could + verb, or reportedly / allegedly — that marks possibility or qualified sourcing."
+        effect_hypothesis: "May cause recipients to treat a proposition as possible or attributed rather than established; that qualification can also be epistemically necessary."
+        verification_probe: "What supports the possibility, and what evidence would resolve the stated uncertainty?"
         examples:
           - marked: "Your data may have been exposed"
-            tell: "may have been"
-            plain: "Your email address and password hash were exposed."
+            marker: "may have been"
+            verification_prompt: "Which data may have been exposed, on what evidence, and what would confirm or rule it out?"
           - marked: "The outage could potentially affect some regions"
-            tell: "could potentially"
-            plain: "The outage took down EU-West and US-East for 40 minutes."
+            marker: "could potentially"
+            verification_prompt: "Which regions are possible, on what basis, and what observation would confirm impact?"
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"
 
       - id: weasel.attribution
+        display_name: "unnamed-source attribution"
         semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        mapping_status: "approximate-candidate"
         # NOTE: the marked thing is the *unnamed source* wording ("experts say",
         # "studies show") — vagueness of source, which is Manipulative Wording.
         # A NAMED authority ("Dr. X, a Nobel laureate, says") would instead be
         # SemEval's "Appeal to Authority" under the Justification parent — a
         # different, future tell. family and technique agree here on purpose.
-        what: "An appeal to an unnamed authority — the 'who says?' has been deleted."
-        why_it_works: "Borrowed authority you cannot check: a reader can't weigh a source they can't see, so the claim rides for free."
+        what: "An attribution to a source that is not identified in the matched phrase."
+        effect_hypothesis: "May make it harder to inspect the authority, sample, or evidence when no source appears nearby."
+        verification_probe: "Which source makes this claim, and what evidence and method does that source provide?"
         examples:
           - marked: "Experts agree this is safe"
-            tell: "Experts agree"
-            plain: "Two of our own engineers think it's safe; no outside body has reviewed it."
+            marker: "Experts agree"
+            verification_prompt: "Which experts, evaluating what safety evidence, agree?"
           - marked: "Studies show our method works"
-            tell: "Studies show"
-            plain: "One internal study (n=30, unpublished) showed a 5% improvement."
+            marker: "Studies show"
+            verification_prompt: "Which studies, methods, samples, and results support the claim?"
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation (unnamed source; cf. Justification › Appeal to Authority for a named one)"
 
       - id: lure.free-offer
+        display_name: "zero-cost or all-inclusive claim"
         semeval_technique: "Exaggeration or Minimisation"
-        what: "A free-offer lure — 'absolutely free', 'no strings attached', 'everything you need' — wording that minimises the cost or inflates the bundle to rush the yes."
-        why_it_works: "'Free' switches off price scrutiny: with nothing apparently at stake, the reader stops asking what is actually being traded — attention, data, a later upsell."
+        mapping_status: "aligned-candidate"
+        what: "A zero-cost or all-inclusive claim — 'absolutely free', 'no strings attached', 'everything you need' — whose matched phrase does not show the full terms."
+        effect_hypothesis: "May reduce attention to conditions, future charges, data exchange, attention costs, or exclusions when those exist."
+        verification_probe: "What price, conditions, exclusions, later charges, data uses, or other exchanges accompany the offer?"
         examples:
           - marked: "Get started absolutely free, no strings attached"
-            tell: "absolutely free"
-            plain: "The starter tier costs nothing; paid tiers begin at $9/month, and we email you about them."
+            marker: "absolutely free"
+            verification_prompt: "What is free, for how long, and what terms or non-price exchanges apply?"
           - marked: "Everything you need to launch your business"
-            tell: "everything you need"
-            plain: "Includes hosting and a template. You still need a domain, a payment account, and content."
+            marker: "everything you need"
+            verification_prompt: "What is included, what is excluded, and whose needs define 'everything'?"
         lineage: "SemEval-2023 · Manipulative Wording › Exaggeration or Minimisation"
 
       - id: shouting.caps
+        display_name: "sustained all-caps"
         semeval_technique: "Loaded Language"
-        what: "Sustained ALL-CAPS — two or more consecutive shouted words, volume standing in for argument. (The one case-sensitive rule in the pack: its whole tell IS the letter case.)"
-        why_it_works: "Typographic shouting manufactures urgency and importance the sentence never argues for; the reader's alarm response fires before their reading response does."
+        mapping_status: "approximate-candidate"
+        what: "Sustained ALL-CAPS — two or more consecutive words given typographic emphasis. (The one case-sensitive rule in the pack.)"
+        effect_hypothesis: "May increase visual priority, perceived urgency, or recall when the capitals function as emphasis rather than convention."
+        verification_probe: "Does changing only letter case alter prioritisation, urgency, or evidence requests?"
         examples:
           - marked: "LIMITED TIME OFFER for our members"
-            tell: "LIMITED TIME OFFER"
-            plain: "This price is available until 31 March."
+            marker: "LIMITED TIME OFFER"
+            verification_prompt: "What is the verified deadline, and what changes after it?"
         lineage: "SemEval-2023 · Manipulative Wording › Loaded Language"
 
       - id: contrition.rehearsed
+        display_name: "stock contrition phrase"
         semeval_technique: "Obfuscation, Intentional Vagueness, Confusion"
+        mapping_status: "approximate-candidate"
         # RhetorLint-AUTHORED PATTERN, EXISTING SemEval TECHNIQUE. SemEval names no
         # technique for rehearsed contrition, so the rule ships the label of its
         # nearest kin rather than inventing one — which keeps `technique` joinable
         # to a SemEval corpus at the cost of hiding this tell inside the
         # Obfuscation bucket. Group by `ruleId` to recover it.
-        what: "The shape of an apology with the substance removed — corporate boilerplate that performs concern without admitting a specific fault or naming a specific fix."
-        why_it_works: "It discharges the social debt of an apology while conceding nothing, so the reader's urge to be satisfied is met before any accountability lands."
+        what: "A stock contrition phrase whose matched span names no specific act or remedy."
+        effect_hypothesis: "May let a recipient recognise the form of contrition while extracting little accountability detail when specifics are absent from the surrounding statement."
+        verification_probe: "Where does the statement identify what happened, who acted, who was affected, and what remedy is verifiably underway?"
         examples:
           - marked: "We take your security seriously and apologize for any inconvenience"
-            tell: "we take your security seriously"
-            plain: "We stored passwords in plain text for three years. They are now hashed, and we've hired an external auditor."
+            marker: "we take your security seriously"
+            verification_prompt: "What happened, who acted, who was affected, and what remedy is supported by evidence?"
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (RhetorLint-authored pattern under a SemEval technique)"
 
   # ==========================================================================
@@ -187,26 +218,29 @@ families:
   # ==========================================================================
   - id: simplification
     semeval_parent: "Simplification"
-    what: "Flattening a messy reality into a single option, a single cause, or a single certainty — and hiding the middle ground."
+    what: "Patterns that can present a complex reality as one option, cause, or certainty."
     seeded_tells: 1
     semeval_siblings_not_yet_seeded: ["Causal Oversimplification", "Consequential Oversimplification"]
     tells:
 
       - id: absolute.universal
+        display_name: "absolute or certainty cue"
         semeval_technique: "False Dilemma or No Choice"
+        mapping_status: "approximate-candidate"
         # The marked words split two ways: "only option / no choice" is squarely
         # False Dilemma; "obviously / everyone knows / undeniable" also brushes
         # SemEval's Conversation Killer (thought-terminating). RhetorLint marks the
         # visible absolute either way.
-        what: "An absolute — always / never / everyone / obviously / the only option — that claims more than anyone could know, or flattens the choices to one."
-        why_it_works: "A universal can't be argued with in detail, and 'everyone knows' reframes disagreement as ignorance; 'no other choice' simply deletes the alternatives from view."
+        what: "An absolute quantifier or certainty cue — always / never / everyone / obviously / the only option — that states an unrestricted scope."
+        effect_hypothesis: "May reduce the alternatives or exceptions a recipient considers when the phrase describes a contestable empirical claim rather than a rule or invariant."
+        verification_probe: "What domain does the universal cover, what exceptions are known, and what evidence supports that scope?"
         examples:
           - marked: "Everyone knows this is the only option"
-            tell: "the only option"
-            plain: "Two of five reviewers preferred this; the other three options are still viable."
+            marker: "the only option"
+            verification_prompt: "Which alternatives were considered, and what evidence eliminates them?"
           - marked: "This will always be free"
-            tell: "always"
-            plain: "It's free today. Pricing may change with 30 days' notice."
+            marker: "always"
+            verification_prompt: "What policy, enforceable commitment, and change conditions support 'always'?"
         lineage: "SemEval-2023 · Simplification › False Dilemma or No Choice"
 
   # ==========================================================================
@@ -214,66 +248,69 @@ families:
   # ==========================================================================
   - id: distraction
     semeval_parent: "Distraction"
-    what: "Pulling your attention off the question that was actually asked and onto something easier to answer."
+    what: "Patterns that may redirect attention from a prior question to a comparison or different issue."
     seeded_tells: 1
     semeval_siblings_not_yet_seeded: ["Straw Man", "Red Herring"]
     tells:
 
       - id: deflection.whataboutism
+        display_name: "comparison or topic-shift cue"
         semeval_technique: "Whataboutism"
-        what: "Answering a charge by pointing at someone else's fault instead of the question in front of you."
-        why_it_works: "It swaps accountability for a hypocrisy contest: if 'they do it too', your original question suddenly feels unfair rather than unanswered."
+        mapping_status: "aligned-candidate"
+        what: "A comparison or topic-shift cue whose interpretation depends on the preceding dialogue."
+        effect_hypothesis: "May redirect attention when used in a response and the comparison does not answer the prior question."
+        verification_probe: "What was the prior question, does this comparison answer it, and is the comparison independently relevant?"
         examples:
           - marked: "What about our competitors' leaks?"
-            tell: "What about"
-            plain: "We leaked 2 million records. Here is what we're doing about ours; theirs is a separate matter."
+            marker: "What about"
+            verification_prompt: "What prior question is being answered, and how is the competitor comparison relevant?"
           - marked: "But what about the last administration's record?"
-            tell: "But what about"
-            plain: "Here is our record. Judge it first."
+            marker: "But what about"
+            verification_prompt: "Does the comparison answer the current claim, or introduce a separate one requiring its own evidence?"
         lineage: "SemEval-2023 · Distraction › Whataboutism"
 
   # ==========================================================================
-  # 4. ATTACK ON REPUTATION  — going after the person or group, not the claim
+  # 4. ATTACK ON REPUTATION  — language about a person or group, not the claim
   #    (no seed rule yet — shown so the curriculum map is complete)
   # ==========================================================================
   - id: attack-on-reputation
     semeval_parent: "Attack on Reputation"
-    what: "Undermining the person or group making a claim instead of engaging with the claim itself."
+    what: "Techniques that discuss a person or group rather than directly engaging with the proposition at issue."
     status: "(no seed rule yet)"
     why_not_seeded: "Reputation attacks usually need a target and context to be read correctly ('is this a slur or a description?'). That is exactly the intent-modelling RhetorLint's deterministic, words-only core refuses to do, so these await a carefully-scoped pack."
     semeval_techniques:
       - name: "Name Calling or Labelling"
-        what: "Pinning a loaded label on the target so the label does the arguing."
+        what: "Applying a loaded label to a target; context is needed to determine its relevance and effect."
       - name: "Guilt by Association"
-        what: "Tarring a target by tying them to a disliked group or figure."
+        what: "Associating a target with a disliked group or figure."
       - name: "Doubt"
-        what: "Casting doubt on someone's credibility or sincerity without evidence."
+        what: "Questioning someone's credibility or sincerity; any supporting evidence must be inspected separately."
       - name: "Appeal to Hypocrisy"
-        what: "Dismissing an argument by charging the arguer with inconsistency."
+        what: "Raising an alleged inconsistency in the arguer instead of or alongside evaluating the proposition."
       - name: "Questioning the Reputation"
-        what: "Undercutting a target's standing so their claims are pre-discounted."
+        what: "Questioning a target's standing; test whether and why this changes evaluation of the target's claims."
     lineage: "SemEval-2023 · Attack on Reputation (5 fine techniques)"
 
   # ==========================================================================
-  # 5. JUSTIFICATION  — propping a claim on an external appeal instead of evidence
+  # 5. JUSTIFICATION  — presenting an external appeal as support
   #    (no seed rule yet)
   # ==========================================================================
   - id: justification
     semeval_parent: "Justification"
-    what: "Backing a claim with an outside appeal — authority, the crowd, shared values, fear, or the flag — in place of evidence."
+    what: "Presenting an outside appeal — authority, popularity, shared values, fear, or affiliation — as support. Whether it substitutes for evidence depends on context."
     status: "(no seed rule yet)"
-    note: "RhetorLint's weasel.attribution touches SemEval's Appeal to Authority, but files it as a wording tell under manipulative-wording. A dedicated justification pack (crowd, values, fear, flag) is future work."
+    note: "RhetorLint's legacy weasel.attribution ID touches SemEval's Appeal to Authority, but files the unnamed-source marker under manipulative-wording. A dedicated justification pack (crowd, values, fear, flag) is future work."
     semeval_techniques:
       - name: "Flag Waving"
-        what: "Riding group loyalty or patriotism to carry the claim."
+        what: "Invoking group loyalty or patriotism in support of a claim."
       - name: "Appeal to Authority"
-        what: "Leaning on an authority's say-so as if it settled the matter."
+        what: "Citing an authority as support; the authority's evidence and relevant expertise remain independently inspectable."
       - name: "Appeal to Popularity"
-        what: "'Everyone's doing it' as a reason to agree."
+        what: "Presenting popularity or widespread practice as a reason to agree."
       - name: "Appeal to Values"
-        what: "Wrapping the claim in cherished values so rejecting it feels like betraying them."
+        what: "Connecting a claim to shared or cherished values."
       - name: "Appeal to Fear/Prejudice"
-        what: "Attaching dread or bias to the alternative to steer the choice."
+        what: "Associating a feared outcome or prejudicial framing with an alternative."
     lineage: "SemEval-2023 · Justification (5 fine techniques)"
 
   # ==========================================================================
@@ -281,53 +318,59 @@ families:
   # ==========================================================================
   - id: call
     semeval_parent: "Call"
-    what: "Driving you to act now, or closing the topic down, rather than letting you weigh it."
+    what: "Patterns that call for action, foreground a deadline, or use discussion-closing language."
     seeded_tells: 1
     semeval_siblings_not_yet_seeded: ["Slogans", "Conversation Killer"]
     tells:
 
       - id: urgency.appeal-to-time
+        display_name: "time-pressure cue"
         semeval_technique: "Appeal to Time"
-        what: "Manufactured urgency — 'act now', 'limited time', 'last chance' — pressure to decide before you can weigh the decision."
-        why_it_works: "A ticking clock converts deliberation into loss-aversion: the cost of thinking feels like the cost of missing out, so the thinking gets skipped."
+        mapping_status: "aligned-candidate"
+        what: "A time-pressure cue — 'act now', 'limited time', 'last chance' — that calls for action or foregrounds a deadline."
+        effect_hypothesis: "May cause a recipient to prioritise immediate action over verification when the deadline or hazard is not already established."
+        verification_probe: "What independently verifiable deadline or hazard exists, and what actually happens if action waits?"
         examples:
           - marked: "Act now — this offer won't last!"
-            tell: "Act now"
-            plain: "The discount ends 31 March; the product does not."
+            marker: "Act now"
+            verification_prompt: "What is the verified deadline, and what consequence follows from waiting?"
           - marked: "Last chance to lock in this rate"
-            tell: "Last chance"
-            plain: "We raise rates on 1 April. Existing customers keep their current rate for 12 months."
+            marker: "Last chance"
+            verification_prompt: "Which rate changes, when, for whom, and according to what binding terms?"
         lineage: "SemEval-2023 · Call › Appeal to Time"
     semeval_techniques_not_yet_seeded:
       - name: "Slogans"
-        what: "A short, catchy phrase that substitutes for an argument."
+        what: "A short, memorable phrase used as an argument cue; inspect the accompanying basis separately."
       - name: "Conversation Killer"
-        what: "A thought-terminating cliché ('it is what it is') that ends the discussion."
+        what: "A cliché such as 'it is what it is' that may reduce continuation of a discussion."
     lineage: "SemEval-2023 · Call (3 fine techniques)"
 
   # ==========================================================================
-  # 7. AGENCY-HIDING  — grammar that deletes who did the thing
+  # 7. AGENCY-HIDING  — grammar that can omit who did the thing
   #    RHETORLINT STRUCTURAL EXTENSION — not a SemEval family.
   # ==========================================================================
   - id: agency-hiding
     semeval_parent: "(RhetorLint extension — not in SemEval)"
-    what: "Sentence structure that removes the actor: the harm is described, but who chose it is gone."
-    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar, so it earns its own family."
+    what: "Sentence structure that omits the semantic agent: an action is described, but the matched phrase does not name who performed it."
+    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one structural family for candidate passive constructions with omitted agents. This is a heuristic grammatical classification, not proof that the classification is correct in context or that attribution was intentionally hidden. Its nearest SemEval kin is Manipulative Wording › Obfuscation."
     seeded_tells: 1
     tells:
 
       - id: agency-hiding.deleted-subject
+        display_name: "passive with omitted semantic agent"
         semeval_technique: "Obfuscation (structural — RhetorLint extension)"
+        mapping_status: "rhetorlint-extension"
         # NOT a SemEval technique. The parenthesis is load-bearing: it keeps the
         # label off SemEval's Obfuscation bucket, so a technique-level join to a
         # SemEval corpus drops this tell rather than silently absorbing it.
-        what: "An agentless passive — 'mistakes were made', 'your account was closed' — a sentence whose grammar has no subject, so who acted has been deleted."
-        why_it_works: "No actor, no accountability: the harm reads like weather that simply happened rather than a choice a specific someone made."
+        what: "A passive construction with an omitted agent — 'mistakes were made', 'your account was closed'. The patient can still be the grammatical subject; the phrase does not name the actor."
+        effect_hypothesis: "May make actor identification or responsibility attribution harder when the actor is not named nearby and attribution matters to the task."
+        verification_probe: "Who performed the action, is that actor known, and what evidence supports the attribution?"
         examples:
           - marked: "Mistakes were made and your account was closed"
-            tell: "Mistakes were made"
-            plain: "We made a mistake and closed your account by error."
+            marker: "Mistakes were made"
+            verification_prompt: "Who made which mistakes, and what evidence identifies the actor?"
           - marked: "Your data was shared with partners"
-            tell: "was shared"
-            plain: "We shared your data with 12 advertising partners."
+            marker: "was shared"
+            verification_prompt: "Who shared which data with which partners, and what records establish that?"
         lineage: "RhetorLint structural extension · nearest SemEval kin: Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion"

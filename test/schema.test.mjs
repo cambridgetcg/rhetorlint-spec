@@ -25,7 +25,7 @@ const SPECIMENS = [
       "We take your privacy extremely seriously, and regrettably, mistakes were made. " +
       "We are reaching out to affected users."
   },
-  { label: "an honest, active sentence", text: "I made a mistake and I will fix it by Friday." },
+  { label: "a direct active sentence", text: "I made a mistake and I will fix it by Friday." },
   { label: "empty input", text: "" },
   { label: "whitespace only", text: "   \n\t  " },
   { label: "a mark at offset 0", text: "ACT NOW — the upgrade is absolutely free." },
@@ -144,6 +144,20 @@ test("every rule in the pack declares metadata the schema will accept", () => {
       validate(rule.family, properties.family, { root: SCHEMA, path: `${where}.family` }), []
     );
     assert.deepEqual(
+      validate(rule.displayName, properties.displayName, {
+        root: SCHEMA,
+        path: `${where}.displayName`
+      }),
+      []
+    );
+    assert.deepEqual(
+      validate(rule.taxonomyMappingStatus, properties.taxonomyMappingStatus, {
+        root: SCHEMA,
+        path: `${where}.taxonomyMappingStatus`
+      }),
+      []
+    );
+    assert.deepEqual(
       validate(rule.level ?? "info", properties.level, { root: SCHEMA, path: `${where}.level` }), []
     );
     assert.deepEqual(
@@ -236,7 +250,7 @@ test("the validator catches each kind of violation the schema forbids", () => {
   assert.match(broken((r) => { r.marks[0].position.start.line = 0; }), /line: 0 is below the minimum 1/);
 
   // Optional-but-legal values stay legal: a null rewrite and an absent strip.
-  assert.deepEqual(broken((r) => { r.rewrite = "a plain-truth paraphrase"; }), "");
+  assert.deepEqual(broken((r) => { r.rewrite = "a caller-supplied model rewrite"; }), "");
   assert.deepEqual(broken((r) => { delete r.strip; }), "");
   assert.deepEqual(broken((r) => { delete r.engine; }), "");
 });
@@ -245,7 +259,7 @@ test("the validator refuses a schema construct it does not implement", () => {
   const cases = [
     [{ oneOf: [{ type: "string" }] }, /keyword 'oneOf'.*is not implemented/],
     [{ type: "object", minProperties: 1 }, /keyword 'minProperties'.*is not implemented/],
-    [{ type: "array", minItems: 1 }, /keyword 'minItems'.*is not implemented/],
+    [{ type: "array", uniqueItems: true }, /keyword 'uniqueItems'.*is not implemented/],
     [{ type: "object", additionalProperties: { type: "string" } }, /only 'additionalProperties: false' is implemented/],
     [{ type: "object", additionalProperties: true }, /only 'additionalProperties: false' is implemented/],
     [{ type: "array", items: [{ type: "string" }] }, /tuple form of 'items' is not implemented/],

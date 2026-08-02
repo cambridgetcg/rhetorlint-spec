@@ -22,19 +22,16 @@ export interface SarifResult {
   }>;
   properties: {
     family: string;
+    displayName: string | null;
     technique: string | null;
+    classificationStatus: "rule-pack-candidate-context-required";
+    taxonomyMappingStatus:
+      | "aligned-candidate"
+      | "approximate-candidate"
+      | "rhetorlint-extension"
+      | null;
     confidence?: number;
   };
-  fixes?: Array<{
-    description: { text: string };
-    artifactChanges: Array<{
-      artifactLocation: { uri: string };
-      replacements: Array<{
-        deletedRegion: { charOffset: number; charLength: number };
-        insertedContent: { text: string };
-      }>;
-    }>;
-  }>;
 }
 
 export interface RhetorLintSarifLog {
@@ -50,7 +47,17 @@ export interface RhetorLintSarifLog {
           id: string;
           name: string;
           shortDescription: { text: string };
-          properties: { family: string; technique: string | null };
+          properties: {
+            family: string;
+            displayName: string | null;
+            technique: string | null;
+            classificationStatus: "rule-pack-candidate-context-required";
+            taxonomyMappingStatus:
+              | "aligned-candidate"
+              | "approximate-candidate"
+              | "rhetorlint-extension"
+              | null;
+          };
         }>;
       };
     };

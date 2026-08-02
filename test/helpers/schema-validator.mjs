@@ -4,7 +4,7 @@
  * The schema is the spec's public contract and this repository ships zero
  * dependencies, so the contract is enforced here or nowhere. Implemented:
  * $ref into $defs, type (including union types), required, properties,
- * additionalProperties: false, items, enum, pattern, minimum, maximum.
+ * additionalProperties: false, items, minItems, enum, pattern, minimum, maximum.
  *
  * Every other keyword throws. A validator that read past what it does not
  * understand would report a pass for a constraint it never checked, and the
@@ -26,7 +26,7 @@ const ANNOTATIONS = new Set([
 /** Keywords this validator enforces. Anything in neither set throws. */
 const CONSTRAINTS = new Set([
   "$ref", "type", "required", "properties", "additionalProperties", "items",
-  "enum", "pattern", "minimum", "maximum"
+  "minItems", "enum", "pattern", "minimum", "maximum"
 ]);
 
 const JSON_TYPES = new Set([
@@ -90,6 +90,9 @@ function assertImplemented(schema, path) {
   }
   if ("items" in schema && Array.isArray(schema.items)) {
     throw new Error(`tuple form of 'items' is not implemented at ${path}`);
+  }
+  if ("minItems" in schema && (!Number.isInteger(schema.minItems) || schema.minItems < 0)) {
+    throw new Error(`'minItems' must be a non-negative integer at ${path}`);
   }
   if ("required" in schema && !Array.isArray(schema.required)) {
     throw new Error(`'required' must be an array at ${path}`);
@@ -163,8 +166,13 @@ function check(value, schema, path, root, errors) {
     }
   }
 
-  if (type === "array" && "items" in schema) {
-    value.forEach((item, i) => check(item, schema.items, `${path}[${i}]`, root, errors));
+  if (type === "array") {
+    if ("minItems" in schema && value.length < schema.minItems) {
+      errors.push(`${path}: expected at least ${schema.minItems} items, got ${value.length}`);
+    }
+    if ("items" in schema) {
+      value.forEach((item, i) => check(item, schema.items, `${path}[${i}]`, root, errors));
+    }
   }
 }
 

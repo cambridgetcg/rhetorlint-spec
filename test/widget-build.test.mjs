@@ -27,7 +27,7 @@ test("the generated content.js embeds the real engine and rules", () => {
   const src = readFileSync(CONTENT, "utf8");
   assert.match(src, /function analyze\b/, "engine inlined");
   assert.match(src, /const RULES =/, "rules inlined");
-  assert.match(src, /agency-hiding\.deleted-subject/, "the structural tell is present");
+  assert.match(src, /agency-hiding\.deleted-subject/, "the structural marker is present");
   assert.match(src, /Obfuscation, Intentional Vagueness/, "synced to the current rule labels");
   assert.match(src, /e\.key === "R" \|\| e\.key === "r"/, "the advertised Alt+Shift+R hotkey is wired");
   assert.doesNotMatch(src, /captione[e]r/i, "the retired brand is absent");

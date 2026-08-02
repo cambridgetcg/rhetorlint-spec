@@ -4,12 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "rhetorlint"
-version = "0.1.1"
-description = "Reference Python engine for the RhetorLint spec: mark rhetorical tells in the words, on-device, zero dependencies."
+version = "0.1.2"
+description = "Reference Python engine for the RhetorLint spec: mark visible rhetorical patterns on-device with zero dependencies."
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
-keywords = ["rhetoric", "manipulation", "media-literacy", "propaganda-techniques", "text-analysis"]
+keywords = ["rhetoric", "rhetorical-effects", "truth-seeking", "media-literacy", "text-analysis"]
 
 [project.urls]
 Homepage = "https://github.com/cambridgetcg/rhetorlint-spec"

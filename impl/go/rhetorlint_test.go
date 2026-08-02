@@ -14,16 +14,19 @@ import (
 
 // flatMark is the comparable projection stored in conformance/cases.json.
 type flatMark struct {
-	RuleID     string   `json:"ruleId"`
-	Family     string   `json:"family"`
-	Technique  string   `json:"technique"`
-	Actual     string   `json:"actual"`
-	Start      int      `json:"start"`
-	End        int      `json:"end"`
-	Note       string   `json:"note"`
-	Confidence float64  `json:"confidence"`
-	Level      string   `json:"level"`
-	Expected   []string `json:"expected"`
+	RuleID                string   `json:"ruleId"`
+	DisplayName           string   `json:"displayName"`
+	Family                string   `json:"family"`
+	Technique             string   `json:"technique"`
+	ClassificationStatus  string   `json:"classificationStatus"`
+	TaxonomyMappingStatus string   `json:"taxonomyMappingStatus"`
+	Actual                string   `json:"actual"`
+	Start                 int      `json:"start"`
+	End                   int      `json:"end"`
+	Note                  string   `json:"note"`
+	Confidence            float64  `json:"confidence"`
+	Level                 string   `json:"level"`
+	Expected              []string `json:"expected"`
 }
 
 type density struct {
@@ -47,7 +50,9 @@ func flatten(r Result) (density, string, []flatMark) {
 	fm := make([]flatMark, 0, len(r.Marks))
 	for _, m := range r.Marks {
 		fm = append(fm, flatMark{
-			RuleID: m.RuleID, Family: m.Family, Technique: m.Technique, Actual: m.Actual,
+			RuleID: m.RuleID, DisplayName: m.DisplayName, Family: m.Family,
+			Technique: m.Technique, ClassificationStatus: m.ClassificationStatus,
+			TaxonomyMappingStatus: m.TaxonomyMappingStatus, Actual: m.Actual,
 			Start: m.Position.Start.Offset, End: m.Position.End.Offset,
 			Note: m.Note, Confidence: m.Confidence, Level: m.Level, Expected: m.Expected,
 		})
@@ -90,13 +95,16 @@ func TestConformance(t *testing.T) {
 		for j := range marks {
 			g, w := marks[j], c.Marks[j]
 			if g.RuleID != w.RuleID || g.Start != w.Start || g.End != w.End ||
-				g.Actual != w.Actual || g.Family != w.Family || g.Technique != w.Technique ||
+				g.Actual != w.Actual || g.DisplayName != w.DisplayName ||
+				g.Family != w.Family || g.Technique != w.Technique ||
+				g.ClassificationStatus != w.ClassificationStatus ||
+				g.TaxonomyMappingStatus != w.TaxonomyMappingStatus ||
 				g.Note != w.Note || g.Level != w.Level || math.Abs(g.Confidence-w.Confidence) > 1e-9 {
 				t.Errorf("case %d mark %d:\n got  %+v\n want %+v", i, j, g, w)
 			}
 		}
 	}
-	t.Logf("go conformance: %d/%d cases checked against the ground truth", len(corpus.Cases), len(corpus.Cases))
+	t.Logf("go conformance: %d/%d cases checked against the reference outputs", len(corpus.Cases), len(corpus.Cases))
 }
 
 // schemaNode is the subset of JSON Schema that spec/output.schema.json actually
@@ -229,7 +237,10 @@ func checkSchema(t *testing.T, defs map[string]*schemaNode, node *schemaNode, v 
 func zeroValuedResult() Result {
 	var m Mark
 	m.RuleID = "agency-hiding.deleted-subject"
+	m.DisplayName = "passive with omitted semantic agent"
 	m.Family = "agency-hiding"
+	m.ClassificationStatus = "rule-pack-candidate-context-required"
+	m.TaxonomyMappingStatus = "rhetorlint-extension"
 	m.Actual = "mistakes were made"
 	m.Position.Start = Point{Line: 1, Column: 1, Offset: 0}
 	m.Position.End = Point{Line: 1, Column: 19, Offset: 18}
