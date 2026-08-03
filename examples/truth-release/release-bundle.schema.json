@@ -1,0 +1,759 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/truth-release/release-bundle.schema.json",
+  "title": "Truth Release 0.1 prepared bundle",
+  "$comment": "A closed prepared-only bundle. Public URLs stay HTTPS and the public RhetorLint signal is aggregate-only: phrase marks, strip, and rewrite are not schema members.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "prepared_at",
+    "bounds",
+    "source_record_digest",
+    "claim",
+    "evidence",
+    "review",
+    "drafts",
+    "seo",
+    "rights",
+    "correction",
+    "workflow",
+    "public_resource",
+    "not_established"
+  ],
+  "properties": {
+    "schema": { "type": "string", "enum": ["truth-release.bundle/0.1"] },
+    "status": { "type": "string", "enum": ["prepared"] },
+    "prepared_at": { "$ref": "#/$defs/isoTimestamp" },
+    "bounds": { "$ref": "#/$defs/bounds" },
+    "source_record_digest": { "$ref": "#/$defs/digest" },
+    "claim": { "$ref": "#/$defs/claim" },
+    "evidence": { "$ref": "#/$defs/localEvidence" },
+    "review": { "$ref": "#/$defs/review" },
+    "drafts": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/$defs/draft" } },
+    "seo": { "$ref": "#/$defs/seo" },
+    "rights": { "$ref": "#/$defs/rightsEnvelope" },
+    "correction": { "$ref": "#/$defs/correction" },
+    "workflow": { "type": "array", "minItems": 6, "maxItems": 6, "items": { "$ref": "#/$defs/workflowState" } },
+    "public_resource": { "$ref": "#/$defs/publicResource" },
+    "not_established": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "httpsUrl": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "nullableHttpsUrl": {
+      "type": ["string", "null"],
+      "pattern": "^https://"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "nullableDate": {
+      "type": ["string", "null"],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "isoTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_input_bytes",
+        "max_sources",
+        "max_media",
+        "max_channel_drafts",
+        "max_parts_per_draft",
+        "max_attempts_per_action",
+        "max_external_effects"
+      ],
+      "properties": {
+        "max_input_bytes": { "type": "integer", "minimum": 1 },
+        "max_sources": { "type": "integer", "minimum": 1 },
+        "max_media": { "type": "integer", "minimum": 1 },
+        "max_channel_drafts": { "type": "integer", "minimum": 1 },
+        "max_parts_per_draft": { "type": "integer", "enum": [8] },
+        "max_attempts_per_action": { "type": "integer", "enum": [1] },
+        "max_external_effects": { "type": "integer", "enum": [0] }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "utf8_sha256", "scope", "audience"],
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "utf8_sha256": { "$ref": "#/$defs/digest" },
+        "scope": { "type": "string" },
+        "audience": { "type": "string" }
+      }
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind", "url"],
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "type": "string", "enum": ["Person", "Organization"] },
+        "url": { "$ref": "#/$defs/nullableHttpsUrl" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "url", "kind", "observed_at", "locator", "supports", "content_sha256"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "kind": {
+          "type": "string",
+          "enum": ["primary", "secondary", "official-data", "testimony"]
+        },
+        "observed_at": { "$ref": "#/$defs/date" },
+        "locator": { "type": "string" },
+        "supports": { "type": "string" },
+        "content_sha256": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "localEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supplied_sources",
+        "primary_or_official_count",
+        "source_contents_fetched",
+        "uncertainties",
+        "contrary_evidence"
+      ],
+      "properties": {
+        "supplied_sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+        "primary_or_official_count": { "type": "integer", "minimum": 0 },
+        "source_contents_fetched": { "type": "boolean", "enum": [false] },
+        "uncertainties": { "type": "array", "items": { "type": "string" } },
+        "contrary_evidence": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["line", "column", "offset"],
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 },
+        "offset": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "$ref": "#/$defs/point" },
+        "end": { "$ref": "#/$defs/point" }
+      }
+    },
+    "localMark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "rule_id", "family", "actual", "note", "level", "position"],
+      "properties": {
+        "field": { "type": "string" },
+        "rule_id": { "type": "string" },
+        "family": { "type": "string" },
+        "actual": { "type": "string" },
+        "note": { "type": ["string", "null"] },
+        "level": { "type": "string" },
+        "position": { "$ref": "#/$defs/position" }
+      }
+    },
+    "sourcePin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "source_commit", "relationship"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/httpsUrl" },
+        "source_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "relationship": { "type": "string" }
+      }
+    },
+    "signalBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observes", "doesNot", "note"],
+      "properties": {
+        "observes": { "type": "string", "enum": ["visible-language-patterns"] },
+        "doesNot": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["infer-speaker-intent", "detect-deception", "determine-factual-truth"]
+          }
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "signalEngine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "rules"],
+      "properties": {
+        "name": { "type": "string", "enum": ["@rhetorlint/core"] },
+        "version": { "type": "string" },
+        "rules": { "type": "string" }
+      }
+    },
+    "signalSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chars", "words", "locale"],
+      "properties": {
+        "chars": { "type": "integer", "minimum": 0 },
+        "words": { "type": "integer", "minimum": 0 },
+        "locale": { "type": "string" }
+      }
+    },
+    "signalDensity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tells", "per100Words"],
+      "properties": {
+        "tells": { "type": "integer", "minimum": 0 },
+        "per100Words": { "type": "number", "minimum": 0 }
+      }
+    },
+    "signalCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "count"],
+      "properties": {
+        "id": { "type": "string" },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "signalSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["families", "rules"],
+      "properties": {
+        "families": { "type": "array", "items": { "$ref": "#/$defs/signalCount" } },
+        "rules": { "type": "array", "items": { "$ref": "#/$defs/signalCount" } }
+      }
+    },
+    "rhetorlintSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "kind", "boundary", "rhetorlint", "engine", "source", "density", "summary"],
+      "properties": {
+        "schema": { "type": "string", "enum": ["rhetorlint.signal/0.1"] },
+        "kind": { "type": "string", "enum": ["rhetorlint.analysis"] },
+        "boundary": { "$ref": "#/$defs/signalBoundary" },
+        "rhetorlint": { "type": "string" },
+        "engine": { "$ref": "#/$defs/signalEngine" },
+        "source": { "$ref": "#/$defs/signalSource" },
+        "density": { "$ref": "#/$defs/signalDensity" },
+        "summary": { "$ref": "#/$defs/signalSummary" }
+      }
+    },
+    "rhetorlintReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "signal", "local_marks", "boundary"],
+      "properties": {
+        "source": { "$ref": "#/$defs/sourcePin" },
+        "signal": { "$ref": "#/$defs/rhetorlintSignal" },
+        "local_marks": { "type": "array", "items": { "$ref": "#/$defs/localMark" } },
+        "boundary": { "type": "string" }
+      }
+    },
+    "reviewIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "level", "field", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "level": { "type": "string", "enum": ["review", "revise"] },
+        "field": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "attentionCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principle", "status", "evidence"],
+      "properties": {
+        "principle": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["declared", "wording-unmarked", "human-review-required", "prepared-not-dispatched"]
+        },
+        "evidence": { "type": "string" }
+      }
+    },
+    "humanApproval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "completed", "dispatch_authorized", "must_bind"],
+      "properties": {
+        "required": { "type": "boolean", "enum": [true] },
+        "completed": { "type": "boolean", "enum": [false] },
+        "dispatch_authorized": { "type": "boolean", "enum": [false] },
+        "must_bind": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visibility",
+        "source_contents_fetched",
+        "factual_truth_checked",
+        "rhetorlint",
+        "issues",
+        "attention",
+        "human_approval"
+      ],
+      "properties": {
+        "visibility": { "type": "string", "enum": ["local-review-only"] },
+        "source_contents_fetched": { "type": "boolean", "enum": [false] },
+        "factual_truth_checked": { "type": "boolean", "enum": [false] },
+        "rhetorlint": { "$ref": "#/$defs/rhetorlintReview" },
+        "issues": { "type": "array", "items": { "$ref": "#/$defs/reviewIssue" } },
+        "attention": { "type": "array", "items": { "$ref": "#/$defs/attentionCheck" } },
+        "human_approval": { "$ref": "#/$defs/humanApproval" }
+      }
+    },
+    "dispatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorized",
+        "adapter_present",
+        "external_effects",
+        "exact_human_approval_required",
+        "future_external_effect_bound"
+      ],
+      "properties": {
+        "authorized": { "type": "boolean", "enum": [false] },
+        "adapter_present": { "type": "boolean", "enum": [false] },
+        "external_effects": { "type": "integer", "enum": [0] },
+        "exact_human_approval_required": { "type": "boolean", "enum": [true] },
+        "future_external_effect_bound": { "type": ["integer", "null"], "minimum": 1, "maximum": 8 }
+      }
+    },
+    "draftLayout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "soft_target", "max_parts", "reason"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["single-draft", "within-soft-target", "human-layout-required"]
+        },
+        "soft_target": { "type": ["integer", "null"], "minimum": 1 },
+        "max_parts": { "type": "integer", "enum": [8] },
+        "reason": { "type": "string" }
+      }
+    },
+    "draft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel",
+        "format",
+        "opening",
+        "body",
+        "parts",
+        "layout",
+        "alt_text",
+        "media",
+        "commercial_interest",
+        "intended_audience",
+        "canonical_claim",
+        "claim_digest",
+        "discovery_note",
+        "adaptation_notes",
+        "checks_before_dispatch",
+        "official_information",
+        "guidance_observed_at",
+        "guidance_review_after",
+        "dispatch",
+        "draft_digest",
+        "digest_scope"
+      ],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": ["bluesky", "mastodon", "linkedin", "youtube", "instagram", "tiktok", "x"]
+        },
+        "format": { "type": "string" },
+        "opening": { "type": "string" },
+        "body": { "type": "string" },
+        "parts": { "type": "array", "maxItems": 8, "items": { "type": "string" } },
+        "layout": { "$ref": "#/$defs/draftLayout" },
+        "alt_text": { "type": ["string", "null"] },
+        "media": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/media" } },
+        "commercial_interest": { "type": "string" },
+        "intended_audience": { "type": "string" },
+        "canonical_claim": { "type": "string" },
+        "claim_digest": { "$ref": "#/$defs/digest" },
+        "discovery_note": { "type": "string" },
+        "adaptation_notes": { "type": "array", "items": { "type": "string" } },
+        "checks_before_dispatch": { "type": "array", "items": { "type": "string" } },
+        "official_information": { "type": "array", "items": { "$ref": "#/$defs/httpsUrl" } },
+        "guidance_observed_at": { "$ref": "#/$defs/date" },
+        "guidance_review_after": { "$ref": "#/$defs/date" },
+        "dispatch": { "$ref": "#/$defs/dispatch" },
+        "draft_digest": { "$ref": "#/$defs/digest" },
+        "digest_scope": { "type": "string" }
+      }
+    },
+    "schemaAuthor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@type", "name"],
+      "properties": {
+        "@type": { "type": "string", "enum": ["Person", "Organization"] },
+        "name": { "type": "string" },
+        "url": { "$ref": "#/$defs/httpsUrl" }
+      }
+    },
+    "mainEntityPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@type", "@id"],
+      "properties": {
+        "@type": { "type": "string", "enum": ["WebPage"] },
+        "@id": { "$ref": "#/$defs/httpsUrl" }
+      }
+    },
+    "articleJsonLd": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "@context",
+        "@type",
+        "@id",
+        "headline",
+        "description",
+        "mainEntityOfPage",
+        "creativeWorkStatus",
+        "author",
+        "citation",
+        "license"
+      ],
+      "properties": {
+        "@context": { "type": "string", "enum": ["https://schema.org"] },
+        "@type": { "type": "string", "enum": ["Article"] },
+        "@id": { "$ref": "#/$defs/httpsUrl" },
+        "headline": { "type": "string" },
+        "description": { "type": "string" },
+        "mainEntityOfPage": { "$ref": "#/$defs/mainEntityPage" },
+        "creativeWorkStatus": { "type": "string", "enum": ["Draft — not published"] },
+        "author": { "$ref": "#/$defs/schemaAuthor" },
+        "citation": { "type": "array", "items": { "$ref": "#/$defs/httpsUrl" } },
+        "license": { "$ref": "#/$defs/httpsUrl" },
+        "image": { "type": "array", "items": { "$ref": "#/$defs/httpsUrl" } }
+      }
+    },
+    "openGraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "title", "description", "url", "image", "image_alt"],
+      "properties": {
+        "type": { "type": "string", "enum": ["article"] },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "image": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "image_alt": { "type": ["string", "null"] }
+      }
+    },
+    "twitterCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["card", "title", "description", "image", "image_alt"],
+      "properties": {
+        "card": { "type": "string", "enum": ["summary", "summary_large_image"] },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "image_alt": { "type": ["string", "null"] }
+      }
+    },
+    "seo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "description_note",
+        "publication_state",
+        "canonical_url",
+        "machine_url",
+        "robots",
+        "open_graph",
+        "twitter_card",
+        "json_ld",
+        "visible_page_requirements"
+      ],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "description_note": { "type": "string" },
+        "publication_state": { "type": "string", "enum": ["prepared-preview"] },
+        "canonical_url": { "$ref": "#/$defs/httpsUrl" },
+        "machine_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "robots": { "type": "string", "enum": ["noindex, nofollow"] },
+        "open_graph": { "$ref": "#/$defs/openGraph" },
+        "twitter_card": { "$ref": "#/$defs/twitterCard" },
+        "json_ld": { "$ref": "#/$defs/articleJsonLd" },
+        "visible_page_requirements": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "xeniaReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "release", "source_commit", "source", "relationship"],
+      "properties": {
+        "profile": { "type": "string", "enum": ["xenia.rights/0.1"] },
+        "release": { "type": "string" },
+        "source_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "relationship": { "type": "string" }
+      }
+    },
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["author", "creator", "rights_holder"],
+      "properties": {
+        "author": { "$ref": "#/$defs/author" },
+        "creator": { "type": "string" },
+        "rights_holder": { "type": "string" }
+      }
+    },
+    "reuse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["license_label", "license_url", "creator", "rights_holder", "permitted_reuse"],
+      "properties": {
+        "license_label": { "type": "string" },
+        "license_url": { "$ref": "#/$defs/httpsUrl" },
+        "creator": { "type": "string" },
+        "rights_holder": { "type": "string" },
+        "permitted_reuse": { "type": "string" }
+      }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "creator", "rights_basis", "alt", "synthetic", "synthetic_disclosure"],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "creator": { "type": "string" },
+        "rights_basis": { "type": "string" },
+        "alt": { "type": "string" },
+        "synthetic": { "type": "boolean" },
+        "synthetic_disclosure": { "type": ["string", "null"] }
+      }
+    },
+    "dataAndPressure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preparation_location",
+        "audience_profiles_created",
+        "tracking_parameters_created",
+        "third_party_media_requests_created",
+        "account_credentials_read",
+        "manufactured_urgency_added",
+        "silence_or_ignore_is_complete",
+        "automated_follow_up"
+      ],
+      "properties": {
+        "preparation_location": { "type": "string", "enum": ["local"] },
+        "audience_profiles_created": { "type": "boolean", "enum": [false] },
+        "tracking_parameters_created": { "type": "boolean", "enum": [false] },
+        "third_party_media_requests_created": { "type": "boolean", "enum": [false] },
+        "account_credentials_read": { "type": "boolean", "enum": [false] },
+        "manufactured_urgency_added": { "type": "boolean", "enum": [false] },
+        "silence_or_ignore_is_complete": { "type": "boolean", "enum": [true] },
+        "automated_follow_up": { "type": "boolean", "enum": [false] }
+      }
+    },
+    "choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "effect", "binding"],
+      "properties": {
+        "id": { "type": "string" },
+        "effect": { "type": "string" },
+        "binding": { "type": "boolean", "enum": [false] }
+      }
+    },
+    "rightsEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["xenia", "adoption", "audience", "attribution", "reuse", "media", "data_and_pressure", "choices"],
+      "properties": {
+        "xenia": { "$ref": "#/$defs/xeniaReference" },
+        "adoption": { "type": "string", "enum": ["not-declared-by-this-bundle"] },
+        "audience": { "type": "string" },
+        "attribution": { "$ref": "#/$defs/attribution" },
+        "reuse": { "$ref": "#/$defs/reuse" },
+        "media": { "type": "array", "items": { "$ref": "#/$defs/media" } },
+        "data_and_pressure": { "$ref": "#/$defs/dataAndPressure" },
+        "choices": { "type": "array", "items": { "$ref": "#/$defs/choice" } }
+      }
+    },
+    "correction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "policy", "history", "fan_out_state", "published_urls", "later_use_must_check_current_correction"],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "policy": { "type": "string" },
+        "history": { "type": "array", "maxItems": 0, "items": { "type": "object" } },
+        "fan_out_state": { "type": "string", "enum": ["not-started"] },
+        "published_urls": { "type": "array", "maxItems": 0, "items": { "$ref": "#/$defs/httpsUrl" } },
+        "later_use_must_check_current_correction": { "type": "boolean", "enum": [true] }
+      }
+    },
+    "workflowState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "owner", "required_evidence", "external_effects"],
+      "properties": {
+        "state": { "type": "string" },
+        "owner": { "type": "string" },
+        "required_evidence": { "type": "string" },
+        "external_effects": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "publicDates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prepared_at",
+        "intended_publication_date",
+        "evidence_updated_at",
+        "review_after",
+        "publication_receipt"
+      ],
+      "properties": {
+        "prepared_at": { "$ref": "#/$defs/isoTimestamp" },
+        "intended_publication_date": { "$ref": "#/$defs/nullableDate" },
+        "evidence_updated_at": { "$ref": "#/$defs/date" },
+        "review_after": { "$ref": "#/$defs/date" },
+        "publication_receipt": { "type": "null" }
+      }
+    },
+    "publicEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources", "uncertainties", "contrary_evidence", "source_contents_fetched_by_preparer"],
+      "properties": {
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+        "uncertainties": { "type": "array", "items": { "type": "string" } },
+        "contrary_evidence": { "type": "array", "items": { "type": "string" } },
+        "source_contents_fetched_by_preparer": { "type": "boolean", "enum": [false] }
+      }
+    },
+    "publicRights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "license_label",
+        "license_url",
+        "creator",
+        "rights_holder",
+        "permitted_reuse",
+        "xenia_design_reference",
+        "xenia_adoption",
+        "choices",
+        "data_and_pressure"
+      ],
+      "properties": {
+        "license_label": { "type": "string" },
+        "license_url": { "$ref": "#/$defs/httpsUrl" },
+        "creator": { "type": "string" },
+        "rights_holder": { "type": "string" },
+        "permitted_reuse": { "type": "string" },
+        "xenia_design_reference": { "$ref": "#/$defs/xeniaReference" },
+        "xenia_adoption": { "type": "string", "enum": ["not-declared-by-this-bundle"] },
+        "choices": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/choice" } },
+        "data_and_pressure": { "$ref": "#/$defs/dataAndPressure" }
+      }
+    },
+    "publicCorrection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "policy", "history"],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "policy": { "type": "string" },
+        "history": { "type": "array", "maxItems": 0, "items": { "type": "object" } }
+      }
+    },
+    "publicResource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "publication_state",
+        "id",
+        "canonical_url",
+        "machine_url",
+        "title",
+        "claim",
+        "summary",
+        "why_now",
+        "call_to_action",
+        "dates",
+        "author",
+        "evidence",
+        "commercial_interest",
+        "rights",
+        "media",
+        "correction",
+        "rhetorlint_signal",
+        "not_established"
+      ],
+      "properties": {
+        "schema_version": { "type": "string", "enum": ["truth-release.public/0.1"] },
+        "publication_state": { "type": "string", "enum": ["prepared-not-published"] },
+        "id": { "type": "string" },
+        "canonical_url": { "$ref": "#/$defs/httpsUrl" },
+        "machine_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "title": { "type": "string" },
+        "claim": { "$ref": "#/$defs/claim" },
+        "summary": { "type": "string" },
+        "why_now": { "type": ["string", "null"] },
+        "call_to_action": { "type": "string" },
+        "dates": { "$ref": "#/$defs/publicDates" },
+        "author": { "$ref": "#/$defs/author" },
+        "evidence": { "$ref": "#/$defs/publicEvidence" },
+        "commercial_interest": { "type": "string" },
+        "rights": { "$ref": "#/$defs/publicRights" },
+        "media": { "type": "array", "items": { "$ref": "#/$defs/media" } },
+        "correction": { "$ref": "#/$defs/publicCorrection" },
+        "rhetorlint_signal": { "$ref": "#/$defs/rhetorlintSignal" },
+        "not_established": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

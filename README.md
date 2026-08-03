@@ -75,6 +75,7 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 - **Readers** — zero install: [**paste any text into the explorer**](https://cambridgetcg.github.io/rhetorlint-spec/) or [drag the bookmarklet](https://cambridgetcg.github.io/rhetorlint-spec/bookmarklet.html) to your bar. Or the [browser widget](apps/widget): select text on any page, press **Alt+Shift+R**, see the marks. All of it on-device; nothing leaves your browser.
 - **Developers** — `@rhetorlint/core` embeds anywhere JS runs (browser, Node, Deno), emits the versioned JSON, and projects explicitly shareable signals without phrase text by default.
 - **Comms & content teams** — the [`rhetorlint` CLI](packages/cli) as a spin-check in CI: `rhetorlint --max 8 comms/*.md` exits non-zero when a file is too thick with spin. `--sarif` surfaces marks in VS Code and GitHub code-scanning.
+- **Public explainers** — the bounded [Truth Release example](examples/truth-release) turns one exact sourced claim into local wording review, channel-aware draft briefs, one canonical-page preview, a public JSON record, and recipient-visible XENIA-informed choices. It prepares only: no posting, scheduling, tracking, or account access.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
 
@@ -124,6 +125,7 @@ impl/python/     rhetorlint.py                             the Python reference 
 impl/go/         rhetorlint.go                             the Go reference engine
 apps/explorer/   index.html                               the learning wing (self-contained)
 apps/widget/     manifest.json · build.mjs · src/panel.js the browser widget (extension + bookmarklet)
+examples/truth-release/ one-claim social + SEO preparation, no dispatch
 test/            *.test.mjs                                proves the engines, CLI, widget, conformance
 scripts/demo.mjs                                           a 20-line taste
 ```

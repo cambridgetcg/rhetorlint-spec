@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">RhetorLint — Read the words. Keep the person.</title>
+  <desc id="desc">A warm proofreader's sheet with visible underlines and the RhetorLint boundary.</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbf8f0"/>
+      <stop offset="1" stop-color="#eee5d3"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#3b2919" flood-opacity=".14"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="#e8deca"/>
+  <rect x="42" y="38" width="1116" height="554" rx="28" fill="url(#paper)" stroke="#c8b99c" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="42" y="38" width="14" height="554" rx="7" fill="#a8442f"/>
+  <g fill="#675c4e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="21" letter-spacing="4">
+    <text x="102" y="112">RHETORLINT · OPEN LENS</text>
+  </g>
+  <g fill="#282119" font-family="Iowan Old Style, Georgia, serif" font-weight="600">
+    <text x="98" y="235" font-size="78">Read the words.</text>
+    <text x="98" y="327" font-size="78">Keep the person.</text>
+  </g>
+  <path d="M101 254 C275 270 480 245 664 258" fill="none" stroke="#d4a33e" stroke-width="19" stroke-linecap="round" opacity=".36"/>
+  <path d="M101 346 C293 362 506 336 708 349" fill="none" stroke="#3c9c8e" stroke-width="19" stroke-linecap="round" opacity=".31"/>
+  <g fill="#5f5447" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="28">
+    <text x="102" y="423">A private, on-device lens for visible rhetorical tells.</text>
+  </g>
+  <line x1="102" y1="468" x2="1098" y2="468" stroke="#d3c6ae" stroke-width="2"/>
+  <g fill="#6f6353" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22">
+    <text x="102" y="520">No truth score · No intent reading · Every mark points to text</text>
+  </g>
+  <g transform="translate(969 95)">
+    <circle cx="55" cy="55" r="50" fill="#a8442f" opacity=".1"/>
+    <circle cx="55" cy="55" r="32" fill="none" stroke="#a8442f" stroke-width="7"/>
+    <line x1="80" y1="81" x2="114" y2="115" stroke="#a8442f" stroke-width="9" stroke-linecap="round"/>
+  </g>
+</svg>

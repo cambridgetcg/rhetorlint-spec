@@ -245,7 +245,7 @@ test("the validator refuses a schema construct it does not implement", () => {
   const cases = [
     [{ oneOf: [{ type: "string" }] }, /keyword 'oneOf'.*is not implemented/],
     [{ type: "object", minProperties: 1 }, /keyword 'minProperties'.*is not implemented/],
-    [{ type: "array", minItems: 1 }, /keyword 'minItems'.*is not implemented/],
+    [{ type: "array", contains: { type: "string" } }, /keyword 'contains'.*is not implemented/],
     [{ type: "object", additionalProperties: { type: "string" } }, /only 'additionalProperties: false' is implemented/],
     [{ type: "object", additionalProperties: true }, /only 'additionalProperties: false' is implemented/],
     [{ type: "array", items: [{ type: "string" }] }, /tuple form of 'items' is not implemented/],
@@ -258,4 +258,13 @@ test("the validator refuses a schema construct it does not implement", () => {
   for (const [schema, message] of cases) {
     assert.throws(() => validate({ any: "instance" }, schema), message, JSON.stringify(schema));
   }
+});
+
+test("uniqueItems reports non-JSON members instead of throwing", () => {
+  const schema = { type: "array", uniqueItems: true };
+  assert.match(validate([1n], schema).join("\n"), /non-JSON data/);
+
+  const cyclic = {};
+  cyclic.self = cyclic;
+  assert.match(validate([cyclic], schema).join("\n"), /non-JSON data/);
 });

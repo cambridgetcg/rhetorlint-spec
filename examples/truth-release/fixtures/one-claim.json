@@ -1,0 +1,67 @@
+{
+  "schema": "truth-release.input/0.1",
+  "id": "rhetorlint-visible-words",
+  "title": "RhetorLint reviews visible wording, not people",
+  "claim": "RhetorLint marks visible rhetorical patterns in supplied text and does not determine whether a claim is factually true.",
+  "scope": "This statement describes the JavaScript reference engine and its published 0.1 output boundary as observed in the pinned source on 2026-08-03.",
+  "summary": "The distinction matters when preparing public explanations: a wording prompt can help a reviewer notice pressure or hidden agency, but it cannot replace opening sources, checking facts, or obtaining publication authority.",
+  "why_now": "A social release workflow needs a narrow review gate before it creates channel-specific drafts.",
+  "audience": "People and agents preparing sourced public explanations",
+  "canonical_url": "https://example.org/evidence/rhetorlint-visible-words/",
+  "machine_url": "https://example.org/evidence/rhetorlint-visible-words/release.json",
+  "correction_url": "https://github.com/cambridgetcg/rhetorlint-spec/issues",
+  "intended_publication_date": null,
+  "evidence_updated_at": "2026-08-03",
+  "review_after": "2026-11-03",
+  "author": {
+    "name": "Cambridge TCG",
+    "kind": "Organization",
+    "url": "https://github.com/cambridgetcg"
+  },
+  "sources": [
+    {
+      "id": "rhetorlint-readme",
+      "title": "RhetorLint README at the observed source commit",
+      "url": "https://github.com/cambridgetcg/rhetorlint-spec/blob/5b93fa7f088b2e38e174717c29e6cf5a6daa4a13/README.md",
+      "kind": "primary",
+      "observed_at": "2026-08-03",
+      "locator": "README.md, opening and ‘What it refuses to do’",
+      "content_sha256": "sha256:5bf01f6e5baf294e7ea2754afcc72325fc1cae200cc085a660463e021a5a2fd6",
+      "supports": "The project says marks point to visible phrases and explicitly refuses person-reading and factual truth decisions."
+    },
+    {
+      "id": "rhetorlint-schema",
+      "title": "RhetorLint 0.1 output contract",
+      "url": "https://github.com/cambridgetcg/rhetorlint-spec/blob/5b93fa7f088b2e38e174717c29e6cf5a6daa4a13/spec/output.schema.json",
+      "kind": "primary",
+      "observed_at": "2026-08-03",
+      "locator": "spec/output.schema.json, mark.required and top-level result properties",
+      "content_sha256": "sha256:1dd1333cea90df00bc141185d2640778791e8efd18c2f5bf9e405bce527c1a55",
+      "supports": "The schema requires phrase text and exact offsets rather than a person-level verdict."
+    }
+  ],
+  "uncertainties": [
+    "A deterministic rule pack deliberately under-marks and may also mark literal or harmless wording.",
+    "This record does not measure whether a reviewer will interpret a mark well."
+  ],
+  "contrary_evidence": [],
+  "call_to_action": "Open the two pinned sources, then use the local explorer on wording you are responsible for reviewing.",
+  "commercial_interest": "none",
+  "rights": {
+    "license_label": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "creator": "Cambridge TCG",
+    "rights_holder": "Cambridge TCG",
+    "permitted_reuse": "Reuse and adaptation are welcome with attribution, a link to the license, and an indication of changes."
+  },
+  "media": [],
+  "channel_selection": [
+    "bluesky",
+    "mastodon",
+    "linkedin",
+    "youtube",
+    "instagram",
+    "tiktok",
+    "x"
+  ]
+}

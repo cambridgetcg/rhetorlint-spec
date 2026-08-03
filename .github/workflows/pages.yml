@@ -3,13 +3,16 @@ name: pages
 # The People Door. The explorer IS the paste-a-text people page — it just
 # never had a URL. Serve it as the site root, with the bookmarklet beside it.
 # Everything stays on-device in the visitor's browser; this workflow only
-# copies two already-committed, self-contained files.
+# copies the already-committed page, bookmarklet, and static discovery assets.
 
 on:
   push:
     branches: [main]
     paths:
       - "apps/explorer/index.html"
+      - "apps/explorer/robots.txt"
+      - "apps/explorer/sitemap.xml"
+      - "apps/explorer/social-card.png"
       - "apps/widget/bookmarklet.html"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -35,6 +38,9 @@ jobs:
         run: |
           mkdir -p _site
           cp apps/explorer/index.html _site/index.html
+          cp apps/explorer/robots.txt _site/robots.txt
+          cp apps/explorer/sitemap.xml _site/sitemap.xml
+          cp apps/explorer/social-card.png _site/social-card.png
           cp apps/widget/bookmarklet.html _site/bookmarklet.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

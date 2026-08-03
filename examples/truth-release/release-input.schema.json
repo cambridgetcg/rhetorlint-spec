@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/truth-release/release-input.schema.json",
+  "title": "Truth Release 0.1 input",
+  "$comment": "This schema enforces JSON shape and ordinary item/character bounds. prepare.mjs remains authoritative for UTF-8 byte ceilings, trimming, real calendar dates, cross-field ordering, URL normalization, and same-origin media.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "title",
+    "claim",
+    "scope",
+    "summary",
+    "why_now",
+    "audience",
+    "canonical_url",
+    "machine_url",
+    "correction_url",
+    "intended_publication_date",
+    "evidence_updated_at",
+    "review_after",
+    "author",
+    "sources",
+    "uncertainties",
+    "contrary_evidence",
+    "call_to_action",
+    "commercial_interest",
+    "rights",
+    "media",
+    "channel_selection"
+  ],
+  "properties": {
+    "schema": { "type": "string", "enum": ["truth-release.input/0.1"] },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$", "maxLength": 96 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "claim": { "type": "string", "minLength": 1, "maxLength": 1200 },
+    "scope": { "type": "string", "minLength": 1, "maxLength": 600 },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "why_now": { "type": ["string", "null"], "minLength": 1, "maxLength": 800 },
+    "audience": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "canonical_url": { "type": "string", "pattern": "^https://", "maxLength": 2048 },
+    "machine_url": { "type": ["string", "null"], "pattern": "^https://", "maxLength": 2048 },
+    "correction_url": { "type": "string", "pattern": "^https://", "maxLength": 2048 },
+    "intended_publication_date": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "evidence_updated_at": { "$ref": "#/$defs/date" },
+    "review_after": { "$ref": "#/$defs/date" },
+    "author": { "$ref": "#/$defs/author" },
+    "sources": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/$defs/source" } },
+    "uncertainties": { "type": "array", "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 1000 } },
+    "contrary_evidence": { "type": "array", "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 1000 } },
+    "call_to_action": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "commercial_interest": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "rights": { "$ref": "#/$defs/rights" },
+    "media": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/media" } },
+    "channel_selection": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["bluesky", "mastodon", "linkedin", "youtube", "instagram", "tiktok", "x"]
+      }
+    }
+  },
+  "$defs": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind", "url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "kind": { "type": "string", "enum": ["Person", "Organization"] },
+        "url": { "type": ["string", "null"], "pattern": "^https://", "maxLength": 2048 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "url", "kind", "observed_at", "locator", "supports", "content_sha256"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 96 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "url": { "type": "string", "pattern": "^https://", "maxLength": 2048 },
+        "kind": {
+          "type": "string",
+          "enum": ["primary", "secondary", "official-data", "testimony"]
+        },
+        "observed_at": { "$ref": "#/$defs/date" },
+        "locator": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "supports": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "content_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["license_label", "license_url", "creator", "rights_holder", "permitted_reuse"],
+      "properties": {
+        "license_label": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "license_url": { "type": "string", "pattern": "^https://", "maxLength": 2048 },
+        "creator": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "rights_holder": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "permitted_reuse": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "creator", "rights_basis", "alt", "synthetic", "synthetic_disclosure"],
+      "properties": {
+        "url": { "type": "string", "pattern": "^https://", "maxLength": 2048 },
+        "creator": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "rights_basis": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "alt": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "synthetic": { "type": "boolean" },
+        "synthetic_disclosure": { "type": ["string", "null"], "minLength": 1, "maxLength": 500 }
+      }
+    }
+  }
+}

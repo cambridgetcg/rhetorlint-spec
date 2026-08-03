@@ -4,7 +4,8 @@
  * The schema is the spec's public contract and this repository ships zero
  * dependencies, so the contract is enforced here or nowhere. Implemented:
  * $ref into $defs, type (including union types), required, properties,
- * additionalProperties: false, items, enum, pattern, minimum, maximum.
+ * additionalProperties: false, items, enum, pattern, numeric bounds, string
+ * length bounds, array length bounds, and uniqueItems.
  *
  * Every other keyword throws. A validator that read past what it does not
  * understand would report a pass for a constraint it never checked, and the
@@ -26,7 +27,8 @@ const ANNOTATIONS = new Set([
 /** Keywords this validator enforces. Anything in neither set throws. */
 const CONSTRAINTS = new Set([
   "$ref", "type", "required", "properties", "additionalProperties", "items",
-  "enum", "pattern", "minimum", "maximum"
+  "enum", "pattern", "minimum", "maximum", "minLength", "maxLength",
+  "minItems", "maxItems", "uniqueItems"
 ]);
 
 const JSON_TYPES = new Set([
@@ -55,6 +57,33 @@ function describe(value) {
   if (type === "number" || type === "boolean" || value === null) return String(value);
   if (type === "object") return Array.isArray(value) ? "an array" : "an object";
   return "a " + type;
+}
+
+function stableJson(value, ancestors = new Set()) {
+  const type = jsonTypeOf(value);
+  if (type === null) return null;
+  if (type !== "array" && type !== "object") return JSON.stringify(value);
+  if (ancestors.has(value)) return null;
+  ancestors.add(value);
+  let result;
+  if (type === "array") {
+    const members = value.map((item) => stableJson(item, ancestors));
+    result = members.some((item) => item === null) ? null : `[${members.join(",")}]`;
+  } else {
+    const members = [];
+    for (const key of Object.keys(value).sort()) {
+      if (value[key] === undefined) continue;
+      const member = stableJson(value[key], ancestors);
+      if (member === null) {
+        result = null;
+        break;
+      }
+      members.push(`${JSON.stringify(key)}:${member}`);
+    }
+    if (result !== null) result = `{${members.join(",")}}`;
+  }
+  ancestors.delete(value);
+  return result;
 }
 
 function resolveRef(ref, root, path) {
@@ -139,6 +168,16 @@ function check(value, schema, path, root, errors) {
     errors.push(`${path}: ${describe(value)} does not match /${schema.pattern}/`);
   }
 
+  if (type === "string") {
+    const length = Array.from(value).length;
+    if ("minLength" in schema && length < schema.minLength) {
+      errors.push(`${path}: string length ${length} is below the minimum ${schema.minLength}`);
+    }
+    if ("maxLength" in schema && length > schema.maxLength) {
+      errors.push(`${path}: string length ${length} is above the maximum ${schema.maxLength}`);
+    }
+  }
+
   if (type === "integer" || type === "number") {
     if ("minimum" in schema && value < schema.minimum) {
       errors.push(`${path}: ${value} is below the minimum ${schema.minimum}`);
@@ -165,6 +204,22 @@ function check(value, schema, path, root, errors) {
 
   if (type === "array" && "items" in schema) {
     value.forEach((item, i) => check(item, schema.items, `${path}[${i}]`, root, errors));
+  }
+  if (type === "array") {
+    if ("minItems" in schema && value.length < schema.minItems) {
+      errors.push(`${path}: item count ${value.length} is below the minimum ${schema.minItems}`);
+    }
+    if ("maxItems" in schema && value.length > schema.maxItems) {
+      errors.push(`${path}: item count ${value.length} is above the maximum ${schema.maxItems}`);
+    }
+    if (schema.uniqueItems === true) {
+      const identities = value.map((item) => stableJson(item));
+      if (identities.some((item) => item === null)) {
+        errors.push(`${path}: uniqueItems cannot compare non-JSON data`);
+      } else if (new Set(identities).size !== identities.length) {
+        errors.push(`${path}: items must be unique`);
+      }
+    }
   }
 }
 
