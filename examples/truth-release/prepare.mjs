@@ -20,6 +20,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { isIP } from "node:net";
+import { types as utilTypes } from "node:util";
 import { fileURLToPath } from "node:url";
 
 import { analyze } from "../../packages/core/index.mjs";
@@ -32,6 +33,8 @@ const RULES = JSON.parse(
 export const INPUT_SCHEMA = "truth-release.input/0.1";
 export const BUNDLE_SCHEMA = "truth-release.bundle/0.1";
 export const PUBLIC_SCHEMA = "truth-release.public/0.1";
+export const ADAPTER_PREVIEW_REQUEST_SCHEMA = "truth-release.adapter-preview-request/0.1";
+export const ADAPTER_PREVIEW_SCHEMA = "truth-release.adapter-preview/0.1";
 
 export const BOUNDS = Object.freeze({
   max_input_bytes: 16 * 1024,
@@ -42,6 +45,14 @@ export const BOUNDS = Object.freeze({
   max_attempts_per_action: 1,
   max_external_effects: 0,
 });
+
+export const ARTIFACT_BOUNDS = Object.freeze({
+  max_bundle_bytes: 512 * 1024,
+  max_adapter_preview_bytes: 256 * 1024,
+});
+
+const DRAFT_DIGEST_SCOPE =
+  "canonical JSON of channel, format, opening, body, parts, layout, alt_text, media, commercial_interest, intended_audience, and canonical_claim";
 
 const RHETORLINT_SOURCE = Object.freeze({
   repository: "https://github.com/cambridgetcg/rhetorlint-spec",
@@ -276,6 +287,117 @@ function copy(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+const MAX_JSON_DEPTH = 32;
+const MAX_JSON_NODES = 4_096;
+
+function hasUnpairedSurrogate(value) {
+  for (let index = 0; index < value.length; index += 1) {
+    const unit = value.charCodeAt(index);
+    if (unit >= 0xd800 && unit <= 0xdbff) {
+      const next = value.charCodeAt(index + 1);
+      if (!(next >= 0xdc00 && next <= 0xdfff)) return true;
+      index += 1;
+    } else if (unit >= 0xdc00 && unit <= 0xdfff) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasUnsafeTextControl(value) {
+  return /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/u
+    .test(value);
+}
+
+function plainJsonIssue(
+  value,
+  path = "$",
+  seen = new Set(),
+  depth = 0,
+  state = { nodes: 0 },
+) {
+  state.nodes += 1;
+  if (state.nodes > MAX_JSON_NODES) return `${path} exceeds the ${MAX_JSON_NODES}-node JSON bound`;
+  if (depth > MAX_JSON_DEPTH) return `${path} exceeds the ${MAX_JSON_DEPTH}-level JSON depth bound`;
+  if (value === null || typeof value === "boolean") return null;
+  if (typeof value === "string") {
+    if (hasUnpairedSurrogate(value)) {
+      return `${path} must contain only Unicode scalar values (no unpaired surrogate)`;
+    }
+    return hasUnsafeTextControl(value)
+      ? `${path} must not contain unsafe control or bidirectional-formatting characters`
+      : null;
+  }
+  if (typeof value === "number") return Number.isFinite(value) ? null : `${path} must be finite`;
+  if (typeof value !== "object") return `${path} must contain only JSON data`;
+  if (utilTypes.isProxy(value)) return `${path} must not be a Proxy`;
+  if (seen.has(value)) return `${path} must not contain a cycle`;
+  seen.add(value);
+  try {
+    const prototype = Object.getPrototypeOf(value);
+    const symbols = Object.getOwnPropertySymbols(value);
+    if (symbols.length) return `${path} must not contain symbol properties`;
+    if (Array.isArray(value)) {
+      if (prototype !== Array.prototype) return `${path} must be a plain array`;
+      if (value.length > MAX_JSON_NODES) {
+        return `${path} exceeds the ${MAX_JSON_NODES}-item array bound`;
+      }
+      const names = Object.getOwnPropertyNames(value);
+      const invalidName = names.find((key) => {
+        if (key === "length") return false;
+        if (!/^(0|[1-9][0-9]*)$/.test(key)) return true;
+        const index = Number(key);
+        return !Number.isSafeInteger(index) || index >= value.length;
+      });
+      if (invalidName) return `${path}.${invalidName} is not one canonical array index`;
+      for (let index = 0; index < value.length; index += 1) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
+        if (!descriptor || !("value" in descriptor) || !descriptor.enumerable) {
+          return `${path}[${index}] must be one ordinary array item`;
+        }
+        const issue = plainJsonIssue(
+          descriptor.value,
+          `${path}[${index}]`,
+          seen,
+          depth + 1,
+          state,
+        );
+        if (issue) return issue;
+      }
+      return null;
+    }
+    if (prototype !== Object.prototype && prototype !== null) {
+      return `${path} must be a plain object`;
+    }
+    const descriptors = Object.getOwnPropertyDescriptors(value);
+    if (Object.keys(descriptors).length > MAX_JSON_NODES) {
+      return `${path} exceeds the ${MAX_JSON_NODES}-property object bound`;
+    }
+    for (const [key, descriptor] of Object.entries(descriptors)) {
+      if (hasUnpairedSurrogate(key)) {
+        return `${path} has a property name with an unpaired surrogate`;
+      }
+      if (hasUnsafeTextControl(key)) {
+        return `${path} has a property name with an unsafe control character`;
+      }
+      if (!("value" in descriptor) || !descriptor.enumerable) {
+        return `${path}.${key} must be one ordinary data property`;
+      }
+      const issue = plainJsonIssue(
+        descriptor.value,
+        `${path}.${key}`,
+        seen,
+        depth + 1,
+        state,
+      );
+      if (issue) return issue;
+    }
+    return null;
+  } finally {
+    seen.delete(value);
+  }
+}
+
 function pushIssue(issues, path, message) {
   issues.push({ path, message });
 }
@@ -354,6 +476,22 @@ function checkDate(value, path, issues, { nullable = false } = {}) {
   return Date.parse(`${value}T00:00:00Z`);
 }
 
+function assertRealTimestamp(value, field) {
+  const parsed = new Date(value);
+  const normalized = typeof value === "string"
+    ? value.replace(/Z$/, (ending) => (value.includes(".") ? ending : `.000${ending}`))
+    : "";
+  if (
+    typeof value !== "string"
+    || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value)
+    || Number.isNaN(parsed.valueOf())
+    || parsed.toISOString() !== normalized
+  ) {
+    throw new TypeError(`${field} must be a real uppercase-UTC ISO timestamp`);
+  }
+  return value;
+}
+
 function checkStringArray(value, path, issues, { maxItems = 8, maxBytes = 1_000 } = {}) {
   if (!Array.isArray(value)) {
     pushIssue(issues, path, "must be an array");
@@ -373,6 +511,11 @@ export class TruthReleaseInputError extends TypeError {
 
 export function validateReleaseInput(value) {
   const issues = [];
+  const dataIssue = plainJsonIssue(value);
+  if (dataIssue) {
+    pushIssue(issues, "$", dataIssue.replace(/^\$\s*/, ""));
+    return issues;
+  }
   let encoded = "";
   try {
     encoded = JSON.stringify(value);
@@ -734,8 +877,7 @@ function makeDraft(channel, input) {
   return {
     ...draft,
     draft_digest: sha256(stableJson(draftDigestRecord(draft))),
-    digest_scope:
-      "canonical JSON of channel, format, opening, body, parts, layout, alt_text, media, commercial_interest, intended_audience, and canonical_claim",
+    digest_scope: DRAFT_DIGEST_SCOPE,
   };
 }
 
@@ -1131,17 +1273,12 @@ export function prepareTruthRelease(input, options = {}) {
   const issues = validateReleaseInput(input);
   if (issues.length) throw new TruthReleaseInputError(issues);
 
-  const preparedAt = options.now ?? new Date().toISOString();
-  const preparedDate = new Date(preparedAt);
-  const normalizedPreparedAt = preparedAt.replace(/Z$/, (ending) =>
-    preparedAt.includes(".") ? ending : `.000${ending}`);
-  if (
-    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(preparedAt)
-    || Number.isNaN(preparedDate.valueOf())
-    || preparedDate.toISOString() !== normalizedPreparedAt
-  ) {
-    throw new TypeError("options.now must be a real uppercase-UTC ISO timestamp");
+  const optionIssue = plainJsonIssue(options, "options");
+  if (optionIssue) throw new TypeError(optionIssue);
+  if (Object.keys(options).length !== 1 || !Object.hasOwn(options, "now")) {
+    throw new TypeError("options must contain exactly one now timestamp");
   }
+  const preparedAt = assertRealTimestamp(options.now, "options.now");
 
   const claimDigest = sha256(input.claim);
   const review = makeReview(input, preparedAt);
@@ -1204,7 +1341,7 @@ export function prepareTruthRelease(input, options = {}) {
     not_established: [...NOT_ESTABLISHED],
   };
 
-  return {
+  const bundle = {
     schema: BUNDLE_SCHEMA,
     status: "prepared",
     prepared_at: preparedAt,
@@ -1235,6 +1372,13 @@ export function prepareTruthRelease(input, options = {}) {
     public_resource: publicResource,
     not_established: [...NOT_ESTABLISHED],
   };
+  const bundleBytes = Buffer.byteLength(JSON.stringify(bundle), "utf8");
+  if (bundleBytes > ARTIFACT_BOUNDS.max_bundle_bytes) {
+    throw new RangeError(
+      `prepared bundle exceeds ${ARTIFACT_BOUNDS.max_bundle_bytes} UTF-8 bytes`,
+    );
+  }
+  return bundle;
 }
 
 function escapeHtml(value) {
@@ -1271,9 +1415,16 @@ function assertSameJson(actual, expected, field) {
 }
 
 function assertPublicRenderBoundary(bundle) {
+  const dataIssue = plainJsonIssue(bundle);
+  if (dataIssue) throw new TypeError(`prepared bundle must be plain JSON data: ${dataIssue}`);
+  const bundleBytes = Buffer.byteLength(JSON.stringify(bundle), "utf8");
+  if (bundleBytes > ARTIFACT_BOUNDS.max_bundle_bytes) {
+    throw new RangeError(`prepared bundle exceeds ${ARTIFACT_BOUNDS.max_bundle_bytes} UTF-8 bytes`);
+  }
   if (!bundle || bundle.schema !== BUNDLE_SCHEMA || bundle.status !== "prepared") {
     throw new TypeError("renderPublicPage needs one prepared truth-release bundle");
   }
+  assertRealTimestamp(bundle.prepared_at, "prepared_at");
   const record = bundle.public_resource;
   if (!record || record.publication_state !== "prepared-not-published") {
     throw new TypeError("the public resource must remain prepared-not-published");
@@ -1391,6 +1542,8 @@ function assertPublicRenderBoundary(bundle) {
   if (bundle.source_record_digest !== sha256(stableJson(reconstructedInput))) {
     throw new TypeError("source_record_digest must bind the reconstructed canonical input record");
   }
+  const expectedBundle = prepareTruthRelease(reconstructedInput, { now: bundle.prepared_at });
+  assertSameJson(bundle, expectedBundle, "prepared bundle");
   const expectedSeo = makeSeo({
     title: record.title,
     claim: record.claim.text,
@@ -1453,6 +1606,349 @@ function assertPublicRenderBoundary(bundle) {
   }
 }
 
+/**
+ * Project one selected draft into a closed, preview-only adapter handoff.
+ *
+ * The projection deliberately carries no account, credential, approval, or
+ * transport capability. A real adapter is a separate project and review turn.
+ */
+const PREVIEW_CANONICALIZATION =
+  "recursive lexicographic object keys; array order preserved; UTF-8 JSON without whitespace";
+const PREVIEW_DIGEST_SCOPE =
+  "canonical JSON of the complete preview with integrity.preview_digest omitted";
+
+function assertExactKeys(value, keys, path) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new TypeError(`${path} must be an object`);
+  }
+  const actual = Object.keys(value).sort();
+  const expected = [...keys].sort();
+  if (actual.length !== expected.length || actual.some((key, index) => key !== expected[index])) {
+    throw new TypeError(`${path} must contain exactly: ${expected.join(", ")}`);
+  }
+}
+
+function assertStringArray(value, path, { min = 0, max = 16 } = {}) {
+  if (
+    !Array.isArray(value)
+    || value.length < min
+    || value.length > max
+    || value.some((item) => typeof item !== "string" || item.length === 0)
+  ) {
+    throw new TypeError(`${path} must contain ${min} to ${max} non-empty strings`);
+  }
+}
+
+function projectAdapterPreview(bundle, request) {
+  assertPublicRenderBoundary(bundle);
+  const requestIssue = plainJsonIssue(request, "request");
+  if (requestIssue) throw new TypeError(requestIssue);
+  assertExactKeys(
+    request,
+    new Set([
+      "schema",
+      "channel",
+      "expected_source_record_digest",
+      "expected_draft_digest",
+    ]),
+    "request",
+  );
+  if (request.schema !== ADAPTER_PREVIEW_REQUEST_SCHEMA) {
+    throw new TypeError(`request.schema must equal ${ADAPTER_PREVIEW_REQUEST_SCHEMA}`);
+  }
+  const channel = request.channel;
+  if (typeof channel !== "string" || !Object.hasOwn(CHANNELS, channel)) {
+    throw new TypeError("channel must name one supported truth-release channel");
+  }
+  if (request.expected_source_record_digest !== bundle.source_record_digest) {
+    throw new TypeError("expected_source_record_digest does not match the prepared bundle");
+  }
+  const matches = bundle.drafts.filter((draft) => draft.channel === channel);
+  if (matches.length !== 1) {
+    throw new TypeError(`prepared bundle must contain exactly one ${channel} draft`);
+  }
+  const draft = matches[0];
+  if (request.expected_draft_digest !== draft.draft_digest) {
+    throw new TypeError("expected_draft_digest does not match the selected draft");
+  }
+  if (draft.layout.status === "human-layout-required" || draft.parts.length === 0) {
+    throw new TypeError(`${channel} needs human layout before an adapter preview can be made`);
+  }
+  if (
+    bundle.bounds?.max_external_effects !== 0
+    || bundle.bounds?.max_attempts_per_action !== 1
+    || bundle.review?.human_approval?.required !== true
+    || bundle.review?.human_approval?.completed !== false
+    || bundle.review?.human_approval?.dispatch_authorized !== false
+  ) {
+    throw new TypeError("prepared bundle must retain its zero-effect human-approval boundary");
+  }
+  if (
+    draft.dispatch?.authorized !== false
+    || draft.dispatch?.adapter_present !== false
+    || draft.dispatch?.external_effects !== 0
+    || draft.dispatch?.exact_human_approval_required !== true
+    || draft.dispatch?.future_external_effect_bound !== draft.parts.length
+  ) {
+    throw new TypeError(`${channel} draft must retain its zero-effect dispatch boundary`);
+  }
+  if (!Array.isArray(bundle.review.human_approval.must_bind)) {
+    throw new TypeError("prepared bundle must name what later approval must bind");
+  }
+
+  const previewRecord = {
+    schema: ADAPTER_PREVIEW_SCHEMA,
+    status: "preview-only",
+    source: {
+      bundle_schema: bundle.schema,
+      prepared_at: bundle.prepared_at,
+      source_record_digest: bundle.source_record_digest,
+    },
+    channel: draft.channel,
+    format: draft.format,
+    content: {
+      opening: draft.opening,
+      body: draft.body,
+      parts: copy(draft.parts),
+      media: copy(draft.media),
+      alt_text: draft.alt_text,
+      canonical_claim: draft.canonical_claim,
+      claim_digest: draft.claim_digest,
+      draft_digest: draft.draft_digest,
+      digest_scope: draft.digest_scope,
+      intended_audience: draft.intended_audience,
+      commercial_interest: draft.commercial_interest,
+    },
+    checks_before_any_dispatch: [
+      ...copy(draft.checks_before_dispatch),
+      "Fetch current platform and account capabilities and limits.",
+      "Show the exact account, audience, visibility, content, media, alt text, and disclosures.",
+      "Obtain literal approval bound to those exact bytes before constructing any request.",
+    ],
+    guidance: {
+      observed_at: draft.guidance_observed_at,
+      review_after: draft.guidance_review_after,
+      must_reopen: true,
+      official_information: copy(draft.official_information),
+    },
+    approval: {
+      required: true,
+      granted: false,
+      must_bind: copy(bundle.review.human_approval.must_bind),
+    },
+    dispatch: {
+      adapter_present: false,
+      authorized: false,
+      attempts: 0,
+      external_effects: 0,
+    },
+    not_established: [
+      ...copy(bundle.not_established),
+      "current platform or account compatibility",
+      "account authority or publication approval",
+    ],
+  };
+  const previewWithoutDigest = {
+    ...previewRecord,
+    integrity: {
+      canonicalization: PREVIEW_CANONICALIZATION,
+      digest_scope: PREVIEW_DIGEST_SCOPE,
+    },
+  };
+  const preview = {
+    ...previewWithoutDigest,
+    integrity: {
+      ...previewWithoutDigest.integrity,
+      preview_digest: sha256(stableJson(previewWithoutDigest)),
+    },
+  };
+  return preview;
+}
+
+export function createAdapterPreview(bundle, request) {
+  const preview = projectAdapterPreview(bundle, request);
+  verifyAdapterPreview(preview, {
+    bundle,
+    request,
+    expected_preview_digest: preview.integrity.preview_digest,
+  });
+  return preview;
+}
+
+export function verifyAdapterPreview(preview, context) {
+  const dataIssue = plainJsonIssue(preview, "preview");
+  if (dataIssue) throw new TypeError(dataIssue);
+  const encoded = JSON.stringify(preview);
+  if (Buffer.byteLength(encoded, "utf8") > ARTIFACT_BOUNDS.max_adapter_preview_bytes) {
+    throw new RangeError(
+      `adapter preview exceeds ${ARTIFACT_BOUNDS.max_adapter_preview_bytes} UTF-8 bytes`,
+    );
+  }
+  assertExactKeys(
+    preview,
+    new Set([
+      "schema",
+      "status",
+      "source",
+      "channel",
+      "format",
+      "content",
+      "checks_before_any_dispatch",
+      "guidance",
+      "approval",
+      "dispatch",
+      "not_established",
+      "integrity",
+    ]),
+    "preview",
+  );
+  if (preview.schema !== ADAPTER_PREVIEW_SCHEMA || preview.status !== "preview-only") {
+    throw new TypeError("preview must use the preview-only 0.1 contract");
+  }
+  if (!Object.hasOwn(CHANNELS, preview.channel) || typeof preview.format !== "string") {
+    throw new TypeError("preview must name one supported channel and format");
+  }
+  assertExactKeys(
+    preview.source,
+    new Set(["bundle_schema", "prepared_at", "source_record_digest"]),
+    "preview.source",
+  );
+  if (preview.source.bundle_schema !== BUNDLE_SCHEMA) {
+    throw new TypeError("preview.source.bundle_schema must name truth-release.bundle/0.1");
+  }
+  assertRealTimestamp(preview.source.prepared_at, "preview.source.prepared_at");
+  if (!/^sha256:[a-f0-9]{64}$/.test(preview.source.source_record_digest)) {
+    throw new TypeError("preview.source.source_record_digest must be one SHA-256 digest");
+  }
+  assertExactKeys(
+    preview.content,
+    new Set([
+      "opening",
+      "body",
+      "parts",
+      "media",
+      "alt_text",
+      "canonical_claim",
+      "claim_digest",
+      "draft_digest",
+      "digest_scope",
+      "intended_audience",
+      "commercial_interest",
+    ]),
+    "preview.content",
+  );
+  assertStringArray(preview.content.parts, "preview.content.parts", {
+    min: 1,
+    max: BOUNDS.max_parts_per_draft,
+  });
+  if (!Array.isArray(preview.content.media) || preview.content.media.length > BOUNDS.max_media) {
+    throw new TypeError(`preview.content.media must contain at most ${BOUNDS.max_media} items`);
+  }
+  preview.content.media.forEach((media, index) => {
+    assertExactKeys(media, MEDIA_KEYS, `preview.content.media[${index}]`);
+    requireHttpsForRender(media.url, `preview.content.media[${index}].url`);
+  });
+  if (
+    typeof preview.content.canonical_claim !== "string"
+    || preview.content.claim_digest !== sha256(preview.content.canonical_claim)
+    || !/^sha256:[a-f0-9]{64}$/.test(preview.content.draft_digest)
+    || preview.content.digest_scope !== DRAFT_DIGEST_SCOPE
+  ) {
+    throw new TypeError("preview content must retain its exact claim, draft digest, and digest scope");
+  }
+  assertStringArray(
+    preview.checks_before_any_dispatch,
+    "preview.checks_before_any_dispatch",
+    { min: 4, max: 16 },
+  );
+  assertExactKeys(
+    preview.guidance,
+    new Set(["observed_at", "review_after", "must_reopen", "official_information"]),
+    "preview.guidance",
+  );
+  const guidanceIssues = [];
+  const observedAt = checkDate(
+    preview.guidance.observed_at,
+    "preview.guidance.observed_at",
+    guidanceIssues,
+  );
+  const reviewAfter = checkDate(
+    preview.guidance.review_after,
+    "preview.guidance.review_after",
+    guidanceIssues,
+  );
+  if (
+    guidanceIssues.length
+    || observedAt === null
+    || reviewAfter === null
+    || reviewAfter <= observedAt
+    || preview.guidance.must_reopen !== true
+  ) {
+    throw new TypeError("preview.guidance must carry real ordered dates and require reopening");
+  }
+  assertStringArray(preview.guidance.official_information, "preview.guidance.official_information", {
+    min: 1,
+    max: 8,
+  });
+  preview.guidance.official_information.forEach((url, index) => {
+    requireHttpsForRender(url, `preview.guidance.official_information[${index}]`);
+  });
+  assertExactKeys(preview.approval, new Set(["required", "granted", "must_bind"]), "preview.approval");
+  if (preview.approval.required !== true || preview.approval.granted !== false) {
+    throw new TypeError("preview approval must remain required and ungranted");
+  }
+  assertStringArray(preview.approval.must_bind, "preview.approval.must_bind", {
+    min: 1,
+    max: 16,
+  });
+  assertExactKeys(
+    preview.dispatch,
+    new Set(["adapter_present", "authorized", "attempts", "external_effects"]),
+    "preview.dispatch",
+  );
+  if (
+    preview.dispatch.adapter_present !== false
+    || preview.dispatch.authorized !== false
+    || preview.dispatch.attempts !== 0
+    || preview.dispatch.external_effects !== 0
+  ) {
+    throw new TypeError("preview dispatch must remain absent, unauthorized, unattempted, and zero-effect");
+  }
+  assertStringArray(preview.not_established, "preview.not_established", {
+    min: 1,
+    max: 16,
+  });
+  assertExactKeys(
+    preview.integrity,
+    new Set(["canonicalization", "digest_scope", "preview_digest"]),
+    "preview.integrity",
+  );
+  if (
+    preview.integrity.canonicalization !== PREVIEW_CANONICALIZATION
+    || preview.integrity.digest_scope !== PREVIEW_DIGEST_SCOPE
+  ) {
+    throw new TypeError("preview integrity must name the 0.1 canonicalization and digest scope");
+  }
+  const { preview_digest: previewDigest, ...integrityWithoutDigest } = preview.integrity;
+  const previewWithoutDigest = { ...preview, integrity: integrityWithoutDigest };
+  if (previewDigest !== sha256(stableJson(previewWithoutDigest))) {
+    throw new TypeError("preview.integrity.preview_digest must bind the complete preview record");
+  }
+  const contextIssue = plainJsonIssue(context, "context");
+  if (contextIssue) throw new TypeError(contextIssue);
+  assertExactKeys(
+    context,
+    new Set(["bundle", "request", "expected_preview_digest"]),
+    "context",
+  );
+  if (context.expected_preview_digest !== previewDigest) {
+    throw new TypeError("context.expected_preview_digest does not match the preview");
+  }
+  const expected = projectAdapterPreview(context.bundle, context.request);
+  assertSameJson(preview, expected, "preview");
+  return true;
+}
+
 export function renderPublicPage(bundle) {
   assertPublicRenderBoundary(bundle);
   const record = bundle.public_resource;
@@ -1481,7 +1977,9 @@ export function renderPublicPage(bundle) {
   const media = record.media
     .map(
       (item) =>
-        `<figure><img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt)}">` +
+        `<figure class="media-record"><p><strong>Declared media, not loaded automatically.</strong> ` +
+        `<a href="${escapeHtml(item.url)}">Open only if you choose</a>.</p>` +
+        `<p><strong>Alt text:</strong> ${escapeHtml(item.alt)}</p>` +
         `<figcaption>${escapeHtml(item.creator)} · ${escapeHtml(item.rights_basis)}` +
         `${item.synthetic ? ` · ${escapeHtml(item.synthetic_disclosure ?? "synthetic media")}` : ""}</figcaption></figure>`,
     )
@@ -1519,7 +2017,7 @@ export function renderPublicPage(bundle) {
 ${ogImage}
 <script type="application/ld+json">${safeJsonForHtml(seo.json_ld)}</script>
 <style>
-:root{color-scheme:light dark;--paper:#f5f0e4;--card:#fffaf0;--ink:#282119;--soft:#655a4e;--line:#d8cdb8;--accent:#a8442f}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 system-ui,-apple-system,sans-serif}main{max-width:820px;margin:auto;padding:clamp(24px,6vw,72px) 20px 90px}article{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,5vw,56px);box-shadow:0 24px 70px #39281416}h1{font:600 clamp(34px,7vw,64px)/1.04 Iowan Old Style,Georgia,serif;letter-spacing:-.02em;margin:.2em 0}.claim{font:500 clamp(22px,3.5vw,31px)/1.35 Iowan Old Style,Georgia,serif;border-left:5px solid var(--accent);padding-left:20px}.eyebrow,.meta{color:var(--soft);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}.scope,.notice{background:#a8442f10;border:1px solid #a8442f40;border-radius:12px;padding:14px 16px}h2{margin-top:2.2em}h3{margin-top:1.6em}a{color:var(--accent);text-underline-offset:3px}li{margin:.8em 0}li span{display:block;color:var(--soft);font-size:.82rem}li p{margin:.2em 0}figure{margin:2em 0}img{max-width:100%;height:auto;border-radius:12px}figcaption{color:var(--soft);font-size:.82rem}.hash{font:12px/1.5 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--soft)}footer{border-top:1px solid var(--line);margin-top:3em;padding-top:1.5em;color:var(--soft)}@media(prefers-color-scheme:dark){:root{--paper:#17140f;--card:#211d16;--ink:#eee6d7;--soft:#b8ad98;--line:#40382b;--accent:#e08a6f}}
+:root{color-scheme:light dark;--paper:#f5f0e4;--card:#fffaf0;--ink:#282119;--soft:#655a4e;--line:#d8cdb8;--accent:#a8442f}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 system-ui,-apple-system,sans-serif}main{max-width:820px;margin:auto;padding:clamp(24px,6vw,72px) 20px 90px}article{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,5vw,56px);box-shadow:0 24px 70px #39281416}h1{font:600 clamp(34px,7vw,64px)/1.04 Iowan Old Style,Georgia,serif;letter-spacing:-.02em;margin:.2em 0}.claim{font:500 clamp(22px,3.5vw,31px)/1.35 Iowan Old Style,Georgia,serif;border-left:5px solid var(--accent);padding-left:20px}.eyebrow,.meta{color:var(--soft);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}.scope,.notice,.media-record{background:#a8442f10;border:1px solid #a8442f40;border-radius:12px;padding:14px 16px}h2{margin-top:2.2em}h3{margin-top:1.6em}a{color:var(--accent);text-underline-offset:3px}li{margin:.8em 0}li span{display:block;color:var(--soft);font-size:.82rem}li p{margin:.2em 0}figure{margin:2em 0}figcaption{color:var(--soft);font-size:.82rem}.hash{font:12px/1.5 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--soft)}footer{border-top:1px solid var(--line);margin-top:3em;padding-top:1.5em;color:var(--soft)}@media(prefers-color-scheme:dark){:root{--paper:#17140f;--card:#211d16;--ink:#eee6d7;--soft:#b8ad98;--line:#40382b;--accent:#e08a6f}}
 </style>
 </head>
 <body><main><article>
@@ -1568,6 +2066,7 @@ function escapeMarkdownInline(text) {
 }
 
 export function renderReviewMarkdown(bundle) {
+  assertPublicRenderBoundary(bundle);
   const issueLines = bundle.review.issues.length
     ? bundle.review.issues.map(
         (issue) =>
@@ -1575,15 +2074,27 @@ export function renderReviewMarkdown(bundle) {
           `(\`${escapeMarkdownInline(issue.field)}\`)`,
       )
     : ["- No structural review issue was produced. This is not a truth or publication pass."];
-  const draftSections = bundle.drafts.map(
-    (draft) => `## ${draft.channel}\n\n${fencedMarkdown(draft.body)}\n\n` +
+  const draftSections = bundle.drafts.map((draft) => {
+    const target = draft.layout.soft_target === null
+      ? "no local soft target asserted"
+      : `${draft.layout.soft_target} code points per part`;
+    const exactParts = draft.parts.length
+      ? draft.parts.map(
+          (part, index) =>
+            `### Part ${index + 1}/${draft.parts.length} · ${Array.from(part).length} code points\n\n` +
+            fencedMarkdown(part),
+        ).join("\n\n")
+      : `### Layout needs a human\n\n${fencedMarkdown(draft.body)}`;
+    return `## ${draft.channel}\n\n` +
+      `Layout: **${draft.layout.status}** · ${target}. ${escapeMarkdownInline(draft.layout.reason)}\n\n` +
+      `${exactParts}\n\n` +
       `Intended audience: ${escapeMarkdownInline(draft.intended_audience)}  \n` +
       `Commercial interest: ${escapeMarkdownInline(draft.commercial_interest)}  \n` +
       `Media records bound into this digest: ${draft.media.length}\n\n` +
       `${fencedMarkdown(JSON.stringify(draft.media, null, 2))}\n\n` +
       `Draft content digest: \`${draft.draft_digest}\`\n\n` +
-      `Dispatch authorized: **no**. Current limits and permissions must be fetched at dispatch time.`,
-  );
+      `Dispatch authorized: **no**. Current limits and permissions must be fetched at dispatch time.`;
+  });
   return `# Truth Release review — ${bundle.claim.id}
 
 Status: **prepared, not approved, not published**
@@ -1649,6 +2160,22 @@ export function writePreparedBundle(bundle, outDirectory) {
   return target;
 }
 
+export function readReleaseInputFile(inputFile) {
+  const inputPath = resolve(inputFile);
+  const stat = lstatSync(inputPath);
+  if (!stat.isFile() || stat.isSymbolicLink()) {
+    throw new Error("input must be one regular, non-symlink file");
+  }
+  if (stat.size > BOUNDS.max_input_bytes) {
+    throw new Error(`input exceeds ${BOUNDS.max_input_bytes} bytes`);
+  }
+  const bytes = readFileSync(inputPath);
+  if (bytes.length > BOUNDS.max_input_bytes) {
+    throw new Error(`input exceeds ${BOUNDS.max_input_bytes} bytes`);
+  }
+  return JSON.parse(bytes.toString("utf8"));
+}
+
 function usage() {
   return `Truth Release 0.1 — prepare one claim; send nothing.
 
@@ -1676,27 +2203,21 @@ export function runCli(argv = process.argv.slice(2)) {
     process.stderr.write(`${usage()}\n`);
     return 2;
   }
-  const inputPath = resolve(argv[0]);
   try {
-    const stat = lstatSync(inputPath);
-    if (!stat.isFile() || stat.isSymbolicLink()) {
-      throw new Error("input must be one regular, non-symlink file");
-    }
-    if (stat.size > BOUNDS.max_input_bytes) {
-      throw new Error(`input exceeds ${BOUNDS.max_input_bytes} bytes`);
-    }
-    const bytes = readFileSync(inputPath);
-    if (bytes.length > BOUNDS.max_input_bytes) {
-      throw new Error(`input exceeds ${BOUNDS.max_input_bytes} bytes`);
-    }
-    const input = JSON.parse(bytes.toString("utf8"));
-    const bundle = prepareTruthRelease(input);
+    const input = readReleaseInputFile(argv[0]);
+    const bundle = prepareTruthRelease(input, { now: new Date().toISOString() });
     if (stdoutForm) {
       process.stdout.write(`${JSON.stringify(bundle, null, 2)}\n`);
     } else {
       const target = writePreparedBundle(bundle, argv[2]);
       process.stdout.write(
-        `${JSON.stringify({ status: "prepared", output: target, external_effects: 0 })}\n`,
+        `${JSON.stringify({
+          status: "prepared",
+          output: target,
+          local_writes: 4,
+          network_effects: 0,
+          dispatch_effects: 0,
+        })}\n`,
       );
     }
     return 0;

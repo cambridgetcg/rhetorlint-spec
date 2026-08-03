@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rhetorlint:truth-release:adapter-preview-request:0.1",
+  "title": "Truth Release 0.1 adapter-preview selection request",
+  "$comment": "Binds one selected channel to the source-record and draft digests the caller expects.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "channel",
+    "expected_source_record_digest",
+    "expected_draft_digest"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["truth-release.adapter-preview-request/0.1"]
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["bluesky", "mastodon", "linkedin", "youtube", "instagram", "tiktok", "x"]
+    },
+    "expected_source_record_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "expected_draft_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}

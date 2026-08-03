@@ -17,6 +17,32 @@ engine. RhetorLint still does one narrow job: it marks visible wording. It does
 not decide truth, intent, identity, consent, authority, or whether anything
 should be published.
 
+## Build one local preview
+
+Node 18 or newer; no install and no network:
+
+```sh
+npm run truth-release -- start /tmp/my-truth-release
+npm run truth-release -- check /tmp/my-truth-release/claim.json
+npm run truth-release -- prepare /tmp/my-truth-release/claim.json --out /tmp/my-truth-release/prepared
+npm run truth-release -- preview /tmp/my-truth-release/prepared --channel bluesky
+```
+
+`start` makes two private starter files. `prepare` makes four private review
+files. `check` and `preview` only print. All four report zero network and
+dispatch effects, and none opens a browser or server. Read [BUILD.md](BUILD.md)
+for the first-ten-minute path, the example-local import interface, tests, and
+safe extension seam.
+
+### Build without joining
+
+Any visitor may run or fork this MIT-licensed example in their own home. Doing
+so is independent evaluation and building; it creates no KINGDOM citizenship,
+civic meeting, `kingdom.yaml`, registry entry, foundation or XENIA adoption,
+AgentTool identity, affiliation, account, schedule, or publication. Your clone
+or fork is your own source home. XENIA remains a linked design reference and no
+XENIA checkout or edit is required.
+
 ## The actual flow
 
 ```text
@@ -42,9 +68,10 @@ later, outside this tool:
 The split is deliberate. A prepared draft is not consent to publish it. A
 published URL is not evidence that the claim is true. Reach is not worth.
 
-## Try it
+## Lower-level prepare command
 
-Node 18 or newer; no install and no network:
+The original one-command form remains available for scripts. Without `--out`
+it prints the complete owner-held bundle to stdout:
 
 ```sh
 node examples/truth-release/prepare.mjs \
@@ -102,7 +129,8 @@ keeps the facts that are often lost during “content repurposing”:
 
 The JSON Schema records the portable structural contract; runtime validation is
 authoritative for UTF-8 byte limits, trimming, real dates, cross-field order,
-URL normalization, and same-origin checks. The preparer checks those things and
+URL normalization, same-origin checks, plain JSON data, Unicode scalar strings,
+and unsafe control/bidirectional-formatting characters. The preparer checks those things and
 requires the canonical, machine, and media URLs to have a public-host-shaped DNS
 name (not an IP, local/reserved suffix, or single-label host), with same-origin,
 query-free canonical, machine, and media URLs. This is a syntax boundary, not

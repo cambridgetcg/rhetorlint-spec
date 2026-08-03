@@ -306,17 +306,17 @@ test("the output schema and renderer preserve the public redaction and URL bound
   const alteredOg = structuredClone(bundle);
   alteredOg.seo.open_graph.url = "https://example.org/a-different-page/";
   assert.deepEqual(validate(alteredOg, BUNDLE_SCHEMA), []);
-  assert.throws(() => renderPublicPage(alteredOg), /seo must match/);
+  assert.throws(() => renderPublicPage(alteredOg), /seo must match|prepared bundle must match/);
 
   const alteredJsonLd = structuredClone(bundle);
   alteredJsonLd.seo.json_ld["@id"] = "https://example.org/a-different-page/#article";
   assert.deepEqual(validate(alteredJsonLd, BUNDLE_SCHEMA), []);
-  assert.throws(() => renderPublicPage(alteredJsonLd), /seo must match/);
+  assert.throws(() => renderPublicPage(alteredJsonLd), /seo must match|prepared bundle must match/);
 
   const alteredCitation = structuredClone(bundle);
   alteredCitation.seo.json_ld.citation[0] = "https://example.org/unrelated";
   assert.deepEqual(validate(alteredCitation, BUNDLE_SCHEMA), []);
-  assert.throws(() => renderPublicPage(alteredCitation), /seo must match/);
+  assert.throws(() => renderPublicPage(alteredCitation), /seo must match|prepared bundle must match/);
 });
 
 test("supplied markup stays inert in the HTML page and Markdown review", () => {
@@ -350,6 +350,69 @@ test("closed input, source, and channel bounds fail before preparation", () => {
   const insecure = fixture();
   insecure.canonical_url = "http://example.test/release";
   assert.ok(validateReleaseInput(insecure).some((issue) => issue.path === "$.canonical_url"));
+});
+
+test("the pure interface rejects hidden data, accessors, proxies, deep trees, and extra options", () => {
+  const hidden = fixture();
+  hidden.channel_selection["01"] = "x";
+  assert.match(validateReleaseInput(hidden)[0].message, /canonical array index/);
+
+  let getterCalls = 0;
+  const accessor = fixture();
+  Object.defineProperty(accessor, "claim", {
+    enumerable: true,
+    get() {
+      getterCalls += 1;
+      return "must not be read";
+    },
+  });
+  assert.match(validateReleaseInput(accessor)[0].message, /ordinary data property/);
+  assert.equal(getterCalls, 0);
+
+  const proxied = new Proxy(fixture(), {});
+  assert.match(validateReleaseInput(proxied)[0].message, /must not be a Proxy/);
+
+  for (const claim of ["\ud800", "\udfff"]) {
+    const unpaired = fixture();
+    unpaired.claim = claim;
+    assert.match(validateReleaseInput(unpaired)[0].message, /unpaired surrogate/);
+    assert.throws(
+      () => prepareTruthRelease(unpaired, { now: "2026-08-03T10:00:00.000Z" }),
+      /unpaired surrogate/,
+    );
+  }
+  const replacement = fixture();
+  replacement.claim = "\ufffd";
+  assert.deepEqual(validateReleaseInput(replacement), []);
+
+  for (const claim of ["A\u0000B", "left\u202eright", "left\u2066right"]) {
+    const controlled = fixture();
+    controlled.claim = claim;
+    assert.match(validateReleaseInput(controlled)[0].message, /unsafe control|bidirectional/);
+  }
+  const multiline = fixture();
+  multiline.claim = "One line\nA second line\twith a tab";
+  assert.deepEqual(validateReleaseInput(multiline), []);
+
+  const deep = fixture();
+  let cursor = deep;
+  for (let index = 0; index < 40; index += 1) {
+    cursor.nested = {};
+    cursor = cursor.nested;
+  }
+  assert.match(validateReleaseInput(deep)[0].message, /depth bound/);
+
+  assert.throws(
+    () => prepareTruthRelease(fixture()),
+    /exactly one now timestamp/,
+  );
+  assert.throws(
+    () => prepareTruthRelease(fixture(), {
+      now: "2026-08-03T10:00:00.000Z",
+      surprise: true,
+    }),
+    /exactly one now timestamp/,
+  );
 });
 
 test("the CLI writes a new owner-only bundle and refuses to overwrite it", () => {
