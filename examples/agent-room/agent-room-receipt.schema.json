@@ -1,0 +1,760 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agent-room.receipt/0.1",
+  "title": "Agent Room 0.1 receipt",
+  "description": "A deterministic local view and held later-use review with no external effects.",
+  "type": "object",
+  "required": [
+    "schema",
+    "status",
+    "pipeline",
+    "view",
+    "training_reviews",
+    "boundaries",
+    "effects",
+    "integrity"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["agent-room.receipt/0.1"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["local-projection-only"]
+    },
+    "pipeline": {
+      "$ref": "#/$defs/pipeline"
+    },
+    "view": {
+      "$ref": "#/$defs/view"
+    },
+    "training_reviews": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/trainingReview"
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1000
+      }
+    },
+    "effects": {
+      "$ref": "#/$defs/effects"
+    },
+    "integrity": {
+      "$ref": "#/$defs/integrity"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$"
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 24,
+      "maxLength": 40,
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "httpsUrl": {
+      "type": "string",
+      "minLength": 9,
+      "maxLength": 2000,
+      "pattern": "^https://"
+    },
+    "language": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 35,
+      "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$"
+    },
+    "content": {
+      "type": "object",
+      "required": ["text", "language", "sha256"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "language": {
+          "$ref": "#/$defs/language"
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    },
+    "rhetorlintSignal": {
+      "type": "object",
+      "required": ["schema", "signal_sha256", "language", "status", "total_marks"],
+      "properties": {
+        "schema": {
+          "type": "string",
+          "enum": ["rhetorlint.signal/0.1"]
+        },
+        "signal_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "language": {
+          "$ref": "#/$defs/language"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["patterns-marked", "no-supported-patterns", "unsupported-language"]
+        },
+        "total_marks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        }
+      },
+      "additionalProperties": false
+    },
+    "discovery": {
+      "type": "object",
+      "required": ["publicly_visible", "robots_allowed"],
+      "properties": {
+        "publicly_visible": {
+          "type": "boolean"
+        },
+        "robots_allowed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "kind",
+        "namespace",
+        "locator",
+        "packet_sha256",
+        "packet_input_sha256",
+        "claim_sha256",
+        "correction_state",
+        "withdrawal_state",
+        "rhetorlint_signal",
+        "discovery"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["owner-supplied", "claim-feedback-packet"]
+        },
+        "namespace": {
+          "$ref": "#/$defs/identifier"
+        },
+        "locator": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "packet_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "packet_input_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "claim_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "correction_state": {
+          "type": ["string", "null"],
+          "enum": [null, "challenge-open", "response-recorded", "boundary-recorded", "correction-recorded"]
+        },
+        "withdrawal_state": {
+          "type": ["string", "null"],
+          "enum": [null, "not-recorded", "withdrawal-recorded", "withdrawal-scheduled"]
+        },
+        "rhetorlint_signal": {
+          "type": ["object", "null"],
+          "required": ["schema", "signal_sha256", "language", "status", "total_marks"],
+          "properties": {
+            "schema": {
+              "type": "string",
+              "enum": ["rhetorlint.signal/0.1"]
+            },
+            "signal_sha256": {
+              "$ref": "#/$defs/digest"
+            },
+            "language": {
+              "$ref": "#/$defs/language"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["patterns-marked", "no-supported-patterns", "unsupported-language"]
+            },
+            "total_marks": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000
+            }
+          },
+          "additionalProperties": false
+        },
+        "discovery": {
+          "$ref": "#/$defs/discovery"
+        }
+      },
+      "additionalProperties": false
+    },
+    "speakerClaim": {
+      "type": "object",
+      "required": ["label", "attribution_basis", "authenticated"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "attribution_basis": {
+          "type": "string",
+          "enum": ["self", "direct-report"]
+        },
+        "authenticated": {
+          "type": "boolean",
+          "enum": [false]
+        }
+      },
+      "additionalProperties": false
+    },
+    "selectedEvent": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "recorded_at",
+        "kind",
+        "scope",
+        "scope_ref",
+        "lane",
+        "content",
+        "source",
+        "speaker_claim",
+        "reply_invited",
+        "no_reask",
+        "selection_reason",
+        "known_limits"
+      ],
+      "properties": {
+        "event_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "recorded_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["offer", "reply", "correction", "refusal"]
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["event"]
+        },
+        "scope_ref": {
+          "$ref": "#/$defs/identifier"
+        },
+        "lane": {
+          "type": "string",
+          "enum": ["share", "question", "reply", "correction"]
+        },
+        "content": {
+          "$ref": "#/$defs/content"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "speaker_claim": {
+          "$ref": "#/$defs/speakerClaim"
+        },
+        "reply_invited": {
+          "type": "boolean"
+        },
+        "no_reask": {
+          "type": "boolean"
+        },
+        "selection_reason": {
+          "type": "string",
+          "enum": ["next-in-declared-lane-with-source-cap"]
+        },
+        "known_limits": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "eventReasons": {
+      "type": "object",
+      "required": ["event_id", "reasons"],
+      "properties": {
+        "event_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "notSelected": {
+      "type": "object",
+      "required": ["event_id", "reason"],
+      "properties": {
+        "event_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "reason": {
+          "type": "string",
+          "enum": ["source-cap", "view-limit"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "boundary": {
+      "type": "object",
+      "required": ["kind", "event_id", "scope_ref"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["rest", "leave", "withdrawal"]
+        },
+        "event_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "scope_ref": {
+          "$ref": "#/$defs/identifier"
+        }
+      },
+      "additionalProperties": false
+    },
+    "view": {
+      "type": "object",
+      "required": [
+        "cursor",
+        "next_cursor",
+        "limit",
+        "selected",
+        "not_selected",
+        "held",
+        "boundaries",
+        "note"
+      ],
+      "properties": {
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999999999
+        },
+        "next_cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999999999
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "selected": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/selectedEvent"
+          }
+        },
+        "not_selected": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/notSelected"
+          }
+        },
+        "held": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/eventReasons"
+          }
+        },
+        "boundaries": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/boundary"
+          }
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceStage": {
+      "type": "object",
+      "required": ["input_events", "network_requests"],
+      "properties": {
+        "input_events": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "network_requests": {
+          "type": "integer",
+          "enum": [0]
+        }
+      },
+      "additionalProperties": false
+    },
+    "hydrateStage": {
+      "type": "object",
+      "required": ["digest_bound_events", "claim_feedback_references", "authenticity_established"],
+      "properties": {
+        "digest_bound_events": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "claim_feedback_references": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "authenticity_established": {
+          "type": "boolean",
+          "enum": [false]
+        }
+      },
+      "additionalProperties": false
+    },
+    "filterStage": {
+      "type": "object",
+      "required": ["held_events", "eligible_events"],
+      "properties": {
+        "held_events": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "eligible_events": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "lanesStage": {
+      "type": "object",
+      "required": ["share", "question", "reply", "correction"],
+      "properties": {
+        "share": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "question": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "reply": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "correction": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "selectStage": {
+      "type": "object",
+      "required": ["method", "cursor", "next_cursor", "limit", "selected_events"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["cursor-round-robin-declared-lanes-one-source-per-view"]
+        },
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999999999
+        },
+        "next_cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999999999
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "selected_events": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 12
+        }
+      },
+      "additionalProperties": false
+    },
+    "sideEffectStage": {
+      "type": "object",
+      "required": ["status", "external_state_changes"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["disabled"]
+        },
+        "external_state_changes": {
+          "type": "integer",
+          "enum": [0]
+        }
+      },
+      "additionalProperties": false
+    },
+    "pipeline": {
+      "type": "object",
+      "required": ["source", "hydrate", "filter", "lanes", "select", "side_effects"],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/sourceStage"
+        },
+        "hydrate": {
+          "$ref": "#/$defs/hydrateStage"
+        },
+        "filter": {
+          "$ref": "#/$defs/filterStage"
+        },
+        "lanes": {
+          "$ref": "#/$defs/lanesStage"
+        },
+        "select": {
+          "$ref": "#/$defs/selectStage"
+        },
+        "side_effects": {
+          "$ref": "#/$defs/sideEffectStage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "trainingMetadata": {
+      "type": "object",
+      "required": [
+        "declared_at",
+        "license_url",
+        "rights_source",
+        "withdrawal_url",
+        "material_review_status"
+      ],
+      "properties": {
+        "declared_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "license_url": {
+          "type": ["string", "null"],
+          "minLength": 9,
+          "maxLength": 2000,
+          "pattern": "^https://"
+        },
+        "rights_source": {
+          "type": ["string", "null"],
+          "minLength": 9,
+          "maxLength": 2000,
+          "pattern": "^https://"
+        },
+        "withdrawal_url": {
+          "type": ["string", "null"],
+          "minLength": 9,
+          "maxLength": 2000,
+          "pattern": "^https://"
+        },
+        "material_review_status": {
+          "type": "string",
+          "enum": ["not-reviewed", "declared-clear", "held"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "trainingReview": {
+      "type": "object",
+      "required": [
+        "schema",
+        "declaration_id",
+        "target_event_id",
+        "target_sha256",
+        "source_packet_sha256",
+        "status",
+        "candidate",
+        "reasons",
+        "metadata",
+        "human_review_required",
+        "note"
+      ],
+      "properties": {
+        "schema": {
+          "type": "string",
+          "enum": ["agent-room.training-review/0.1"]
+        },
+        "declaration_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "target_event_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "target_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "source_packet_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["held-for-independent-review", "not-offered", "withdrawal-recorded"]
+        },
+        "candidate": {
+          "type": "null"
+        },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/trainingMetadata"
+        },
+        "human_review_required": {
+          "type": "boolean"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "additionalProperties": false
+    },
+    "effects": {
+      "type": "object",
+      "required": [
+        "crawler_requests",
+        "network_requests",
+        "messages_sent",
+        "publications",
+        "persistent_files_written",
+        "training_runs",
+        "training_records_written",
+        "karma_records_written",
+        "external_state_changes",
+        "cli_stdout"
+      ],
+      "properties": {
+        "crawler_requests": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "network_requests": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "messages_sent": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "publications": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "persistent_files_written": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "training_runs": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "training_records_written": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "karma_records_written": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "external_state_changes": {
+          "type": "integer",
+          "enum": [0]
+        },
+        "cli_stdout": {
+          "type": "string",
+          "enum": ["one local receipt when the CLI succeeds"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["canonicalization", "input_sha256", "digest_scope", "receipt_sha256"],
+      "properties": {
+        "canonicalization": {
+          "type": "string",
+          "enum": ["recursive lexicographic object keys; array order preserved; UTF-8 JSON without whitespace"]
+        },
+        "input_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "digest_scope": {
+          "type": "string",
+          "enum": ["canonical JSON of the complete receipt with integrity.receipt_sha256 omitted"]
+        },
+        "receipt_sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
