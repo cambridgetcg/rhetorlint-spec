@@ -1,0 +1,876 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/claim-feedback-packet.schema.json",
+  "title": "Claim Feedback 0.1 packet",
+  "$comment": "This closed schema enforces the projected JSON wire shape. claim-feedback.mjs remains authoritative for strict plain JSON, UTF-8 and Unicode safety, remote-claim limitations, complete input and packet recomputation, method-byte and result digests, chronology, correction history meaning, supplied rights and material-review meaning, and all cross-field conditions. A schema pass does not authenticate a crawl, speaker, rights holder, correction, withdrawal, or authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "source_claim",
+    "crawl_receipt",
+    "wording_review",
+    "challenge",
+    "response",
+    "material_review",
+    "correction_state",
+    "withdrawal_state",
+    "reuse_declaration",
+    "karma_draft",
+    "training_candidate",
+    "effects",
+    "limits",
+    "integrity"
+  ],
+  "properties": {
+    "schema": { "type": "string", "enum": ["claim-feedback.packet/0.1"] },
+    "status": {
+      "type": "string",
+      "enum": ["challenge-open", "response-recorded", "correction-recorded", "boundary-recorded"]
+    },
+    "source_claim": { "$ref": "#/$defs/sourceClaim" },
+    "crawl_receipt": { "$ref": "#/$defs/crawlReceipt" },
+    "wording_review": { "$ref": "#/$defs/wordingReview" },
+    "challenge": { "$ref": "#/$defs/challenge" },
+    "response": { "$ref": "#/$defs/response" },
+    "material_review": { "$ref": "#/$defs/materialReview" },
+    "correction_state": { "$ref": "#/$defs/correctionState" },
+    "withdrawal_state": { "$ref": "#/$defs/withdrawalState" },
+    "reuse_declaration": { "$ref": "#/$defs/reuseDeclaration" },
+    "karma_draft": { "$ref": "#/$defs/karmaDraft" },
+    "training_candidate": { "$ref": "#/$defs/trainingCandidate" },
+    "effects": { "$ref": "#/$defs/effects" },
+    "limits": { "$ref": "#/$defs/stringList" },
+    "integrity": { "$ref": "#/$defs/integrity" }
+  },
+  "$defs": {
+    "httpsUrl": {
+      "type": "string",
+      "pattern": "^https://",
+      "minLength": 9,
+      "maxLength": 2000
+    },
+    "nullableHttpsUrl": {
+      "type": ["string", "null"],
+      "pattern": "^https://",
+      "minLength": 9,
+      "maxLength": 2000
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "nullableDigest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "maxLength": 24
+    },
+    "nullableTimestamp": {
+      "type": ["string", "null"],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "maxLength": 24
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 255
+    },
+    "language": { "type": "string", "minLength": 1, "maxLength": 35 },
+    "stringList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
+    },
+    "inputKnownLimits": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+    },
+    "attributionBasis": {
+      "type": "string",
+      "enum": ["self", "direct-report", "indirect-report", "inference"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["not-assessed", "low", "medium", "high", "undecidable"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "observed_at", "content_sha256", "supports"],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "observed_at": { "$ref": "#/$defs/timestamp" },
+        "content_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "supports": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "sourceClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "url",
+        "text",
+        "language",
+        "scope",
+        "correction_url",
+        "withdrawal_url",
+        "claim_sha256",
+        "sources",
+        "uncertainties",
+        "original_preserved"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 8000 },
+        "language": { "$ref": "#/$defs/language" },
+        "scope": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "correction_url": { "$ref": "#/$defs/httpsUrl" },
+        "withdrawal_url": { "$ref": "#/$defs/httpsUrl" },
+        "claim_sha256": { "$ref": "#/$defs/digest" },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/source" }
+        },
+        "uncertainties": { "$ref": "#/$defs/inputKnownLimits" },
+        "original_preserved": { "type": "boolean", "enum": [true] }
+      }
+    },
+    "robots": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "url", "observed_at", "content_sha256"],
+      "properties": {
+        "decision": { "type": "string", "enum": ["allowed", "disallowed", "not-checked"] },
+        "url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "observed_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "content_sha256": { "$ref": "#/$defs/nullableDigest" }
+      }
+    },
+    "crawlAccess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "crawler_name",
+        "crawler_version",
+        "crawler_user_agent",
+        "robots",
+        "note"
+      ],
+      "properties": {
+        "basis": {
+          "type": "string",
+          "enum": ["owner-supplied", "owner-published", "not-established"]
+        },
+        "crawler_name": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "crawler_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "crawler_user_agent": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "robots": { "$ref": "#/$defs/robots" },
+        "note": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "crawlReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "retrieved_at",
+        "method",
+        "url",
+        "final_url",
+        "http_status",
+        "media_type",
+        "body_bytes",
+        "body_sha256",
+        "literal_claim_match",
+        "access",
+        "known_effects",
+        "known_limits"
+      ],
+      "properties": {
+        "kind": { "type": "string", "enum": ["supplied-receipt"] },
+        "retrieved_at": { "$ref": "#/$defs/timestamp" },
+        "method": { "type": "string", "enum": ["GET"] },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "final_url": { "$ref": "#/$defs/httpsUrl" },
+        "http_status": { "type": "integer", "minimum": 200, "maximum": 299 },
+        "media_type": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "body_bytes": { "type": "integer", "minimum": 1, "maximum": 32768 },
+        "body_sha256": { "$ref": "#/$defs/digest" },
+        "literal_claim_match": { "type": "boolean", "enum": [true] },
+        "access": { "$ref": "#/$defs/crawlAccess" },
+        "known_effects": { "$ref": "#/$defs/inputKnownLimits" },
+        "known_limits": { "$ref": "#/$defs/inputKnownLimits" }
+      }
+    },
+    "methodComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "source_sha256"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "source_sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "ruleComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "source_sha256"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "source_sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "packetProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "source_sha256"],
+      "properties": {
+        "schema": { "type": "string", "enum": ["claim-feedback.packet/0.1"] },
+        "source_sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "wordingMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine",
+        "signal_projection",
+        "rules",
+        "packet_projection",
+        "language_support",
+        "offset_units"
+      ],
+      "properties": {
+        "engine": { "$ref": "#/$defs/methodComponent" },
+        "signal_projection": { "$ref": "#/$defs/methodComponent" },
+        "rules": { "$ref": "#/$defs/ruleComponent" },
+        "packet_projection": { "$ref": "#/$defs/packetProjection" },
+        "language_support": { "type": "string", "enum": ["English pack only"] },
+        "offset_units": { "type": "string", "enum": ["UTF-16 code units"] }
+      }
+    },
+    "count": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "count"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "signal": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "kind",
+        "boundary",
+        "rhetorlint",
+        "engine",
+        "source",
+        "density",
+        "summary"
+      ],
+      "properties": {
+        "schema": { "type": "string", "enum": ["rhetorlint.signal/0.1"] },
+        "kind": { "type": "string", "enum": ["rhetorlint.analysis"] },
+        "boundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["observes", "doesNot", "note"],
+          "properties": {
+            "observes": { "type": "string", "enum": ["visible-language-patterns"] },
+            "doesNot": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": ["infer-speaker-intent", "detect-deception", "determine-factual-truth"]
+              }
+            },
+            "note": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          }
+        },
+        "rhetorlint": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "rules"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+            "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "rules": { "type": "string", "minLength": 1, "maxLength": 255 }
+          }
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["chars", "words", "locale"],
+          "properties": {
+            "chars": { "type": "integer", "minimum": 0 },
+            "words": { "type": "integer", "minimum": 0 },
+            "locale": { "type": "string", "minLength": 1, "maxLength": 35 }
+          }
+        },
+        "density": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tells", "per100Words"],
+          "properties": {
+            "tells": { "type": "integer", "minimum": 0 },
+            "per100Words": { "type": "number", "minimum": 0 }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["families", "rules"],
+          "properties": {
+            "families": { "type": "array", "maxItems": 22, "items": { "$ref": "#/$defs/count" } },
+            "rules": { "type": "array", "maxItems": 22, "items": { "$ref": "#/$defs/count" } }
+          }
+        }
+      }
+    },
+    "textReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "language_support",
+        "supplied_language",
+        "signal",
+        "analysis_result_sha256",
+        "shared_signal_sha256",
+        "note"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unsupported-language", "none-marked-by-pack", "patterns-marked"]
+        },
+        "language_support": { "type": "string", "enum": ["English only"] },
+        "supplied_language": { "$ref": "#/$defs/language" },
+        "signal": { "$ref": "#/$defs/signal" },
+        "analysis_result_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "shared_signal_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "note": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "nullableTextReview": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "language_support",
+        "supplied_language",
+        "signal",
+        "analysis_result_sha256",
+        "shared_signal_sha256",
+        "note"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unsupported-language", "none-marked-by-pack", "patterns-marked"]
+        },
+        "language_support": { "type": "string", "enum": ["English only"] },
+        "supplied_language": { "$ref": "#/$defs/language" },
+        "signal": { "$ref": "#/$defs/signal" },
+        "analysis_result_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "shared_signal_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "note": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "wordingReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "person_aggregation",
+        "method",
+        "claim",
+        "challenge",
+        "response",
+        "replacement_claim"
+      ],
+      "properties": {
+        "scope": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "person_aggregation": { "type": "boolean", "enum": [false] },
+        "method": { "$ref": "#/$defs/wordingMethod" },
+        "claim": { "$ref": "#/$defs/textReview" },
+        "challenge": { "$ref": "#/$defs/textReview" },
+        "response": { "$ref": "#/$defs/nullableTextReview" },
+        "replacement_claim": { "$ref": "#/$defs/nullableTextReview" }
+      }
+    },
+    "evidenceSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "observed_at",
+        "http_status",
+        "media_type",
+        "body_bytes",
+        "body_sha256",
+        "excerpt",
+        "interpretation"
+      ],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "observed_at": { "$ref": "#/$defs/timestamp" },
+        "http_status": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "media_type": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "body_bytes": { "type": "integer", "minimum": 1, "maximum": 16384 },
+        "body_sha256": { "$ref": "#/$defs/digest" },
+        "excerpt": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "interpretation": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "challenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "made_at",
+        "text",
+        "language",
+        "evidence",
+        "speaker_claim",
+        "attribution_basis",
+        "source",
+        "confidence",
+        "known_limits"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "evidence-request",
+            "contrary-evidence",
+            "scope-question",
+            "wording-question",
+            "prediction-check",
+            "advertised-observed-mismatch"
+          ]
+        },
+        "made_at": { "$ref": "#/$defs/timestamp" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "language": { "$ref": "#/$defs/language" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/evidenceSummary" }
+        },
+        "speaker_claim": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "attribution_basis": { "$ref": "#/$defs/attributionBasis" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "known_limits": { "$ref": "#/$defs/inputKnownLimits" }
+      }
+    },
+    "response": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "received_at",
+        "text",
+        "language",
+        "replacement_claim",
+        "replacement_claim_language",
+        "replacement_claim_sha256",
+        "speaker_claim",
+        "attribution_basis",
+        "source",
+        "confidence",
+        "known_limits"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["reply", "dispute", "settlement", "redaction-request", "correction", "boundary"]
+        },
+        "received_at": { "$ref": "#/$defs/timestamp" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "language": { "$ref": "#/$defs/language" },
+        "replacement_claim": { "type": ["string", "null"], "minLength": 1, "maxLength": 8000 },
+        "replacement_claim_language": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 35
+        },
+        "replacement_claim_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "speaker_claim": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "attribution_basis": { "$ref": "#/$defs/attributionBasis" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "known_limits": { "$ref": "#/$defs/inputKnownLimits" }
+      }
+    },
+    "materialReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewed_at",
+        "speaker_claim",
+        "attribution_basis",
+        "source",
+        "confidence",
+        "contains_personal_data",
+        "contains_sensitive_data",
+        "contains_third_party_material",
+        "known_limits",
+        "note"
+      ],
+      "properties": {
+        "status": { "type": "string", "enum": ["passed", "blocked", "not-reviewed"] },
+        "reviewed_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "speaker_claim": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "attribution_basis": { "$ref": "#/$defs/attributionBasis" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "contains_personal_data": { "type": "boolean" },
+        "contains_sensitive_data": { "type": "boolean" },
+        "contains_third_party_material": { "type": "boolean" },
+        "known_limits": { "$ref": "#/$defs/inputKnownLimits" },
+        "note": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "historyItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "recorded_at", "claim_sha256", "source", "attribution_basis"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["original", "correction"] },
+        "recorded_at": { "$ref": "#/$defs/timestamp" },
+        "claim_sha256": { "$ref": "#/$defs/digest" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "attribution_basis": {
+          "type": "string",
+          "enum": ["supplied-receipt", "self", "direct-report"]
+        }
+      }
+    },
+    "correctionState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "original_claim_sha256",
+        "latest_recorded_claim",
+        "latest_recorded_claim_sha256",
+        "correction_url",
+        "history"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["challenge-open", "response-recorded", "correction-recorded", "boundary-recorded"]
+        },
+        "original_claim_sha256": { "$ref": "#/$defs/digest" },
+        "latest_recorded_claim": { "type": "string", "minLength": 1, "maxLength": 8000 },
+        "latest_recorded_claim_sha256": { "$ref": "#/$defs/digest" },
+        "correction_url": { "$ref": "#/$defs/httpsUrl" },
+        "history": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/historyItem" }
+        }
+      }
+    },
+    "withdrawalState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "withdrawal_url", "effective_at", "assessed_at", "note"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["not-recorded", "withdrawal-recorded", "withdrawal-scheduled"]
+        },
+        "withdrawal_url": { "$ref": "#/$defs/httpsUrl" },
+        "effective_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "assessed_at": { "$ref": "#/$defs/timestamp" },
+        "note": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "useChoice": { "type": "string", "enum": ["allow", "deny", "unspecified"] },
+    "reuseDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "search",
+        "retrieval",
+        "model_input",
+        "training",
+        "mirror",
+        "declaring_party",
+        "authority_basis",
+        "applies_to_sha256",
+        "license_url",
+        "policy_url",
+        "effective_at",
+        "assessed_at",
+        "withdrawn_at",
+        "source",
+        "known_limits",
+        "note"
+      ],
+      "properties": {
+        "search": { "$ref": "#/$defs/useChoice" },
+        "retrieval": { "$ref": "#/$defs/useChoice" },
+        "model_input": { "$ref": "#/$defs/useChoice" },
+        "training": { "$ref": "#/$defs/useChoice" },
+        "mirror": { "$ref": "#/$defs/useChoice" },
+        "declaring_party": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "authority_basis": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "applies_to_sha256": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/digest" }
+        },
+        "license_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "policy_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "effective_at": { "$ref": "#/$defs/timestamp" },
+        "assessed_at": { "$ref": "#/$defs/timestamp" },
+        "withdrawn_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "known_limits": { "$ref": "#/$defs/inputKnownLimits" },
+        "note": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "karmaRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_ref",
+        "proposed_deed_kind",
+        "parent_local_ref",
+        "text",
+        "purpose",
+        "expectation_ref",
+        "effect_basis",
+        "evidence_status",
+        "evidence",
+        "claimed_relation",
+        "causal_confidence",
+        "response_type",
+        "speaker_claim",
+        "attribution_basis",
+        "source",
+        "epistemic_confidence",
+        "known_limits"
+      ],
+      "properties": {
+        "local_ref": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "proposed_deed_kind": {
+          "type": "string",
+          "enum": ["action", "consequence", "response", "correction", "boundary"]
+        },
+        "parent_local_ref": { "type": ["string", "null"], "minLength": 1, "maxLength": 255 },
+        "text": { "type": "string", "minLength": 4, "maxLength": 1800 },
+        "purpose": { "type": "string", "maxLength": 1800 },
+        "expectation_ref": { "type": "string", "maxLength": 32 },
+        "effect_basis": { "type": "string", "maxLength": 32 },
+        "evidence_status": { "type": "string", "maxLength": 32 },
+        "evidence": { "type": "string", "maxLength": 1800 },
+        "claimed_relation": { "type": "string", "maxLength": 255 },
+        "causal_confidence": { "type": "string", "maxLength": 32 },
+        "response_type": { "type": "string", "maxLength": 32 },
+        "speaker_claim": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "attribution_basis": { "$ref": "#/$defs/attributionBasis" },
+        "source": { "type": "string", "minLength": 1, "maxLength": 1800 },
+        "epistemic_confidence": { "$ref": "#/$defs/confidence" },
+        "known_limits": { "type": "string", "minLength": 1, "maxLength": 1800 }
+      }
+    },
+    "karmaDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "status",
+        "importable",
+        "records",
+        "deeds_signed",
+        "ledger_writes",
+        "note"
+      ],
+      "properties": {
+        "schema": { "type": "string", "enum": ["claim-feedback.karma-draft/0.1"] },
+        "status": { "type": "string", "enum": ["unsigned-draft-only"] },
+        "importable": { "type": "boolean", "enum": [false] },
+        "records": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/karmaRecord" }
+        },
+        "deeds_signed": { "type": "integer", "enum": [0] },
+        "ledger_writes": { "type": "integer", "enum": [0] },
+        "note": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "suppliedMaterialReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewed_at",
+        "source",
+        "contains_personal_data",
+        "contains_sensitive_data",
+        "contains_third_party_material"
+      ],
+      "properties": {
+        "status": { "type": "string", "enum": ["passed", "blocked", "not-reviewed"] },
+        "reviewed_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "contains_personal_data": { "type": "boolean" },
+        "contains_sensitive_data": { "type": "boolean" },
+        "contains_third_party_material": { "type": "boolean" }
+      }
+    },
+    "suppliedRights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declaring_party",
+        "authority_basis",
+        "license_url",
+        "policy_url",
+        "effective_at",
+        "assessed_at",
+        "withdrawn_at",
+        "source"
+      ],
+      "properties": {
+        "declaring_party": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "authority_basis": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "license_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "policy_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "effective_at": { "$ref": "#/$defs/timestamp" },
+        "assessed_at": { "$ref": "#/$defs/timestamp" },
+        "withdrawn_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "source": { "$ref": "#/$defs/httpsUrl" }
+      }
+    },
+    "reviewProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assessed_at",
+        "original_claim_sha256",
+        "evidence_sha256",
+        "corrected_claim_sha256",
+        "correction_source",
+        "supplied_material_review",
+        "supplied_rights"
+      ],
+      "properties": {
+        "assessed_at": { "$ref": "#/$defs/timestamp" },
+        "original_claim_sha256": { "$ref": "#/$defs/digest" },
+        "evidence_sha256": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/digest" }
+        },
+        "corrected_claim_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "correction_source": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "supplied_material_review": { "$ref": "#/$defs/suppliedMaterialReview" },
+        "supplied_rights": { "$ref": "#/$defs/suppliedRights" }
+      }
+    },
+    "trainingCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "status",
+        "reasons",
+        "declared_conditions_met",
+        "review_proposal",
+        "candidate",
+        "human_review_required",
+        "current_declaration_recheck_required",
+        "dataset_writes",
+        "not_established"
+      ],
+      "properties": {
+        "schema": { "type": "string", "enum": ["claim-feedback.training-candidate/0.1"] },
+        "status": { "type": "string", "enum": ["held-for-independent-review"] },
+        "reasons": { "$ref": "#/$defs/stringList" },
+        "declared_conditions_met": { "type": "boolean" },
+        "review_proposal": { "$ref": "#/$defs/reviewProposal" },
+        "candidate": { "type": "null", "enum": [null] },
+        "human_review_required": { "type": "boolean", "enum": [true] },
+        "current_declaration_recheck_required": { "type": "boolean", "enum": [true] },
+        "dataset_writes": { "type": "integer", "enum": [0] },
+        "not_established": { "$ref": "#/$defs/stringList" }
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network_requests",
+        "messages_sent",
+        "persistent_files_written",
+        "karma_deeds_signed",
+        "karma_ledger_writes",
+        "training_records_written",
+        "retries",
+        "external_state_changes_by_builder",
+        "cli_stdout"
+      ],
+      "properties": {
+        "network_requests": { "type": "integer", "enum": [0] },
+        "messages_sent": { "type": "integer", "enum": [0] },
+        "persistent_files_written": { "type": "integer", "enum": [0] },
+        "karma_deeds_signed": { "type": "integer", "enum": [0] },
+        "karma_ledger_writes": { "type": "integer", "enum": [0] },
+        "training_records_written": { "type": "integer", "enum": [0] },
+        "retries": { "type": "integer", "enum": [0] },
+        "external_state_changes_by_builder": { "type": "integer", "enum": [0] },
+        "cli_stdout": { "type": "string", "enum": ["one report when the CLI succeeds"] }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonicalization", "input_sha256", "digest_scope", "packet_sha256"],
+      "properties": {
+        "canonicalization": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "input_sha256": { "$ref": "#/$defs/digest" },
+        "digest_scope": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "packet_sha256": { "$ref": "#/$defs/digest" }
+      }
+    }
+  }
+}

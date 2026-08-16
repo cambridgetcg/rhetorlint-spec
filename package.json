@@ -10,10 +10,12 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/conformance.test.mjs test/media-wave.test.mjs test/pack-bands.test.mjs test/package-types.test.mjs test/schema.test.mjs test/signals.test.mjs test/widget-build.test.mjs test/pages-seo.test.mjs examples/truth-release/prepare.test.mjs examples/truth-release/builder.test.mjs",
+    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/conformance.test.mjs test/media-wave.test.mjs test/pack-bands.test.mjs test/package-types.test.mjs test/schema.test.mjs test/signals.test.mjs test/widget-build.test.mjs test/pages-seo.test.mjs examples/truth-release/prepare.test.mjs examples/truth-release/builder.test.mjs examples/claim-feedback/claim-feedback.test.mjs",
     "test:conformance": "node --test test/conformance.test.mjs && python3 impl/python/test_conformance.py",
     "test:truth-release": "node --test examples/truth-release/prepare.test.mjs examples/truth-release/builder.test.mjs",
+    "test:claim-feedback": "node --test examples/claim-feedback/claim-feedback.test.mjs",
     "truth-release": "node examples/truth-release/builder.mjs",
+    "claim-feedback": "node examples/claim-feedback/claim-feedback.mjs",
     "demo": "node scripts/demo.mjs",
     "cli": "node packages/cli/cli.mjs",
     "build:widget": "node apps/widget/build.mjs"

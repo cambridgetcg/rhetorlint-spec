@@ -76,6 +76,7 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 - **Developers** — `@rhetorlint/core` embeds anywhere JS runs (browser, Node, Deno), emits the versioned JSON, and projects explicitly shareable signals without phrase text by default.
 - **Comms & content teams** — the [`rhetorlint` CLI](packages/cli) as a spin-check in CI: `rhetorlint --max 8 comms/*.md` exits non-zero when a file is too thick with spin. `--sarif` surfaces marks in VS Code and GitHub code-scanning.
 - **Public explainers** — the bounded [Truth Release builder](examples/truth-release/BUILD.md) gives anyone one local `start → check → prepare → preview` path from an exact sourced claim to channel briefs, a canonical-page preview, public JSON, and recipient-visible XENIA-informed choices. No KINGDOM membership, install, posting, scheduling, tracking, or account access is required.
+- **Claim correction** — the finite [Claim Feedback example](examples/claim-feedback/README.md) carries one exact claim and supplied crawl receipt through an evidence challenge, attributed reply or correction, an unsigned KARMA draft, and a held AI-training review proposal. It crawls nobody, judges nobody, and has no network or persistent-write capability.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
 
@@ -126,6 +127,7 @@ impl/go/         rhetorlint.go                             the Go reference engi
 apps/explorer/   index.html                               the learning wing (self-contained)
 apps/widget/     manifest.json · build.mjs · src/panel.js the browser widget (extension + bookmarklet)
 examples/truth-release/ one-claim social + SEO preparation, no dispatch
+examples/claim-feedback/ claim receipt → challenge → correction, no crawl or send
 test/            *.test.mjs                                proves the engines, CLI, widget, conformance
 scripts/demo.mjs                                           a 20-line taste
 ```

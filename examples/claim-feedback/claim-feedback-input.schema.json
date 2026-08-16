@@ -1,0 +1,378 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/claim-feedback-input.schema.json",
+  "title": "Claim Feedback 0.1 input",
+  "$comment": "This closed schema enforces the JSON wire shape and ordinary item/character bounds. claim-feedback.mjs remains authoritative for plain-data/accessor/proxy checks, UTF-8 byte ceilings, unpaired surrogates, real calendar times and ordering, URL normalization and equality, digest recomputation, literal inclusion, origin binding, attribution meaning, material-review meaning, reuse timing, and the KARMA draft's signed-field bounds.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "claim",
+    "crawl",
+    "challenge",
+    "response",
+    "material_review",
+    "reuse"
+  ],
+  "properties": {
+    "schema": { "type": "string", "enum": ["claim-feedback.input/0.1"] },
+    "claim": { "$ref": "#/$defs/claim" },
+    "crawl": { "$ref": "#/$defs/crawl" },
+    "challenge": { "$ref": "#/$defs/challenge" },
+    "response": { "$ref": "#/$defs/response" },
+    "material_review": { "$ref": "#/$defs/materialReview" },
+    "reuse": { "$ref": "#/$defs/reuse" }
+  },
+  "$defs": {
+    "httpsUrl": {
+      "type": "string",
+      "pattern": "^https://",
+      "minLength": 9,
+      "maxLength": 2000
+    },
+    "nullableHttpsUrl": {
+      "type": ["string", "null"],
+      "pattern": "^https://",
+      "minLength": 9,
+      "maxLength": 2000
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "nullableDigest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "maxLength": 24
+    },
+    "nullableTimestamp": {
+      "type": ["string", "null"],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "maxLength": 24
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 255
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 35
+    },
+    "knownLimits": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+    },
+    "attributionBasis": {
+      "type": "string",
+      "enum": ["self", "direct-report", "indirect-report", "inference"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["not-assessed", "low", "medium", "high", "undecidable"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "observed_at", "content_sha256", "supports"],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "observed_at": { "$ref": "#/$defs/timestamp" },
+        "content_sha256": { "$ref": "#/$defs/nullableDigest" },
+        "supports": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "url",
+        "text",
+        "language",
+        "scope",
+        "correction_url",
+        "withdrawal_url",
+        "sources",
+        "uncertainties"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 8000 },
+        "language": { "$ref": "#/$defs/language" },
+        "scope": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "correction_url": { "$ref": "#/$defs/httpsUrl" },
+        "withdrawal_url": { "$ref": "#/$defs/httpsUrl" },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/source" }
+        },
+        "uncertainties": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        }
+      }
+    },
+    "robots": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "url", "observed_at", "content_sha256"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["allowed", "disallowed", "not-checked"]
+        },
+        "url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "observed_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "content_sha256": { "$ref": "#/$defs/nullableDigest" }
+      }
+    },
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "crawler_name",
+        "crawler_version",
+        "crawler_user_agent",
+        "robots"
+      ],
+      "properties": {
+        "basis": {
+          "type": "string",
+          "enum": ["owner-supplied", "owner-published", "not-established"]
+        },
+        "crawler_name": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "crawler_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "crawler_user_agent": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "robots": { "$ref": "#/$defs/robots" }
+      }
+    },
+    "crawl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "retrieved_at",
+        "method",
+        "url",
+        "final_url",
+        "http_status",
+        "media_type",
+        "body_utf8",
+        "body_sha256",
+        "claim_sha256",
+        "access",
+        "known_effects",
+        "known_limits"
+      ],
+      "properties": {
+        "retrieved_at": { "$ref": "#/$defs/timestamp" },
+        "method": { "type": "string", "enum": ["GET"] },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "final_url": { "$ref": "#/$defs/httpsUrl" },
+        "http_status": { "type": "integer", "minimum": 200, "maximum": 299 },
+        "media_type": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "body_utf8": { "type": "string", "minLength": 1, "maxLength": 32768 },
+        "body_sha256": { "$ref": "#/$defs/digest" },
+        "claim_sha256": { "$ref": "#/$defs/digest" },
+        "access": { "$ref": "#/$defs/access" },
+        "known_effects": { "$ref": "#/$defs/knownLimits" },
+        "known_limits": { "$ref": "#/$defs/knownLimits" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "observed_at",
+        "http_status",
+        "media_type",
+        "body_utf8",
+        "body_sha256",
+        "excerpt",
+        "interpretation"
+      ],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "observed_at": { "$ref": "#/$defs/timestamp" },
+        "http_status": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "media_type": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "body_utf8": { "type": "string", "minLength": 1, "maxLength": 16384 },
+        "body_sha256": { "$ref": "#/$defs/digest" },
+        "excerpt": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "interpretation": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "challenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "made_at",
+        "text",
+        "language",
+        "evidence",
+        "speaker_claim",
+        "attribution_basis",
+        "source",
+        "confidence",
+        "known_limits"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "evidence-request",
+            "contrary-evidence",
+            "scope-question",
+            "wording-question",
+            "prediction-check",
+            "advertised-observed-mismatch"
+          ]
+        },
+        "made_at": { "$ref": "#/$defs/timestamp" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "language": { "$ref": "#/$defs/language" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/evidence" }
+        },
+        "speaker_claim": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "attribution_basis": { "$ref": "#/$defs/attributionBasis" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "known_limits": { "$ref": "#/$defs/knownLimits" }
+      }
+    },
+    "response": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "received_at",
+        "text",
+        "language",
+        "replacement_claim",
+        "replacement_claim_language",
+        "speaker_claim",
+        "attribution_basis",
+        "source",
+        "confidence",
+        "known_limits"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["reply", "dispute", "settlement", "redaction-request", "correction", "boundary"]
+        },
+        "received_at": { "$ref": "#/$defs/timestamp" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "language": { "$ref": "#/$defs/language" },
+        "replacement_claim": { "type": ["string", "null"], "minLength": 1, "maxLength": 8000 },
+        "replacement_claim_language": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 35
+        },
+        "speaker_claim": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "attribution_basis": { "$ref": "#/$defs/attributionBasis" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "known_limits": { "$ref": "#/$defs/knownLimits" }
+      }
+    },
+    "materialReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewed_at",
+        "speaker_claim",
+        "attribution_basis",
+        "source",
+        "confidence",
+        "contains_personal_data",
+        "contains_sensitive_data",
+        "contains_third_party_material",
+        "known_limits"
+      ],
+      "properties": {
+        "status": { "type": "string", "enum": ["passed", "blocked", "not-reviewed"] },
+        "reviewed_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "speaker_claim": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "attribution_basis": { "$ref": "#/$defs/attributionBasis" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "contains_personal_data": { "type": "boolean" },
+        "contains_sensitive_data": { "type": "boolean" },
+        "contains_third_party_material": { "type": "boolean" },
+        "known_limits": { "$ref": "#/$defs/knownLimits" }
+      }
+    },
+    "useChoice": {
+      "type": "string",
+      "enum": ["allow", "deny", "unspecified"]
+    },
+    "reuse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "search",
+        "retrieval",
+        "model_input",
+        "training",
+        "mirror",
+        "declaring_party",
+        "authority_basis",
+        "applies_to_sha256",
+        "license_url",
+        "policy_url",
+        "effective_at",
+        "assessed_at",
+        "withdrawn_at",
+        "source",
+        "known_limits"
+      ],
+      "properties": {
+        "search": { "$ref": "#/$defs/useChoice" },
+        "retrieval": { "$ref": "#/$defs/useChoice" },
+        "model_input": { "$ref": "#/$defs/useChoice" },
+        "training": { "$ref": "#/$defs/useChoice" },
+        "mirror": { "$ref": "#/$defs/useChoice" },
+        "declaring_party": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "authority_basis": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "applies_to_sha256": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/digest" }
+        },
+        "license_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "policy_url": { "$ref": "#/$defs/nullableHttpsUrl" },
+        "effective_at": { "$ref": "#/$defs/timestamp" },
+        "assessed_at": { "$ref": "#/$defs/timestamp" },
+        "withdrawn_at": { "$ref": "#/$defs/nullableTimestamp" },
+        "source": { "$ref": "#/$defs/httpsUrl" },
+        "known_limits": { "$ref": "#/$defs/knownLimits" }
+      }
+    }
+  }
+}
