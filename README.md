@@ -106,7 +106,7 @@ The claim that "engines are just implementations of the spec" is not a promise h
 | [`impl/go/rhetorlint.go`](impl/go) | Go (stdlib only) | `go -C impl/go test ./...` |
 
 ```bash
-npm run test:conformance     # 15/15 cases — JS and Python only
+npm run test:conformance     # 31/31 cases — JS and Python only
 go -C impl/go test ./...     # the third engine; CI runs all three on every push
 ```
 

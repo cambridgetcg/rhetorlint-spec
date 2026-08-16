@@ -49,6 +49,25 @@ test("robots, sitemap, and deployment carry the same public doors", () => {
   }
 });
 
+test("Claim Feedback is discoverable without deploying a claim or a second app", () => {
+  const feedbackLink = "https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/README.md";
+  assert.ok(INDEX.includes('id="claim-feedback"'));
+  assert.ok(INDEX.includes(`href="${feedbackLink}"`));
+  assert.match(
+    INDEX,
+    /local Claim Feedback example[\s\S]*one bounded packet[\s\S]*does not crawl[\s\S]*score a person[\s\S]*write KARMA[\s\S]*train a model/,
+  );
+  assert.ok(!INDEX.includes("examples/claim-feedback/fixtures/"));
+  assert.ok(!INDEX.includes("We always review every submitted report within 48 hours."));
+  assert.ok(!WORKFLOW.includes("examples/claim-feedback/"));
+  assert.ok(!WORKFLOW.includes("fixtures/"));
+  assert.match(
+    SITEMAP,
+    /<loc>https:\/\/cambridgetcg\.github\.io\/rhetorlint-spec\/<\/loc>\s*<lastmod>2026-08-16<\/lastmod>/,
+  );
+  assert.ok(!SITEMAP.includes("#claim-feedback"));
+});
+
 test("structured data describes the actual free on-device web application", () => {
   const match = INDEX.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
   assert.ok(match, "JSON-LD exists");
