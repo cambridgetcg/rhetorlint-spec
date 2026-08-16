@@ -1,6 +1,9 @@
 # Cloudflare Claim Feedback door
 
-Status observed 2026-08-16: **prepared locally, not yet deployed**.
+Status observed 2026-08-17: the separate project exists with the exact
+`rhetorlint-claim-feedback.pages.dev` hostname, production branch `main`, Direct
+Upload source, and Web Analytics disabled. **No deployment has been uploaded
+yet.**
 
 Proposed project: `rhetorlint-claim-feedback`
 
@@ -71,13 +74,14 @@ RHETORLINT_CLOUDFLARE_DEPLOY="active:$(git rev-parse HEAD)" \
 ```
 
 The script refuses any dirty worktree or commit other than freshly fetched
-`origin/main`, confirms the named project already exists with production branch
-`main`, rechecks the generated allowlist, and deploys a `git archive` snapshot
-of the exact commit. Wrangler runs non-interactively from a fresh temporary
-working directory so a future repository `functions/` folder cannot be
-discovered. The activation word is bound to the exact mode and commit.
-Wrangler's `--commit-dirty=false` remains metadata; the script's Git and
-snapshot checks are the gate.
+`origin/main`. It reads the provider project through Cloudflare's API and
+requires the exact name, hostname, production branch, Direct Upload source, Web
+Analytics off, and no reported Pages Functions. It then rechecks the generated
+allowlist and deploys a `git archive` snapshot of the exact commit. Wrangler
+runs non-interactively from a fresh temporary working directory so a future
+repository `functions/` folder cannot be discovered. The activation word is
+bound to the exact mode and commit. Wrangler's `--commit-dirty=false` remains
+metadata; the script's Git, provider, and snapshot checks are the gate.
 
 This is not a recurring deployment loop or standing authority. Rollback is a
 separate Cloudflare action. A resting production alias does not erase the

@@ -46,7 +46,7 @@
       "packages/core/signals.mjs": "727a6f310dd6424beb72a4b2ffd7f1cbb712ea9aba6b8573078242f20af295d7",
       "packages/rules-en/rules.json": "85a84ed51334a353ca162b2c7224a49df1b3f6a0160d4ef6577d65545f729b77",
       "scripts/build-cloudflare-claim-feedback.mjs": "bc7641a2c907f92cd3e9b35bd18452a0b67762bd2c3725ae54e5a50fc0bef9e5",
-      "scripts/deploy-cloudflare-claim-feedback.zsh": "8a7646994e64dd0fee456379592bc453017182023b1373838de0df3391634e01"
+      "scripts/deploy-cloudflare-claim-feedback.zsh": "85e98ee2a98e25203035fb7c3d2cf322c6b529b5ccd6559abdec89a47dc7dfcd"
     }
   },
   "crawlAndReuse": {

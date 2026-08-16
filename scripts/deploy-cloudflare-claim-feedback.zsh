@@ -70,23 +70,56 @@ if [[ -n $(ls -A) ]]; then
   exit 1
 fi
 
-project_json=$(WRANGLER_SEND_METRICS=false CI=1 wrangler pages project list --json </dev/null)
-if ! print -r -- "$project_json" | PROJECT_NAME="$project_name" node --input-type=module -e '
-  import { readFileSync } from "node:fs";
-  const projects = JSON.parse(readFileSync(0, "utf8"));
-  const project = projects.find((item) => item.name === process.env.PROJECT_NAME);
-  if (!project) {
-    process.stderr.write("Refusing Cloudflare deployment: create and review the named project separately first.\n");
-    process.exit(1);
+PROJECT_NAME="$project_name" EXPECTED_SUBDOMAIN="$project_name.pages.dev" node --input-type=module -e '
+  import { execFileSync } from "node:child_process";
+
+  const commandOptions = {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "inherit"],
+    env: { ...process.env, WRANGLER_SEND_METRICS: "false" },
+  };
+  const auth = JSON.parse(execFileSync("wrangler", ["auth", "token", "--json"], commandOptions));
+  const identity = JSON.parse(execFileSync("wrangler", ["whoami", "--json"], commandOptions));
+  if (!auth.token || identity.accounts?.length !== 1) {
+    throw new Error("Cloudflare preflight requires one authenticated account");
   }
-  const branch = project.production_branch ?? project.productionBranch;
-  if (branch !== "main") {
-    process.stderr.write("Refusing Cloudflare deployment: project production branch is not main.\n");
-    process.exit(1);
+
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${identity.accounts[0].id}/pages/projects/${process.env.PROJECT_NAME}`,
+    { headers: { Authorization: `Bearer ${auth.token}` } },
+  );
+  const body = await response.json();
+  if (!response.ok || !body.success) {
+    throw new Error(`named Cloudflare project is unavailable (${response.status})`);
   }
-'; then
-  exit 1
-fi
+  const project = body.result;
+  if (project.name !== process.env.PROJECT_NAME || project.subdomain !== process.env.EXPECTED_SUBDOMAIN) {
+    throw new Error("Cloudflare project name or hostname differs from the reviewed release");
+  }
+  if (project.production_branch !== "main" || project.source != null) {
+    throw new Error("Cloudflare project is not the reviewed main-branch Direct Upload project");
+  }
+  if (project.uses_functions === true) {
+    throw new Error("Cloudflare project unexpectedly reports Pages Functions");
+  }
+
+  const analyticsPaths = [];
+  function inspect(value, path = "project") {
+    if (!value || typeof value !== "object") return;
+    for (const [key, child] of Object.entries(value)) {
+      const childPath = `${path}.${key}`;
+      if (/^web_analytics_(?:tag|token)$/.test(key) && typeof child === "string" && child.length > 0) {
+        analyticsPaths.push(childPath);
+      } else {
+        inspect(child, childPath);
+      }
+    }
+  }
+  inspect(project);
+  if (analyticsPaths.length > 0) {
+    throw new Error("Cloudflare Web Analytics must be disabled before deployment");
+  }
+' </dev/null
 
 git -C "$repo_dir" archive --format=tar "$commit" -- "$release_path" | tar -xf - -C "$deploy_cwd"
 snapshot_dir="$deploy_cwd/$release_path"

@@ -343,7 +343,12 @@ test("the deployment door is executable, exact-commit, snapshotted, and non-inte
   assert.notEqual(statSync(path).mode & 0o111, 0);
   assert.match(source, /git fetch --quiet origin main <\/dev\/null/);
   assert.match(source, /refs\/remotes\/origin\/main/);
-  assert.match(source, /wrangler pages project list --json <\/dev\/null/);
+  assert.match(source, /api\.cloudflare\.com\/client\/v4\/accounts/);
+  assert.match(source, /project\.production_branch !== "main"/);
+  assert.match(source, /project\.source != null/);
+  assert.match(source, /project\.uses_functions === true/);
+  assert.match(source, /web_analytics_\(\?:tag\|token\)/);
+  assert.match(source, /Cloudflare Web Analytics must be disabled/);
   assert.match(source, /git .*archive --format=tar "\$commit"/);
   assert.match(source, /pages deploy "\$snapshot_dir"/);
   assert.match(source, /WRANGLER_SEND_METRICS=false CI=1/);
