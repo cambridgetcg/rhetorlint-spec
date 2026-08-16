@@ -1,11 +1,10 @@
 # Cloudflare Claim Feedback door
 
-Status observed 2026-08-17: the separate project exists with the exact
-`rhetorlint-claim-feedback.pages.dev` hostname, production branch `main`, Direct
-Upload source, and Web Analytics disabled. **No deployment has been uploaded
-yet.**
+Status observed 2026-08-17: **live at
+<https://rhetorlint-claim-feedback.pages.dev/>** from exact source commit
+`733440216d4d1d25c2b70ea00c1849a2879dba59`.
 
-Proposed project: `rhetorlint-claim-feedback`
+Project: `rhetorlint-claim-feedback`
 
 This integration follows the account's established Cloudflare Pages Direct
 Upload pattern while keeping the factual source in this repository.
@@ -45,7 +44,37 @@ live response headers are checked separately. The active lock also hashes the
 canonical source files and release scripts from which the static door was
 derived.
 
-## First deployment order
+## Live receipt — 2026-08-17
+
+Cloudflare Pages Direct Upload, Wrangler `4.103.0`, production branch `main`:
+
+- resting deployment ID: `8762922c-bece-49f5-ac05-69176ab45193`;
+- resting immutable URL:
+  <https://8762922c.rhetorlint-claim-feedback.pages.dev/>;
+- active deployment ID: `35c5a411-4e82-42ad-989e-bafcb620c816`;
+- active immutable URL:
+  <https://35c5a411.rhetorlint-claim-feedback.pages.dev/>;
+- active release-lock SHA-256:
+  `b52d888991ccd641da725fa616994561dbf5cb964d265ffafdeddaea3b89c6d5`;
+- resting release-lock SHA-256:
+  `7e71742929f68cb0432983960d9fcedff84bc015cc62591ee4579e0328c40c68`.
+
+The provider API reports both deployments as successful production releases
+from branch `main`; the active deployment carries the full source commit above.
+The project and both deployments report no Pages Functions. Web Analytics is
+disabled and the served HTML is byte-identical to the reviewed file, so no
+analytics script was injected.
+
+Every served active file and every served resting file was fetched from its
+immutable URL and compared byte-for-byte with its committed release input.
+Root responses, JSON, text, the real nested `404`, and the production alias were
+checked separately. The live CSP keeps `script-src` and `connect-src` at
+`'none'`; `_headers` itself returns the custom `404` instead of being served.
+Cloudflare adds `Access-Control-Allow-Origin: *` on the public `pages.dev`
+responses, and returned `Cache-Control: no-store` on the custom `404`; neither
+adds an intake or credential-bearing route.
+
+## Release order
 
 1. review one exact clean commit and confirm the Cloudflare account and project;
 2. create the separate project only if it does not exist, with production
