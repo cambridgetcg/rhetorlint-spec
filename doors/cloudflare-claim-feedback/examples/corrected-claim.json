@@ -1,0 +1,131 @@
+{
+  "schema": "claim-feedback.input/0.1",
+  "claim": {
+    "id": "feedback-response-time",
+    "url": "https://example.org/claims/feedback-response-time",
+    "text": "We always review every submitted report within 48 hours.",
+    "language": "en",
+    "scope": "A fictional claim used only to test this local example; it describes the advertised feedback path at the captured time.",
+    "correction_url": "https://example.org/claims/feedback-response-time/corrections",
+    "withdrawal_url": "https://example.org/claims/feedback-response-time/withdrawals",
+    "sources": [
+      {
+        "url": "https://example.org/claims/feedback-response-time",
+        "observed_at": "2026-08-16T09:00:00.000Z",
+        "content_sha256": "sha256:8e265ca72e15c31eaf16b0ead76785b26d1a04e0a0442187eb4c87a391ccbc11",
+        "supports": "The supplied page bytes contain the exact advertised response-time claim."
+      }
+    ],
+    "uncertainties": [
+      "The fixture records one advertised sentence and one endpoint response; it does not establish behavior at other times."
+    ]
+  },
+  "crawl": {
+    "retrieved_at": "2026-08-16T09:00:00.000Z",
+    "method": "GET",
+    "url": "https://example.org/claims/feedback-response-time",
+    "final_url": "https://example.org/claims/feedback-response-time",
+    "http_status": 200,
+    "media_type": "text/html; charset=utf-8",
+    "body_utf8": "<main><p>We always review every submitted report within 48 hours.</p><p>Submit feedback at /api/feedback.</p></main>",
+    "body_sha256": "sha256:8e265ca72e15c31eaf16b0ead76785b26d1a04e0a0442187eb4c87a391ccbc11",
+    "claim_sha256": "sha256:562dda7dab22496d7b61e86a3ae44a96e0776a3480a5b69c239dd45ad5d57426",
+    "access": {
+      "basis": "owner-supplied",
+      "crawler_name": "Example Claim Crawler",
+      "crawler_version": "0.1.0",
+      "crawler_user_agent": "ExampleClaimCrawler/0.1 (+https://example.org/crawler)",
+      "robots": {
+        "decision": "allowed",
+        "url": "https://example.org/robots.txt",
+        "observed_at": "2026-08-16T08:59:59.000Z",
+        "content_sha256": "sha256:16ceb5ee3e0dc13aa9adf31a3ebbe45a1d965b8c2b9f72eaf84e5911e140ed95"
+      }
+    },
+    "known_effects": [
+      "The fixture represents one bounded GET; this builder itself makes no request."
+    ],
+    "known_limits": [
+      "This is synthetic example.org data, not proof that a real remote request occurred or that a server kept no logs."
+    ]
+  },
+  "challenge": {
+    "id": "endpoint-unavailable",
+    "kind": "advertised-observed-mismatch",
+    "made_at": "2026-08-16T09:02:00.000Z",
+    "text": "The advertised response-time claim and the supplied endpoint receipt differ. What is the current feedback path and commitment?",
+    "language": "en",
+    "evidence": [
+      {
+        "url": "https://example.org/api/feedback",
+        "observed_at": "2026-08-16T09:01:00.000Z",
+        "http_status": 503,
+        "media_type": "application/json; charset=utf-8",
+        "body_utf8": "{\"error\":\"Feedback is unavailable while storage is disabled.\"}",
+        "body_sha256": "sha256:10844266330546195af32b8e37c761b3685796e63bd7c91f0df5065a10ffb581",
+        "excerpt": "Feedback is unavailable while storage is disabled.",
+        "interpretation": "The named endpoint was unavailable at the observed time; this does not establish its earlier or later state."
+      }
+    ],
+    "speaker_claim": "recorder",
+    "attribution_basis": "self",
+    "source": "https://example.org/local-review/endpoint-unavailable",
+    "confidence": "high",
+    "known_limits": [
+      "The challenge compares supplied records and does not infer who caused the mismatch or why."
+    ]
+  },
+  "response": {
+    "kind": "correction",
+    "received_at": "2026-08-16T10:00:00.000Z",
+    "text": "The publisher supplied a narrower replacement claim and retained the original record.",
+    "language": "en",
+    "replacement_claim": "Feedback submission is currently unavailable. We will publish a response-time commitment only after storage is enabled and verified.",
+    "replacement_claim_language": "en",
+    "speaker_claim": "Example Publisher",
+    "attribution_basis": "direct-report",
+    "source": "https://example.org/claims/feedback-response-time/corrections#2026-08-16",
+    "confidence": "high",
+    "known_limits": [
+      "This supplied record does not authenticate the publisher or prove that the replacement was published remotely."
+    ]
+  },
+  "material_review": {
+    "status": "passed",
+    "reviewed_at": "2026-08-16T10:04:00.000Z",
+    "speaker_claim": "recorder",
+    "attribution_basis": "self",
+    "source": "https://example.org/local-review/material-review",
+    "confidence": "high",
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_third_party_material": false,
+    "known_limits": [
+      "This is a review of a small synthetic fixture, not proof about material at any remote URL."
+    ]
+  },
+  "reuse": {
+    "search": "allow",
+    "retrieval": "allow",
+    "model_input": "allow",
+    "training": "allow",
+    "mirror": "deny",
+    "declaring_party": "Example Publisher",
+    "authority_basis": "The fixture says the publisher controls these synthetic words; the builder does not authenticate that statement.",
+    "applies_to_sha256": [
+      "sha256:562dda7dab22496d7b61e86a3ae44a96e0776a3480a5b69c239dd45ad5d57426",
+      "sha256:8e265ca72e15c31eaf16b0ead76785b26d1a04e0a0442187eb4c87a391ccbc11",
+      "sha256:10844266330546195af32b8e37c761b3685796e63bd7c91f0df5065a10ffb581",
+      "sha256:50667abbb94ed8c86f828d54fea58628ab58f4c487e0b1d331d7e1d349f94573"
+    ],
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "policy_url": "https://example.org/reuse-policy",
+    "effective_at": "2026-08-16T10:00:00.000Z",
+    "assessed_at": "2026-08-16T10:05:00.000Z",
+    "withdrawn_at": null,
+    "source": "https://example.org/reuse-policy",
+    "known_limits": [
+      "The rights and permission fields are supplied declarations, not findings made by this builder."
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+/.gitattributes text eol=lf
+/apps/claim-feedback-door/** text eol=lf
+/doors/cloudflare-claim-feedback/** text eol=lf
+/doors/cloudflare-resting-baseline/** text eol=lf
+/examples/claim-feedback/** text eol=lf
+/packages/core/*.mjs text eol=lf
+/packages/core/package.json text eol=lf
+/packages/rules-en/rules.json text eol=lf
+/scripts/build-cloudflare-claim-feedback.mjs text eol=lf
+/scripts/deploy-cloudflare-claim-feedback.zsh text eol=lf
+/LICENSE text eol=lf
+/package.json text eol=lf

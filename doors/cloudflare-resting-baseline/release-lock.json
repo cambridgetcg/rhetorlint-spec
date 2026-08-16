@@ -1,0 +1,24 @@
+{
+  "schema": "claim-feedback.cloudflare-release/0.1",
+  "artifact": "rhetorlint-claim-feedback-resting-baseline",
+  "platform": "cloudflare-pages-direct-upload",
+  "project": "rhetorlint-claim-feedback",
+  "releaseManifestRule": "releaseFilesSha256 hashes every uploaded release input except this self-describing release-lock.json; _headers is parsed as configuration and its resulting response headers require separate live verification",
+  "releaseFilesSha256": {
+    "404.html": "41e07254270d3943f1e902a6e8ea58827f36423dd84fddae75cebac02dfc2bf4",
+    "README.md": "80d7a58d1bf56dceddaf2002d12c8510d8cba33717cf91699311ac65a7f118d2",
+    "_headers": "da4b176c34ad7b1d34bc3d811af3806c6c06851b62cf3c1f70bdfb91e544f942",
+    "index.html": "abc8f7e5e6b974996ff0b6bb421036b57a5a3b0260805a0834cfa05b76fa3a5d",
+    "rest.css": "c9822715aaf68b392593c14c4f7fc7aeb836adf6e43d1fe1dfb7755ee701ee36",
+    "robots.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1"
+  },
+  "effects": {
+    "claimFeedbackContractsFixturesOrSubmissionsServed": false,
+    "inputsAccepted": false,
+    "redirects": false,
+    "serverCode": false,
+    "storage": false,
+    "analyticsCode": false,
+    "timers": false
+  }
+}

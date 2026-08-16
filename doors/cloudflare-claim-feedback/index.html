@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#17140f" />
+    <meta
+      name="description"
+      content="A static Cloudflare door for RhetorLint Claim Feedback. Claims stay on your machine; only reviewed contracts and a fictional example are served."
+    />
+    <link rel="canonical" href="https://rhetorlint-claim-feedback.pages.dev/" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Claim Feedback · words can come back</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the meaning</a>
+    <main id="main" tabindex="-1">
+      <header class="hero">
+        <p class="eyebrow">RhetorLint · Claim Feedback 0.1</p>
+        <h1>Words can come back.</h1>
+        <p class="lead">
+          Carry claims, not people. Let crawlers find the public contracts—not
+          harvest submissions—and make correction easier than denial.
+        </p>
+        <p class="boundary">
+          This Cloudflare door is static. It cannot receive, fetch, store, send,
+          score, sign, or train on your claim.
+        </p>
+      </header>
+
+      <section aria-labelledby="path-title">
+        <h2 id="path-title">One finite path</h2>
+        <ol class="path">
+          <li><strong>Exact claim</strong><span>Keep the words, source, scope, and digest together.</span></li>
+          <li><strong>Supplied receipt</strong><span>Record what a named crawler says it observed without pretending the identity is authenticated.</span></li>
+          <li><strong>Evidence challenge</strong><span>Separate literal evidence from the interpretation placed on it.</span></li>
+          <li><strong>Reply or correction</strong><span>Attribute the response and append the changed claim without erasing the first.</span></li>
+          <li><strong>Stop</strong><span>KARMA stays an unsigned draft. Training stays held for an independent rights and privacy review.</span></li>
+        </ol>
+      </section>
+
+      <section class="run" aria-labelledby="run-title">
+        <div>
+          <p class="eyebrow">Local by construction</p>
+          <h2 id="run-title">Run the actual builder locally</h2>
+          <p>
+            The complete builder is a one-shot Node command in the public
+            repository. It reads one bounded JSON file, prints one packet, and
+            stops. Your file is never uploaded by this page.
+          </p>
+        </div>
+        <pre aria-label="Local Claim Feedback command"><code>npm run claim-feedback -- INPUT.json</code></pre>
+        <p class="actions">
+          <a href="https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/README.md">Read the complete local guide</a>
+          <a href="https://github.com/cambridgetcg/rhetorlint-spec">Open the source repository</a>
+        </p>
+      </section>
+
+      <section aria-labelledby="machine-title">
+        <p class="eyebrow">For tools and crawlers</p>
+        <h2 id="machine-title">Public contracts, not harvested submissions</h2>
+        <p>
+          These reviewed bytes are deliberately easy to retrieve. The example
+          is fictional and uses reserved <code>example.org</code> addresses.
+          Crawler access is not proof of reuse permission, dataset selection,
+          training, model update, or correction uptake.
+          The schemas describe the JSON shape; the local runner adds stricter
+          URL and policy checks.
+        </p>
+        <ul class="contracts">
+          <li><a href="./.well-known/claim-feedback.json">Machine-readable door manifest</a></li>
+          <li><a href="./contracts/claim-feedback-input.schema.json">Closed input schema</a></li>
+          <li><a href="./contracts/claim-feedback-packet.schema.json">Closed packet schema</a></li>
+          <li><a href="./examples/corrected-claim.json">Fictional corrected-claim example</a></li>
+          <li><a href="./llms.txt">Plain machine guide</a></li>
+          <li><a href="./release-lock.json">Exact release-file hashes</a></li>
+        </ul>
+      </section>
+
+      <section class="limits" aria-labelledby="limits-title">
+        <h2 id="limits-title">What this does not decide</h2>
+        <ul>
+          <li>A RhetorLint mark is a wording prompt, not a truth or lie verdict.</li>
+          <li>No result describes a speaker's ego, motive, intent, character, or worth.</li>
+          <li>A supplied crawler receipt does not authenticate a fetch or grant copyright, privacy, or training rights.</li>
+          <li>An unsigned KARMA draft is not a deed, reputation score, punishment, or public accusation.</li>
+        </ul>
+      </section>
+
+      <footer>
+        <p>
+          Cloudflare serves these static files and may keep ordinary request,
+          security, or account logs under its own settings. The application
+          sends no telemetry and provides no submission endpoint.
+        </p>
+        <p>
+          Found a problem in these words or contracts?
+          <a href="https://github.com/cambridgetcg/rhetorlint-spec/issues/new">Open an optional public correction on GitHub</a>.
+          Do not paste a private claim file or personal, sensitive, or
+          third-party material into that public issue.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

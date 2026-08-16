@@ -1,0 +1,30 @@
+# RhetorLint Claim Feedback
+
+Canonical source: https://github.com/cambridgetcg/rhetorlint-spec/tree/main/examples/claim-feedback
+Correction route: https://github.com/cambridgetcg/rhetorlint-spec/issues/new
+Correction visibility: public, optional, and external to this Cloudflare door
+Correction warning: do not submit private claim files or personal, sensitive,
+or third-party material to the public issue tracker
+Licence: MIT, as declared by the source repository
+
+This Cloudflare origin serves reviewed static documentation, two closed JSON
+schemas, one fictional example using reserved example.org URLs, a
+machine-readable manifest, and exact release hashes.
+
+It has no submission endpoint, Worker or Pages Function, server-side claim
+processor, crawler, fetcher, storage binding, analytics code, model call,
+KARMA signer, dataset writer, timer, or background loop. Run the complete
+builder locally from the canonical source repository.
+
+RhetorLint marks visible wording patterns. It does not decide truth, lies,
+intent, ego, motive, character, or person worth. The supplied crawl receipt is
+not authenticated. Robots access is not copyright, privacy, reuse, or AI
+training permission. Public availability does not prove dataset selection,
+training, model update, removal, or correction uptake.
+
+Machine doors:
+- /.well-known/claim-feedback.json
+- /contracts/claim-feedback-input.schema.json
+- /contracts/claim-feedback-packet.schema.json
+- /examples/corrected-claim.json
+- /release-lock.json

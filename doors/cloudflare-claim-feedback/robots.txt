@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rhetorlint-claim-feedback.pages.dev/sitemap.xml
+
+# Access to these static public bytes is not copyright, privacy, reuse, or
+# AI-training permission. See /.well-known/claim-feedback.json.
