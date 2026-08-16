@@ -1,0 +1,5 @@
+rhetorlint-spec — licensing notes
+
+Note on the taxonomy corpus: the human-readable taxonomy in spec/taxonomy.yaml
+is additionally offered under CC-BY-SA-4.0 so educators may copy and adapt it
+freely. Code (the engine and rule matchers) is MIT as above.

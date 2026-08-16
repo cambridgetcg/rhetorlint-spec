@@ -79,6 +79,7 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 - **Claim correction** — the finite [Claim Feedback example](examples/claim-feedback/README.md) carries one exact claim and supplied crawl receipt through an evidence challenge, attributed reply or correction, an unsigned KARMA draft, and a held AI-training review proposal. Its [public Cloudflare door](https://rhetorlint-claim-feedback.pages.dev/) mirrors only the reviewed contracts and one fictional example; the builder stays local. It crawls nobody, judges nobody, and has no network or persistent-write capability.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
+- **ML evaluators** — the local-first [RhetorLint conformance dataset](datasets/rhetorlint-conformance/README.md) turns all 31 committed engine cases into one digest-bound Hugging Face-compatible `test` snapshot. It has no training split, upload, model call, person score, or truth label; the sole Claim Feedback fixture is explicitly excluded because its reuse lane denies mirroring.
 
 ```bash
 echo "Mistakes were made." | npm run cli -- --json     # the CLI, on stdin
@@ -119,6 +120,7 @@ Agreement is on **values**, not on serialised bytes: the same density that JS an
 ```
 spec/            taxonomy.yaml · output.schema.json      the portable core
 conformance/     cases.json                               the cross-engine ground truth
+datasets/rhetorlint-conformance/ derived HF-shaped evaluation snapshot, no upload
 packages/core/   index.mjs · sarif.mjs · signals.mjs      JS engine + explicit exports
 packages/rules-en/ rules.json                             the English tell-pack
 packages/cli/    cli.mjs                                   the CLI (JSON/SARIF, CI spin-gate)

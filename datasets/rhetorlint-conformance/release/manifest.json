@@ -1,0 +1,72 @@
+{
+  "schema": "rhetorlint.conformance-hf-release/0.1",
+  "status": "local-review-snapshot",
+  "config": "conformance",
+  "split": "test",
+  "rows": 31,
+  "train_rows": 0,
+  "claim_feedback_content_rows": 0,
+  "license": "MIT",
+  "measured_frame": {
+    "unique_inputs": 31,
+    "minimum_input_characters": 28,
+    "maximum_input_characters": 117,
+    "marks": 50,
+    "marked_cases": 26,
+    "zero_mark_cases": 5,
+    "rules_in_pack": 22,
+    "rules_observed": 22,
+    "families_observed": 6,
+    "strip_outputs_changed": 10
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1068,
+      "sha256": "sha256:a1613ba5d78294b212dfdb6691181c104c4620a848ebc17a5307d769418b0d29"
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 255,
+      "sha256": "sha256:5b8345db04a6820b9e96a31dccb4e940a0196232dff39fe9ab2ff0ef5d724c72"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4764,
+      "sha256": "sha256:11a988c78ac46ffa927442996cdae771ac55a369783bceb27a68b100c3cf937c"
+    },
+    {
+      "path": "data/test-00000-of-00001.jsonl",
+      "bytes": 83494,
+      "sha256": "sha256:27d415f31784bd7dfe288aac7c11ba0e0f470f2b37e68729e4a9eaa176ca6b8f"
+    },
+    {
+      "path": "metadata/claim-feedback-admission.json",
+      "bytes": 1071,
+      "sha256": "sha256:6202ff6633d0232d10eac7df674a61a4e7c5e71481003ae3f079abcd7569149b"
+    },
+    {
+      "path": "metadata/source-manifest.json",
+      "bytes": 3231,
+      "sha256": "sha256:66904373fa09bdcbc18cae5166e06fc3de65ec17aa0f7c8b71db8abaebbcd70e"
+    },
+    {
+      "path": "schema/row.schema.json",
+      "bytes": 6130,
+      "sha256": "sha256:0952d89c6e31dc1f11d38bc317f84ca4e42b90e89b4fecf79c56891a39889c25"
+    }
+  ],
+  "checksums": {
+    "algorithm": "sha256",
+    "path": "SHA256SUMS",
+    "covers": "every release file except SHA256SUMS"
+  },
+  "effects": {
+    "network_requests": 0,
+    "hub_repositories_created": 0,
+    "hub_uploads": 0,
+    "models_run": 0,
+    "training_runs": 0,
+    "karma_writes": 0
+  }
+}

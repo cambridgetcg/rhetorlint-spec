@@ -1,0 +1,26 @@
+{
+  "schema": "rhetorlint.claim-feedback-dataset-admission/0.1",
+  "source_path": "examples/claim-feedback/fixtures/corrected-claim.json",
+  "source_input_sha256": "sha256:c6aac7b7f92beef9af59c80908dc14d4805cf2a2c8ffe8655857ffbe75d7b58f",
+  "source_file_sha256": "sha256:cc8cbca3750d4bf7917c2161c95db3abc2787ee0995463470f79143f924a9e5c",
+  "status": "excluded",
+  "content_rows_admitted": 0,
+  "supplied_training_choice": "allow",
+  "supplied_mirror_choice": "deny",
+  "independent_admission_performed": false,
+  "reasons": [
+    "public or private Hub packaging is a mirror use, and the supplied declaration says mirror: deny",
+    "the dataset builder performs no rights, privacy, safety, or provenance admission",
+    "one fictional correction turn cannot support training or benchmark claims"
+  ],
+  "retained_content": "digests-and-exclusion-reasons-only",
+  "carried_action_authority": false,
+  "effects": {
+    "network_requests": 0,
+    "hub_repositories_created": 0,
+    "hub_uploads": 0,
+    "models_run": 0,
+    "training_runs": 0,
+    "karma_writes": 0
+  }
+}
