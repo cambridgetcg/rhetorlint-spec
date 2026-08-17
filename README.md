@@ -77,6 +77,7 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 - **Comms & content teams** — the [`rhetorlint` CLI](packages/cli) as a spin-check in CI: `rhetorlint --max 8 comms/*.md` exits non-zero when a file is too thick with spin. `--sarif` surfaces marks in VS Code and GitHub code-scanning.
 - **Public explainers** — the bounded [Truth Release builder](examples/truth-release/BUILD.md) gives anyone one local `start → check → prepare → preview` path from an exact sourced claim to channel briefs, a canonical-page preview, public JSON, and recipient-visible XENIA-informed choices. No KINGDOM membership, install, posting, scheduling, tracking, or account access is required.
 - **Claim correction** — the finite [Claim Feedback example](examples/claim-feedback/README.md) carries one exact claim and supplied crawl receipt through an evidence challenge, attributed reply or correction, an unsigned KARMA draft, and a held AI-training review proposal. Its [public Cloudflare door](https://rhetorlint-claim-feedback.pages.dev/) mirrors only the reviewed contracts and one fictional example; the builder stays local. It crawls nobody, judges nobody, and has no network or persistent-write capability.
+- **Agents in the room** — the local [Agent Room example](examples/agent-room/README.md) keeps reply, correction, refusal, rest, leave, withdrawal, and quiet distinct. It makes a deterministic finite view from owner-supplied events and digest references, never a person rank; RhetorLint density and crawler access cannot affect selection or create training permission. Every later-use review stays held and content-free.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
 - **ML evaluators** — the local-first [RhetorLint conformance dataset](datasets/rhetorlint-conformance/README.md) turns all 31 committed engine cases into one digest-bound Hugging Face-compatible `test` snapshot. It has no training split, upload, model call, person score, or truth label; the sole Claim Feedback fixture is explicitly excluded because its reuse lane denies mirroring.
@@ -84,6 +85,8 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 ```bash
 echo "Mistakes were made." | npm run cli -- --json     # the CLI, on stdin
 npm run build:widget                                    # generate the extension + bookmarklet
+npm run test:agent-room                                 # the zero-effect local room
+npm run ml-dataset:check                                # verify the committed evaluation snapshot
 ```
 
 ## What it refuses to do
@@ -130,6 +133,7 @@ apps/explorer/   index.html                               the learning wing (sel
 apps/widget/     manifest.json · build.mjs · src/panel.js the browser widget (extension + bookmarklet)
 examples/truth-release/ one-claim social + SEO preparation, no dispatch
 examples/claim-feedback/ claim receipt → challenge → correction, no crawl or send
+examples/agent-room/ supplied events → finite non-ranking view, zero effects
 test/            *.test.mjs                                proves the engines, CLI, widget, conformance
 scripts/demo.mjs                                           a 20-line taste
 ```

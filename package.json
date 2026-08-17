@@ -10,10 +10,11 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/conformance.test.mjs test/media-wave.test.mjs test/pack-bands.test.mjs test/package-types.test.mjs test/schema.test.mjs test/signals.test.mjs test/widget-build.test.mjs test/pages-seo.test.mjs test/cloudflare-claim-feedback.test.mjs examples/truth-release/prepare.test.mjs examples/truth-release/builder.test.mjs examples/claim-feedback/claim-feedback.test.mjs datasets/rhetorlint-conformance/build.test.mjs",
+    "test": "node --test test/analyze.test.mjs test/cli.test.mjs test/conformance.test.mjs test/media-wave.test.mjs test/pack-bands.test.mjs test/package-types.test.mjs test/schema.test.mjs test/signals.test.mjs test/widget-build.test.mjs test/pages-seo.test.mjs test/cloudflare-claim-feedback.test.mjs examples/truth-release/prepare.test.mjs examples/truth-release/builder.test.mjs examples/claim-feedback/claim-feedback.test.mjs examples/agent-room/agent-room.test.mjs datasets/rhetorlint-conformance/build.test.mjs",
     "test:conformance": "node --test test/conformance.test.mjs && python3 impl/python/test_conformance.py",
     "test:truth-release": "node --test examples/truth-release/prepare.test.mjs examples/truth-release/builder.test.mjs",
     "test:claim-feedback": "node --test examples/claim-feedback/claim-feedback.test.mjs",
+    "test:agent-room": "node --test examples/agent-room/agent-room.test.mjs",
     "test:ml-dataset": "node --test datasets/rhetorlint-conformance/build.test.mjs",
     "build:cloudflare": "node scripts/build-cloudflare-claim-feedback.mjs",
     "check:cloudflare": "node scripts/build-cloudflare-claim-feedback.mjs --check",
