@@ -2,7 +2,7 @@
 
 Status observed 2026-08-17: **live at
 <https://rhetorlint-claim-feedback.pages.dev/>** from exact source commit
-`39d75769d6b7821903bc374f079608767ae6ec26`.
+`0939317a1d64b2da2ca230bd39a9617cf7de7236`.
 
 Project: `rhetorlint-claim-feedback`
 
@@ -13,7 +13,8 @@ Upload pattern while keeping the factual source in this repository.
 
 Only the generated upload inputs in `doors/cloudflare-claim-feedback/`:
 
-- a plain static explanation;
+- one bounded, on-device browser worksheet;
+- the browser adapter and exact shared deterministic projection;
 - the two closed Claim Feedback schemas;
 - one explicitly fictional `example.org` fixture;
 - `llms.txt` and a machine-readable boundary manifest;
@@ -21,9 +22,11 @@ Only the generated upload inputs in `doors/cloudflare-claim-feedback/`:
   release-file hashes.
 
 The deployable tree contains no Worker, Pages Function, form, submission route,
-fetch, storage binding, analytics code, AI binding, secret, timer, crawler,
-KARMA signer, or dataset writer. The full builder remains the one-shot local
-Node command documented in `examples/claim-feedback/README.md`.
+scripted network request, browser storage, storage binding, analytics code, AI
+binding, secret, timer, crawler, KARMA signer, or dataset writer. One explicit
+Run processes one supplied record in browser memory and renders it into the
+page. The stronger stable-file adapter remains the one-shot local Node command
+documented in `examples/claim-feedback/README.md`.
 
 Cloudflare can still retain ordinary request, account, security, abuse, or
 operational records under provider settings. “The app sends nothing” is not a
@@ -35,16 +38,52 @@ claim that the hosting platform observes nothing.
 npm run build:cloudflare
 npm run check:cloudflare
 npm test
+npm run test:claim-feedback-browser-real
 ```
 
 The build wholly regenerates both Cloudflare folders. Each
 `release-lock.json` hashes every other upload input. Cloudflare parses
 `_headers` as configuration instead of serving that path, so its resulting
 live response headers are checked separately. The active lock also hashes the
-canonical source files and release scripts from which the static door was
+canonical source files and release scripts from which the browser door was
 derived.
 
-## Live receipt — 2026-08-17
+## Browser worksheet live receipt — 2026-08-17
+
+Cloudflare Pages Direct Upload, Wrangler `4.103.0`, production branch `main`:
+
+- source commit: `0939317a1d64b2da2ca230bd39a9617cf7de7236`;
+- active deployment ID: `1a9ccc8d-b53d-4681-afee-d639596af417`;
+- active immutable URL:
+  <https://1a9ccc8d.rhetorlint-claim-feedback.pages.dev/>;
+- active release-lock SHA-256:
+  `5a96310a847b25236dc5146937e88e3ed2431ef996487d3f97fa83f2e8787ec4`;
+- retained resting deployment ID: `8762922c-bece-49f5-ac05-69176ab45193`;
+- resting release-lock SHA-256:
+  `7e71742929f68cb0432983960d9fcedff84bc015cc62591ee4579e0328c40c68`.
+
+Before deployment, GitHub CI passed the complete JavaScript, Python, and Go
+suites and the real headless-Chrome abuse gate on the exact source commit. The
+guarded deploy then rechecked the named Direct Upload project, production
+branch, absence of Pages Functions, disabled Web Analytics, clean Git state,
+current `origin/main`, and the exact generated release.
+
+After deployment, all 19 publicly served release files were fetched from both
+the production alias and immutable hostname and matched their committed
+SHA-256 values. The response CSP permits only the committed same-origin script
+graph and keeps `connect-src`, `frame-ancestors`, `worker-src`, and
+`form-action` at `'none'`. The `_headers` configuration path returns `404`, and
+an unknown route returns the exact committed custom 404 bytes.
+
+The browser proof exercises hostile markup, inert private and link-local URLs,
+network interception, transient and durable storage, Stop, changed input,
+Clear, repeated `pagehide`, held training review, and unsigned KARMA. This
+receipt establishes the tested release bytes and those named checks. It does
+not establish the truth of a supplied claim, the identity of a speaker, reuse
+permission, correction uptake, or secure erasure from browser or operating
+system memory.
+
+## Previous static-door receipt — 2026-08-17
 
 Cloudflare Pages Direct Upload, Wrangler `4.103.0`, production branch `main`:
 
@@ -77,7 +116,8 @@ adds an intake or credential-bearing route.
 
 ## Release order
 
-1. review one exact clean commit and confirm the Cloudflare account and project;
+1. review one exact clean commit, run the real-browser gate, and confirm the
+   Cloudflare account and project;
 2. create the separate project only if it does not exist, with production
    branch exactly `main`, then read back its real Pages hostname;
 3. confirm Cloudflare Web Analytics is disabled; otherwise Cloudflare may
