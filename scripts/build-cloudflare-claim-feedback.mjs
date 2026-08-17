@@ -23,13 +23,17 @@ const sourcePaths = Object.freeze([
   ".gitattributes",
   "LICENSE",
   "package.json",
+  "apps/claim-feedback-door/claim-feedback-browser.mjs",
+  "apps/claim-feedback-door/favicon.svg",
   "apps/claim-feedback-door/index.html",
   "apps/claim-feedback-door/style.css",
   "apps/claim-feedback-door/llms.txt",
+  "apps/claim-feedback-door/worksheet.mjs",
   "examples/claim-feedback/README.md",
   "examples/claim-feedback/claim-feedback-input.schema.json",
   "examples/claim-feedback/claim-feedback-packet.schema.json",
   "examples/claim-feedback/claim-feedback.mjs",
+  "examples/claim-feedback/claim-feedback-projection.mjs",
   "examples/claim-feedback/fixtures/corrected-claim.json",
   "packages/core/index.mjs",
   "packages/core/package.json",
@@ -74,9 +78,9 @@ function releaseHashes(files) {
 
 function activeManifest(hashes) {
   return {
-    schema: "claim-feedback.cloudflare-door/0.1",
+    schema: "claim-feedback.cloudflare-door/0.2",
     name: "RhetorLint Claim Feedback",
-    relationship: "static-discovery-and-local-run-door",
+    relationship: "static-on-device-worksheet-and-local-node-door",
     canonicalSource: `${repository}/tree/main/examples/claim-feedback`,
     correctionUrl,
     correctionRoute: {
@@ -89,10 +93,11 @@ function activeManifest(hashes) {
     runtime: {
       platform: "cloudflare-pages-static",
       serverCode: false,
-      claimProcessing: "local-node-command-only",
+      claimProcessing: "browser-memory-or-local-node",
       submissionEndpoint: null,
       storage: null,
       analyticsCode: false,
+      claimBytesLeaveBrowserThroughWorksheet: false,
     },
     contracts: {
       inputSchema: `${origin}contracts/claim-feedback-input.schema.json`,
@@ -121,6 +126,9 @@ function activeManifest(hashes) {
       personScore: false,
       mentalStateOrEgoInference: false,
       outboundCrawlerFetches: false,
+      browserStorage: false,
+      browserClaimUpload: false,
+      publicSharing: false,
       dispatch: false,
       karmaSignature: false,
       datasetWrite: false,
@@ -133,14 +141,16 @@ function activeReadme() {
   return `# Cloudflare Claim Feedback door
 
 This generated folder is the exact static payload for the Cloudflare Pages
-project \`${projectName}\`. It makes the reviewed Claim Feedback contracts and
-one fictional example easy to retrieve while keeping the actual builder on the
-reader's machine.
+project \`${projectName}\`. It serves the reviewed contracts, one fictional
+example, and a browser-memory worksheet. The same deterministic projection is
+also available through the stronger local Node file adapter.
 
-There is no Worker, Pages Function, form, submission route, crawler, storage
-binding, analytics code, model call, KARMA signer, dataset write, timer, or
-background loop. Cloudflare may still keep ordinary request, account, security,
-or operational logs under its own settings.
+There is no Worker, Pages Function, submission route, crawler, claim-upload,
+storage binding, analytics code, model call, KARMA signer, dataset write, timer,
+or background loop. The browser script performs one explicit in-memory
+projection and DOM render. It has no network or persistence capability.
+Cloudflare may still keep ordinary page and static-asset request, account,
+security, or operational logs under its own settings.
 
 \`release-lock.json\` hashes every other upload input and the exact source files
 from which this door was generated. Cloudflare parses \`_headers\` as
@@ -163,9 +173,43 @@ root for current deployment observations and rollback receipts.
 
 function activeFiles() {
   const hashes = sourceHashes();
+  const corePackage = JSON.parse(sourceBytes("packages/core/package.json").toString("utf8"));
+  const rules = JSON.parse(sourceBytes("packages/rules-en/rules.json").toString("utf8"));
+  const method = {
+    engine: {
+      name: corePackage.name,
+      version: corePackage.version,
+      source_sha256: `sha256:${sha256(sourceBytes("packages/core/index.mjs"))}`,
+    },
+    signal_projection: {
+      name: `${corePackage.name}/signals`,
+      version: corePackage.version,
+      source_sha256: `sha256:${sha256(sourceBytes("packages/core/signals.mjs"))}`,
+    },
+    rules: {
+      id: rules.id,
+      version: rules.version,
+      source_sha256: `sha256:${sha256(sourceBytes("packages/rules-en/rules.json"))}`,
+    },
+    packet_projection: {
+      schema: "claim-feedback.packet/0.2",
+      source_sha256: `sha256:${sha256(sourceBytes("examples/claim-feedback/claim-feedback-projection.mjs"))}`,
+    },
+  };
   const files = new Map([
     ["index.html", sourceBytes("apps/claim-feedback-door/index.html")],
+    ["favicon.svg", sourceBytes("apps/claim-feedback-door/favicon.svg")],
     ["style.css", sourceBytes("apps/claim-feedback-door/style.css")],
+    ["claim-feedback-browser.mjs", sourceBytes("apps/claim-feedback-door/claim-feedback-browser.mjs")],
+    ["worksheet.mjs", sourceBytes("apps/claim-feedback-door/worksheet.mjs")],
+    ["runtime/core.mjs", sourceBytes("packages/core/index.mjs")],
+    ["runtime/signals.mjs", sourceBytes("packages/core/signals.mjs")],
+    [
+      "runtime/claim-feedback-projection.mjs",
+      sourceBytes("examples/claim-feedback/claim-feedback-projection.mjs"),
+    ],
+    ["runtime/rules.mjs", utf8(`export default ${JSON.stringify(rules, null, 2)};\n`)],
+    ["runtime/method.mjs", utf8(`export default ${JSON.stringify(method, null, 2)};\n`)],
     ["llms.txt", sourceBytes("apps/claim-feedback-door/llms.txt")],
     [
       "contracts/claim-feedback-input.schema.json",
@@ -216,7 +260,7 @@ Sitemap: ${origin}sitemap.xml
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
   Cross-Origin-Opener-Policy: same-origin
-  Content-Security-Policy: default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'
   Cache-Control: public, max-age=300, must-revalidate
 
 /*.json
@@ -229,8 +273,8 @@ Sitemap: ${origin}sitemap.xml
   ]);
 
   files.set("release-lock.json", json({
-    schema: "claim-feedback.cloudflare-release/0.1",
-    artifact: "rhetorlint-claim-feedback-static-door",
+    schema: "claim-feedback.cloudflare-release/0.2",
+    artifact: "rhetorlint-claim-feedback-browser-door",
     platform: "cloudflare-pages-direct-upload",
     project: projectName,
     sourceFilesSha256: hashes,
@@ -239,12 +283,17 @@ Sitemap: ${origin}sitemap.xml
     releaseFilesSha256: releaseHashes(files),
     effects: {
       staticAssetRequests: true,
+      browserScriptExecution: true,
+      browserMemoryProcessing: true,
+      browserDomRenders: true,
       scriptedNetworkRequests: false,
       automaticThirdPartySubrequests: false,
       serverCode: false,
       submissions: false,
       claimStorage: false,
       browserStorage: false,
+      claimBytesLeaveBrowserThroughWorksheet: false,
+      publicSharing: false,
       analyticsCode: false,
       modelCalls: false,
       outboundCrawlerFetches: false,

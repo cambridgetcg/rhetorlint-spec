@@ -1,4 +1,4 @@
-# Claim Feedback 0.1
+# Claim Feedback 0.2
 
 **Crawl claims, not people. Expose mismatches, not souls. Speed correction,
 not punishment.**
@@ -15,10 +15,17 @@ exact claim + captured bytes
   → stop
 ```
 
-It is a local bridge, not a crawler. It reads one JSON file, recomputes the
+It is a local bridge, not a crawler. The Node adapter reads one JSON file, recomputes the
 supplied UTF-8 body and claim digests, checks that quoted spans are literal,
 prints one packet, and stops. It makes no request, sends no message, writes no
 file, signs no deed, and adds nothing to a dataset.
+
+The public [browser worksheet](https://rhetorlint-claim-feedback.pages.dev/)
+accepts one pasted record or selected byte snapshot and runs the same
+deterministic projection in browser memory. It has no URL fetch, upload,
+storage, telemetry, copy, share, signing, or dataset action. Cloudflare still
+sees the ordinary page and static-asset requests; the worksheet does not send
+the supplied claim bytes. The browser cannot make the CLI's stable-path claim.
 
 ## Try the complete fictional turn
 
@@ -175,17 +182,17 @@ import {
   verifyClaimFeedbackPacket,
 } from "./examples/claim-feedback/claim-feedback.mjs";
 
-const issues = validateClaimFeedbackInput(input);
+const issues = await validateClaimFeedbackInput(input);
 if (issues.length) throw new Error(issues[0].message);
 
-const packet = buildClaimFeedback(input);
-verifyClaimFeedbackPacket(packet, input);
+const packet = await buildClaimFeedback(input);
+await verifyClaimFeedbackPacket(packet, input);
 ```
 
 The closed [input schema](claim-feedback-input.schema.json), closed
 [packet schema](claim-feedback-packet.schema.json), and runtime use the
 example-local contracts `claim-feedback.input/0.1`,
-`claim-feedback.packet/0.1`, `claim-feedback.karma-draft/0.1`, and
+`claim-feedback.packet/0.2`, `claim-feedback.karma-draft/0.1`, and
 `claim-feedback.training-candidate/0.1`. Runtime validation is closed for exact
 keys and structurally checks bounds, timestamps, URLs, supplied digests,
 literal spans, attribution labels, Unicode safety, method-source and result
@@ -194,6 +201,11 @@ input; the runtime also rejects accessors, proxies, sparse arrays, hidden
 properties, cycles, excessive depth, and unpaired surrogates. It does not
 authenticate a remote fetch, robots decision, speaker, response meaning,
 rights holder, licence, consent, or authority.
+
+The packet's zero-effect counters have the explicit scope
+`projection-call-only`. Node standard output, browser DOM rendering, and the
+host's static-asset requests belong to their adapters and release receipts,
+not to that deterministic projection.
 
 Truth Release can later supply the source-owned claim, sources, limits, rights
 and correction door. Do not merge the two records by treating a prepared Truth

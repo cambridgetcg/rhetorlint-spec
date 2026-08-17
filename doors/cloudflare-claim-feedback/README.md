@@ -1,14 +1,16 @@
 # Cloudflare Claim Feedback door
 
 This generated folder is the exact static payload for the Cloudflare Pages
-project `rhetorlint-claim-feedback`. It makes the reviewed Claim Feedback contracts and
-one fictional example easy to retrieve while keeping the actual builder on the
-reader's machine.
+project `rhetorlint-claim-feedback`. It serves the reviewed contracts, one fictional
+example, and a browser-memory worksheet. The same deterministic projection is
+also available through the stronger local Node file adapter.
 
-There is no Worker, Pages Function, form, submission route, crawler, storage
-binding, analytics code, model call, KARMA signer, dataset write, timer, or
-background loop. Cloudflare may still keep ordinary request, account, security,
-or operational logs under its own settings.
+There is no Worker, Pages Function, submission route, crawler, claim-upload,
+storage binding, analytics code, model call, KARMA signer, dataset write, timer,
+or background loop. The browser script performs one explicit in-memory
+projection and DOM render. It has no network or persistence capability.
+Cloudflare may still keep ordinary page and static-asset request, account,
+security, or operational logs under its own settings.
 
 `release-lock.json` hashes every other upload input and the exact source files
 from which this door was generated. Cloudflare parses `_headers` as

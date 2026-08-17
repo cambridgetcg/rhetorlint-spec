@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/claim-feedback-packet.schema.json",
-  "title": "Claim Feedback 0.1 packet",
-  "$comment": "This closed schema enforces the projected JSON wire shape. claim-feedback.mjs remains authoritative for strict plain JSON, UTF-8 and Unicode safety, remote-claim limitations, complete input and packet recomputation, method-byte and result digests, chronology, correction history meaning, supplied rights and material-review meaning, and all cross-field conditions. A schema pass does not authenticate a crawl, speaker, rights holder, correction, withdrawal, or authority.",
+  "title": "Claim Feedback 0.2 packet",
+  "$comment": "This closed schema enforces the projected JSON wire shape. The shared claim-feedback-projection.mjs runtime and its Node or browser adapter remain authoritative for strict plain JSON, UTF-8 and Unicode safety, remote-claim limitations, complete input and packet recomputation, method-byte and result digests, chronology, correction history meaning, supplied rights and material-review meaning, and all cross-field conditions. A schema pass does not authenticate a crawl, speaker, rights holder, correction, withdrawal, or authority.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -24,7 +24,7 @@
     "integrity"
   ],
   "properties": {
-    "schema": { "type": "string", "enum": ["claim-feedback.packet/0.1"] },
+    "schema": { "type": "string", "enum": ["claim-feedback.packet/0.2"] },
     "status": {
       "type": "string",
       "enum": ["challenge-open", "response-recorded", "correction-recorded", "boundary-recorded"]
@@ -240,7 +240,7 @@
       "additionalProperties": false,
       "required": ["schema", "source_sha256"],
       "properties": {
-        "schema": { "type": "string", "enum": ["claim-feedback.packet/0.1"] },
+        "schema": { "type": "string", "enum": ["claim-feedback.packet/0.2"] },
         "source_sha256": { "$ref": "#/$defs/digest" }
       }
     },
@@ -839,6 +839,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "scope",
         "network_requests",
         "messages_sent",
         "persistent_files_written",
@@ -846,10 +847,10 @@
         "karma_ledger_writes",
         "training_records_written",
         "retries",
-        "external_state_changes_by_builder",
-        "cli_stdout"
+        "external_state_changes_by_projection"
       ],
       "properties": {
+        "scope": { "type": "string", "enum": ["projection-call-only"] },
         "network_requests": { "type": "integer", "enum": [0] },
         "messages_sent": { "type": "integer", "enum": [0] },
         "persistent_files_written": { "type": "integer", "enum": [0] },
@@ -857,8 +858,7 @@
         "karma_ledger_writes": { "type": "integer", "enum": [0] },
         "training_records_written": { "type": "integer", "enum": [0] },
         "retries": { "type": "integer", "enum": [0] },
-        "external_state_changes_by_builder": { "type": "integer", "enum": [0] },
-        "cli_stdout": { "type": "string", "enum": ["one report when the CLI succeeds"] }
+        "external_state_changes_by_projection": { "type": "integer", "enum": [0] }
       }
     },
     "integrity": {

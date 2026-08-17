@@ -5,55 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#17140f" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta
       name="description"
-      content="A static Cloudflare door for RhetorLint Claim Feedback. Claims stay on your machine; only reviewed contracts and a fictional example are served."
+      content="A bounded, on-device worksheet for one supplied RhetorLint Claim Feedback record. It does not fetch, send, store, score people, sign KARMA, or train a model."
     />
     <link rel="canonical" href="https://rhetorlint-claim-feedback.pages.dev/" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./worksheet.mjs"></script>
     <title>Claim Feedback · words can come back</title>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to the meaning</a>
+    <a class="skip-link" href="#main">Skip to the worksheet</a>
     <main id="main" tabindex="-1">
       <header class="hero">
-        <p class="eyebrow">RhetorLint · Claim Feedback 0.1</p>
+        <p class="eyebrow">RhetorLint · Claim Feedback 0.2</p>
         <h1>Words can come back.</h1>
         <p class="lead">
-          Carry claims, not people. Let crawlers find the public contracts—not
-          harvest submissions—and make correction easier than denial.
+          Carry claims, not people. Expose a supplied mismatch without
+          pretending to read a soul. Make correction easier than denial.
         </p>
         <p class="boundary">
-          This Cloudflare door is static. It cannot receive, fetch, store, send,
-          score, sign, or train on your claim.
+          The page request and static files come from Cloudflare. After those
+          files load, this worksheet processes your selected bytes in browser
+          memory. The app has no claim-upload, fetch, storage, message, signing,
+          dataset, or model endpoint.
         </p>
       </header>
+
+      <section class="worksheet" aria-labelledby="worksheet-title">
+        <p class="eyebrow">One local turn</p>
+        <h2 id="worksheet-title">Review one supplied record</h2>
+        <aside class="privacy-note" id="privacy-note">
+          <strong>Pause before you paste.</strong>
+          <span>
+            The app does not upload this input, but your browser, operating
+            system, extensions, clipboard, or screen tools may retain it. Do not
+            use private messages, personal or sensitive data, confidential work,
+            secrets, internal URLs, or third-party material. Redact first.
+          </span>
+        </aside>
+
+        <div class="intake-grid">
+          <div class="intake-field">
+            <label for="claim-file">Choose one JSON file</label>
+            <input
+              id="claim-file"
+              type="file"
+              accept="application/json,.json"
+              aria-describedby="privacy-note intake-limit"
+              autocomplete="off"
+            />
+          </div>
+          <p class="or" aria-hidden="true">or</p>
+          <div class="intake-field">
+            <label for="claim-json">Paste one JSON record</label>
+            <textarea
+              id="claim-json"
+              rows="12"
+              maxlength="65536"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              aria-describedby="privacy-note intake-limit"
+              placeholder="Paste one claim-feedback.input/0.1 record here."
+            ></textarea>
+          </div>
+        </div>
+        <p id="intake-limit" class="fine-print">
+          Maximum 65,536 UTF-8 bytes. Selecting or pasting does not run the
+          review. A browser file choice is a selected byte snapshot, not the
+          CLI's stable-path receipt. Stop discards a pending result; an
+          already-started browser digest or file read may still finish before
+          another run can begin.
+        </p>
+        <div class="controls" aria-label="Worksheet controls">
+          <button id="run-review" type="button">Run one review</button>
+          <button id="stop-review" type="button" class="secondary">Stop</button>
+          <button id="clear-review" type="button" class="secondary">Clear</button>
+        </div>
+        <p id="worksheet-status" class="status" data-state="idle" aria-live="polite">
+          Waiting. Nothing runs until you choose Run.
+        </p>
+        <p id="worksheet-error" class="error" role="alert" hidden></p>
+      </section>
+
+      <section id="worksheet-results" class="results" aria-labelledby="results-title" hidden>
+        <p class="eyebrow">Local result</p>
+        <h2 id="results-title">Six lanes, kept separate</h2>
+        <p class="result-boundary">
+          This is a projection of supplied records. It is not publication,
+          contact, factual verification, permission, punishment, or a score of
+          any person.
+        </p>
+        <div class="lane-grid">
+          <article class="lane">
+            <p class="lane-number">01</p>
+            <h3>Claim</h3>
+            <dl id="lane-claim"></dl>
+          </article>
+          <article class="lane">
+            <p class="lane-number">02</p>
+            <h3>Supplied crawl receipt</h3>
+            <dl id="lane-crawl"></dl>
+          </article>
+          <article class="lane">
+            <p class="lane-number">03</p>
+            <h3>Wording review</h3>
+            <dl id="lane-wording"></dl>
+          </article>
+          <article class="lane">
+            <p class="lane-number">04</p>
+            <h3>Challenge and response</h3>
+            <dl id="lane-response"></dl>
+          </article>
+          <article class="lane">
+            <p class="lane-number">05</p>
+            <h3>KARMA draft</h3>
+            <dl id="lane-karma"></dl>
+          </article>
+          <article class="lane">
+            <p class="lane-number">06</p>
+            <h3>Training review</h3>
+            <dl id="lane-training"></dl>
+          </article>
+        </div>
+
+        <details class="packet">
+          <summary>Inspect the exact packet JSON</summary>
+          <p>
+            This may repeat every supplied word. Review it on screen only; this
+            page offers no copy, download, share, publish, or send action.
+          </p>
+          <pre id="packet-json" tabindex="0"></pre>
+        </details>
+      </section>
 
       <section aria-labelledby="path-title">
         <h2 id="path-title">One finite path</h2>
         <ol class="path">
           <li><strong>Exact claim</strong><span>Keep the words, source, scope, and digest together.</span></li>
-          <li><strong>Supplied receipt</strong><span>Record what a named crawler says it observed without pretending the identity is authenticated.</span></li>
+          <li><strong>Supplied receipt</strong><span>Record what a named crawler says it observed without authenticating that identity.</span></li>
           <li><strong>Evidence challenge</strong><span>Separate literal evidence from the interpretation placed on it.</span></li>
           <li><strong>Reply or correction</strong><span>Attribute the response and append the changed claim without erasing the first.</span></li>
-          <li><strong>Stop</strong><span>KARMA stays an unsigned draft. Training stays held for an independent rights and privacy review.</span></li>
+          <li><strong>Stop</strong><span>KARMA stays unsigned. Training stays held for independent rights and privacy review.</span></li>
         </ol>
       </section>
 
       <section class="run" aria-labelledby="run-title">
         <div>
-          <p class="eyebrow">Local by construction</p>
-          <h2 id="run-title">Run the actual builder locally</h2>
+          <p class="eyebrow">Stronger local file boundary</p>
+          <h2 id="run-title">The Node door remains</h2>
           <p>
-            The complete builder is a one-shot Node command in the public
-            repository. It reads one bounded JSON file, prints one packet, and
-            stops. Your file is never uploaded by this page.
+            The command-line adapter opens one regular non-symlink file, checks
+            it before and after reading, prints one packet, and stops. The
+            browser and Node adapters share the same deterministic projection.
           </p>
         </div>
         <pre aria-label="Local Claim Feedback command"><code>npm run claim-feedback -- INPUT.json</code></pre>
         <p class="actions">
-          <a href="https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/README.md">Read the complete local guide</a>
-          <a href="https://github.com/cambridgetcg/rhetorlint-spec">Open the source repository</a>
+          <a rel="noreferrer noopener" href="https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/README.md">Read the complete local guide</a>
+          <a rel="noreferrer noopener" href="https://github.com/cambridgetcg/rhetorlint-spec">Open the source repository</a>
         </p>
       </section>
 
@@ -61,12 +178,11 @@
         <p class="eyebrow">For tools and crawlers</p>
         <h2 id="machine-title">Public contracts, not harvested submissions</h2>
         <p>
-          These reviewed bytes are deliberately easy to retrieve. The example
-          is fictional and uses reserved <code>example.org</code> addresses.
-          Crawler access is not proof of reuse permission, dataset selection,
-          training, model update, or correction uptake.
-          The schemas describe the JSON shape; the local runner adds stricter
-          URL and policy checks.
+          These reviewed static bytes are deliberately easy to retrieve. The
+          example is fictional and uses reserved <code>example.org</code>
+          addresses. Crawler access is not proof of reuse permission, dataset
+          selection, training, model update, or correction uptake. The schemas
+          describe the JSON shape; runtime checks add cross-field boundaries.
         </p>
         <ul class="contracts">
           <li><a href="./.well-known/claim-feedback.json">Machine-readable door manifest</a></li>
@@ -82,7 +198,7 @@
         <h2 id="limits-title">What this does not decide</h2>
         <ul>
           <li>A RhetorLint mark is a wording prompt, not a truth or lie verdict.</li>
-          <li>No result describes a speaker's ego, motive, intent, character, or worth.</li>
+          <li>No result describes a speaker's ego, motive, intent, character, trustworthiness, or worth.</li>
           <li>A supplied crawler receipt does not authenticate a fetch or grant copyright, privacy, or training rights.</li>
           <li>An unsigned KARMA draft is not a deed, reputation score, punishment, or public accusation.</li>
         </ul>
@@ -90,15 +206,15 @@
 
       <footer>
         <p>
-          Cloudflare serves these static files and may keep ordinary request,
-          security, or account logs under its own settings. The application
-          sends no telemetry and provides no submission endpoint.
+          Cloudflare serves the page and may keep ordinary request, security,
+          abuse, or account logs under its own settings. The worksheet has no
+          telemetry, claim submission endpoint, or remote content loader.
         </p>
         <p>
           Found a problem in these words or contracts?
-          <a href="https://github.com/cambridgetcg/rhetorlint-spec/issues/new">Open an optional public correction on GitHub</a>.
-          Do not paste a private claim file or personal, sensitive, or
-          third-party material into that public issue.
+          <a rel="noreferrer noopener" href="https://github.com/cambridgetcg/rhetorlint-spec/issues/new">Open an optional public correction on GitHub</a>.
+          Never put a private claim file or personal, sensitive, confidential,
+          or third-party material in that public issue.
         </p>
       </footer>
     </main>

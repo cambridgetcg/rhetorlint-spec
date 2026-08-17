@@ -49,13 +49,13 @@ test("robots, sitemap, and deployment carry the same public doors", () => {
   }
 });
 
-test("Claim Feedback is discoverable without deploying a claim or a second app", () => {
-  const feedbackLink = "https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/claim-feedback/README.md";
+test("the People Door links to the separate Claim Feedback worksheet without copying claim inputs", () => {
+  const feedbackLink = "https://rhetorlint-claim-feedback.pages.dev/";
   assert.ok(INDEX.includes('id="claim-feedback"'));
   assert.ok(INDEX.includes(`href="${feedbackLink}"`));
   assert.match(
     INDEX,
-    /local Claim Feedback example[\s\S]*one bounded packet[\s\S]*does not crawl[\s\S]*score a person[\s\S]*write KARMA[\s\S]*train a model/,
+    /on-device Claim Feedback worksheet[\s\S]*one bounded packet in browser memory[\s\S]*does not crawl[\s\S]*score a person[\s\S]*write KARMA[\s\S]*train a model/,
   );
   assert.ok(!INDEX.includes("examples/claim-feedback/fixtures/"));
   assert.ok(!INDEX.includes("We always review every submitted report within 48 hours."));

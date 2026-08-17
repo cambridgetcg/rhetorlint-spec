@@ -13,6 +13,10 @@ jobs:
           node-version: 20
       - name: run the JS reference-engine test suite (zero dependencies)
         run: npm test
+      - name: prove the generated Claim Feedback worksheet in headless Chrome
+        run: |
+          google-chrome --version
+          npm run test:claim-feedback-browser-real
       - name: run the demo
         run: node scripts/demo.mjs
       - uses: actions/setup-python@v5

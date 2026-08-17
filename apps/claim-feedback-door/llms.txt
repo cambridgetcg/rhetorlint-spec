@@ -4,23 +4,29 @@ Canonical source: https://github.com/cambridgetcg/rhetorlint-spec/tree/main/exam
 Correction route: https://github.com/cambridgetcg/rhetorlint-spec/issues/new
 Correction visibility: public, optional, and external to this Cloudflare door
 Correction warning: do not submit private claim files or personal, sensitive,
-or third-party material to the public issue tracker
+confidential, or third-party material to the public issue tracker
 Licence: MIT, as declared by the source repository
 
 This Cloudflare origin serves reviewed static documentation, two closed JSON
-schemas, one fictional example using reserved example.org URLs, a
-machine-readable manifest, and exact release hashes.
+schemas, one fictional example using reserved example.org URLs, a bounded
+browser-memory worksheet, a machine-readable manifest, and exact release
+hashes. The browser and Node adapters use the same deterministic packet
+projection.
 
-It has no submission endpoint, Worker or Pages Function, server-side claim
-processor, crawler, fetcher, storage binding, analytics code, model call,
-KARMA signer, dataset writer, timer, or background loop. Run the complete
-builder locally from the canonical source repository.
+The worksheet has no submission endpoint, Worker or Pages Function,
+server-side claim processor, crawler, fetcher, storage binding, analytics code,
+model call, KARMA signer, dataset writer, timer, or background loop. It runs
+only after a person supplies one bounded record and chooses Run. Stop and Clear
+invalidate pending work. Cloudflare still receives the ordinary page and
+static-asset requests. The app does not send the supplied claim bytes.
 
 RhetorLint marks visible wording patterns. It does not decide truth, lies,
-intent, ego, motive, character, or person worth. The supplied crawl receipt is
-not authenticated. Robots access is not copyright, privacy, reuse, or AI
-training permission. Public availability does not prove dataset selection,
-training, model update, removal, or correction uptake.
+intent, ego, motive, character, trust, or person worth. The supplied crawl
+receipt is not authenticated. Robots access is not copyright, privacy, reuse,
+or AI-training permission. Public availability does not prove dataset
+selection, training, model update, removal, or correction uptake. Training
+output remains held for independent review with candidate null. KARMA output
+remains an unsigned, non-importable draft.
 
 Machine doors:
 - /.well-known/claim-feedback.json

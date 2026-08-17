@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">A returning word</title>
+  <rect width="64" height="64" rx="16" fill="#f3eddf"/>
+  <path d="M18 19h29v20H28l-10 9V19Z" fill="#9f3e2a"/>
+  <path d="M25 27h15M25 33h11" fill="none" stroke="#fbf7ed" stroke-linecap="round" stroke-width="4"/>
+</svg>

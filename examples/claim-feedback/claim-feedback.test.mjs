@@ -39,7 +39,7 @@ function rebindClaim(input, claimText, language = "en") {
   ];
 }
 
-test("closed schemas cover every current branch and its JSON wire form", () => {
+test("closed schemas cover every current branch and its JSON wire form", async () => {
   assert.doesNotThrow(() => assertSupported(INPUT_SCHEMA));
   assert.doesNotThrow(() => assertSupported(PACKET_SCHEMA));
 
@@ -80,8 +80,8 @@ test("closed schemas cover every current branch and its JSON wire form", () => {
 
   for (const [name, input] of variants) {
     assert.deepEqual(validate(input, INPUT_SCHEMA), [], `${name} input schema`);
-    assert.deepEqual(validateClaimFeedbackInput(input), [], `${name} runtime input`);
-    const packet = buildClaimFeedback(input);
+    assert.deepEqual(await validateClaimFeedbackInput(input), [], `${name} runtime input`);
+    const packet = await buildClaimFeedback(input);
     assert.deepEqual(validate(packet, PACKET_SCHEMA), [], `${name} packet schema`);
     assert.deepEqual(
       validate(JSON.parse(JSON.stringify(packet)), PACKET_SCHEMA),
@@ -91,7 +91,7 @@ test("closed schemas cover every current branch and its JSON wire form", () => {
   }
 });
 
-test("schemas reject shape drift, person scores, phrase leaks, rows, and effects", () => {
+test("schemas reject shape drift, person scores, phrase leaks, rows, and effects", async () => {
   const extraInput = clone(FIXTURE);
   extraInput.crawl.access.person_score = 1;
   assert.match(validate(extraInput, INPUT_SCHEMA).join("\n"), /person_score/);
@@ -100,26 +100,26 @@ test("schemas reject shape drift, person scores, phrase leaks, rows, and effects
   delete incomplete.crawl.access.crawler_user_agent;
   assert.match(validate(incomplete, INPUT_SCHEMA).join("\n"), /crawler_user_agent/);
 
-  const phraseLeak = buildClaimFeedback(FIXTURE);
+  const phraseLeak = await buildClaimFeedback(FIXTURE);
   phraseLeak.wording_review.claim.signal.marks = [];
   assert.match(validate(phraseLeak, PACKET_SCHEMA).join("\n"), /marks/);
 
-  const score = buildClaimFeedback(FIXTURE);
+  const score = await buildClaimFeedback(FIXTURE);
   score.training_candidate.person_score = 1;
   assert.match(validate(score, PACKET_SCHEMA).join("\n"), /person_score/);
 
-  const row = buildClaimFeedback(FIXTURE);
+  const row = await buildClaimFeedback(FIXTURE);
   row.training_candidate.candidate = {};
   assert.match(validate(row, PACKET_SCHEMA).join("\n"), /expected null/);
 
-  const effect = buildClaimFeedback(FIXTURE);
+  const effect = await buildClaimFeedback(FIXTURE);
   effect.effects.network_requests = 1;
   assert.match(validate(effect, PACKET_SCHEMA).join("\n"), /permitted set/);
 });
 
-test("the correction-recorded fixture keeps six separate, digest-bound lanes", () => {
-  assert.deepEqual(validateClaimFeedbackInput(FIXTURE), []);
-  const packet = buildClaimFeedback(FIXTURE);
+test("the correction-recorded fixture keeps six separate, digest-bound lanes", async () => {
+  assert.deepEqual(await validateClaimFeedbackInput(FIXTURE), []);
+  const packet = await buildClaimFeedback(FIXTURE);
 
   assert.equal(packet.schema, SCHEMAS.packet);
   assert.equal(packet.status, "correction-recorded");
@@ -210,9 +210,10 @@ test("the correction-recorded fixture keeps six separate, digest-bound lanes", (
   assert.equal(packet.training_candidate.current_declaration_recheck_required, true);
   assert.equal(packet.training_candidate.dataset_writes, 0);
   assert.equal(packet.effects.network_requests, 0);
+  assert.equal(packet.effects.scope, "projection-call-only");
   assert.equal(packet.effects.persistent_files_written, 0);
-  assert.equal(packet.effects.external_state_changes_by_builder, 0);
-  assert.equal(packet.effects.cli_stdout, "one report when the CLI succeeds");
+  assert.equal(packet.effects.external_state_changes_by_projection, 0);
+  assert.equal(Object.hasOwn(packet.effects, "cli_stdout"), false);
   assert.equal(
     packet.crawl_receipt.access.crawler_user_agent,
     FIXTURE.crawl.access.crawler_user_agent,
@@ -222,26 +223,26 @@ test("the correction-recorded fixture keeps six separate, digest-bound lanes", (
   assert.equal(packet.crawl_receipt.access.crawler_name, FIXTURE.crawl.access.crawler_name);
 });
 
-test("integrity binds the complete input and packet", () => {
-  const packet = buildClaimFeedback(FIXTURE);
+test("integrity binds the complete input and packet", async () => {
+  const packet = await buildClaimFeedback(FIXTURE);
   assert.equal(packet.integrity.input_sha256, sha256(stableJson(FIXTURE)));
   const withoutOwnDigest = clone(packet);
   delete withoutOwnDigest.integrity.packet_sha256;
   assert.equal(packet.integrity.packet_sha256, sha256(stableJson(withoutOwnDigest)));
-  assert.equal(verifyClaimFeedbackPacket(packet, FIXTURE), true);
+  assert.equal(await verifyClaimFeedbackPacket(packet, FIXTURE), true);
 
   const altered = clone(packet);
   altered.challenge.text = "A different challenge";
-  assert.throws(
+  await assert.rejects(
     () => verifyClaimFeedbackPacket(altered, FIXTURE),
     /canonical projection/,
   );
 });
 
-test("KARMA handoff preserves the challenge kind without calling every reply a dispute", () => {
+test("KARMA handoff preserves the challenge kind without calling every reply a dispute", async () => {
   const evidenceRequest = clone(FIXTURE);
   evidenceRequest.challenge.kind = "evidence-request";
-  const challenge = buildClaimFeedback(evidenceRequest).karma_draft.records[2];
+  const challenge = (await buildClaimFeedback(evidenceRequest)).karma_draft.records[2];
   assert.match(challenge.text, /Challenge kind \(evidence-request\)/);
   assert.equal(challenge.response_type, "reply");
 
@@ -250,19 +251,19 @@ test("KARMA handoff preserves the challenge kind without calling every reply a d
   boundaryInput.response.replacement_claim = null;
   boundaryInput.response.replacement_claim_language = null;
   boundaryInput.reuse.applies_to_sha256.pop();
-  const boundary = buildClaimFeedback(boundaryInput).karma_draft.records[3];
+  const boundary = (await buildClaimFeedback(boundaryInput)).karma_draft.records[3];
   assert.match(boundary.text, /^Claimed boundary:/);
   assert.match(boundary.known_limits, /does not .*establish authority/);
 
   const inferredBoundary = clone(boundaryInput);
   inferredBoundary.response.attribution_basis = "inference";
-  assert.throws(() => buildClaimFeedback(inferredBoundary), /boundary cannot be inferred/);
+  await assert.rejects(() => buildClaimFeedback(inferredBoundary), /boundary cannot be inferred/);
 
   const tooLong = clone(FIXTURE);
   tooLong.response.replacement_claim = "x".repeat(1_700);
   tooLong.reuse.applies_to_sha256[3] = sha256(tooLong.response.replacement_claim);
-  assert.match(validateClaimFeedbackInput(tooLong)[0].message, /\$karma\.text/);
-  assert.throws(() => buildClaimFeedback(tooLong), /\$karma\.text/);
+  assert.match((await validateClaimFeedbackInput(tooLong))[0].message, /\$karma\.text/);
+  await assert.rejects(() => buildClaimFeedback(tooLong), /\$karma\.text/);
 
   for (const kind of ["reply", "dispute", "settlement", "redaction-request", "boundary"]) {
     const nonCorrection = clone(FIXTURE);
@@ -270,50 +271,50 @@ test("KARMA handoff preserves the challenge kind without calling every reply a d
     nonCorrection.response.replacement_claim = null;
     nonCorrection.response.replacement_claim_language = null;
     nonCorrection.reuse.applies_to_sha256.pop();
-    const proposal = buildClaimFeedback(nonCorrection).training_candidate.review_proposal;
+    const proposal = (await buildClaimFeedback(nonCorrection)).training_candidate.review_proposal;
     assert.equal(proposal.corrected_claim_sha256, null, `${kind} correction digest`);
     assert.equal(proposal.correction_source, null, `${kind} correction source`);
   }
 });
 
-test("the builder rejects altered claim and evidence bytes", () => {
+test("the builder rejects altered claim and evidence bytes", async () => {
   const claimTamper = clone(FIXTURE);
   claimTamper.claim.text = "We review some reports.";
-  assert.match(validateClaimFeedbackInput(claimTamper)[0].message, /claim_sha256/);
-  assert.throws(() => buildClaimFeedback(claimTamper), /claim_sha256/);
+  assert.match((await validateClaimFeedbackInput(claimTamper))[0].message, /claim_sha256/);
+  await assert.rejects(() => buildClaimFeedback(claimTamper), /claim_sha256/);
 
   const evidenceTamper = clone(FIXTURE);
   evidenceTamper.challenge.evidence[0].body_utf8 =
     evidenceTamper.challenge.evidence[0].body_utf8.replace("disabled", "enabled");
-  assert.throws(() => buildClaimFeedback(evidenceTamper), /body_sha256/);
+  await assert.rejects(() => buildClaimFeedback(evidenceTamper), /body_sha256/);
 
   const excerptTamper = clone(FIXTURE);
   excerptTamper.challenge.evidence[0].excerpt = "A sentence that is not in the body.";
-  assert.throws(() => buildClaimFeedback(excerptTamper), /must appear literally/);
+  await assert.rejects(() => buildClaimFeedback(excerptTamper), /must appear literally/);
 
   const sourceTamper = clone(FIXTURE);
   sourceTamper.claim.sources[0].content_sha256 = null;
-  assert.throws(() => buildClaimFeedback(sourceTamper), /sources must bind/);
+  await assert.rejects(() => buildClaimFeedback(sourceTamper), /sources must bind/);
 
   const borrowedChallenge = clone(FIXTURE);
   borrowedChallenge.challenge.attribution_basis = "direct-report";
   borrowedChallenge.challenge.speaker_claim = "Someone else";
-  assert.throws(() => buildClaimFeedback(borrowedChallenge), /recorder's self-attributed challenge/);
+  await assert.rejects(() => buildClaimFeedback(borrowedChallenge), /recorder's self-attributed challenge/);
 
   const unlocatableChallenge = clone(FIXTURE);
   unlocatableChallenge.challenge.source = "recorder memory";
-  assert.throws(() => buildClaimFeedback(unlocatableChallenge), /HTTPS source locator/);
+  await assert.rejects(() => buildClaimFeedback(unlocatableChallenge), /HTTPS source locator/);
 
   const unlocatableResponse = clone(FIXTURE);
   unlocatableResponse.response.source = "unretained conversation";
-  assert.throws(() => buildClaimFeedback(unlocatableResponse), /HTTPS source locator/);
+  await assert.rejects(() => buildClaimFeedback(unlocatableResponse), /HTTPS source locator/);
 
   const futureEvidence = clone(FIXTURE);
   futureEvidence.challenge.evidence[0].observed_at = "2026-08-16T09:03:00.000Z";
-  assert.throws(() => buildClaimFeedback(futureEvidence), /must not follow .*challenge\.made_at/);
+  await assert.rejects(() => buildClaimFeedback(futureEvidence), /must not follow .*challenge\.made_at/);
 });
 
-test("the direct API rejects accessors, proxies, and hidden data before they can drift", () => {
+test("the direct API rejects accessors, proxies, and hidden data before they can drift", async () => {
   const accessor = clone(FIXTURE);
   let reads = 0;
   Object.defineProperty(accessor.claim, "text", {
@@ -323,20 +324,20 @@ test("the direct API rejects accessors, proxies, and hidden data before they can
       return FIXTURE.claim.text;
     },
   });
-  assert.throws(() => buildClaimFeedback(accessor), /not an accessor/);
+  await assert.rejects(() => buildClaimFeedback(accessor), /not an accessor/);
   assert.equal(reads, 0, "descriptor inspection must not invoke the getter");
 
   const proxied = clone(FIXTURE);
   proxied.claim = new Proxy(proxied.claim, {});
-  assert.throws(() => buildClaimFeedback(proxied), /must not be a Proxy/);
+  await assert.rejects(() => buildClaimFeedback(proxied), /must not be a Proxy/);
 
   const hidden = clone(FIXTURE);
   Object.defineProperty(hidden.claim, "hidden_profile", { value: "not JSON-visible" });
-  assert.throws(() => buildClaimFeedback(hidden), /enumerable data property/);
+  await assert.rejects(() => buildClaimFeedback(hidden), /enumerable data property/);
 
   const sparse = clone(FIXTURE);
   sparse.claim.uncertainties = new Array(1);
-  assert.throws(() => buildClaimFeedback(sparse), /dense JSON array/);
+  await assert.rejects(() => buildClaimFeedback(sparse), /dense JSON array/);
 
   const inheritedMethods = clone(FIXTURE);
   let inheritedCalls = 0;
@@ -347,7 +348,7 @@ test("the direct API rejects accessors, proxies, and hidden data before they can
       some() { inheritedCalls += 1; return true; },
     },
   ));
-  assert.throws(() => buildClaimFeedback(inheritedMethods), /standard Array prototype/);
+  await assert.rejects(() => buildClaimFeedback(inheritedMethods), /standard Array prototype/);
   assert.equal(inheritedCalls, 0, "validation must not dispatch through an input array prototype");
 
   const ownKeysAccessor = clone(FIXTURE);
@@ -359,13 +360,13 @@ test("the direct API rejects accessors, proxies, and hidden data before they can
       return Array.prototype.keys;
     },
   });
-  assert.throws(() => buildClaimFeedback(ownKeysAccessor), /dense JSON array/);
+  await assert.rejects(() => buildClaimFeedback(ownKeysAccessor), /dense JSON array/);
   assert.equal(ownKeysReads, 0, "array shape checks must not invoke an own keys accessor");
 
   for (const loneSurrogate of ["\ud800", "\udc00"]) {
     const malformed = clone(FIXTURE);
     malformed.challenge.text = loneSurrogate;
-    assert.throws(() => buildClaimFeedback(malformed), /unpaired UTF-16 surrogate/);
+    await assert.rejects(() => buildClaimFeedback(malformed), /unpaired UTF-16 surrogate/);
     assert.throws(() => sha256(loneSurrogate), /unpaired UTF-16 surrogate/);
   }
 
@@ -373,7 +374,7 @@ test("the direct API rejects accessors, proxies, and hidden data before they can
   for (let index = 0; index < BOUNDS.max_json_depth + 2; index += 1) nested = [nested];
   assert.throws(() => stableJson(nested), /exceeds JSON depth/);
 
-  const packetAccessor = buildClaimFeedback(FIXTURE);
+  const packetAccessor = await buildClaimFeedback(FIXTURE);
   let packetReads = 0;
   Object.defineProperty(packetAccessor.challenge, "text", {
     enumerable: true,
@@ -382,24 +383,24 @@ test("the direct API rejects accessors, proxies, and hidden data before they can
       return FIXTURE.challenge.text;
     },
   });
-  assert.throws(() => verifyClaimFeedbackPacket(packetAccessor, FIXTURE), /not an accessor/);
+  await assert.rejects(() => verifyClaimFeedbackPacket(packetAccessor, FIXTURE), /not an accessor/);
   assert.equal(packetReads, 0);
 });
 
-test("bounded pattern-dense text validates and builds on the same domain", () => {
+test("bounded pattern-dense text validates and builds on the same domain", async () => {
   const dense = clone(FIXTURE);
   rebindClaim(dense, `${"always ".repeat(1_141)}always`);
   assert.equal(dense.claim.text.length, 7_993);
-  assert.deepEqual(validateClaimFeedbackInput(dense), []);
-  const packet = buildClaimFeedback(dense);
+  assert.deepEqual(await validateClaimFeedbackInput(dense), []);
+  const packet = await buildClaimFeedback(dense);
   assert.equal(packet.wording_review.claim.status, "patterns-marked");
-  assert.equal(verifyClaimFeedbackPacket(packet, dense), true);
+  assert.equal(await verifyClaimFeedbackPacket(packet, dense), true);
 });
 
-test("training remains held pending every supplied condition and an independent review", () => {
+test("training remains held pending every supplied condition and an independent review", async () => {
   const denied = clone(FIXTURE);
   denied.reuse.training = "deny";
-  let candidate = buildClaimFeedback(denied).training_candidate;
+  let candidate = (await buildClaimFeedback(denied)).training_candidate;
   assert.equal(candidate.status, "held-for-independent-review");
   assert.equal(candidate.candidate, null);
   assert.equal(candidate.declared_conditions_met, false);
@@ -407,71 +408,71 @@ test("training remains held pending every supplied condition and an independent 
 
   const uncovered = clone(FIXTURE);
   uncovered.reuse.applies_to_sha256.pop();
-  candidate = buildClaimFeedback(uncovered).training_candidate;
+  candidate = (await buildClaimFeedback(uncovered)).training_candidate;
   assert.equal(candidate.status, "held-for-independent-review");
   assert.match(candidate.reasons.join("\n"), /does not cover 1 required digest/);
 
   const unanswered = clone(FIXTURE);
   unanswered.response = null;
-  candidate = buildClaimFeedback(unanswered).training_candidate;
+  candidate = (await buildClaimFeedback(unanswered)).training_candidate;
   assert.equal(candidate.status, "held-for-independent-review");
   assert.match(candidate.reasons.join("\n"), /source-attributed correction/);
-  assert.equal(buildClaimFeedback(unanswered).status, "challenge-open");
+  assert.equal((await buildClaimFeedback(unanswered)).status, "challenge-open");
 
   const withdrawn = clone(FIXTURE);
   withdrawn.reuse.withdrawn_at = "2026-08-16T10:01:00.000Z";
-  candidate = buildClaimFeedback(withdrawn).training_candidate;
+  candidate = (await buildClaimFeedback(withdrawn)).training_candidate;
   assert.equal(candidate.status, "held-for-independent-review");
   assert.match(candidate.reasons.join("\n"), /withdrawn/);
 
   const futureWithdrawal = clone(FIXTURE);
   futureWithdrawal.reuse.withdrawn_at = "2026-08-16T11:00:00.000Z";
-  candidate = buildClaimFeedback(futureWithdrawal).training_candidate;
+  candidate = (await buildClaimFeedback(futureWithdrawal)).training_candidate;
   assert.equal(candidate.declared_conditions_met, true);
 
   const notYetEffective = clone(FIXTURE);
   notYetEffective.reuse.effective_at = "2026-08-16T11:00:00.000Z";
-  candidate = buildClaimFeedback(notYetEffective).training_candidate;
+  candidate = (await buildClaimFeedback(notYetEffective)).training_candidate;
   assert.equal(candidate.declared_conditions_met, false);
   assert.match(candidate.reasons.join("\n"), /not yet effective/);
 
   const inferredCorrection = clone(FIXTURE);
   inferredCorrection.response.attribution_basis = "inference";
-  assert.throws(() => buildClaimFeedback(inferredCorrection), /self-attributed or directly reported/);
+  await assert.rejects(() => buildClaimFeedback(inferredCorrection), /self-attributed or directly reported/);
 
   const impossibleWithdrawal = clone(FIXTURE);
   impossibleWithdrawal.reuse.withdrawn_at = "2026-08-16T09:59:59.000Z";
-  assert.throws(() => buildClaimFeedback(impossibleWithdrawal), /must not precede effective_at/);
+  await assert.rejects(() => buildClaimFeedback(impossibleWithdrawal), /must not precede effective_at/);
 
   const blockedMaterial = clone(FIXTURE);
   blockedMaterial.material_review.status = "blocked";
   blockedMaterial.material_review.contains_personal_data = true;
-  candidate = buildClaimFeedback(blockedMaterial).training_candidate;
+  candidate = (await buildClaimFeedback(blockedMaterial)).training_candidate;
   assert.equal(candidate.declared_conditions_met, false);
   assert.match(candidate.reasons.join("\n"), /material review has not passed/);
   assert.match(candidate.reasons.join("\n"), /personal data/);
 
   const falsePass = clone(FIXTURE);
   falsePass.material_review.contains_third_party_material = true;
-  assert.throws(() => buildClaimFeedback(falsePass), /passed material review/);
+  await assert.rejects(() => buildClaimFeedback(falsePass), /passed material review/);
 
   const reviewBeforeCorrection = clone(FIXTURE);
   reviewBeforeCorrection.material_review.reviewed_at = "2026-08-16T09:59:59.000Z";
-  assert.throws(() => buildClaimFeedback(reviewBeforeCorrection), /latest reviewed record/);
+  await assert.rejects(() => buildClaimFeedback(reviewBeforeCorrection), /latest reviewed record/);
 
   const rightsBeforeCorrection = clone(FIXTURE);
   rightsBeforeCorrection.reuse.assessed_at = "2026-08-16T09:59:59.000Z";
-  assert.throws(() => buildClaimFeedback(rightsBeforeCorrection), /latest covered record/);
+  await assert.rejects(() => buildClaimFeedback(rightsBeforeCorrection), /latest covered record/);
 
   const reviewAfterAssessment = clone(FIXTURE);
   reviewAfterAssessment.material_review.reviewed_at = "2099-01-01T00:00:00.000Z";
-  assert.throws(
+  await assert.rejects(
     () => buildClaimFeedback(reviewAfterAssessment),
     /assessed_at must not precede .*material_review\.reviewed_at/,
   );
 });
 
-test("one unauthenticated payload cannot authorize its own training use", () => {
+test("one unauthenticated payload cannot authorize its own training use", async () => {
   const selfAuthorizing = clone(FIXTURE);
   selfAuthorizing.response.speaker_claim = "Unverified payload";
   selfAuthorizing.reuse.declaring_party = "Unverified payload";
@@ -480,7 +481,7 @@ test("one unauthenticated payload cannot authorize its own training use", () => 
   selfAuthorizing.reuse.policy_url = null;
   selfAuthorizing.reuse.source = "https://attacker.invalid/self-assertion";
 
-  const review = buildClaimFeedback(selfAuthorizing).training_candidate;
+  const review = (await buildClaimFeedback(selfAuthorizing)).training_candidate;
   assert.equal(review.status, "held-for-independent-review");
   assert.equal(review.declared_conditions_met, true);
   assert.equal(review.candidate, null);
@@ -488,8 +489,8 @@ test("one unauthenticated payload cannot authorize its own training use", () => 
   assert.ok(review.not_established.includes("the declaring party's identity or rights authority"));
 });
 
-test("robots is recorded as crawl preference, never training permission", () => {
-  const packet = buildClaimFeedback(FIXTURE);
+test("robots is recorded as crawl preference, never training permission", async () => {
+  const packet = await buildClaimFeedback(FIXTURE);
   assert.match(packet.crawl_receipt.access.note, /not .*AI-training consent/i);
   assert.match(packet.crawl_receipt.access.note, /unauthenticated/i);
   assert.equal(
@@ -500,45 +501,45 @@ test("robots is recorded as crawl preference, never training permission", () => 
 
   const noBasis = clone(FIXTURE);
   noBasis.crawl.access.basis = "not-established";
-  const candidate = buildClaimFeedback(noBasis).training_candidate;
+  const candidate = (await buildClaimFeedback(noBasis)).training_candidate;
   assert.equal(candidate.status, "held-for-independent-review");
   assert.match(candidate.reasons.join("\n"), /collection basis/);
 
   const unidentified = clone(FIXTURE);
   delete unidentified.crawl.access.crawler_user_agent;
-  assert.throws(() => buildClaimFeedback(unidentified), /crawler_user_agent/);
+  await assert.rejects(() => buildClaimFeedback(unidentified), /crawler_user_agent/);
 
   const robotsAsAuthority = clone(FIXTURE);
   robotsAsAuthority.crawl.access.basis = "robots-allowed";
-  assert.throws(() => buildClaimFeedback(robotsAsAuthority), /owner-supplied/);
+  await assert.rejects(() => buildClaimFeedback(robotsAsAuthority), /owner-supplied/);
 
   const ownerPublishedButDisallowed = clone(FIXTURE);
   ownerPublishedButDisallowed.crawl.access.basis = "owner-published";
   ownerPublishedButDisallowed.crawl.access.robots.decision = "disallowed";
-  const held = buildClaimFeedback(ownerPublishedButDisallowed).training_candidate;
+  const held = (await buildClaimFeedback(ownerPublishedButDisallowed)).training_candidate;
   assert.equal(held.declared_conditions_met, false);
   assert.match(held.reasons.join("\n"), /crawl was disallowed/);
 
   const ownerSuppliedDespiteRobots = clone(FIXTURE);
   ownerSuppliedDespiteRobots.crawl.access.robots.decision = "disallowed";
   assert.equal(
-    buildClaimFeedback(ownerSuppliedDespiteRobots).training_candidate.declared_conditions_met,
+    (await buildClaimFeedback(ownerSuppliedDespiteRobots)).training_candidate.declared_conditions_met,
     true,
   );
 
   const robotsQuery = clone(FIXTURE);
   robotsQuery.crawl.access.robots.url = "https://example.org/robots.txt?copy=1";
-  assert.throws(() => buildClaimFeedback(robotsQuery), /query-free/);
+  await assert.rejects(() => buildClaimFeedback(robotsQuery), /query-free/);
 
   const futureRobots = clone(FIXTURE);
   futureRobots.crawl.access.robots.observed_at = "2026-08-16T09:00:01.000Z";
-  assert.throws(() => buildClaimFeedback(futureRobots), /must not follow retrieved_at/);
+  await assert.rejects(() => buildClaimFeedback(futureRobots), /must not follow retrieved_at/);
 });
 
-test("unsupported languages are named instead of receiving a false clean result", () => {
+test("unsupported languages are named instead of receiving a false clean result", async () => {
   const input = clone(FIXTURE);
   rebindClaim(input, "個個都亂咁講嘢。", "zh-Hant");
-  const review = buildClaimFeedback(input).wording_review.claim;
+  const review = (await buildClaimFeedback(input)).wording_review.claim;
   assert.equal(review.status, "unsupported-language");
   assert.equal(review.signal, null);
   assert.match(review.note, /not run/i);
@@ -546,7 +547,7 @@ test("unsupported languages are named instead of receiving a false clean result"
   const mixed = clone(FIXTURE);
   mixed.challenge.text = "個個都亂咁講嘢。";
   mixed.challenge.language = "zh-Hant";
-  const mixedReview = buildClaimFeedback(mixed).wording_review;
+  const mixedReview = (await buildClaimFeedback(mixed)).wording_review;
   assert.equal(mixedReview.claim.status, "patterns-marked");
   assert.equal(mixedReview.challenge.status, "unsupported-language");
 
@@ -554,20 +555,20 @@ test("unsupported languages are named instead of receiving a false clean result"
   mixedCorrection.response.text = "依句回覆係廣東話。";
   mixedCorrection.response.language = "zh-Hant";
   mixedCorrection.response.replacement_claim_language = "en";
-  const correctionReview = buildClaimFeedback(mixedCorrection).wording_review;
+  const correctionReview = (await buildClaimFeedback(mixedCorrection)).wording_review;
   assert.equal(correctionReview.response.status, "unsupported-language");
   assert.notEqual(correctionReview.replacement_claim.status, "unsupported-language");
 });
 
-test("zero English marks use the narrow pack wording", () => {
+test("zero English marks use the narrow pack wording", async () => {
   const input = clone(FIXTURE);
   rebindClaim(input, "I made a mistake and I will fix it by Friday.");
-  const review = buildClaimFeedback(input).wording_review.claim;
+  const review = (await buildClaimFeedback(input)).wording_review.claim;
   assert.equal(review.status, "none-marked-by-pack");
   assert.equal(review.note, "No supported wording patterns were marked by this English pack.");
 });
 
-test("claim, challenge, reply, and correction wording stay separate and redacted", () => {
+test("claim, challenge, reply, and correction wording stay separate and redacted", async () => {
   const input = clone(FIXTURE);
   input.challenge.text = "ACT NOW and accept this guaranteed challenge.";
   input.response.text = "Obviously, this reply fixes everything.";
@@ -579,7 +580,7 @@ test("claim, challenge, reply, and correction wording stay separate and redacted
     sha256(input.response.replacement_claim),
   ];
 
-  const reviews = buildClaimFeedback(input).wording_review;
+  const reviews = (await buildClaimFeedback(input)).wording_review;
   for (const review of [
     reviews.claim,
     reviews.challenge,
@@ -592,11 +593,11 @@ test("claim, challenge, reply, and correction wording stay separate and redacted
   assert.equal(reviews.person_aggregation, false);
 });
 
-test("the command is one-shot, print-only, and has an off-switch before input read", () => {
+test("the command is one-shot, print-only, and has an off-switch before input read", async () => {
   const before = statSync(FIXTURE_URL);
   const beforeBytes = readFileSync(FIXTURE_URL);
   let output = "";
-  assert.equal(runCli([new URL(FIXTURE_URL).pathname], {
+  assert.equal(await runCli([new URL(FIXTURE_URL).pathname], {
     env: {},
     stdout: { write: (chunk) => { output += chunk; } },
   }), 0);
@@ -607,7 +608,7 @@ test("the command is one-shot, print-only, and has an off-switch before input re
   assert.equal(after.mode, before.mode);
   assert.equal(after.mtimeMs, before.mtimeMs);
 
-  assert.throws(
+  await assert.rejects(
     () => runCli(["/definitely/not/read.json"], {
       env: { CLAIM_FEEDBACK_HALT: "1" },
       stdout: { write: () => { throw new Error("must not write"); } },

@@ -1,7 +1,7 @@
 {
-  "schema": "claim-feedback.cloudflare-door/0.1",
+  "schema": "claim-feedback.cloudflare-door/0.2",
   "name": "RhetorLint Claim Feedback",
-  "relationship": "static-discovery-and-local-run-door",
+  "relationship": "static-on-device-worksheet-and-local-node-door",
   "canonicalSource": "https://github.com/cambridgetcg/rhetorlint-spec/tree/main/examples/claim-feedback",
   "correctionUrl": "https://github.com/cambridgetcg/rhetorlint-spec/issues/new",
   "correctionRoute": {
@@ -14,10 +14,11 @@
   "runtime": {
     "platform": "cloudflare-pages-static",
     "serverCode": false,
-    "claimProcessing": "local-node-command-only",
+    "claimProcessing": "browser-memory-or-local-node",
     "submissionEndpoint": null,
     "storage": null,
-    "analyticsCode": false
+    "analyticsCode": false,
+    "claimBytesLeaveBrowserThroughWorksheet": false
   },
   "contracts": {
     "inputSchema": "https://rhetorlint-claim-feedback.pages.dev/contracts/claim-feedback-input.schema.json",
@@ -32,20 +33,24 @@
     "filesSha256": {
       ".gitattributes": "373fd9c046cf8ce13504fe0433211cd5b7da81964e632456e21bd0db74765a2c",
       "LICENSE": "a1613ba5d78294b212dfdb6691181c104c4620a848ebc17a5307d769418b0d29",
-      "package.json": "9b8f39b3f403453fc8dc7834bdf1173e5f4b6cb1e738c42aea3cad35490c3841",
-      "apps/claim-feedback-door/index.html": "fe323815ba40def477b5c14a3dc24d8cef31340bbc04133d59105cc9fe7d44b0",
-      "apps/claim-feedback-door/style.css": "ce337fb66c8142a8f43c1f1d4196d8f6a5126449cb68d260dcb6f0307afe8c28",
-      "apps/claim-feedback-door/llms.txt": "281ecbb50743200ef5fd127bd77bd6faef8d963def5a90081ceb3bc3d254c159",
-      "examples/claim-feedback/README.md": "21ec4e4684d7f2d246f1bd8d29f2501857b19ddf0ef45d4aa1ed55a9f0295975",
+      "package.json": "314275f982f8d974076ed2272c10dce2f149aebc3faf5751f61de23273a3d89d",
+      "apps/claim-feedback-door/claim-feedback-browser.mjs": "b587181fb76c65d817d57548207a6635db70d8e85b4ad172782293bcc399ec3a",
+      "apps/claim-feedback-door/favicon.svg": "08f8cfe1f98bc80932a9f3c9a1fe757f80ef9bf0c148b4894a11333eb54bd435",
+      "apps/claim-feedback-door/index.html": "bc61c17ee381f0c826239a6b4ea88f02a65c3767a2ba75773a3bbddc17456958",
+      "apps/claim-feedback-door/style.css": "8b0d58967c6cc563312376ed485700bdbe202cf706e9f91ccf2cb546585fdc68",
+      "apps/claim-feedback-door/llms.txt": "be1d12e9e0b71915dcf9e811b3de359920b0f135d4b4cb11e4a32c812e8b0631",
+      "apps/claim-feedback-door/worksheet.mjs": "df54869792961b4c8550bc05a0f5263bc3da3812d9f3d3c377378603fa6947f7",
+      "examples/claim-feedback/README.md": "cd3f2b96dd457e6ca18dfd68ed93289c0fdc4ba5c1f697af9b908c77dae9b73a",
       "examples/claim-feedback/claim-feedback-input.schema.json": "717645c587785f46f9046827d3342060105dc2b6c4d59bbc084c83f4f4317c58",
-      "examples/claim-feedback/claim-feedback-packet.schema.json": "a1aa431f23f4241fc3419f968f80844496857a974ab744170effbf071711f1dd",
-      "examples/claim-feedback/claim-feedback.mjs": "e065b4752ed3f005fbe8e0e7a89a2d3ac7eef63f548bb3af6a5ebb141ab734ad",
+      "examples/claim-feedback/claim-feedback-packet.schema.json": "508e90173b7743f44e81bdbf9dfb7c4ee44fb2a3a6b1f9d2c43a0c5df8252033",
+      "examples/claim-feedback/claim-feedback.mjs": "fcc44e5e3851c436e6cc447aaa38c90cbbc232eb10905e65a1822a73e3baf08a",
+      "examples/claim-feedback/claim-feedback-projection.mjs": "cdcf6d07e4ab2dc5d368d769e506d2080996de959c03fe74d4422aa7e499a005",
       "examples/claim-feedback/fixtures/corrected-claim.json": "cc8cbca3750d4bf7917c2161c95db3abc2787ee0995463470f79143f924a9e5c",
       "packages/core/index.mjs": "eed568c939e8fe7b6613348d0757cc86ce86e1db4278a6ce524f038f5f82d6fc",
       "packages/core/package.json": "4b8dc40ee15ac79ef04794631b45402126a393b20cc05fdbeda9585aa9b1544e",
       "packages/core/signals.mjs": "727a6f310dd6424beb72a4b2ffd7f1cbb712ea9aba6b8573078242f20af295d7",
       "packages/rules-en/rules.json": "85a84ed51334a353ca162b2c7224a49df1b3f6a0160d4ef6577d65545f729b77",
-      "scripts/build-cloudflare-claim-feedback.mjs": "bc7641a2c907f92cd3e9b35bd18452a0b67762bd2c3725ae54e5a50fc0bef9e5",
+      "scripts/build-cloudflare-claim-feedback.mjs": "bf0c8b7f143a9e8f8c5c9dab482b212ee96c6b0f7430e3e37e5652c94a6e68c3",
       "scripts/deploy-cloudflare-claim-feedback.zsh": "85e98ee2a98e25203035fb7c3d2cf322c6b529b5ccd6559abdec89a47dc7dfcd"
     }
   },
@@ -63,6 +68,9 @@
     "personScore": false,
     "mentalStateOrEgoInference": false,
     "outboundCrawlerFetches": false,
+    "browserStorage": false,
+    "browserClaimUpload": false,
+    "publicSharing": false,
     "dispatch": false,
     "karmaSignature": false,
     "datasetWrite": false,

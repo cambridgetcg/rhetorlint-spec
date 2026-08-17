@@ -30,15 +30,23 @@ const ACTIVE_PATHS = Object.freeze([
   "404.html",
   "README.md",
   "_headers",
+  "claim-feedback-browser.mjs",
   "contracts/claim-feedback-input.schema.json",
   "contracts/claim-feedback-packet.schema.json",
   "examples/corrected-claim.json",
+  "favicon.svg",
   "index.html",
   "llms.txt",
   "release-lock.json",
   "robots.txt",
+  "runtime/claim-feedback-projection.mjs",
+  "runtime/core.mjs",
+  "runtime/method.mjs",
+  "runtime/rules.mjs",
+  "runtime/signals.mjs",
   "sitemap.xml",
   "style.css",
+  "worksheet.mjs",
 ]);
 
 const RESTING_PATHS = Object.freeze([
@@ -55,13 +63,17 @@ const SOURCE_PATHS = Object.freeze([
   ".gitattributes",
   "LICENSE",
   "package.json",
+  "apps/claim-feedback-door/claim-feedback-browser.mjs",
+  "apps/claim-feedback-door/favicon.svg",
   "apps/claim-feedback-door/index.html",
   "apps/claim-feedback-door/llms.txt",
   "apps/claim-feedback-door/style.css",
+  "apps/claim-feedback-door/worksheet.mjs",
   "examples/claim-feedback/README.md",
   "examples/claim-feedback/claim-feedback-input.schema.json",
   "examples/claim-feedback/claim-feedback-packet.schema.json",
   "examples/claim-feedback/claim-feedback.mjs",
+  "examples/claim-feedback/claim-feedback-projection.mjs",
   "examples/claim-feedback/fixtures/corrected-claim.json",
   "packages/core/index.mjs",
   "packages/core/package.json",
@@ -154,7 +166,7 @@ function json(directory, path) {
   return JSON.parse(text(directory, path));
 }
 
-function assertLocked(directory, expectedPaths) {
+function assertLocked(directory, expectedPaths, expectedSchema) {
   const files = walk(directory);
   assert.deepEqual([...files.keys()].sort(), [...expectedPaths].sort());
   const lock = JSON.parse(files.get("release-lock.json").toString("utf8"));
@@ -165,48 +177,57 @@ function assertLocked(directory, expectedPaths) {
       .map(([path, value]) => [path, sha256(value)]),
   );
   assert.deepEqual(lock.releaseFilesSha256, actual);
-  assert.match(lock.schema, /^claim-feedback\.cloudflare-release\/0\.1$/);
+  assert.equal(lock.schema, expectedSchema);
   return { files, lock };
 }
 
 test("the generated Cloudflare trees exactly match their reviewed sources", () => {
   assert.deepEqual(checkCloudflareBundles(), []);
-  const active = assertLocked(ACTIVE, ACTIVE_PATHS);
-  const resting = assertLocked(RESTING, RESTING_PATHS);
+  const active = assertLocked(ACTIVE, ACTIVE_PATHS, "claim-feedback.cloudflare-release/0.2");
+  const resting = assertLocked(RESTING, RESTING_PATHS, "claim-feedback.cloudflare-release/0.1");
 
   assert.deepEqual(Object.keys(active.lock.sourceFilesSha256).sort(), [...SOURCE_PATHS].sort());
   for (const [path, digest] of Object.entries(active.lock.sourceFilesSha256)) {
     assert.equal(sha256(readFileSync(new URL(path, ROOT))), digest, path);
   }
-  assert.equal(active.lock.artifact, "rhetorlint-claim-feedback-static-door");
+  assert.equal(active.lock.artifact, "rhetorlint-claim-feedback-browser-door");
   assert.equal(resting.lock.artifact, "rhetorlint-claim-feedback-resting-baseline");
   assert.match(active.lock.releaseManifestRule, /every uploaded release input/);
   assert.match(active.lock.releaseManifestRule, /_headers is parsed as configuration/);
 });
 
-test("the active door is static, local-run only, and has no intake surface", () => {
+test("the active door is a bounded on-device worksheet with no remote intake", () => {
   const html = text(ACTIVE, "index.html");
   const headers = text(ACTIVE, "_headers");
   const lock = json(ACTIVE, "release-lock.json");
 
   assert.match(html, /Words can come back/);
-  assert.match(html, /Run the actual builder locally/);
-  assert.match(html, /cannot receive, fetch, store, send,\s+score, sign, or train/i);
-  assert.match(html, /Cloudflare.*ordinary request,\s+security, or account logs/is);
+  assert.match(html, /Review one supplied record/);
+  assert.match(html, /Run one review/);
+  assert.match(html, /browser, operating\s+system, extensions, clipboard/is);
+  assert.match(html, /Cloudflare serves the page and may keep ordinary request/is);
   assert.match(html, /RhetorLint mark is a wording prompt, not a truth or lie verdict/);
   for (const path of ACTIVE_PATHS.filter((path) => path.endsWith(".html"))) {
     const source = text(ACTIVE, path);
-    assert.doesNotMatch(source, /<script\b|<form\b|<input\b|<textarea\b|contenteditable|<iframe\b/i, path);
+    assert.doesNotMatch(source, /<form\b|contenteditable|<iframe\b/i, path);
     assert.doesNotMatch(source, /onclick=|onload=|onerror=/i, path);
   }
+  assert.match(html, /<script type="module" src="\.\/worksheet\.mjs"><\/script>/);
+  assert.equal((html.match(/<script\b/g) ?? []).length, 1);
+  assert.equal((html.match(/type="file"/g) ?? []).length, 1);
+  assert.equal((html.match(/<textarea\b/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /\bmultiple\b|webkitdirectory|<button[^>]*>(?:Share|Copy|Download|Send|Publish|Train|Approve|Sign|Import)</i);
   for (const path of ACTIVE_PATHS.filter((path) => path.endsWith(".css"))) {
     assert.doesNotMatch(text(ACTIVE, path), /@import\b|url\s*\(/i, path);
   }
 
-  assert.match(headers, /script-src 'none'/);
+  assert.match(headers, /script-src 'self'/);
   assert.match(headers, /connect-src 'none'/);
   assert.match(headers, /form-action 'none'/);
   assert.match(headers, /frame-ancestors 'none'/);
+  assert.match(headers, /frame-src 'none'/);
+  assert.match(headers, /worker-src 'none'/);
+  assert.match(headers, /media-src 'none'/);
   assert.match(headers, /browsing-topics=\(\)/);
   assert.match(headers, /Access-Control-Allow-Origin: \*/);
   assertNoOverlappingGuardHeaders(headers, [
@@ -219,9 +240,15 @@ test("the active door is static, local-run only, and has no intake surface", () 
   ]);
 
   assert.equal(lock.effects.staticAssetRequests, true);
-  for (const [effect, value] of Object.entries(lock.effects).filter(([effect]) => effect !== "staticAssetRequests")) {
-    assert.equal(value, false, effect);
-  }
+  assert.equal(lock.effects.browserScriptExecution, true);
+  assert.equal(lock.effects.browserMemoryProcessing, true);
+  assert.equal(lock.effects.browserDomRenders, true);
+  for (const effect of [
+    "scriptedNetworkRequests", "automaticThirdPartySubrequests", "serverCode",
+    "submissions", "claimStorage", "browserStorage", "claimBytesLeaveBrowserThroughWorksheet",
+    "publicSharing", "analyticsCode", "modelCalls", "outboundCrawlerFetches",
+    "messagesSent", "karmaDeedsSigned", "datasetWrites", "timers",
+  ]) assert.equal(lock.effects[effect], false, effect);
   assert.ok(lock.claimsNotMade.includes("truth-or-lie-verdict"));
   assert.ok(lock.claimsNotMade.includes("person-or-ego-score"));
   assert.ok(lock.claimsNotMade.includes("dataset-selection-or-model-update"));
@@ -232,10 +259,12 @@ test("the machine door separates crawl access, rights, training, and correction"
   const robots = text(ACTIVE, "robots.txt");
   const llms = text(ACTIVE, "llms.txt");
 
-  assert.equal(manifest.schema, "claim-feedback.cloudflare-door/0.1");
+  assert.equal(manifest.schema, "claim-feedback.cloudflare-door/0.2");
   assert.equal(manifest.runtime.serverCode, false);
   assert.equal(manifest.runtime.submissionEndpoint, null);
   assert.equal(manifest.runtime.storage, null);
+  assert.equal(manifest.runtime.claimProcessing, "browser-memory-or-local-node");
+  assert.equal(manifest.runtime.claimBytesLeaveBrowserThroughWorksheet, false);
   assert.equal(manifest.contracts.validationNote.includes("additional URL and policy checks"), true);
   assert.equal(manifest.crawlAndReuse.robotsIsAuthorization, false);
   assert.equal(manifest.crawlAndReuse.robotsGrantsReuseOrTrainingPermission, false);
@@ -244,6 +273,9 @@ test("the machine door separates crawl access, rights, training, and correction"
   assert.equal(manifest.boundaries.personScore, false);
   assert.equal(manifest.boundaries.mentalStateOrEgoInference, false);
   assert.equal(manifest.boundaries.outboundCrawlerFetches, false);
+  assert.equal(manifest.boundaries.browserStorage, false);
+  assert.equal(manifest.boundaries.browserClaimUpload, false);
+  assert.equal(manifest.boundaries.publicSharing, false);
   assert.equal(manifest.correctionUrl, "https://github.com/cambridgetcg/rhetorlint-spec/issues/new");
   assert.deepEqual(manifest.correctionRoute, {
     visibility: "public",
@@ -254,10 +286,11 @@ test("the machine door separates crawl access, rights, training, and correction"
   });
   assert.match(robots, /^User-agent: \*\nAllow: \//);
   assert.match(robots, /not copyright, privacy, reuse, or\s+# AI-training permission/);
-  assert.match(llms, /Robots access is not copyright, privacy, reuse, or AI\s+training permission/);
+  assert.match(llms, /Robots access is not copyright, privacy, reuse,\s+or AI-?\s*training permission/);
   assert.match(llms, /no submission endpoint/i);
+  assert.match(llms, /does not send the supplied claim bytes/i);
   assert.match(llms, /Correction visibility: public, optional, and external/);
-  assert.match(text(ACTIVE, "index.html"), /Do not paste a private claim file or personal, sensitive, or\s+third-party material/);
+  assert.match(text(ACTIVE, "index.html"), /Do not\s+use private messages, personal or sensitive data, confidential work/is);
 });
 
 test("only closed schemas and one reserved fictional example are mirrored", () => {
