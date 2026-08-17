@@ -2,7 +2,7 @@
 
 Status observed 2026-08-17: **live at
 <https://rhetorlint-claim-feedback.pages.dev/>** from exact source commit
-`733440216d4d1d25c2b70ea00c1849a2879dba59`.
+`39d75769d6b7821903bc374f079608767ae6ec26`.
 
 Project: `rhetorlint-claim-feedback`
 
@@ -51,19 +51,20 @@ Cloudflare Pages Direct Upload, Wrangler `4.103.0`, production branch `main`:
 - resting deployment ID: `8762922c-bece-49f5-ac05-69176ab45193`;
 - resting immutable URL:
   <https://8762922c.rhetorlint-claim-feedback.pages.dev/>;
-- active deployment ID: `35c5a411-4e82-42ad-989e-bafcb620c816`;
+- active deployment ID: `b8c076a1-77b1-4eb9-ad21-6db32fc4e6b0`;
 - active immutable URL:
-  <https://35c5a411.rhetorlint-claim-feedback.pages.dev/>;
+  <https://b8c076a1.rhetorlint-claim-feedback.pages.dev/>;
 - active release-lock SHA-256:
-  `b52d888991ccd641da725fa616994561dbf5cb964d265ffafdeddaea3b89c6d5`;
+  `87312c8ea2e44ffa490a2ac1ebd758e853068e3add08e67be45cd503e796f68e`;
 - resting release-lock SHA-256:
   `7e71742929f68cb0432983960d9fcedff84bc015cc62591ee4579e0328c40c68`.
 
-The provider API reports both deployments as successful production releases
-from branch `main`; the active deployment carries the full source commit above.
-The project and both deployments report no Pages Functions. Web Analytics is
-disabled and the served HTML is byte-identical to the reviewed file, so no
-analytics script was injected.
+The provider API reports the active deployment as a successful production
+release from branch `main` carrying the full source commit above. The resting
+receipt remains the successful byte-verified release from commit
+`733440216d4d1d25c2b70ea00c1849a2879dba59`. The project and both deployments
+report no Pages Functions. Web Analytics is disabled and the served HTML is
+byte-identical to the reviewed file, so no analytics script was injected.
 
 Every served active file and every served resting file was fetched from its
 immutable URL and compared byte-for-byte with its committed release input.
