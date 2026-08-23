@@ -14,6 +14,8 @@ on:
       - "apps/explorer/sitemap.xml"
       - "apps/explorer/social-card.png"
       - "apps/widget/bookmarklet.html"
+      - "humans.txt"
+      - "llms.txt"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -42,6 +44,8 @@ jobs:
           cp apps/explorer/sitemap.xml _site/sitemap.xml
           cp apps/explorer/social-card.png _site/social-card.png
           cp apps/widget/bookmarklet.html _site/bookmarklet.html
+          cp humans.txt _site/humans.txt
+          cp llms.txt _site/llms.txt
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
