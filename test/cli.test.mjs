@@ -7,6 +7,7 @@ import { validate } from "./helpers/schema-validator.mjs";
 
 const CLI = fileURLToPath(new URL("../packages/cli/cli.mjs", import.meta.url));
 const CLI_MANIFEST = JSON.parse(readFileSync(new URL("../packages/cli/package.json", import.meta.url)));
+const RULES_MANIFEST = JSON.parse(readFileSync(new URL("../packages/rules-en/package.json", import.meta.url)));
 const SCHEMA = JSON.parse(readFileSync(new URL("../spec/output.schema.json", import.meta.url)));
 const SPECIMEN =
   "We take your privacy extremely seriously, and regrettably, mistakes were made. " +
@@ -69,6 +70,11 @@ test("the CLI's dependency ranges can receive engine and rule-pack patches", () 
   for (const dep of ["@rhetorlint/core", "@rhetorlint/rules-en"]) {
     assert.match(CLI_MANIFEST.dependencies[dep], /^\^/, `${dep} must be a caret range`);
   }
+});
+
+test("the coordinated packages require modality-preserving core 0.1.3", () => {
+  assert.equal(CLI_MANIFEST.dependencies["@rhetorlint/core"], "^0.1.3");
+  assert.equal(RULES_MANIFEST.peerDependencies["@rhetorlint/core"], ">=0.1.3");
 });
 
 test("the CLI's caret ranges actually reach the in-repo pack", () => {
