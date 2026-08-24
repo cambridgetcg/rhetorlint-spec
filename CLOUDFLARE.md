@@ -1,8 +1,8 @@
 # Cloudflare Claim Feedback door
 
-Status observed 2026-08-17: **live at
+Status observed 2026-08-24: **live at
 <https://rhetorlint-claim-feedback.pages.dev/>** from exact source commit
-`0939317a1d64b2da2ca230bd39a9617cf7de7236`.
+`82ee10fb54eb527b03ca1d4059e666da0ad15661`.
 
 Project: `rhetorlint-claim-feedback`
 
@@ -47,6 +47,37 @@ The build wholly regenerates both Cloudflare folders. Each
 live response headers are checked separately. The active lock also hashes the
 canonical source files and release scripts from which the browser door was
 derived.
+
+## Core 0.1.3 active-door receipt — 2026-08-24
+
+Cloudflare Pages Direct Upload, Wrangler `4.103.0`, production branch `main`:
+
+- source commit: `82ee10fb54eb527b03ca1d4059e666da0ad15661`;
+- active deployment ID: `f06dec45-d5d7-40a4-b635-637934a69ef0`;
+- active immutable URL:
+  <https://f06dec45.rhetorlint-claim-feedback.pages.dev/>;
+- active release-lock SHA-256:
+  `201e0280ea7f49b3dea324997d706250cc41ccff15b5dac93d90dd2f4c7dfc15`;
+- retained resting deployment ID: `8762922c-bece-49f5-ac05-69176ab45193`;
+- retained resting release-lock SHA-256:
+  `7e71742929f68cb0432983960d9fcedff84bc015cc62591ee4579e0328c40c68`.
+
+Before deployment, the exact `main` commit passed the 248-test JavaScript
+suite, the real headless-Chrome worksheet gate, the Go race suite, the
+generated-bundle equality check, and GitHub's complete main-branch CI. The
+guarded deploy rechecked the named Direct Upload project, production branch,
+absence of Pages Functions, disabled Web Analytics, clean Git state, current
+`origin/main`, and the archived committed release.
+
+After deployment, all 20 release-lock-covered inputs were accounted for on
+both the production alias and immutable hostname: the 19 served payloads
+matched their committed bytes, while `_headers` was applied as configuration
+and not served. The self-describing release lock matched separately. Four
+custom-404 checks, four canonical `.html` redirects, and the root security
+headers also matched the reviewed release. This deploy updates the embedded
+engine to core 0.1.3; it does not publish the optional claim graph, create a
+submission route, or add storage, analytics, model, crawler, or signing
+capability.
 
 ## Browser worksheet live receipt — 2026-08-17
 
