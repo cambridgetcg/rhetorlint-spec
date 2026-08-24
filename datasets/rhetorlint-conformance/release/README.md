@@ -20,7 +20,7 @@ configs:
 # RhetorLint Conformance Evaluation
 
 31 exact cases derived from RhetorLint's committed conformance
-fixture. The JSONL shard digest is `sha256:27d415f31784bd7dfe288aac7c11ba0e0f470f2b37e68729e4a9eaa176ca6b8f`.
+fixture. The JSONL shard digest is `sha256:68993e08e006b3316f8ef7b28686ed84a4a00ee81c567f12cecac362d6c92ba5`.
 
 ## What the rows support
 
@@ -43,7 +43,7 @@ project review. This is implementation conformance, not independent human
 annotation or a sample of naturally occurring language. Reconfirm input
 provenance and licence before any public upload.
 
-The locked source is [RhetorLint revision `5450687cbd46e52359c6d12e408c22ee1b38c5ea`](https://github.com/cambridgetcg/rhetorlint-spec/tree/5450687cbd46e52359c6d12e408c22ee1b38c5ea).
+The locked source is [RhetorLint revision `af3b87115d3d154f2ba8b4c955b5a6584be5cf60`](https://github.com/cambridgetcg/rhetorlint-spec/tree/af3b87115d3d154f2ba8b4c955b5a6584be5cf60).
 The stored technique names follow the project's documented SemEval-2023 to
 SemEval-2020 taxonomy mapping; that taxonomy file is not copied here.
 
@@ -62,7 +62,7 @@ or offsets for general non-ASCII input.
 - 31 unique inputs, 28–117 characters each;
 - 50 marks across 26 marked cases and 5 zero-mark controls;
 - 22/22 current English rules observed across 6 families; and
-- 10/31 strip outputs differ from their inputs.
+- 9/31 strip outputs differ from their inputs.
 
 The unseeded justification taxonomy family is absent.
 
