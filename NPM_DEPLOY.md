@@ -12,7 +12,7 @@ The three packages that publish (nothing else does):
 |------|---------|-----------|
 | 1 | `@rhetorlint/core` | — |
 | 2 | `@rhetorlint/rules-en` | — |
-| 3 | `@rhetorlint/cli` | `^0.1.2` core, `^0.1.1` rules-en (must be live first) |
+| 3 | `@rhetorlint/cli` | `^0.1.3` core, `^0.2.0` rules-en (must be live first) |
 
 > The CLI's ranges are carets on purpose, and it was not always so: `cli@0.1.0`
 > shipped with **exact** pins, so every `npm i @rhetorlint/cli` kept installing
@@ -20,6 +20,10 @@ The three packages that publish (nothing else does):
 > pack that improves is the whole point of this tool; the CLI must be allowed to
 > receive those improvements. Keep them carets, and re-release the CLI whenever
 > a floor rises (an engine feature the CLI's own output depends on).
+
+Core 0.1.3 is the current floor for the coordinated 0.2.0 CLI and rule pack:
+it preserves modality and attribution in strip output. Allowing core 0.1.2
+would install successfully while producing the superseded strip semantics.
 
 `apps/explorer` and `apps/widget` are **not** npm packages (they're the site and
 the browser extension). The repo root `rhetorlint-spec` is `"private": true` and
@@ -180,8 +184,9 @@ token with write access plus bypass 2FA, publish only the workspaces whose
 manifest carries a new reviewed version, in the table's order:
 
 ```bash
+npm publish -w @rhetorlint/core        # only if its version moved
 npm publish -w @rhetorlint/rules-en    # only if its version moved
-npm publish -w @rhetorlint/cli         # last of the three, always
+npm publish -w @rhetorlint/cli         # only if its version moved; always last
 ```
 
 ## 5 · Verify the real install path (the important test)
