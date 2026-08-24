@@ -1,0 +1,597 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/cambridgetcg/rhetorlint-spec/main/spec/claim-graph.schema.json",
+  "title": "RhetorLint Claim Graph 0.1",
+  "description": "A closed, bounded, opt-in graph that anchors visible-span observations to caller-verified source bytes and keeps rule-pack classifications, claim hypotheses, effect hypotheses, verification questions, and opaque external references separate. A valid graph does not establish truth, intent, effect, causality, authority, or consent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "graphId",
+    "headRevisionId",
+    "boundary",
+    "doesNotEstablish",
+    "assurance",
+    "sourceArtifacts",
+    "rhetorlintBindings",
+    "observations",
+    "classifications",
+    "claimHypotheses",
+    "effectHypotheses",
+    "verificationQuestions",
+    "externalRefs",
+    "revisionLog"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["rhetorlint.claim-graph/0.1"]
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["rhetorlint.claim-graph"]
+    },
+    "graphId": { "$ref": "#/$defs/stableId" },
+    "headRevisionId": { "$ref": "#/$defs/stableId" },
+    "boundary": { "$ref": "#/$defs/boundary" },
+    "doesNotEstablish": { "$ref": "#/$defs/doesNotEstablish" },
+    "assurance": { "$ref": "#/$defs/assurance" },
+    "sourceArtifacts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/sourceArtifact" }
+    },
+    "rhetorlintBindings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": { "$ref": "#/$defs/rhetorlintBinding" }
+    },
+    "observations": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/observation" }
+    },
+    "classifications": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/classification" }
+    },
+    "claimHypotheses": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/claimHypothesis" }
+    },
+    "effectHypotheses": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/effectHypothesis" }
+    },
+    "verificationQuestions": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/verificationQuestion" }
+    },
+    "externalRefs": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/externalRef" }
+    },
+    "revisionLog": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/revision" }
+    }
+  },
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,31}:[a-z0-9][a-z0-9._-]{0,127}$",
+      "minLength": 3,
+      "maxLength": 160
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "maxLength": 71
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "maxLength": 24
+    },
+    "boundedText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "shortText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "idList": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stableId" }
+    },
+    "nonEmptyIdList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stableId" }
+    },
+    "textList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/boundedText" }
+    },
+    "optionalTextList": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/boundedText" }
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation",
+        "classification",
+        "claimHypotheses",
+        "effectHypotheses",
+        "verificationQuestions",
+        "externalReferences"
+      ],
+      "properties": {
+        "observation": {
+          "type": "string",
+          "enum": ["source-span-and-position-only"]
+        },
+        "classification": {
+          "type": "string",
+          "enum": ["rule-pack-candidate-context-required"]
+        },
+        "claimHypotheses": {
+          "type": "string",
+          "enum": ["claim-candidates-not-adjudicated"]
+        },
+        "effectHypotheses": {
+          "type": "string",
+          "enum": ["recipient-specific-evidence-required"]
+        },
+        "verificationQuestions": {
+          "type": "string",
+          "enum": ["questions-not-verdicts"]
+        },
+        "externalReferences": {
+          "type": "string",
+          "enum": ["opaque-caller-supplied-not-resolved-or-evaluated"]
+        }
+      }
+    },
+    "doesNotEstablish": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["truth", "intent", "effect", "causality", "authority", "consent"],
+      "properties": {
+        "truth": { "type": "string", "enum": ["not-established"] },
+        "intent": { "type": "string", "enum": ["not-established"] },
+        "effect": { "type": "string", "enum": ["not-established"] },
+        "causality": { "type": "string", "enum": ["not-established"] },
+        "authority": { "type": "string", "enum": ["not-established"] },
+        "consent": { "type": "string", "enum": ["not-established"] }
+      }
+    },
+    "assurance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaValidation",
+        "digestClaims",
+        "sourceContent",
+        "referenceResolution",
+        "revisionSemantics"
+      ],
+      "properties": {
+        "schemaValidation": {
+          "type": "string",
+          "enum": ["closed-shape-and-bounds-only"]
+        },
+        "digestClaims": {
+          "type": "string",
+          "enum": ["caller-verified-declarations-not-recomputed-by-schema"]
+        },
+        "sourceContent": {
+          "type": "string",
+          "enum": ["not-included"]
+        },
+        "referenceResolution": {
+          "type": "string",
+          "enum": ["producer-declared-consumer-must-resolve"]
+        },
+        "revisionSemantics": {
+          "type": "string",
+          "enum": ["append-and-supersede-declared-storage-must-enforce"]
+        }
+      }
+    },
+    "sourceArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "createdInRevisionId",
+        "locator",
+        "mediaType",
+        "encoding",
+        "normalization",
+        "byteLength",
+        "sha256",
+        "digestVerification",
+        "contentDisclosure"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "locator": { "$ref": "#/$defs/boundedText" },
+        "mediaType": { "type": "string", "enum": ["text/plain"] },
+        "encoding": { "type": "string", "enum": ["utf-8"] },
+        "normalization": { "type": "string", "enum": ["none"] },
+        "byteLength": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "digestVerification": {
+          "type": "string",
+          "enum": ["caller-verified-exact-bytes"]
+        },
+        "contentDisclosure": { "type": "string", "enum": ["not-included"] }
+      }
+    },
+    "componentBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "sourceLocator",
+        "sourceSha256",
+        "digestVerification"
+      ],
+      "properties": {
+        "name": { "$ref": "#/$defs/shortText" },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+(?:\\.\\d+)?$",
+          "maxLength": 32
+        },
+        "sourceLocator": { "$ref": "#/$defs/boundedText" },
+        "sourceSha256": { "$ref": "#/$defs/sha256" },
+        "digestVerification": {
+          "type": "string",
+          "enum": ["caller-verified-exact-bytes"]
+        }
+      }
+    },
+    "rhetorlintBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "createdInRevisionId",
+        "rhetorlintSpecVersion",
+        "engine",
+        "rulePack",
+        "offsetUnit",
+        "bindingLimit"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "rhetorlintSpecVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+(?:\\.\\d+)?$",
+          "maxLength": 32
+        },
+        "engine": { "$ref": "#/$defs/componentBinding" },
+        "rulePack": { "$ref": "#/$defs/componentBinding" },
+        "offsetUnit": { "type": "string", "enum": ["utf16-code-units"] },
+        "bindingLimit": {
+          "type": "string",
+          "enum": ["binds-declared-bytes-not-execution-or-semantics"]
+        }
+      }
+    },
+    "sourceAnchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceArtifactId",
+        "sourceSha256",
+        "offsetUnit",
+        "startOffset",
+        "endOffset",
+        "spanSha256",
+        "spanDigestBasis"
+      ],
+      "properties": {
+        "sourceArtifactId": { "$ref": "#/$defs/stableId" },
+        "sourceSha256": { "$ref": "#/$defs/sha256" },
+        "offsetUnit": { "type": "string", "enum": ["utf16-code-units"] },
+        "startOffset": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+        "endOffset": { "type": "integer", "minimum": 1, "maximum": 100000000 },
+        "spanSha256": { "$ref": "#/$defs/sha256" },
+        "spanDigestBasis": {
+          "type": "string",
+          "enum": ["utf8-of-selected-text-without-normalization"]
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "createdInRevisionId", "kind", "status", "anchor"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "kind": { "type": "string", "enum": ["surface-span"] },
+        "status": { "type": "string", "enum": ["source-span-observed"] },
+        "anchor": { "$ref": "#/$defs/sourceAnchor" }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "createdInRevisionId",
+        "observationId",
+        "rhetorlintBindingId",
+        "ruleId",
+        "family",
+        "technique",
+        "classificationStatus",
+        "taxonomyMappingStatus"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "observationId": { "$ref": "#/$defs/stableId" },
+        "rhetorlintBindingId": { "$ref": "#/$defs/stableId" },
+        "ruleId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$",
+          "maxLength": 255
+        },
+        "family": { "$ref": "#/$defs/shortText" },
+        "technique": { "$ref": "#/$defs/shortText" },
+        "classificationStatus": {
+          "type": "string",
+          "enum": ["rule-pack-candidate-context-required"]
+        },
+        "taxonomyMappingStatus": {
+          "type": "string",
+          "enum": ["aligned-candidate", "approximate-candidate", "rhetorlint-extension"]
+        }
+      }
+    },
+    "claimHypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "createdInRevisionId",
+        "classificationIds",
+        "metadataSource",
+        "claimRole",
+        "subjectDomain",
+        "representationForm",
+        "methodKind",
+        "status",
+        "statement",
+        "scope",
+        "conditions",
+        "alternatives",
+        "externalRefIds"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "classificationIds": { "$ref": "#/$defs/nonEmptyIdList" },
+        "metadataSource": {
+          "type": "string",
+          "enum": ["caller-supplied"]
+        },
+        "claimRole": {
+          "type": "string",
+          "enum": [
+            "assertion",
+            "definition",
+            "theorem-claim",
+            "conjecture",
+            "design-commitment"
+          ]
+        },
+        "subjectDomain": {
+          "type": "string",
+          "enum": [
+            "ordinary-language",
+            "mathematics",
+            "empirical-science",
+            "philosophy",
+            "cross-domain",
+            "other"
+          ]
+        },
+        "representationForm": {
+          "type": "string",
+          "enum": ["natural-language", "formal-expression", "diagram", "other"]
+        },
+        "methodKind": {
+          "type": "string",
+          "enum": ["none", "not-specified", "proof", "model", "measurement", "other"]
+        },
+        "status": { "type": "string", "enum": ["claim-candidate-not-adjudicated"] },
+        "statement": { "$ref": "#/$defs/boundedText" },
+        "scope": { "$ref": "#/$defs/textList" },
+        "conditions": { "$ref": "#/$defs/optionalTextList" },
+        "alternatives": { "$ref": "#/$defs/optionalTextList" },
+        "externalRefIds": { "$ref": "#/$defs/idList" }
+      }
+    },
+    "effectHypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "createdInRevisionId",
+        "classificationIds",
+        "claimHypothesisIds",
+        "metadataSource",
+        "status",
+        "recipientOrSubstrate",
+        "dimension",
+        "operation",
+        "description",
+        "conditions",
+        "alternatives",
+        "measureStatus",
+        "qualitativeMeasureCandidates",
+        "externalRefIds",
+        "evaluationDesignRefIds"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "classificationIds": { "$ref": "#/$defs/nonEmptyIdList" },
+        "claimHypothesisIds": { "$ref": "#/$defs/idList" },
+        "metadataSource": {
+          "type": "string",
+          "enum": ["caller-supplied"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["hypothesis-recipient-specific-evidence-required"]
+        },
+        "recipientOrSubstrate": { "$ref": "#/$defs/shortText" },
+        "dimension": { "$ref": "#/$defs/shortText" },
+        "operation": { "$ref": "#/$defs/shortText" },
+        "description": { "$ref": "#/$defs/boundedText" },
+        "conditions": { "$ref": "#/$defs/textList" },
+        "alternatives": { "$ref": "#/$defs/textList" },
+        "measureStatus": {
+          "type": "string",
+          "enum": ["qualitative-candidates-not-operationalized"]
+        },
+        "qualitativeMeasureCandidates": { "$ref": "#/$defs/textList" },
+        "externalRefIds": { "$ref": "#/$defs/idList" },
+        "evaluationDesignRefIds": { "$ref": "#/$defs/idList" }
+      }
+    },
+    "verificationQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "createdInRevisionId",
+        "classificationIds",
+        "claimHypothesisIds",
+        "effectHypothesisIds",
+        "metadataSource",
+        "status",
+        "question",
+        "evidenceNeeded",
+        "externalRefIds"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "classificationIds": { "$ref": "#/$defs/nonEmptyIdList" },
+        "claimHypothesisIds": { "$ref": "#/$defs/idList" },
+        "effectHypothesisIds": { "$ref": "#/$defs/idList" },
+        "metadataSource": {
+          "type": "string",
+          "enum": ["caller-supplied"]
+        },
+        "status": { "type": "string", "enum": ["question-not-verdict"] },
+        "question": { "$ref": "#/$defs/boundedText" },
+        "evidenceNeeded": { "$ref": "#/$defs/textList" },
+        "externalRefIds": { "$ref": "#/$defs/idList" }
+      }
+    },
+    "externalRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "createdInRevisionId",
+        "kind",
+        "locator",
+        "artifactSha256",
+        "digestVerification",
+        "assurance"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "createdInRevisionId": { "$ref": "#/$defs/stableId" },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "evidence",
+            "research-report",
+            "mathematical-treatment-card",
+            "formal-verification",
+            "evaluation-design"
+          ]
+        },
+        "locator": { "$ref": "#/$defs/boundedText" },
+        "artifactSha256": { "$ref": "#/$defs/sha256" },
+        "digestVerification": {
+          "type": "string",
+          "enum": ["caller-verified-exact-bytes"]
+        },
+        "assurance": {
+          "type": "string",
+          "enum": ["opaque-reference-not-resolved-or-evaluated"]
+        }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sequence",
+        "previousRevisionId",
+        "recordedAt",
+        "operation",
+        "addedNodeIds",
+        "supersededNodeIds",
+        "reason"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "sequence": { "type": "integer", "minimum": 1, "maximum": 1000000 },
+        "previousRevisionId": {
+          "type": ["string", "null"],
+          "pattern": "^[a-z][a-z0-9-]{0,31}:[a-z0-9][a-z0-9._-]{0,127}$",
+          "maxLength": 160
+        },
+        "recordedAt": { "$ref": "#/$defs/timestamp" },
+        "operation": {
+          "type": "string",
+          "enum": ["create", "append", "supersede", "withdraw"]
+        },
+        "addedNodeIds": { "$ref": "#/$defs/idList" },
+        "supersededNodeIds": { "$ref": "#/$defs/idList" },
+        "reason": { "$ref": "#/$defs/boundedText" }
+      }
+    }
+  }
+}

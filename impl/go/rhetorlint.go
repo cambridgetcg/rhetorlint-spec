@@ -2,12 +2,12 @@
 //
 // A third engine, in a third language, that reads the same rule pack
 // (packages/rules-en/rules.json) and reproduces the same conformance corpus
-// as the JavaScript and Python engines — byte for byte on BMP/ASCII text.
+// values as the JavaScript and Python engines over its current ASCII scope.
 // Its only reason to exist is to prove the taxonomy is portable.
 //
 // Note on offsets: Go strings are byte sequences, so positions are byte
-// offsets. For ASCII/BMP text these equal the JS (UTF-16) and Python
-// (code-point) offsets; the conformance corpus is ASCII. See
+// offsets. For ASCII text these equal the JS (UTF-16) and Python (code-point)
+// offsets; the conformance corpus is ASCII. See
 // conformance/README.md for the astral-character caveat.
 //
 // Zero third-party dependencies (standard library only). It marks tells in
@@ -25,6 +25,7 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"unicode/utf16"
 )
 
 const specVersion = "0.1"
@@ -51,7 +52,7 @@ var agentlessPassive = regexp.MustCompile(
 	`(?i)\b(is|are|was|were|been|being|be)\s+(?:(?:\w+ly|often|never|always|still|already)\s+)?(\w+(?:ed|en)|` + irregularPP + `)\b`)
 var byFollows = regexp.MustCompile(`(?i)^\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b`)
 
-var removable = map[string]bool{"intensifier.loaded": true, "hedge.deniable": true}
+var removable = map[string]bool{"intensifier.loaded": true}
 
 // Rule mirrors one entry of rules.json. Fields not relevant to a rule's type
 // are simply absent in the JSON and stay at their zero value.
@@ -129,36 +130,72 @@ type hit struct {
 	actual        string
 }
 
-var lexicalCache = map[string]*regexp.Regexp{}
-var patternCache = map[string]*regexp.Regexp{}
+type lexicalAlternative struct {
+	escaped     string
+	length      int
+	escapedCode []uint16
+}
+
+func compareCodeUnits(left, right []uint16) int {
+	limit := len(left)
+	if len(right) < limit {
+		limit = len(right)
+	}
+	for i := 0; i < limit; i++ {
+		if left[i] < right[i] {
+			return -1
+		}
+		if left[i] > right[i] {
+			return 1
+		}
+	}
+	if len(left) < len(right) {
+		return -1
+	}
+	if len(left) > len(right) {
+		return 1
+	}
+	return 0
+}
 
 func matchesFor(rule Rule, text string) []hit {
 	var out []hit
 	switch {
 	case rule.Type == "lexical":
-		re, ok := lexicalCache[rule.RuleID]
-		if !ok {
-			esc := make([]string, len(rule.Terms))
-			for i, t := range rule.Terms {
-				esc[i] = regexp.QuoteMeta(t)
+		// RE2 alternation is leftmost-first. Put longer overlapping terms first
+		// without mutating the caller's authored rule-pack order. Escaped UTF-16
+		// length and code-unit order mirror the JavaScript reference exactly.
+		alternatives := make([]lexicalAlternative, len(rule.Terms))
+		for i, term := range rule.Terms {
+			escaped := regexp.QuoteMeta(term)
+			escapedCode := utf16.Encode([]rune(escaped))
+			alternatives[i] = lexicalAlternative{
+				escaped:     escaped,
+				length:      len(escapedCode),
+				escapedCode: escapedCode,
 			}
-			re = regexp.MustCompile(`(?i)\b(?:` + strings.Join(esc, "|") + `)\b`)
-			lexicalCache[rule.RuleID] = re
 		}
+		sort.Slice(alternatives, func(i, j int) bool {
+			if alternatives[i].length != alternatives[j].length {
+				return alternatives[i].length > alternatives[j].length
+			}
+			return compareCodeUnits(alternatives[i].escapedCode, alternatives[j].escapedCode) < 0
+		})
+		esc := make([]string, len(alternatives))
+		for i, alternative := range alternatives {
+			esc[i] = alternative.escaped
+		}
+		re := regexp.MustCompile(`(?i)\b(?:` + strings.Join(esc, "|") + `)\b`)
 		for _, loc := range re.FindAllStringIndex(text, -1) {
 			out = append(out, hit{loc[0], loc[1] - loc[0], text[loc[0]:loc[1]]})
 		}
 	case rule.Type == "pattern":
-		re, ok := patternCache[rule.RuleID]
-		if !ok {
-			// Case-insensitive unless the rule opts out (e.g. ALL-CAPS shouting).
-			flags := `(?i)`
-			if rule.CaseSensitive {
-				flags = ``
-			}
-			re = regexp.MustCompile(flags + rule.Pattern)
-			patternCache[rule.RuleID] = re
+		// Case-insensitive unless the rule opts out (e.g. ALL-CAPS shouting).
+		flags := `(?i)`
+		if rule.CaseSensitive {
+			flags = ``
 		}
+		re := regexp.MustCompile(flags + rule.Pattern)
 		for _, loc := range re.FindAllStringIndex(text, -1) {
 			if loc[1] == loc[0] {
 				continue
@@ -213,7 +250,7 @@ func Analyze(text string, pack RulePack) Result {
 			if rule.Expected == nil {
 				mk.Expected = []string{}
 			} else {
-				mk.Expected = rule.Expected
+				mk.Expected = append([]string{}, rule.Expected...)
 			}
 			mk.Confidence = rule.Confidence
 			if rule.Level == "" {
@@ -263,19 +300,25 @@ func Analyze(text string, pack RulePack) Result {
 	r.Strip = Strip(text, deduped)
 	r.Rewrite = nil
 	r.Engine.Name = "rhetorlint (go)"
-	r.Engine.Version = "0.1.1"
+	r.Engine.Version = "0.1.2"
 	r.Engine.Rules = pack.ID + "@" + pack.Version
 	return r
 }
 
-var reWhitespaceRun = regexp.MustCompile(`\s{2,}`)
-var reSpaceBeforePunct = regexp.MustCompile(`\s+([,.;:!?])`)
-var reDoubleComma = regexp.MustCompile(`,\s*,`)
-var reTrailingWS = regexp.MustCompile(`(?m)\s+$`)
-
-// Strip returns the deterministic de-spun text: adverbial spin removed,
-// agentless passives flagged [who?]. It subtracts spin; it never paraphrases.
+// Strip removes loaded intensifiers and flags agentless passives [who?].
+// It preserves modality and attribution and never paraphrases.
 func Strip(text string, marks []Mark) string {
+	hasEdit := false
+	for _, mark := range marks {
+		if removable[mark.RuleID] || mark.RuleID == "agency-hiding.deleted-subject" {
+			hasEdit = true
+			break
+		}
+	}
+	if !hasEdit {
+		return text
+	}
+
 	ordered := make([]Mark, len(marks))
 	copy(ordered, marks)
 	sort.SliceStable(ordered, func(i, j int) bool {
@@ -285,16 +328,63 @@ func Strip(text string, marks []Mark) string {
 	for _, m := range ordered {
 		s, e := m.Position.Start.Offset, m.Position.End.Offset
 		if removable[m.RuleID] {
-			out = out[:s] + out[e:]
+			out = joinRemovalSeam(out[:s], out[e:])
 		} else if m.RuleID == "agency-hiding.deleted-subject" {
 			out = out[:s] + "[who?] " + out[s:]
 		}
 	}
-	out = reWhitespaceRun.ReplaceAllString(out, " ")
-	out = reSpaceBeforePunct.ReplaceAllString(out, "${1}")
-	out = reDoubleComma.ReplaceAllString(out, ",")
-	out = reTrailingWS.ReplaceAllString(out, "")
-	return strings.TrimSpace(out)
+	return out
+}
+
+// joinRemovalSeam tidies only horizontal whitespace and duplicate commas that
+// directly touch one removed span. Unrelated formatting and line breaks remain
+// byte-identical to the source.
+func joinRemovalSeam(left, right string) string {
+	leftWhitespaceStart := len(left)
+	for leftWhitespaceStart > 0 {
+		char := left[leftWhitespaceStart-1]
+		if char != ' ' && char != '\t' {
+			break
+		}
+		leftWhitespaceStart--
+	}
+	rightWhitespaceEnd := 0
+	for rightWhitespaceEnd < len(right) {
+		char := right[rightWhitespaceEnd]
+		if char != ' ' && char != '\t' {
+			break
+		}
+		rightWhitespaceEnd++
+	}
+
+	leftCore, leftWhitespace := left[:leftWhitespaceStart], left[leftWhitespaceStart:]
+	rightWhitespace, rightCore := right[:rightWhitespaceEnd], right[rightWhitespaceEnd:]
+
+	if leftWhitespace != "" && rightWhitespace != "" {
+		switch {
+		case leftCore == "" && rightCore == "":
+			return ""
+		case leftCore == "" || strings.HasSuffix(leftCore, "\r") || strings.HasSuffix(leftCore, "\n"):
+			leftCore += leftWhitespace
+		case rightCore == "" || strings.HasPrefix(rightCore, "\r") || strings.HasPrefix(rightCore, "\n"):
+			// Drop horizontal whitespace at an end or line-break seam.
+		default:
+			leftCore += " "
+		}
+	} else if leftWhitespace != "" {
+		if rightCore != "" && !strings.ContainsRune(",.;:!?\r\n", rune(rightCore[0])) {
+			leftCore += leftWhitespace
+		}
+	} else if rightWhitespace != "" {
+		if leftCore != "" && !strings.HasSuffix(leftCore, "\r") && !strings.HasSuffix(leftCore, "\n") {
+			rightCore = rightWhitespace + rightCore
+		}
+	}
+
+	if strings.HasSuffix(leftCore, ",") && strings.HasPrefix(rightCore, ",") {
+		rightCore = rightCore[1:]
+	}
+	return leftCore + rightCore
 }
 
 // LoadDefaultRules reads the canonical @rhetorlint/rules-en pack from the repo,

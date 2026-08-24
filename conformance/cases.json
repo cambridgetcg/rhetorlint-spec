@@ -154,7 +154,7 @@
         "tells": 2,
         "per100Words": 28.6
       },
-      "strip": "The system failed,.",
+      "strip": "The system might have possibly failed, allegedly.",
       "marks": [
         {
           "ruleId": "hedge.deniable",

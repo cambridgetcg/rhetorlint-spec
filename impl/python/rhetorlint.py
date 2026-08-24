@@ -14,6 +14,8 @@ Conformance: this engine must reproduce every case in conformance/cases.json.
 See conformance/README.md.
 """
 from __future__ import annotations
+import copy
+import inspect
 import json
 import math
 import re
@@ -22,7 +24,7 @@ from pathlib import Path
 
 SPEC_VERSION = "0.1"
 NAME = "rhetorlint (python)"
-CORE_VERSION = "0.1.1"
+CORE_VERSION = "0.1.2"
 
 # Words the -ed/-en passive heuristic should treat as predicate adjectives.
 # Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
@@ -51,8 +53,18 @@ AGENTLESS_PASSIVE = re.compile(
     re.IGNORECASE,
 )
 
-# The ruleIds whose phrases `strip` may remove without breaking grammar.
-REMOVABLE = {"intensifier.loaded", "hedge.deniable"}
+# The sole ruleId eligible under the conservative strip counterfactual.
+REMOVABLE = {"intensifier.loaded"}
+_REGEX_META = frozenset(r"\^$.*+?()[]{}|")
+
+
+def _escape_regexp(value):
+    """Escape exactly the metacharacters escaped by the JavaScript reference."""
+    return "".join("\\" + char if char in _REGEX_META else char for char in value)
+
+
+def _utf16_sort_bytes(value):
+    return value.encode("utf-16-be", errors="surrogatepass")
 
 
 def _matches_for(rule, text):
@@ -60,7 +72,19 @@ def _matches_for(rule, text):
     out = []
     kind = rule.get("type")
     if kind == "lexical":
-        alt = "|".join(re.escape(t) for t in rule["terms"])
+        # Python alternation is leftmost-first. Put longer overlapping terms
+        # first without mutating the caller's authored rule-pack order.
+        alternatives = [
+            (term, _escape_regexp(term))
+            for term in rule["terms"]
+        ]
+        alternatives.sort(
+            key=lambda item: (
+                -(len(_utf16_sort_bytes(item[1])) // 2),
+                _utf16_sort_bytes(item[1]),
+            )
+        )
+        alt = "|".join(escaped for _term, escaped in alternatives)
         rx = re.compile(r"\b(?:" + alt + r")\b", re.IGNORECASE)
         for m in rx.finditer(text):
             out.append((m.start(), len(m.group(0)), m.group(0)))
@@ -99,28 +123,62 @@ def _js_round(x):
 
 
 def strip(text, marks):
-    """Deterministic de-spun text: subtract adverbial spin, flag hidden agents."""
+    """Remove loaded intensifiers and flag hidden agents; preserve modality."""
+    if not any(
+        m["ruleId"] in REMOVABLE or m["ruleId"] == "agency-hiding.deleted-subject"
+        for m in marks
+    ):
+        return text
+
     ordered = sorted(marks, key=lambda m: m["position"]["start"]["offset"], reverse=True)
     out = text
     for m in ordered:
         s = m["position"]["start"]["offset"]
         e = m["position"]["end"]["offset"]
         if m["ruleId"] in REMOVABLE:
-            out = out[:s] + out[e:]
+            out = _join_removal_seam(out[:s], out[e:])
         elif m["ruleId"] == "agency-hiding.deleted-subject":
             out = out[:s] + "[who?] " + out[s:]
-    out = re.sub(r"\s{2,}", " ", out)
-    out = re.sub(r"\s+([,.;:!?])", r"\1", out)
-    out = re.sub(r",\s*,", ",", out)
-    out = re.sub(r"\s+$", "", out, flags=re.MULTILINE)
-    return out.strip()
+    return out
+
+
+def _join_removal_seam(left, right):
+    """Tidy only horizontal whitespace and duplicate commas at a removal seam."""
+    left_match = re.search(r"[\t ]+$", left)
+    right_match = re.match(r"[\t ]+", right)
+    left_whitespace = left_match.group(0) if left_match else ""
+    right_whitespace = right_match.group(0) if right_match else ""
+    left_core = left[: len(left) - len(left_whitespace)] if left_whitespace else left
+    right_core = right[len(right_whitespace) :]
+
+    if left_whitespace and right_whitespace:
+        if not left_core and not right_core:
+            return ""
+        if not left_core or left_core.endswith(("\r", "\n")):
+            left_core += left_whitespace
+        elif not right_core or right_core.startswith(("\r", "\n")):
+            pass
+        else:
+            left_core += " "
+    elif left_whitespace:
+        if right_core and not right_core.startswith(tuple(",.;:!?\r\n")):
+            left_core += left_whitespace
+    elif right_whitespace:
+        if left_core and not left_core.endswith(("\r", "\n")):
+            right_core = right_whitespace + right_core
+
+    if left_core.endswith(",") and right_core.startswith(","):
+        right_core = right_core[1:]
+    return left_core + right_core
 
 
 def analyze(text, rules=None, locale=None, rewrite=None):
-    """analyze(text, rules) -> a RhetorLint result dict (see the spec)."""
+    """analyze(text, rules, rewrite=...) -> a RhetorLint result dict."""
     if not rules or not isinstance(rules.get("rules"), list):
         raise ValueError("analyze() needs a rule pack: analyze(text, rules)")
 
+    reported_locale = locale or rules.get("locale") or "en"
+    rules_provenance = rules["id"] + "@" + rules["version"]
     marks = []
     for rule in rules["rules"]:
         for index, length, actual in _matches_for(rule, text):
@@ -131,7 +189,7 @@ def analyze(text, rules=None, locale=None, rewrite=None):
                 "actual": actual,
                 "position": {"start": _point_at(text, index), "end": _point_at(text, index + length)},
                 "note": rule.get("note"),
-                "expected": rule.get("expected", []),
+                "expected": list(rule.get("expected", [])),
                 "confidence": rule.get("confidence"),
                 "level": rule.get("level", "info"),
             })
@@ -147,15 +205,33 @@ def analyze(text, rules=None, locale=None, rewrite=None):
 
     words = _count_words(text)
     per100 = (_js_round((len(deduped) / words) * 1000) / 10) if words else 0
+    stripped = strip(text, deduped)
+
+    rewritten = None
+    if callable(rewrite):
+        # Adapters receive an isolated snapshot: they cannot mutate canonical
+        # marks, nested mark metadata, or the deterministic strip result.
+        rewritten = rewrite(text, copy.deepcopy(deduped))
+        if inspect.isawaitable(rewritten):
+            # A native coroutine otherwise emits an un-awaited warning while
+            # we reject the async adapter required to keep analyze synchronous.
+            if inspect.iscoroutine(rewritten):
+                rewritten.close()
+            raise TypeError(
+                "analyze() rewrite adapter must return a string synchronously; "
+                "async adapters are not supported"
+            )
+        if not isinstance(rewritten, str):
+            raise TypeError("analyze() rewrite adapter must return a string")
 
     return {
         "rhetorlint": SPEC_VERSION,
-        "source": {"chars": len(text), "words": words, "locale": locale or rules.get("locale") or "en"},
+        "source": {"chars": len(text), "words": words, "locale": reported_locale},
         "density": {"tells": len(deduped), "per100Words": per100},
         "marks": deduped,
-        "strip": strip(text, deduped),
-        "rewrite": rewrite(text, deduped) if callable(rewrite) else None,
-        "engine": {"name": NAME, "version": CORE_VERSION, "rules": rules["id"] + "@" + rules["version"]},
+        "strip": stripped,
+        "rewrite": rewritten,
+        "engine": {"name": NAME, "version": CORE_VERSION, "rules": rules_provenance},
     }
 
 

@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const BUILD = fileURLToPath(new URL("../apps/widget/build.mjs", import.meta.url));
+const EXPLORER_BUILD = fileURLToPath(new URL("../scripts/update-explorer.mjs", import.meta.url));
 const CONTENT = fileURLToPath(new URL("../apps/widget/content.js", import.meta.url));
 const BOOKMARKLET = fileURLToPath(new URL("../apps/widget/bookmarklet.html", import.meta.url));
 const EXPLORER = fileURLToPath(new URL("../apps/explorer/index.html", import.meta.url));
@@ -23,6 +24,17 @@ test("the committed widget artifacts are in sync with their sources (rebuild is 
   assert.equal(bookmarkletAfter, bookmarkletBefore, "bookmarklet.html is stale — run `node apps/widget/build.mjs` and commit");
 });
 
+test("the committed explorer engine and pack are in sync (rebuild is a no-op)", () => {
+  const before = readFileSync(EXPLORER, "utf8");
+  const result = spawnSync("node", [EXPLORER_BUILD], { encoding: "utf8" });
+  assert.equal(result.status, 0, "explorer build should succeed: " + result.stderr);
+  assert.equal(
+    readFileSync(EXPLORER, "utf8"),
+    before,
+    "explorer is stale — run `npm run build:explorer` and commit"
+  );
+});
+
 test("the generated content.js embeds the real engine and rules", () => {
   const src = readFileSync(CONTENT, "utf8");
   assert.match(src, /function analyze\b/, "engine inlined");
@@ -32,6 +44,9 @@ test("the generated content.js embeds the real engine and rules", () => {
   assert.match(src, /e\.key === "R" \|\| e\.key === "r"/, "the advertised Alt+Shift+R hotkey is wired");
   assert.doesNotMatch(src, /captione[e]r/i, "the retired brand is absent");
   assert.doesNotMatch(src, /\bexport\s/, "no stray ES export keyword survived inlining");
+  assert.match(src, /No configured tells found in this text/);
+  assert.match(src, /not a truth, intent, or effect verdict/);
+  assert.doesNotMatch(src, /language is doing what it says/i);
 });
 
 test("the explorer copy declares the current engine and rewrite boundary", () => {
@@ -42,10 +57,12 @@ test("the explorer copy declares the current engine and rewrite boundary", () =>
   );
   assert.match(src, /async adapters are not supported/);
   assert.match(src, /rewrite adapter must return a string/);
+  assert.match(src, /No configured tells found in this pass/);
+  assert.doesNotMatch(src, /Clean &amp; honest/);
 });
 
-test("the explorer's hand-inlined pack matches the canonical pack", () => {
-  // The explorer is the public door; its RULES block is synced by hand.
+test("the explorer's generated pack matches the canonical pack", () => {
+  // The explorer is the public door; its generated RULES block stays exact.
   // Version alone can lie, so hold it to the rule count too.
   const src = readFileSync(EXPLORER, "utf8");
   const RULES_PACKAGE = JSON.parse(readFileSync(new URL("../packages/rules-en/rules.json", import.meta.url)));

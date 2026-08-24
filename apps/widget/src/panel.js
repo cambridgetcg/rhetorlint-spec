@@ -99,7 +99,7 @@ function capShow(result, selectedText) {
           <div><div class="phrase">${capEscape(m.actual)} <span class="rid">${capEscape(m.ruleId)}</span></div>
           <div class="note">${capEscape(m.note)}</div></div></div>`;
       }).join("")
-    : `<p class="cap-empty">No tells found. The language is doing what it says.</p>`;
+    : `<p class="cap-empty">No configured tells found in this text. That is not a truth, intent, or effect verdict.</p>`;
 
   root.innerHTML = `<style>${CAP_CSS}</style>
     <div class="cap-wrap" role="dialog" aria-label="RhetorLint reading">
@@ -114,7 +114,7 @@ function capShow(result, selectedText) {
         </div>
         <div class="cap-read">${capMarkup(selectedText, result.marks)}</div>
         ${marksHtml}
-        ${result.marks.length ? `<div class="cap-strip"><div class="k">strip · spin removed, hidden agents flagged</div><div class="v">${capEscape(result.strip)}</div></div>` : ""}
+        ${result.marks.length ? `<div class="cap-strip"><div class="k">counterfactual · loaded intensifiers removed, omitted agents flagged · not guaranteed meaning-preserving</div><div class="v">${capEscape(result.strip)}</div></div>` : ""}
         <div class="cap-foot">On-device · nothing you selected left this page.<br>${capEscape(result.engine.name + "@" + result.engine.version)} · ${capEscape(result.engine.rules)}</div>
       </div>
     </div>`;

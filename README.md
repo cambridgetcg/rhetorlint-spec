@@ -17,13 +17,14 @@ This repository is the **open RhetorLint framework**: a specification you can im
 
 ## The shape (open the method, not the app)
 
-The durable asset is **data + a schema**, not any one engine — the lesson of Vale and retext. Three layers:
+The durable asset is **data + a schema**, not any one engine — the lesson of Vale and retext. Four surfaces:
 
-| Layer | What it is |
-|-------|-----------|
+| Surface | What it is |
+|---------|------------|
 | **`spec/`** | The language-agnostic core. [`taxonomy.yaml`](spec/taxonomy.yaml) — the families of tells, aligned to the SemEval-2023 persuasion taxonomy, readable as a syllabus. [`output.schema.json`](spec/output.schema.json) — the one result object every implementation emits. |
 | **`@rhetorlint/core`** | A browser-first, zero-dependency JS reference engine that implements the spec. Runs fully on-device. |
 | **`@rhetorlint/rules-en`** | The English tell-pack as declarative rules — compiled into the JS engine *and* read unchanged by the Python and Go engines in [`impl/`](impl). |
+| **Claim graph (opt-in)** | A closed inquiry projection that keeps source observations, candidate classifications, claim/effect hypotheses, verification questions, and opaque research or formal references separate. It does not establish truth, intent, effect, causality, authority, or consent. |
 
 The taxonomy is the framework, the curriculum, and the moat — all at once.
 
@@ -80,6 +81,7 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 - **Agents in the room** — the local [Agent Room example](examples/agent-room/README.md) keeps reply, correction, refusal, rest, leave, withdrawal, and quiet distinct. It makes a deterministic finite view from owner-supplied events and digest references, never a person rank; RhetorLint density and crawler access cannot affect selection or create training permission. Every later-use review stays held and content-free.
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
+- **Inquiry and formal-methods work** — the opt-in [claim graph](examples/claim-graph/README.md) binds exact source spans and external mathematical treatment cards (including KINGDOM's Math Passport), formal-verification, evidence, report, or evaluation-design artifacts without treating a digest, formula, proof method, or study plan as a verdict.
 - **ML evaluators** — the local-first [RhetorLint conformance dataset](datasets/rhetorlint-conformance/README.md) turns all 31 committed engine cases into one digest-bound Hugging Face-compatible `test` snapshot. It has no training split, upload, model call, person score, or truth label; the sole Claim Feedback fixture is explicitly excluded because its reuse lane denies mirroring.
 
 ```bash
@@ -121,7 +123,7 @@ Agreement is on **values**, not on serialised bytes: the same density that JS an
 ## Layout
 
 ```
-spec/            taxonomy.yaml · output.schema.json      the portable core
+spec/            taxonomy · output + claim-graph schemas the portable contracts
 conformance/     cases.json                               the cross-engine ground truth
 datasets/rhetorlint-conformance/ derived HF-shaped evaluation snapshot, no upload
 packages/core/   index.mjs · sarif.mjs · signals.mjs      JS engine + explicit exports
@@ -134,6 +136,7 @@ apps/widget/     manifest.json · build.mjs · src/panel.js the browser widget (
 examples/truth-release/ one-claim social + SEO preparation, no dispatch
 examples/claim-feedback/ claim receipt → challenge → correction, no crawl or send
 examples/agent-room/ supplied events → finite non-ranking view, zero effects
+examples/claim-graph/ exact observations → bounded inquiry, no verdicts
 test/            *.test.mjs                                proves the engines, CLI, widget, conformance
 scripts/demo.mjs                                           a 20-line taste
 ```

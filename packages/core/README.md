@@ -23,8 +23,8 @@ const rules = require("@rhetorlint/rules-en");
 
 const r = analyze("Mistakes were made.", { rules });
 r.density;      // { tells: 1, per100Words: 33.3 }
-r.marks[0];     // { ruleId:"agency-hiding.deleted-subject", actual:"Mistakes were made", position:{…}, note:"…", … }
-r.strip;        // "[who?] Mistakes were made."
+r.marks[0];     // { ruleId:"agency-hiding.deleted-subject", actual:"were made", position:{…}, note:"…", … }
+r.strip;        // "Mistakes [who?] were made."
 ```
 
 **Options**
@@ -35,9 +35,20 @@ r.strip;        // "[who?] Mistakes were made."
 | `locale` | overrides the reported locale |
 | `rewrite` | *(optional)* synchronous `fn(text, marks) → string`. Plug in a model to produce a plain-truth paraphrase. Omitted → `result.rewrite` is `null`. Async adapters are rejected so the result remains JSON-safe. **The core never invents a paraphrase.** |
 
+Core 0.1.3 validates rule packs as closed, bounded inputs before matching. It
+rejects unknown fields and matcher kinds, duplicate IDs, invalid metadata,
+future `minEngine` requirements, and patterns that are known or observed to
+match zero characters. These checks constrain shape and size; they do not
+certify the runtime complexity of an arbitrary regular expression.
+
 ### `strip(text, marks) → string`
 
-The deterministic, on-device de-spin: removes adverbial spin (intensifiers, deniable adverbs) and flags each agentless passive with `[who?]`. It subtracts spin; it does not paraphrase, so it never breaks a sentence's grammar. Verb-phrase hedges and structural tells are left *marked* for the reader to judge.
+The deterministic, on-device de-spin removes only loaded intensifiers and flags
+each agentless passive with `[who?]`. Modality and attribution—including
+deniable modals and `allegedly`—remain intact because deleting them can
+strengthen or otherwise change a claim. `strip` is a conservative reading aid,
+not a guarantee of grammatical or meaning-preserving revision; all other tells
+remain *marked* for the reader to judge.
 
 ### `toSarif(result) → sarifLog` (`@rhetorlint/core/sarif`)
 

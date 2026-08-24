@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -91,12 +92,181 @@ func TestConformance(t *testing.T) {
 			g, w := marks[j], c.Marks[j]
 			if g.RuleID != w.RuleID || g.Start != w.Start || g.End != w.End ||
 				g.Actual != w.Actual || g.Family != w.Family || g.Technique != w.Technique ||
-				g.Note != w.Note || g.Level != w.Level || math.Abs(g.Confidence-w.Confidence) > 1e-9 {
+				g.Note != w.Note || g.Level != w.Level ||
+				!reflect.DeepEqual(g.Expected, w.Expected) ||
+				math.Abs(g.Confidence-w.Confidence) > 1e-9 {
 				t.Errorf("case %d mark %d:\n got  %+v\n want %+v", i, j, g, w)
 			}
 		}
 	}
 	t.Logf("go conformance: %d/%d cases checked against the ground truth", len(corpus.Cases), len(corpus.Cases))
+}
+
+func testPack(rule Rule) RulePack {
+	return RulePack{
+		ID: "test-pack", Version: "1", Locale: "en",
+		Rules: []Rule{rule},
+	}
+}
+
+func markActuals(result Result) []string {
+	actuals := make([]string, len(result.Marks))
+	for i, mark := range result.Marks {
+		actuals[i] = mark.Actual
+	}
+	return actuals
+}
+
+func TestMatcherUsesCurrentDefinition(t *testing.T) {
+	t.Run("changed lexical terms", func(t *testing.T) {
+		rule := Rule{RuleID: "test.cache.lexical", Family: "test", Type: "lexical", Terms: []string{"alpha"}}
+		Analyze("alpha beta", testPack(rule))
+
+		rule.Terms = []string{"beta"}
+		got := markActuals(Analyze("alpha beta", testPack(rule)))
+		if !reflect.DeepEqual(got, []string{"beta"}) {
+			t.Fatalf("changed terms reused the old matcher: got %v want [beta]", got)
+		}
+	})
+
+	t.Run("changed pattern", func(t *testing.T) {
+		rule := Rule{RuleID: "test.cache.pattern", Family: "test", Type: "pattern", Pattern: `\balpha\b`}
+		Analyze("alpha beta", testPack(rule))
+
+		rule.Pattern = `\bbeta\b`
+		got := markActuals(Analyze("alpha beta", testPack(rule)))
+		if !reflect.DeepEqual(got, []string{"beta"}) {
+			t.Fatalf("changed pattern reused the old matcher: got %v want [beta]", got)
+		}
+	})
+
+	t.Run("changed case sensitivity", func(t *testing.T) {
+		rule := Rule{
+			RuleID: "test.cache.case", Family: "test", Type: "pattern",
+			Pattern: "alpha", CaseSensitive: true,
+		}
+		Analyze("alpha", testPack(rule))
+
+		rule.CaseSensitive = false
+		got := markActuals(Analyze("ALPHA", testPack(rule)))
+		if !reflect.DeepEqual(got, []string{"ALPHA"}) {
+			t.Fatalf("changed case setting reused the old matcher: got %v want [ALPHA]", got)
+		}
+	})
+}
+
+func TestAnalyzeConcurrentMatchers(t *testing.T) {
+	const workers = 48
+	const iterations = 40
+
+	start := make(chan struct{})
+	errs := make(chan string, workers)
+	var wg sync.WaitGroup
+	for worker := 0; worker < workers; worker++ {
+		term := fmt.Sprintf("term-%d", worker)
+		rule := Rule{
+			RuleID: "test.cache.concurrent", Family: "test", Type: "lexical",
+			Terms: []string{term},
+		}
+		pack := testPack(rule)
+		wg.Add(1)
+		go func(term string, pack RulePack) {
+			defer wg.Done()
+			<-start
+			for i := 0; i < iterations; i++ {
+				got := markActuals(Analyze(term, pack))
+				if !reflect.DeepEqual(got, []string{term}) {
+					errs <- fmt.Sprintf("matcher for %q produced %v", term, got)
+					return
+				}
+			}
+		}(term, pack)
+	}
+	close(start)
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		t.Error(err)
+	}
+}
+
+func TestLexicalTermsPreferLongestWithoutMutation(t *testing.T) {
+	terms := []string{"kind", "kind of"}
+	rule := Rule{
+		RuleID: "test.lexical.longest", Family: "test", Type: "lexical",
+		Terms: terms,
+	}
+	got := markActuals(Analyze("It is kind of difficult.", testPack(rule)))
+	if !reflect.DeepEqual(got, []string{"kind of"}) {
+		t.Fatalf("overlapping terms: got %v want [kind of]", got)
+	}
+	if !reflect.DeepEqual(terms, []string{"kind", "kind of"}) {
+		t.Fatalf("matcher reordered the authored terms: %v", terms)
+	}
+}
+
+func TestAnalyzeDetachesExpectedMetadataFromPack(t *testing.T) {
+	expected := []string{"original"}
+	rule := Rule{
+		RuleID: "test.expected.detached", Family: "test", Type: "lexical",
+		Terms: []string{"marked"}, Expected: expected,
+	}
+	result := Analyze("marked", testPack(rule))
+	expected[0] = "poisoned"
+	rule.Expected[0] = "also poisoned"
+	if !reflect.DeepEqual(result.Marks[0].Expected, []string{"original"}) {
+		t.Fatalf("result expected metadata aliases pack: %v", result.Marks[0].Expected)
+	}
+}
+
+func TestStripSemanticBoundaryAndIdentity(t *testing.T) {
+	t.Run("no marks is exact identity", func(t *testing.T) {
+		text := "  Untouched  text.\n"
+		got := Analyze(text, RulePack{ID: "empty", Version: "1", Locale: "en"}).Strip
+		if got != text {
+			t.Fatalf("no-op strip changed text: got %q want %q", got, text)
+		}
+	})
+
+	t.Run("modal hedge is marked but preserved", func(t *testing.T) {
+		text := "It  may be true.\n"
+		rule := Rule{
+			RuleID: "hedge.deniable", Family: "hedge", Type: "lexical",
+			Terms: []string{"may"},
+		}
+		result := Analyze(text, testPack(rule))
+		if len(result.Marks) != 1 {
+			t.Fatalf("expected hedge mark, got %d", len(result.Marks))
+		}
+		if result.Strip != text {
+			t.Fatalf("strip changed modal truth conditions: got %q want %q", result.Strip, text)
+		}
+	})
+
+	t.Run("lexical intensifier remains removable", func(t *testing.T) {
+		rule := Rule{
+			RuleID: "intensifier.loaded", Family: "intensifier", Type: "lexical",
+			Terms: []string{"extremely"},
+		}
+		cases := []struct {
+			input, want string
+		}{
+			{"It is extremely clear.", "It is clear."},
+			{"A  extremely   careful claim.\nSecond  line.", "A careful claim.\nSecond  line."},
+			{"A extremely, careful claim.", "A, careful claim."},
+			{"A, extremely, careful claim.", "A, careful claim."},
+			{"Careful, extremely", "Careful,"},
+			{"Careful extremely", "Careful"},
+			{"Extremely careful", "careful"},
+			{"A extremely\nNext  line.", "A\nNext  line."},
+			{"A\nextremely clear", "A\nclear"},
+		}
+		for _, test := range cases {
+			if got := Analyze(test.input, testPack(rule)).Strip; got != test.want {
+				t.Errorf("strip intensifier from %q: got %q want %q", test.input, got, test.want)
+			}
+		}
+	})
 }
 
 // schemaNode is the subset of JSON Schema that spec/output.schema.json actually

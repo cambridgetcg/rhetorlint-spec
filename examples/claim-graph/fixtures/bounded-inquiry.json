@@ -1,0 +1,272 @@
+{
+  "schema": "rhetorlint.claim-graph/0.1",
+  "kind": "rhetorlint.claim-graph",
+  "graphId": "graph:bounded-inquiry",
+  "headRevisionId": "revision:002",
+  "boundary": {
+    "observation": "source-span-and-position-only",
+    "classification": "rule-pack-candidate-context-required",
+    "claimHypotheses": "claim-candidates-not-adjudicated",
+    "effectHypotheses": "recipient-specific-evidence-required",
+    "verificationQuestions": "questions-not-verdicts",
+    "externalReferences": "opaque-caller-supplied-not-resolved-or-evaluated"
+  },
+  "doesNotEstablish": {
+    "truth": "not-established",
+    "intent": "not-established",
+    "effect": "not-established",
+    "causality": "not-established",
+    "authority": "not-established",
+    "consent": "not-established"
+  },
+  "assurance": {
+    "schemaValidation": "closed-shape-and-bounds-only",
+    "digestClaims": "caller-verified-declarations-not-recomputed-by-schema",
+    "sourceContent": "not-included",
+    "referenceResolution": "producer-declared-consumer-must-resolve",
+    "revisionSemantics": "append-and-supersede-declared-storage-must-enforce"
+  },
+  "sourceArtifacts": [
+    {
+      "id": "source:bounded-inquiry-v1",
+      "createdInRevisionId": "revision:001",
+      "locator": "fixtures/bounded-inquiry.source.txt",
+      "mediaType": "text/plain",
+      "encoding": "utf-8",
+      "normalization": "none",
+      "byteLength": 44,
+      "sha256": "sha256:c7f9d6342a2aa4c57e84b1c3d34a9a287988837d6ef97089c1a26451a2650257",
+      "digestVerification": "caller-verified-exact-bytes",
+      "contentDisclosure": "not-included"
+    }
+  ],
+  "rhetorlintBindings": [
+    {
+      "id": "binding:core-0.1.2-rules-en-0.2.0",
+      "createdInRevisionId": "revision:001",
+      "rhetorlintSpecVersion": "0.1",
+      "engine": {
+        "name": "@rhetorlint/core",
+        "version": "0.1.2",
+        "sourceLocator": "git:ac3017df8516b0e70595a4c048f0084f5e3b790f:packages/core/index.mjs",
+        "sourceSha256": "sha256:eed568c939e8fe7b6613348d0757cc86ce86e1db4278a6ce524f038f5f82d6fc",
+        "digestVerification": "caller-verified-exact-bytes"
+      },
+      "rulePack": {
+        "name": "@rhetorlint/rules-en",
+        "version": "0.2.0",
+        "sourceLocator": "git:ac3017df8516b0e70595a4c048f0084f5e3b790f:packages/rules-en/rules.json",
+        "sourceSha256": "sha256:85a84ed51334a353ca162b2c7224a49df1b3f6a0160d4ef6577d65545f729b77",
+        "digestVerification": "caller-verified-exact-bytes"
+      },
+      "offsetUnit": "utf16-code-units",
+      "bindingLimit": "binds-declared-bytes-not-execution-or-semantics"
+    }
+  ],
+  "observations": [
+    {
+      "id": "observation:unnamed-authority",
+      "createdInRevisionId": "revision:001",
+      "kind": "surface-span",
+      "status": "source-span-observed",
+      "anchor": {
+        "sourceArtifactId": "source:bounded-inquiry-v1",
+        "sourceSha256": "sha256:c7f9d6342a2aa4c57e84b1c3d34a9a287988837d6ef97089c1a26451a2650257",
+        "offsetUnit": "utf16-code-units",
+        "startOffset": 0,
+        "endOffset": 11,
+        "spanSha256": "sha256:abb36417e00ea5c85c334c40d99fc8a9a3dca93a4f4577a550061e8b89fcc25d",
+        "spanDigestBasis": "utf8-of-selected-text-without-normalization"
+      }
+    },
+    {
+      "id": "observation:absolute",
+      "createdInRevisionId": "revision:001",
+      "kind": "surface-span",
+      "status": "source-span-observed",
+      "anchor": {
+        "sourceArtifactId": "source:bounded-inquiry-v1",
+        "sourceSha256": "sha256:c7f9d6342a2aa4c57e84b1c3d34a9a287988837d6ef97089c1a26451a2650257",
+        "offsetUnit": "utf16-code-units",
+        "startOffset": 27,
+        "endOffset": 33,
+        "spanSha256": "sha256:9cdc6c47aa193ae7fdab6c57a88f118e0adbe254c82095d39531f5e5c1314bdd",
+        "spanDigestBasis": "utf8-of-selected-text-without-normalization"
+      }
+    }
+  ],
+  "classifications": [
+    {
+      "id": "classification:unnamed-authority",
+      "createdInRevisionId": "revision:001",
+      "observationId": "observation:unnamed-authority",
+      "rhetorlintBindingId": "binding:core-0.1.2-rules-en-0.2.0",
+      "ruleId": "weasel.attribution",
+      "family": "manipulative-wording",
+      "technique": "Obfuscation, Intentional Vagueness, Confusion",
+      "classificationStatus": "rule-pack-candidate-context-required",
+      "taxonomyMappingStatus": "aligned-candidate"
+    },
+    {
+      "id": "classification:absolute",
+      "createdInRevisionId": "revision:001",
+      "observationId": "observation:absolute",
+      "rhetorlintBindingId": "binding:core-0.1.2-rules-en-0.2.0",
+      "ruleId": "absolute.universal",
+      "family": "simplification",
+      "technique": "False Dilemma or No Choice",
+      "classificationStatus": "rule-pack-candidate-context-required",
+      "taxonomyMappingStatus": "approximate-candidate"
+    }
+  ],
+  "claimHypotheses": [
+    {
+      "id": "claim:unnamed-authority-context-v1",
+      "createdInRevisionId": "revision:001",
+      "classificationIds": ["classification:unnamed-authority"],
+      "metadataSource": "caller-supplied",
+      "claimRole": "assertion",
+      "subjectDomain": "ordinary-language",
+      "representationForm": "natural-language",
+      "methodKind": "none",
+      "status": "claim-candidate-not-adjudicated",
+      "statement": "The passage relies on an unnamed authority.",
+      "scope": ["The bounded source artifact."],
+      "conditions": ["No source is named inside the bounded source artifact."],
+      "alternatives": ["A source may be named outside the bounded source artifact."],
+      "externalRefIds": ["ref:source-context"]
+    },
+    {
+      "id": "claim:unnamed-authority-context-v2",
+      "createdInRevisionId": "revision:002",
+      "classificationIds": ["classification:unnamed-authority"],
+      "metadataSource": "caller-supplied",
+      "claimRole": "assertion",
+      "subjectDomain": "ordinary-language",
+      "representationForm": "natural-language",
+      "methodKind": "none",
+      "status": "claim-candidate-not-adjudicated",
+      "statement": "The bounded source contains an unnamed-authority formula at the anchored span.",
+      "scope": ["Only the exact caller-verified source artifact."],
+      "conditions": ["The source and span digests resolve to the declared bytes and offsets."],
+      "alternatives": ["A named source or different function may appear in omitted context."],
+      "externalRefIds": ["ref:source-context"]
+    }
+  ],
+  "effectHypotheses": [
+    {
+      "id": "effect:source-inspection",
+      "createdInRevisionId": "revision:002",
+      "classificationIds": ["classification:unnamed-authority"],
+      "claimHypothesisIds": ["claim:unnamed-authority-context-v2"],
+      "metadataSource": "caller-supplied",
+      "status": "hypothesis-recipient-specific-evidence-required",
+      "recipientOrSubstrate": "readers shown only the bounded passage under a declared task",
+      "dimension": "source inspection",
+      "operation": "possible reduction in inspectability",
+      "description": "The wording may make source authority harder to inspect for a reader who sees only this passage.",
+      "conditions": ["The reader treats the unnamed attribution as support for the surrounding proposition."],
+      "alternatives": ["The wording may instead prompt the reader to request a named source."],
+      "measureStatus": "qualitative-candidates-not-operationalized",
+      "qualitativeMeasureCandidates": ["Source-identification requests under a pre-registered comparison."],
+      "externalRefIds": [],
+      "evaluationDesignRefIds": ["ref:reader-study-design"]
+    }
+  ],
+  "verificationQuestions": [
+    {
+      "id": "question:absolute-domain",
+      "createdInRevisionId": "revision:001",
+      "classificationIds": ["classification:absolute"],
+      "claimHypothesisIds": [],
+      "effectHypothesisIds": [],
+      "metadataSource": "caller-supplied",
+      "status": "question-not-verdict",
+      "question": "What domain and exceptions does the marked universal quantify over here?",
+      "evidenceNeeded": ["The relevant domain, observation horizon, and known exceptions."],
+      "externalRefIds": ["ref:source-context"]
+    },
+    {
+      "id": "question:named-source",
+      "createdInRevisionId": "revision:002",
+      "classificationIds": ["classification:unnamed-authority"],
+      "claimHypothesisIds": ["claim:unnamed-authority-context-v2"],
+      "effectHypothesisIds": [],
+      "metadataSource": "caller-supplied",
+      "status": "question-not-verdict",
+      "question": "Is a named source present in the relevant surrounding context?",
+      "evidenceNeeded": ["The exact bounded context and any separately retained adjacent source material."],
+      "externalRefIds": ["ref:source-context"]
+    },
+    {
+      "id": "question:reader-effect",
+      "createdInRevisionId": "revision:002",
+      "classificationIds": ["classification:unnamed-authority"],
+      "claimHypothesisIds": ["claim:unnamed-authority-context-v2"],
+      "effectHypothesisIds": ["effect:source-inspection"],
+      "metadataSource": "caller-supplied",
+      "status": "question-not-verdict",
+      "question": "Does naming the source change source-identification requests under the same declared task?",
+      "evidenceNeeded": ["A pre-registered recipient, task, comparison, outcome, stopping rule, and null interpretation."],
+      "externalRefIds": ["ref:reader-study-design"]
+    }
+  ],
+  "externalRefs": [
+    {
+      "id": "ref:source-context",
+      "createdInRevisionId": "revision:001",
+      "kind": "evidence",
+      "locator": "fixtures/bounded-inquiry.source.txt",
+      "artifactSha256": "sha256:c7f9d6342a2aa4c57e84b1c3d34a9a287988837d6ef97089c1a26451a2650257",
+      "digestVerification": "caller-verified-exact-bytes",
+      "assurance": "opaque-reference-not-resolved-or-evaluated"
+    },
+    {
+      "id": "ref:reader-study-design",
+      "createdInRevisionId": "revision:002",
+      "kind": "evaluation-design",
+      "locator": "fixtures/reader-study-design.md",
+      "artifactSha256": "sha256:ba169c9d9f1625af90831c846e5a74e1c576d3f673856899abb913f94afb9caf",
+      "digestVerification": "caller-verified-exact-bytes",
+      "assurance": "opaque-reference-not-resolved-or-evaluated"
+    }
+  ],
+  "revisionLog": [
+    {
+      "id": "revision:001",
+      "sequence": 1,
+      "previousRevisionId": null,
+      "recordedAt": "2026-08-24T10:00:00.000Z",
+      "operation": "create",
+      "addedNodeIds": [
+        "source:bounded-inquiry-v1",
+        "binding:core-0.1.2-rules-en-0.2.0",
+        "observation:unnamed-authority",
+        "observation:absolute",
+        "classification:unnamed-authority",
+        "classification:absolute",
+        "claim:unnamed-authority-context-v1",
+        "question:absolute-domain",
+        "ref:source-context"
+      ],
+      "supersededNodeIds": [],
+      "reason": "Create the exact source anchors and keep candidate classifications separate from inquiry metadata."
+    },
+    {
+      "id": "revision:002",
+      "sequence": 2,
+      "previousRevisionId": "revision:001",
+      "recordedAt": "2026-08-24T10:05:00.000Z",
+      "operation": "supersede",
+      "addedNodeIds": [
+        "claim:unnamed-authority-context-v2",
+        "effect:source-inspection",
+        "question:named-source",
+        "question:reader-effect",
+        "ref:reader-study-design"
+      ],
+      "supersededNodeIds": ["claim:unnamed-authority-context-v1"],
+      "reason": "Narrow the claim from inferred reliance to visible wording while preserving the earlier hypothesis and out-of-scope alternatives."
+    }
+  ]
+}
