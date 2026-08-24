@@ -30,7 +30,7 @@ const HERE = fileURLToPath(new URL(".", import.meta.url));
 const REPO = resolve(HERE, "..", "..");
 const COMMITTED_RELEASE = join(HERE, "release");
 const SOURCE_REPOSITORY = "https://github.com/cambridgetcg/rhetorlint-spec";
-const SOURCE_REVISION = "5450687cbd46e52359c6d12e408c22ee1b38c5ea";
+const SOURCE_REVISION = "af3b87115d3d154f2ba8b4c955b5a6584be5cf60";
 const PATHS = Object.freeze({
   cases: join(REPO, "conformance", "cases.json"),
   core: join(REPO, "packages", "core", "index.mjs"),
@@ -42,8 +42,8 @@ const PATHS = Object.freeze({
   notice: join(REPO, "NOTICE"),
 });
 const SOURCE_LOCK = Object.freeze({
-  cases: "sha256:37a74e41f9ec29e5015ad1b994c35a4be745054512e6e3efdd78d766e478f36b",
-  core: "sha256:eed568c939e8fe7b6613348d0757cc86ce86e1db4278a6ce524f038f5f82d6fc",
+  cases: "sha256:9bd1952367858af2bda8c3dbff1b2ed8ddbf5ff592800faf41086a1e1e2ce7fa",
+  core: "sha256:2e8803be6345bfb5ba52d5fda9dffa177ffb9435a160487b31e18b244b19098e",
   rules: "sha256:85a84ed51334a353ca162b2c7224a49df1b3f6a0160d4ef6577d65545f729b77",
   fixture: "sha256:cc8cbca3750d4bf7917c2161c95db3abc2787ee0995463470f79143f924a9e5c",
   license: "sha256:a1613ba5d78294b212dfdb6691181c104c4620a848ebc17a5307d769418b0d29",

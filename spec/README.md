@@ -1,6 +1,8 @@
 # The RhetorLint Spec
 
-Two files, language-agnostic. This is the framework; engines are implementations of it.
+Three language-agnostic contracts: the taxonomy, the analyzer result, and an
+optional claim graph. Engines implement the first two; the graph remains a
+standalone interchange schema.
 
 ## [`taxonomy.yaml`](taxonomy.yaml) — the families of tells
 
@@ -35,7 +37,7 @@ Every implementation, in any language, emits this one JSON shape. Analyzing the 
   "strip":   "We take your privacy seriously, and regrettably, mistakes [who?] were made. We are reaching out to affected users.",
   "rewrite": null,                                    // only non-null with a model adapter
   // `rules` is the pack's own `version` field verbatim; the engine hard-codes nothing
-  "engine":  { "name": "@rhetorlint/core", "version": "0.1.2", "rules": "@rhetorlint/rules-en@0.1.2" }
+  "engine":  { "name": "@rhetorlint/core", "version": "0.1.3", "rules": "@rhetorlint/rules-en@0.2.0" }
 }
 ```
 
@@ -48,6 +50,15 @@ Every implementation, in any language, emits this one JSON shape. Analyzing the 
 3. **No fabricated rewrite.** `rewrite` is `null` unless a model adapter was explicitly supplied.
 4. **Confidence is heuristic.** It is a language-pattern likelihood, never a probability of deception.
 5. **Family is one of the seven** enumerated in the schema.
+
+## Optional claim graph
+
+[`claim-graph.schema.json`](claim-graph.schema.json) defines a separate,
+opt-in inquiry contract. It anchors exact source-span observations and keeps
+candidate classifications, claim hypotheses, effect hypotheses, questions,
+and opaque research/formal references in distinct lanes. A valid claim graph
+does not establish truth, intent, effect, causality, authority, or consent; it
+does not change the `rhetorlint: "0.1"` analyzer result.
 
 ### Interop
 

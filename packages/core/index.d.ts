@@ -1,4 +1,12 @@
 export type RhetorLintLevel = "info" | "note" | "warning";
+export type RhetorLintFamily =
+  | "manipulative-wording"
+  | "simplification"
+  | "distraction"
+  | "attack-on-reputation"
+  | "justification"
+  | "call"
+  | "agency-hiding";
 
 export interface RhetorLintPoint {
   line?: number;
@@ -13,7 +21,7 @@ export interface RhetorLintPosition {
 
 export interface RhetorLintMark {
   ruleId: string;
-  family: string;
+  family: RhetorLintFamily;
   technique?: string;
   actual: string;
   position: RhetorLintPosition;
@@ -52,7 +60,7 @@ export interface RhetorLintResult {
 
 export interface RhetorLintRuleBase {
   ruleId: string;
-  family: string;
+  family: RhetorLintFamily;
   technique?: string;
   note?: string;
   expected?: string[];
@@ -70,6 +78,8 @@ export interface RhetorLintPatternRule extends RhetorLintRuleBase {
   pattern: string;
   /** Patterns match case-insensitively unless this is true (e.g. ALL-CAPS shouting). */
   caseSensitive?: boolean;
+  /** Lowest core version that understands fields this matcher depends on. */
+  minEngine?: string;
 }
 
 export interface RhetorLintAgentlessPassiveRule extends RhetorLintRuleBase {
@@ -86,6 +96,7 @@ export interface RhetorLintRulePack {
   id: string;
   version: string;
   locale?: string;
+  note?: string;
   rules: RhetorLintRule[];
 }
 

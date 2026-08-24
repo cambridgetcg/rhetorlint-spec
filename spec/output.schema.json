@@ -38,7 +38,7 @@
     },
     "strip": {
       "type": "string",
-      "description": "Deterministic de-spun version: adverbial spin (intensifiers, deniable adverbs) removed and agentless passives flagged with [who?]. Verb-phrase hedges and other tells are left marked, not paraphrased. On-device, no model required."
+      "description": "Deterministic reading aid: loaded intensifiers removed and agentless passives flagged with [who?]. Modality, attribution, verb-phrase hedges, and other tells remain marked rather than being deleted or paraphrased. This is not a guarantee of grammatical or meaning-preserving revision. On-device, no model required."
     },
     "rewrite": {
       "type": ["string", "null"],
@@ -84,6 +84,7 @@
         },
         "actual": {
           "type": "string",
+          "minLength": 1,
           "description": "The real, visible phrase that was marked. Every mark MUST point at text a reader can see."
         },
         "position": {

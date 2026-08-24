@@ -1,12 +1,12 @@
 export default {
   "engine": {
     "name": "@rhetorlint/core",
-    "version": "0.1.2",
-    "source_sha256": "sha256:eed568c939e8fe7b6613348d0757cc86ce86e1db4278a6ce524f038f5f82d6fc"
+    "version": "0.1.3",
+    "source_sha256": "sha256:2e8803be6345bfb5ba52d5fda9dffa177ffb9435a160487b31e18b244b19098e"
   },
   "signal_projection": {
     "name": "@rhetorlint/core/signals",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "source_sha256": "sha256:727a6f310dd6424beb72a4b2ffd7f1cbb712ea9aba6b8573078242f20af295d7"
   },
   "rules": {
