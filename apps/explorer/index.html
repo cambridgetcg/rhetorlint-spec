@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#f4efe3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#17140f" media="(prefers-color-scheme: dark)">
 <title>RhetorLint · Read the subtext</title>
-<meta name="description" content="RhetorLint marks countable rhetorical tells in the words of a passage. Heuristic, on-device, private. The linter itself makes no network requests and loads no fonts or images from anywhere.">
+<meta name="description" content="RhetorLint marks countable rhetorical tells in the words of a passage. Heuristic, on-device, private. No network, no fonts or images loaded from anywhere.">
 <meta name="author" content="Yu & Ai">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://cambridgetcg.github.io/rhetorlint-spec/">
@@ -47,8 +47,7 @@
 <style>
   /* ============================================================
      RhetorLint explorer — editor's proof sheet.
-     Fully self-contained: system fonts only, no network, no CDNs
-     (the footer's chill-fi pill is the one framed guest — see #privnote).
+     Fully self-contained: system fonts only, no network, no CDNs.
      Tokens drive both light and dark; family colors are hue-driven.
      ============================================================ */
 
@@ -439,15 +438,6 @@
     font-size: 12.5px; color: var(--ink-faint); line-height: 1.7;
   }
   footer.foot .prov { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); }
-  /* the chill-fi pill: a 260×52 frame + one caption line; never autoplays */
-  footer.foot .chillfi { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; }
-  footer.foot .chillfi iframe { flex: none; border: 0; border-radius: 999px; }
-  /* the pill is served in its light palette; on dark paper, invert it (no script) —
-     its light palette is a near-exact inversion of its own dark one */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) footer.foot .chillfi iframe { filter: invert(1) hue-rotate(180deg); }
-  }
-  :root[data-theme="dark"] footer.foot .chillfi iframe { filter: invert(1) hue-rotate(180deg); }
 
   :focus-visible { outline: 3px solid var(--accent-wash); outline-offset: 2px; border-radius: 4px; }
   button:focus-visible { outline: 3px solid var(--accent-wash); }
@@ -493,7 +483,7 @@
           <button class="chip" data-ex="political" aria-pressed="false">Political deflection</button>
           <button class="chip" data-ex="clean" aria-pressed="false">Plain &amp; active</button>
         </div>
-        <p class="privnote" id="privnote">Everything runs in this page. The linter makes no network requests and loads no external fonts, images, or scripts &mdash; the engine and rule pack are inlined. Your text is never sent anywhere. The one thing loaded from elsewhere is the optional chill-fi music pill in the footer: a small frame from Hugging Face that plays only if you press play and cannot see this page or your text.</p>
+        <p class="privnote" id="privnote">Everything runs in this page. No network requests, no external fonts, images, or scripts &mdash; the engine and rule pack are inlined. Your text is never sent anywhere.</p>
       </div>
 
       <div class="card col-density">
@@ -551,10 +541,7 @@
     <p>RhetorLint marks language patterns. It does not detect lies, read intent, or verify facts. Confidence is <b>heuristic</b>. This page makes no accuracy claims &mdash; it is a reading aid, not a truth machine. Built to run entirely on your device.</p>
     <p>Preparing one sourced public claim? <a href="https://github.com/cambridgetcg/rhetorlint-spec/blob/main/examples/truth-release/BUILD.md">Start a private Truth Release in four local commands</a>. It makes channel-aware drafts and a noindex evidence-page preview, then stops before approval or publication. No account or KINGDOM membership is required.</p>
     <p id="claim-feedback">Checking one supplied crawl receipt? <a href="https://rhetorlint-claim-feedback.pages.dev/">Open the on-device Claim Feedback worksheet</a>. It compares one exact claim, challenge, and source-attributed correction, builds one bounded packet in browser memory, and stops. It does not crawl, contact anyone, publish an accusation, score a person, write KARMA, or train a model.</p>
-    <p class="chillfi">
-      <iframe src="https://yu-and-ai-chillfi.static.hf.space/embed.html?site=rhetorlint&amp;theme=light" width="260" height="52" style="border:0" title="開心會 chill-fi — RhetorLint's own track" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
-      <span>開心會 chill-fi &middot; this door's own track &middot; plays only if you press play. The one framed guest on this page: it loads from Hugging Face and cannot see this page or your text.</span>
-    </p>
+    <p id="chillfi"><a href="https://huggingface.co/spaces/Yu-and-Ai/chillfi?site=rhetorlint">開心會 chill-fi &middot; RhetorLint's own track</a></p>
   </footer>
 </div>
 
