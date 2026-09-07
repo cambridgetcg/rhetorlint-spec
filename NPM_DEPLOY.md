@@ -90,9 +90,11 @@ Neither live Aletheia dependencies nor its metadata are updated.
 
 Before publication, run the full release gates below and in
 `docs/core-0.2-migration.md`, inspect the core tarball, and review the candidate's
-complete delta. After explicit approval, use a **core-scoped** publication.
-Do not invoke either generic publish helper or push a `v*`/`release-*` tag:
-those routes also offer the unpublished rules/CLI versions to npm.
+complete delta. After explicit approval, use a **core-scoped** publication:
+manual `release.yml` dispatch with `packages=core`, or the core workspace alone.
+Do not invoke the interactive helper, run the CI publisher with its default
+`all` scope, or push a `v*`/`release-*` tag: those routes also offer the
+unpublished rules/CLI versions to npm.
 
 After the approved core release is registry-installable, update Aletheia's core
 floor to `^0.1.3`, regenerate its registry-backed lockfile, and add permanent
@@ -156,44 +158,79 @@ To release:
 git tag v0.1.2-rules-0.1.1 && git push origin v0.1.2-rules-0.1.1
 ```
 
-Any tag matching `v*` or `release-*` triggers it, as does a manual
-**Actions → release → Run workflow** (which offers a `dry_run` box that resolves
-versions and reports what would go out without publishing). The tag name is a
-label for humans, not an input: the script reads each manifest and publishes
-only what the registry does not already have, so re-running after a partial
-failure is safe and an unchanged package is skipped on its own.
+Any tag matching `v*` or `release-*` triggers an **all-package** release.
+Manual **Actions → release → Run workflow** defaults to **core only** and offers
+`packages` (`core` or `all`) plus `dry_run`. Choose `all` explicitly for a reviewed
+coordinated release. No dependency packages are automatically added to `core`.
+
+For the isolated repair, keep the reviewed branch fixed and verify each run's
+`headSha` before proceeding; do not use release-triggering tags:
+
+```sh
+gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
+  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=true
+# Inspect the completed run: only core may be selected. After approval:
+gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
+  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=false
+```
+
+The dry-run contacts the registry but does not publish, exercise the OIDC
+exchange, or prove the local tarball correct. Independently inspect package
+bytes before publication and verify a registry-backed install afterward; the
+existing propagation timeout warns rather than failing the workflow.
+
+The publisher receives `PUBLISH_PACKAGES` through the environment, never shell
+interpolation. It accepts exactly `core` or `all`; empty or invalid values fail
+before manifest reads and npm commands. Direct script calls with the variable
+**absent** retain the legacy `all` default. Tag names remain human labels: the
+script reads selected manifest versions and skips those already installable.
+Network-free subprocess tests use a fake npm to check these boundaries.
+
+Local scoped-workflow verification on 2026-09-07: 19 publisher regressions and
+273 total JavaScript tests passed. Python (31 conformance + nine unit tests), Go
+race tests, dataset/generated checks, the real Chrome test, and the packed
+Aletheia comparison (four candidate cases + 14 consumer tests) also passed.
+These local checks do not establish a successful OIDC publication.
 
 ### One-time setup (must be done by a human, once per package)
 
-Trusted publishing has to be told which workflow to trust. On npmjs.com, for
-**each** of `@rhetorlint/core`, `@rhetorlint/rules-en`, and `@rhetorlint/cli`:
+Trusted publishing must authorize the workflow on npmjs.com for **each selected
+package**. For this core-only release inspect `@rhetorlint/core` only:
 
-> Package → **Settings** → **Trusted Publisher** → GitHub Actions
+> Package → **Settings** → **Trusted publishing** → GitHub Actions
 > - Organization or user: `cambridgetcg`
 > - Repository: `rhetorlint-spec`
-> - Workflow filename: `release.yml`
+> - Workflow filename: `release.yml` (filename only)
 > - Environment: `npm-release`
+> - Allowed actions: direct `npm publish` must be permitted
 
-Until that is configured the publish job fails closed — it cannot fall back to
-a token, because there is none. Nothing reaches the registry unauthenticated.
+Use GitHub-hosted runners, Node >=22.14.0, npm >=11.5.1, and `id-token: write`.
+The package repository URL must identify this GitHub repository. The existing
+Node 22/npm 11 workflow supplies those runtime and permission requirements.
+See [npm's trusted publisher documentation](https://docs.npmjs.com/trusted-publishers/).
+GitHub admin access does not grant access to npm's private publisher settings.
+Inspect an existing entry before changing it; do not blindly remove publisher
+records, weaken 2FA, or place tokens/one-time codes in commands or chat.
 
-**It is per package, and npm will not tell you which one you missed.** Every
-misconfiguration — no entry, wrong owner case, full workflow path instead of
-the bare filename — surfaces as the same bare `ENEEDAUTH: This command
-requires you to be logged in`, because npm swallows the real reason at default
-loglevel (npm/cli#9088). The publish script therefore forces `--loglevel
-verbose`; read the `npm verbose oidc` line, which names the actual rejection:
+If trust is rejected the publish job fails closed — it cannot fall back to a
+token, because there is none. Nothing reaches the registry unauthenticated.
+
+A bare `ENEEDAUTH` is not enough to diagnose the trust configuration: npm can
+hide the OIDC rejection at default loglevel (npm/cli#9088). The publish script
+forces `--loglevel verbose`; inspect the `npm verbose oidc` line, for example:
 
 ```
 npm verbose oidc Failed token exchange request with body message:
   OIDC token exchange error - package not found
 ```
 
-That exact message means **this package has no trusted-publisher record** —
-not that the workflow, the environment, or the token is wrong. Measured on
-2026-07-24: identical runs with and without `environment:` produced it, so
-the environment is not what it is complaining about. Register the missing
-package and re-run; the script skips whatever is already live.
+That rejection was observed in past runs, including 2026-08-24. It does not
+inspect today's private npm settings or uniquely establish which field is
+wrong. Check the selected package's publisher record and matching repository,
+workflow, environment, and allowed-action settings. Historical tests with and
+without the environment both failed; do not treat that as proof the environment
+can never matter. After correcting verified configuration, rerun the same
+reviewed scope and revision; already-installable versions are skipped.
 
 The `npm-release` environment also gives you a second lever: add required
 reviewers to it in GitHub repo settings and every automated publish waits for a
