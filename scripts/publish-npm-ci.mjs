@@ -29,6 +29,14 @@ const PACKAGES = [
   { name: '@rhetorlint/cli', dir: 'packages/cli' },
 ]
 
+const PUBLISH_PACKAGES = process.env.PUBLISH_PACKAGES ?? 'all'
+if (!['core', 'all'].includes(PUBLISH_PACKAGES)) {
+  console.error('PUBLISH_PACKAGES must be exactly core or all')
+  process.exit(1)
+}
+const selected = PACKAGES.filter(({ name }) => PUBLISH_PACKAGES === 'all' || name === '@rhetorlint/core')
+console.log(`Publication scope: ${PUBLISH_PACKAGES} (${selected.map(({ name }) => name).join(', ')})`)
+
 const DRY_RUN = process.env.DRY_RUN === 'true'
 
 // Probes only. Their output is noise on the way to a boolean, and a probe that
@@ -105,12 +113,11 @@ let published = 0
 let skipped = 0
 let propagating = 0
 
-for (const { name, dir } of PACKAGES) {
+for (const { name, dir } of selected) {
   const version = versionOf(dir)
 
-  // Every package is offered every run; the registry decides what is new.
-  // That is what makes a re-run after a partial failure safe, and it is why
-  // an unchanged package (cli, most releases) needs no special-casing here.
+  // Every selected package is offered; the registry decides what is new.
+  // Re-runs after a partial failure still skip already-published versions.
   if (isInstallable(name, version)) {
     console.log(`✓ ${name}@${version} is already live; skipping`)
     skipped += 1
@@ -162,7 +169,7 @@ for (const { name, dir } of PACKAGES) {
 const verb = DRY_RUN ? 'would publish' : 'published'
 console.log(`\n✓ done — ${verb} ${published}, skipped ${skipped} already live.`)
 if (published === 0) {
-  console.log('Nothing was new. The registry already matches this commit.')
+  console.log('Nothing was new. The selected packages are already live.')
 }
 if (propagating > 0) {
   console.log(`${propagating} not yet visible to a fresh install. Re-run to confirm; anything live by then is skipped.`)

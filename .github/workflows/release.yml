@@ -17,6 +17,14 @@ on:
       - "release-*"
   workflow_dispatch:
     inputs:
+      packages:
+        description: "Packages to publish (tags always select all)"
+        type: choice
+        required: true
+        default: core
+        options:
+          - core
+          - all
       dry_run:
         description: "Resolve versions and report what would publish, without publishing"
         type: boolean
@@ -63,16 +71,11 @@ jobs:
   publish:
     needs: verify
     runs-on: ubuntu-latest
-    # Restored after the 2026-07-24 diagnostic: runs with and without this
-    # line failed IDENTICALLY ("OIDC token exchange error - package not
-    # found"), so the environment claim is not the variable — a package
-    # simply has no trusted-publisher record until a human registers one for
-    # THAT package (per-package, never per-scope). Keeping it costs nothing
-    # and buys the optional human-approval gate on the GitHub side.
-    #
-    # Still unproven end to end: no release has yet completed an OIDC
-    # exchange. core 0.1.2 and rules-en 0.1.1 went out by hand. The first
-    # package whose publisher is genuinely registered will settle it.
+    # Past runs with and without this environment both received an OIDC
+    # "package not found" rejection. That historical response does not inspect
+    # today's private npm configuration. Check each selected package's trusted
+    # publisher, including the workflow and environment claims, if it recurs.
+    # Retain the environment so optional human approval remains available.
     environment: npm-release
     permissions:
       contents: read
@@ -95,7 +98,9 @@ jobs:
       # caret keeps patches to the OIDC exchange, not a new major's semantics.
       - name: install an npm new enough to publish without a token
         run: npm install -g "npm@^11.5.1" && npm --version
-      - name: publish the packages the registry does not have yet
+      - name: publish the selected packages the registry does not have yet
         env:
+          # Only tag pushes supply all; an empty dispatch input must fail closed.
+          PUBLISH_PACKAGES: ${{ github.event_name == 'push' && 'all' || inputs.packages }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: node scripts/publish-npm-ci.mjs

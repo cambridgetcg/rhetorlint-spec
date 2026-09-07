@@ -25,6 +25,114 @@ Core 0.1.3 is the current floor for the coordinated 0.2.0 CLI and rule pack:
 it preserves modality and attribution in strip output. Allowing core 0.1.2
 would install successfully while producing the superseded strip semantics.
 
+### Core-only meaning-preservation candidate
+
+A core-only 0.1.3 release does **not** require publishing the 0.2.0 rule pack or
+CLI. Test it with already-published rules-en 0.1.2 so the correction can reach
+existing consumers independently of the media-rule changes.
+
+The candidate is more than the one-line hedge correction. Compared with npm
+core 0.1.2, it already includes:
+
+- preserved modality/attribution and whitespace cleanup only at removal seams;
+- closed, bounded rule-pack validation, engine-floor checks, and rejection of
+  zero-width patterns (not a guarantee of regular-expression complexity);
+- longest-first overlapping lexical matches, without mutating the rule pack;
+- detached rewrite-adapter marks and snapshotted analysis provenance;
+- tighter family types and corrected documentation.
+
+Custom packs previously tolerated by the permissive engine may now be rejected.
+Review that compatibility boundary rather than describing the candidate as
+only a strip allowlist edit. Public exports, the output schema version, and
+runtime dependencies are unchanged; SARIF and signal implementation bytes are
+unchanged in this candidate.
+
+#### Reproduce the correction through Aletheia before publication
+
+From this repository, set `ALETHEIA_CHECKOUT` to an ordinary trusted Aletheia
+checkout and `PACK_DIR` to an existing absolute scratch directory. No paths or
+local tarball dependencies belong in committed consumer metadata.
+
+```sh
+npm pack --workspace @rhetorlint/core --pack-destination "$PACK_DIR"
+core_v=$(node -p "require('./packages/core/package.json').version")
+npm run test:aletheia-consumer -- \
+  --aletheia "$ALETHEIA_CHECKOUT" \
+  --core-tarball "$PACK_DIR/rhetorlint-core-$core_v.tgz"
+```
+
+This explicit release check needs Node 20+, npm, `tar`, and registry access (or
+a sufficiently populated npm cache). It is not part of the ordinary offline
+unit suite. It executes code from the supplied trusted checkout; a disposable
+copy is isolation from the live install, not a security sandbox.
+
+The check copies only source, tests, the public feed registry, and package
+metadata into a fresh temporary directory; it rejects symlinks and omits hidden
+state and installed dependencies. It first reproduces the known core 0.1.2 loss
+of `allegedly`, then installs the supplied candidate and checks allegation,
+reported attribution, modal uncertainty, and an adjacent removable intensifier
+through **both** `lintText().strip` and `lintArticle({text}).stripPreview`.
+Annotations remain present. It also runs Aletheia's existing suite.
+
+The negative control deliberately requires Aletheia's lockfile to contain core
+0.1.2 and rules-en 0.1.2. Once that checkout adopts the fix, use its reviewed
+pre-upgrade revision for this comparison; a newer baseline fails explicitly,
+not as a successful reproduction of the old defect.
+
+`--no-save --package-lock=true` keeps lockfile reading enabled while preventing
+metadata writes. **Do not use `--package-lock=false`:** that can re-resolve and
+upgrade unrelated dependencies. The check compares installed dependency
+versions/integrities (except core), verifies unchanged manifest/lockfile bytes,
+prints the supplied tarball's SHA-256, and removes only its own temporary copy.
+Neither live Aletheia dependencies nor its metadata are updated.
+
+#### Publication and uptake remain separate
+
+Before publication, run the full release gates below and in
+`docs/core-0.2-migration.md`, inspect the core tarball, and review the candidate's
+complete delta. After explicit approval, use a **core-scoped** publication:
+manual `release.yml` dispatch with `packages=core`, or the core workspace alone.
+Do not invoke the interactive helper, run the CI publisher with its default
+`all` scope, or push a `v*`/`release-*` tag: those routes also offer the
+unpublished rules/CLI versions to npm.
+
+After the approved core release is registry-installable, update Aletheia's core
+floor to `^0.1.3`, regenerate its registry-backed lockfile, and add permanent
+allegation/preview regressions to `test/unit.test.mjs`. Retain rules `^0.1.2` for
+this isolated repair. Browser 0.6 understanding bytes stay frozen; browser
+uptake needs its own reviewed release. Dependency uptake is not deployment.
+
+#### Local candidate evidence — 2026-09-07
+
+Core source/package bytes were unchanged by this release-check work. The packed
+candidate contains nine files and no runtime dependency. Its SHA-256 is:
+
+```text
+40705425306737d515f13839a6afa9580964c9517bdea81a74b91fd58985f73c
+```
+
+Verified locally with Node 25.2.1 and npm 11.6.2 (not a complete supported-runtime
+matrix):
+
+- Full JavaScript suite: 254 passed, zero failed or skipped.
+- Python: 31 conformance cases and nine unit tests passed; Go race tests passed.
+- Demo, nine-file/31-row dataset snapshot check, generated-asset check, and the
+  real Chrome worksheet test passed.
+- Packed Aletheia comparison against clean source revision `94c6952`: old-core
+  meaning loss reproduced; all four candidate paragraphs retained qualification
+  and annotations through both consumer APIs; all 14 consumer tests passed.
+  Only core changed in the disposable installation; live dependencies and both
+  source metadata files remained unchanged.
+- A strict TypeScript 5.9.3 consumer compiled against the packed root, `/sarif`,
+  and `/signals` exports using NodeNext resolution with no emit.
+
+The first full run caught stale generated hashes after adding the root test
+command. Regeneration changed only three digest lines in the active door's
+manifest/lock; the full rerun passed. Existing runtime assets and historical
+deployment receipts were not changed. Registry still served core 0.1.2 at the
+check; **no package was published and no service was deployed**. Revalidate the
+artifact and registry state before a later authorized publication.
+
 `apps/explorer` and `apps/widget` are **not** npm packages (they're the site and
 the browser extension). The repo root `rhetorlint-spec` is `"private": true` and
 never publishes.
@@ -50,44 +158,79 @@ To release:
 git tag v0.1.2-rules-0.1.1 && git push origin v0.1.2-rules-0.1.1
 ```
 
-Any tag matching `v*` or `release-*` triggers it, as does a manual
-**Actions → release → Run workflow** (which offers a `dry_run` box that resolves
-versions and reports what would go out without publishing). The tag name is a
-label for humans, not an input: the script reads each manifest and publishes
-only what the registry does not already have, so re-running after a partial
-failure is safe and an unchanged package is skipped on its own.
+Any tag matching `v*` or `release-*` triggers an **all-package** release.
+Manual **Actions → release → Run workflow** defaults to **core only** and offers
+`packages` (`core` or `all`) plus `dry_run`. Choose `all` explicitly for a reviewed
+coordinated release. No dependency packages are automatically added to `core`.
+
+For the isolated repair, keep the reviewed branch fixed and verify each run's
+`headSha` before proceeding; do not use release-triggering tags:
+
+```sh
+gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
+  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=true
+# Inspect the completed run: only core may be selected. After approval:
+gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
+  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=false
+```
+
+The dry-run contacts the registry but does not publish, exercise the OIDC
+exchange, or prove the local tarball correct. Independently inspect package
+bytes before publication and verify a registry-backed install afterward; the
+existing propagation timeout warns rather than failing the workflow.
+
+The publisher receives `PUBLISH_PACKAGES` through the environment, never shell
+interpolation. It accepts exactly `core` or `all`; empty or invalid values fail
+before manifest reads and npm commands. Direct script calls with the variable
+**absent** retain the legacy `all` default. Tag names remain human labels: the
+script reads selected manifest versions and skips those already installable.
+Network-free subprocess tests use a fake npm to check these boundaries.
+
+Local scoped-workflow verification on 2026-09-07: 19 publisher regressions and
+273 total JavaScript tests passed. Python (31 conformance + nine unit tests), Go
+race tests, dataset/generated checks, the real Chrome test, and the packed
+Aletheia comparison (four candidate cases + 14 consumer tests) also passed.
+These local checks do not establish a successful OIDC publication.
 
 ### One-time setup (must be done by a human, once per package)
 
-Trusted publishing has to be told which workflow to trust. On npmjs.com, for
-**each** of `@rhetorlint/core`, `@rhetorlint/rules-en`, and `@rhetorlint/cli`:
+Trusted publishing must authorize the workflow on npmjs.com for **each selected
+package**. For this core-only release inspect `@rhetorlint/core` only:
 
-> Package → **Settings** → **Trusted Publisher** → GitHub Actions
+> Package → **Settings** → **Trusted publishing** → GitHub Actions
 > - Organization or user: `cambridgetcg`
 > - Repository: `rhetorlint-spec`
-> - Workflow filename: `release.yml`
+> - Workflow filename: `release.yml` (filename only)
 > - Environment: `npm-release`
+> - Allowed actions: direct `npm publish` must be permitted
 
-Until that is configured the publish job fails closed — it cannot fall back to
-a token, because there is none. Nothing reaches the registry unauthenticated.
+Use GitHub-hosted runners, Node >=22.14.0, npm >=11.5.1, and `id-token: write`.
+The package repository URL must identify this GitHub repository. The existing
+Node 22/npm 11 workflow supplies those runtime and permission requirements.
+See [npm's trusted publisher documentation](https://docs.npmjs.com/trusted-publishers/).
+GitHub admin access does not grant access to npm's private publisher settings.
+Inspect an existing entry before changing it; do not blindly remove publisher
+records, weaken 2FA, or place tokens/one-time codes in commands or chat.
 
-**It is per package, and npm will not tell you which one you missed.** Every
-misconfiguration — no entry, wrong owner case, full workflow path instead of
-the bare filename — surfaces as the same bare `ENEEDAUTH: This command
-requires you to be logged in`, because npm swallows the real reason at default
-loglevel (npm/cli#9088). The publish script therefore forces `--loglevel
-verbose`; read the `npm verbose oidc` line, which names the actual rejection:
+If trust is rejected the publish job fails closed — it cannot fall back to a
+token, because there is none. Nothing reaches the registry unauthenticated.
+
+A bare `ENEEDAUTH` is not enough to diagnose the trust configuration: npm can
+hide the OIDC rejection at default loglevel (npm/cli#9088). The publish script
+forces `--loglevel verbose`; inspect the `npm verbose oidc` line, for example:
 
 ```
 npm verbose oidc Failed token exchange request with body message:
   OIDC token exchange error - package not found
 ```
 
-That exact message means **this package has no trusted-publisher record** —
-not that the workflow, the environment, or the token is wrong. Measured on
-2026-07-24: identical runs with and without `environment:` produced it, so
-the environment is not what it is complaining about. Register the missing
-package and re-run; the script skips whatever is already live.
+That rejection was observed in past runs, including 2026-08-24. It does not
+inspect today's private npm settings or uniquely establish which field is
+wrong. Check the selected package's publisher record and matching repository,
+workflow, environment, and allowed-action settings. Historical tests with and
+without the environment both failed; do not treat that as proof the environment
+can never matter. After correcting verified configuration, rerun the same
+reviewed scope and revision; already-installable versions are skipped.
 
 The `npm-release` environment also gives you a second lever: add required
 reviewers to it in GitHub repo settings and every automated publish waits for a
