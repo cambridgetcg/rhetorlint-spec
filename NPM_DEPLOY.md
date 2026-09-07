@@ -25,6 +25,112 @@ Core 0.1.3 is the current floor for the coordinated 0.2.0 CLI and rule pack:
 it preserves modality and attribution in strip output. Allowing core 0.1.2
 would install successfully while producing the superseded strip semantics.
 
+### Core-only meaning-preservation candidate
+
+A core-only 0.1.3 release does **not** require publishing the 0.2.0 rule pack or
+CLI. Test it with already-published rules-en 0.1.2 so the correction can reach
+existing consumers independently of the media-rule changes.
+
+The candidate is more than the one-line hedge correction. Compared with npm
+core 0.1.2, it already includes:
+
+- preserved modality/attribution and whitespace cleanup only at removal seams;
+- closed, bounded rule-pack validation, engine-floor checks, and rejection of
+  zero-width patterns (not a guarantee of regular-expression complexity);
+- longest-first overlapping lexical matches, without mutating the rule pack;
+- detached rewrite-adapter marks and snapshotted analysis provenance;
+- tighter family types and corrected documentation.
+
+Custom packs previously tolerated by the permissive engine may now be rejected.
+Review that compatibility boundary rather than describing the candidate as
+only a strip allowlist edit. Public exports, the output schema version, and
+runtime dependencies are unchanged; SARIF and signal implementation bytes are
+unchanged in this candidate.
+
+#### Reproduce the correction through Aletheia before publication
+
+From this repository, set `ALETHEIA_CHECKOUT` to an ordinary trusted Aletheia
+checkout and `PACK_DIR` to an existing absolute scratch directory. No paths or
+local tarball dependencies belong in committed consumer metadata.
+
+```sh
+npm pack --workspace @rhetorlint/core --pack-destination "$PACK_DIR"
+core_v=$(node -p "require('./packages/core/package.json').version")
+npm run test:aletheia-consumer -- \
+  --aletheia "$ALETHEIA_CHECKOUT" \
+  --core-tarball "$PACK_DIR/rhetorlint-core-$core_v.tgz"
+```
+
+This explicit release check needs Node 20+, npm, `tar`, and registry access (or
+a sufficiently populated npm cache). It is not part of the ordinary offline
+unit suite. It executes code from the supplied trusted checkout; a disposable
+copy is isolation from the live install, not a security sandbox.
+
+The check copies only source, tests, the public feed registry, and package
+metadata into a fresh temporary directory; it rejects symlinks and omits hidden
+state and installed dependencies. It first reproduces the known core 0.1.2 loss
+of `allegedly`, then installs the supplied candidate and checks allegation,
+reported attribution, modal uncertainty, and an adjacent removable intensifier
+through **both** `lintText().strip` and `lintArticle({text}).stripPreview`.
+Annotations remain present. It also runs Aletheia's existing suite.
+
+The negative control deliberately requires Aletheia's lockfile to contain core
+0.1.2 and rules-en 0.1.2. Once that checkout adopts the fix, use its reviewed
+pre-upgrade revision for this comparison; a newer baseline fails explicitly,
+not as a successful reproduction of the old defect.
+
+`--no-save --package-lock=true` keeps lockfile reading enabled while preventing
+metadata writes. **Do not use `--package-lock=false`:** that can re-resolve and
+upgrade unrelated dependencies. The check compares installed dependency
+versions/integrities (except core), verifies unchanged manifest/lockfile bytes,
+prints the supplied tarball's SHA-256, and removes only its own temporary copy.
+Neither live Aletheia dependencies nor its metadata are updated.
+
+#### Publication and uptake remain separate
+
+Before publication, run the full release gates below and in
+`docs/core-0.2-migration.md`, inspect the core tarball, and review the candidate's
+complete delta. After explicit approval, use a **core-scoped** publication.
+Do not invoke either generic publish helper or push a `v*`/`release-*` tag:
+those routes also offer the unpublished rules/CLI versions to npm.
+
+After the approved core release is registry-installable, update Aletheia's core
+floor to `^0.1.3`, regenerate its registry-backed lockfile, and add permanent
+allegation/preview regressions to `test/unit.test.mjs`. Retain rules `^0.1.2` for
+this isolated repair. Browser 0.6 understanding bytes stay frozen; browser
+uptake needs its own reviewed release. Dependency uptake is not deployment.
+
+#### Local candidate evidence — 2026-09-07
+
+Core source/package bytes were unchanged by this release-check work. The packed
+candidate contains nine files and no runtime dependency. Its SHA-256 is:
+
+```text
+40705425306737d515f13839a6afa9580964c9517bdea81a74b91fd58985f73c
+```
+
+Verified locally with Node 25.2.1 and npm 11.6.2 (not a complete supported-runtime
+matrix):
+
+- Full JavaScript suite: 254 passed, zero failed or skipped.
+- Python: 31 conformance cases and nine unit tests passed; Go race tests passed.
+- Demo, nine-file/31-row dataset snapshot check, generated-asset check, and the
+  real Chrome worksheet test passed.
+- Packed Aletheia comparison against clean source revision `94c6952`: old-core
+  meaning loss reproduced; all four candidate paragraphs retained qualification
+  and annotations through both consumer APIs; all 14 consumer tests passed.
+  Only core changed in the disposable installation; live dependencies and both
+  source metadata files remained unchanged.
+- A strict TypeScript 5.9.3 consumer compiled against the packed root, `/sarif`,
+  and `/signals` exports using NodeNext resolution with no emit.
+
+The first full run caught stale generated hashes after adding the root test
+command. Regeneration changed only three digest lines in the active door's
+manifest/lock; the full rerun passed. Existing runtime assets and historical
+deployment receipts were not changed. Registry still served core 0.1.2 at the
+check; **no package was published and no service was deployed**. Revalidate the
+artifact and registry state before a later authorized publication.
+
 `apps/explorer` and `apps/widget` are **not** npm packages (they're the site and
 the browser extension). The repo root `rhetorlint-spec` is `"private": true` and
 never publishes.

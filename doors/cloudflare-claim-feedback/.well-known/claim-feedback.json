@@ -33,7 +33,7 @@
     "filesSha256": {
       ".gitattributes": "373fd9c046cf8ce13504fe0433211cd5b7da81964e632456e21bd0db74765a2c",
       "LICENSE": "a1613ba5d78294b212dfdb6691181c104c4620a848ebc17a5307d769418b0d29",
-      "package.json": "9f7739e5d6bedd63133c5baaafdd03eab394c12cd59fa00fbc9e2685a702c49a",
+      "package.json": "443ac73ad497aed8f7f646ecdb3d58f698bd59902c04fb0026512f8ce1895132",
       "apps/claim-feedback-door/claim-feedback-browser.mjs": "b587181fb76c65d817d57548207a6635db70d8e85b4ad172782293bcc399ec3a",
       "apps/claim-feedback-door/favicon.svg": "08f8cfe1f98bc80932a9f3c9a1fe757f80ef9bf0c148b4894a11333eb54bd435",
       "apps/claim-feedback-door/index.html": "bc61c17ee381f0c826239a6b4ea88f02a65c3767a2ba75773a3bbddc17456958",

@@ -99,12 +99,38 @@ test("strip removes a loaded intensifier and flags the hidden agent", () => {
 
 test("strip preserves epistemic modality and attribution", () => {
   for (const text of [
+    "He allegedly stole it.",
+    "Allegedly, the company concealed the losses.",
     "The server may have failed because the disk is full.",
-    "The outage reportedly affected some users."
+    "The outage reportedly affected some users.",
+    "The document purportedly describes the agreement.",
+    "He reportedly, and allegedly, stole it."
+  ]) {
+    const r = analyze(text, { rules: RULES });
+    const hedges = r.marks.filter((mark) => mark.ruleId === "hedge.deniable");
+    assert.ok(hedges.length > 0, "preservation must not disable detection");
+    for (const mark of hedges) {
+      assert.equal(text.slice(mark.position.start.offset, mark.position.end.offset), mark.actual);
+    }
+    assert.equal(r.strip, text, "deleting the marker could strengthen the proposition");
+    assert.equal(strip(text, r.marks), text, "the direct strip API preserves the same meaning");
+  }
+});
+
+test("strip removes intensifiers without deleting adjacent qualifications", () => {
+  for (const [text, expected] of [
+    ["He allegedly made extremely serious errors.", "He allegedly made serious errors."],
+    ["The result is reportedly extremely uncertain.", "The result is reportedly uncertain."],
+    ["He is extremely allegedly careful.", "He is allegedly careful."]
   ]) {
     const r = analyze(text, { rules: RULES });
     assert.ok(r.marks.some((mark) => mark.ruleId === "hedge.deniable"));
-    assert.equal(r.strip, text, "deleting the marker could strengthen the proposition");
+    assert.ok(r.marks.some((mark) => mark.ruleId === "intensifier.loaded"));
+    for (const mark of r.marks) {
+      assert.equal(text.slice(mark.position.start.offset, mark.position.end.offset), mark.actual);
+    }
+    assert.equal(r.strip, expected);
+    assert.equal(strip(text, r.marks), expected);
   }
 });
 
