@@ -52,13 +52,14 @@ engine emits the nested `position` of `spec/output.schema.json`.
 
 Core 0.1.4 narrows `agency-hiding.deleted-subject`. Before, it marked a be-verb
 followed by any `-ed`/`-en` word or a listed irregular participle, unless `by`
-followed. Now it marks an accountable past passive whose doer the clause does
-not name: `was`, `were` or `been`, at most one adverb, a participle from a
+followed. Now it marks an accountable past passive, which needs all of:
+`was`, `were` or `been`, at most one adverb, a participle from a
 closed class (a fault, a breach, a concealment; a light verb after an error or
 decision noun, as in `mistakes were made`; `raised` after `concerns`,
-`questions` or `allegations`; `decided` after `it`; `shared`, `sold` or
-`disclosed` after a data noun; `affected` or `impacted` after a data or account
-noun), no `by` among the next seven words of the clause, and no negator
+`questions` or `allegations`; `agreed`, `decided` or `determined` after `it`;
+`shared`, `sold` or `disclosed` after a data noun; `affected` or `impacted`
+after a data or account noun), no `by` among the next seven words of the
+clause, and no negator
 anywhere in its clause before the auxiliary (`Your data was never sold`, `No
 customer data was accessed`, `No credit card numbers, bank account details or
 passwords were stolen`). The words, the numbers and the characters the walks
@@ -95,7 +96,7 @@ frankly, were made.`, `Customer data was quietly accessed.`, `Your data was
 shared with partners.`, `PII may have been compromised.`, `Records were
 withheld from investigators.`, `It was decided that the program would end.`,
 `Hundreds of workers were laid off.` and `Additional safeguards have been put
-in place.` (the span is `been put`). Eleven are unmarked controls:
+in place.` (the span is `been put`). Eleven carry no agency mark:
 
 - `My name is Fred.`, `JavaScript is required.` and `This option is ignored
   when the flag is unset.`: no past passive, or a present procedural one;
@@ -299,7 +300,10 @@ It is built from committed, licence-clean sources only:
   `lexiconProbes()` in `scripts/gen-agency-lexicon.mjs`: one the agency
   detector must mark, and the same with `by the board` after the participle,
   which it must not. A word dropped from or added to one engine's generated
-  copy of the lexicon parts the engines here.
+  copy of the lexicon parts the engines here;
+- one sentence per word of `spec/guard-lexicon.json` and per clause break,
+  from `guardProbes()` in the same script: each negator before an intensifier
+  and before an absolute, and each word after a clause-initial `Never`.
 
 Duplicate texts are kept once. The file holds inputs only, never expected
 values, and the check fails when it is stale against its sources. It sits
