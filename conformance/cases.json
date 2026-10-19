@@ -1007,6 +1007,54 @@
           ]
         }
       ]
+    },
+    {
+      "input": "The risk is not extremely high.",
+      "density": {
+        "tells": 1,
+        "per100Words": 16.7
+      },
+      "strip": "The risk is not extremely high.",
+      "marks": [
+        {
+          "ruleId": "intensifier.loaded",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "extremely",
+          "start": 16,
+          "end": 25,
+          "note": "an intensifier — turns up the emotional volume without adding fact",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(state the fact without the intensifier)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "\"It was utterly devastating,\" she said.",
+      "density": {
+        "tells": 1,
+        "per100Words": 16.7
+      },
+      "strip": "\"It was utterly devastating,\" she said.",
+      "marks": [
+        {
+          "ruleId": "intensifier.loaded",
+          "family": "manipulative-wording",
+          "technique": "Loaded Language",
+          "actual": "utterly",
+          "start": 8,
+          "end": 15,
+          "note": "an intensifier — turns up the emotional volume without adding fact",
+          "confidence": 0.55,
+          "level": "info",
+          "expected": [
+            "(state the fact without the intensifier)"
+          ]
+        }
+      ]
     }
   ]
 }

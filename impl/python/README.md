@@ -27,7 +27,7 @@ echo "We take your privacy extremely seriously." | python3 impl/python/rhetorlin
 ## Conformance
 
 ```bash
-python3 impl/python/test_conformance.py   # 31/31 ASCII cases match the JS ground truth
+python3 impl/python/test_conformance.py   # 33/33 ASCII cases match the JS ground truth
 ```
 
 ## Guarantees (identical to the JS engine)
