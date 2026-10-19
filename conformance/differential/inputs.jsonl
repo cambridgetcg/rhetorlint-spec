@@ -35,6 +35,8 @@
 {"id":"case:34","source":"conformance/cases.json","text":"Results aren't always typical."}
 {"id":"case:35","source":"conformance/cases.json","text":"Never share your password with anyone."}
 {"id":"case:36","source":"conformance/cases.json","text":"Guaranteed to double your savings."}
+{"id":"case:37","source":"conformance/cases.json","text":"No risk, guaranteed."}
+{"id":"case:38","source":"conformance/cases.json","text":"Never again will prices be this low."}
 {"id":"item:inv-breach-apology#1","source":"measurement/items/inv-breach-apology.txt","text":"Subject: An important update about your account"}
 {"id":"item:inv-breach-apology#2","source":"measurement/items/inv-breach-apology.txt","text":"Dear Valued Customer,"}
 {"id":"item:inv-breach-apology#3","source":"measurement/items/inv-breach-apology.txt","text":"At Brightwell, the trust you place in us is the foundation of everything we do. We are writing to let you know about a recent security incident that may have involved some of your information."}
@@ -764,11 +766,10 @@
 {"id":"contrast:negation.absolute-universal.never-manufacture","source":"measurement/contrast.json","text":"Explain real constraints; never manufacture the shortage."}
 {"id":"contrast:lesson.absolute-universal.nobody","source":"measurement/contrast.json","text":"Nobody beats our prices."}
 {"id":"contrast:lesson.absolute-universal.undeniable","source":"measurement/contrast.json","text":"Our results are undeniable."}
-{"id":"contrast:lesson.absolute-universal.never-again","source":"measurement/contrast.json","text":"Never again will prices be this low."}
 {"id":"contrast:lesson.absolute-universal.no-doubt-everyone","source":"measurement/contrast.json","text":"There's no doubt everyone loves it."}
 {"id":"contrast:lesson.absolute-universal.colon-never-sold","source":"measurement/contrast.json","text":"Your data: never sold."}
-{"id":"contrast:lesson.absolute-universal.no-risk-guaranteed","source":"measurement/contrast.json","text":"No risk, guaranteed."}
 {"id":"contrast:lesson.absolute-universal.no-exceptions-list","source":"measurement/contrast.json","text":"No contracts, no fees, no exceptions."}
+{"id":"contrast:negation.absolute-universal.aside-cannot-be","source":"measurement/contrast.json","text":"Returns are not, and cannot be, guaranteed."}
 {"id":"contrast:probe.hedge-softener.01","source":"measurement/contrast.json","text":"We believe this update will fix most issues."}
 {"id":"contrast:probe.hedge-softener.02","source":"measurement/contrast.json","text":"It seems the outage is sort of resolved."}
 {"id":"contrast:probe.hedge-softener.03","source":"measurement/contrast.json","text":"To some extent, the rollout went well."}
@@ -1077,3 +1078,25 @@
 {"id":"probe:abs-nbsp-after-never","source":"scripts/xengine-diff.mjs","text":"Never\u00a0share it."}
 {"id":"probe:abs-accented-word-before-never","source":"scripts/xengine-diff.mjs","text":"Caf\u00e9 never closes."}
 {"id":"probe:abs-greek-word-before-never","source":"scripts/xengine-diff.mjs","text":"\u03a9 never fails."}
+{"id":"probe:abs-comma-after-noun","source":"scripts/xengine-diff.mjs","text":"No fees, always free."}
+{"id":"probe:abs-comma-after-verb","source":"scripts/xengine-diff.mjs","text":"Don't wait, everyone is buying."}
+{"id":"probe:abs-comma-after-word-tab","source":"scripts/xengine-diff.mjs","text":"No risk,\tguaranteed."}
+{"id":"probe:abs-comma-right-after-negator","source":"scripts/xengine-diff.mjs","text":"Past performance is not, however, always a guide."}
+{"id":"probe:abs-comma-right-after-word-one","source":"scripts/xengine-diff.mjs","text":"No, never."}
+{"id":"probe:abs-comma-strip-unchanged","source":"scripts/xengine-diff.mjs","text":"It isn't, frankly, extremely high."}
+{"id":"probe:abs-never-fragment","source":"scripts/xengine-diff.mjs","text":"Battery life? Never an issue."}
+{"id":"probe:abs-never-inversion-has","source":"scripts/xengine-diff.mjs","text":"Never has a product been this good."}
+{"id":"probe:abs-never-inversion-before","source":"scripts/xengine-diff.mjs","text":"Never before have prices been this low."}
+{"id":"probe:abs-never-ever-imperative","source":"scripts/xengine-diff.mjs","text":"Never ever share your password."}
+{"id":"probe:abs-never-adverb-then-end","source":"scripts/xengine-diff.mjs","text":"Never ever again."}
+{"id":"probe:abs-never-adverb-newline","source":"scripts/xengine-diff.mjs","text":"Never again\nshare it."}
+{"id":"probe:abs-never-adverb-capital","source":"scripts/xengine-diff.mjs","text":"Never again Share it."}
+{"id":"probe:abs-never-mixed-case-next","source":"scripts/xengine-diff.mjs","text":"Go; never hAS it."}
+{"id":"probe:abs-never-prefix-word","source":"scripts/xengine-diff.mjs","text":"Never answer it."}
+{"id":"probe:abs-never-contraction-next","source":"scripts/xengine-diff.mjs","text":"Never can't stop."}
+{"id":"probe:abs-comma-curly-quoted-values","source":"scripts/xengine-diff.mjs","text":"Values are \u201cnever\u201d, \u201calways\u201d and \u201cauto\u201d."}
+{"id":"probe:abs-comma-emoji-after-word","source":"scripts/xengine-diff.mjs","text":"No fees, \ud83d\ude00 always free."}
+{"id":"probe:abs-fullwidth-comma","source":"scripts/xengine-diff.mjs","text":"No risk\uff0c guaranteed."}
+{"id":"probe:abs-never-nbsp-after-adverb","source":"scripts/xengine-diff.mjs","text":"Never again\u00a0will prices fall."}
+{"id":"probe:abs-never-accented-next","source":"scripts/xengine-diff.mjs","text":"Never \u00e9t\u00e9 again."}
+{"id":"probe:abs-never-rsquo-in-next","source":"scripts/xengine-diff.mjs","text":"Never can\u2019t stop."}
