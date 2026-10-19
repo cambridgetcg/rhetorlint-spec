@@ -1422,3 +1422,50 @@
 {"id":"boundary:space-requires-u000c","source":"spec/agency-lexicon.json","text":"Safeguards were put\fin place."}
 {"id":"boundary:space-u000b","source":"spec/agency-lexicon.json","text":"Mistakes were\u000bmade."}
 {"id":"boundary:space-requires-u000b","source":"spec/agency-lexicon.json","text":"Safeguards were put\u000bin place."}
+{"id":"guard:negator-cannot-strip","source":"spec/guard-lexicon.json","text":"It was cannot extremely bad."}
+{"id":"guard:negator-cannot-absolute","source":"spec/guard-lexicon.json","text":"It is cannot always so."}
+{"id":"guard:negator-hardly-strip","source":"spec/guard-lexicon.json","text":"It was hardly extremely bad."}
+{"id":"guard:negator-hardly-absolute","source":"spec/guard-lexicon.json","text":"It is hardly always so."}
+{"id":"guard:negator-never-strip","source":"spec/guard-lexicon.json","text":"It was never extremely bad."}
+{"id":"guard:negator-never-absolute","source":"spec/guard-lexicon.json","text":"It is never always so."}
+{"id":"guard:negator-no-strip","source":"spec/guard-lexicon.json","text":"It was no extremely bad."}
+{"id":"guard:negator-no-absolute","source":"spec/guard-lexicon.json","text":"It is no always so."}
+{"id":"guard:negator-nor-strip","source":"spec/guard-lexicon.json","text":"It was nor extremely bad."}
+{"id":"guard:negator-nor-absolute","source":"spec/guard-lexicon.json","text":"It is nor always so."}
+{"id":"guard:negator-not-strip","source":"spec/guard-lexicon.json","text":"It was not extremely bad."}
+{"id":"guard:negator-not-absolute","source":"spec/guard-lexicon.json","text":"It is not always so."}
+{"id":"guard:negator-without-strip","source":"spec/guard-lexicon.json","text":"It was without extremely bad."}
+{"id":"guard:negator-without-absolute","source":"spec/guard-lexicon.json","text":"It is without always so."}
+{"id":"guard:never-non-verb-a","source":"spec/guard-lexicon.json","text":"Never a x."}
+{"id":"guard:never-non-verb-an","source":"spec/guard-lexicon.json","text":"Never an x."}
+{"id":"guard:never-non-verb-any","source":"spec/guard-lexicon.json","text":"Never any x."}
+{"id":"guard:never-non-verb-are","source":"spec/guard-lexicon.json","text":"Never are x."}
+{"id":"guard:never-non-verb-been","source":"spec/guard-lexicon.json","text":"Never been x."}
+{"id":"guard:never-non-verb-before","source":"spec/guard-lexicon.json","text":"Never before x."}
+{"id":"guard:never-non-verb-being","source":"spec/guard-lexicon.json","text":"Never being x."}
+{"id":"guard:never-non-verb-can","source":"spec/guard-lexicon.json","text":"Never can x."}
+{"id":"guard:never-non-verb-could","source":"spec/guard-lexicon.json","text":"Never could x."}
+{"id":"guard:never-non-verb-did","source":"spec/guard-lexicon.json","text":"Never did x."}
+{"id":"guard:never-non-verb-does","source":"spec/guard-lexicon.json","text":"Never does x."}
+{"id":"guard:never-non-verb-had","source":"spec/guard-lexicon.json","text":"Never had x."}
+{"id":"guard:never-non-verb-has","source":"spec/guard-lexicon.json","text":"Never has x."}
+{"id":"guard:never-non-verb-is","source":"spec/guard-lexicon.json","text":"Never is x."}
+{"id":"guard:never-non-verb-such","source":"spec/guard-lexicon.json","text":"Never such x."}
+{"id":"guard:never-non-verb-the","source":"spec/guard-lexicon.json","text":"Never the x."}
+{"id":"guard:never-non-verb-was","source":"spec/guard-lexicon.json","text":"Never was x."}
+{"id":"guard:never-non-verb-were","source":"spec/guard-lexicon.json","text":"Never were x."}
+{"id":"guard:never-non-verb-will","source":"spec/guard-lexicon.json","text":"Never will x."}
+{"id":"guard:never-non-verb-would","source":"spec/guard-lexicon.json","text":"Never would x."}
+{"id":"guard:never-advice-opener-at","source":"spec/guard-lexicon.json","text":"Never at x."}
+{"id":"guard:never-advice-opener-have","source":"spec/guard-lexicon.json","text":"Never have x."}
+{"id":"guard:never-advice-opener-in","source":"spec/guard-lexicon.json","text":"Never in x."}
+{"id":"guard:never-advice-opener-on","source":"spec/guard-lexicon.json","text":"Never on x."}
+{"id":"guard:never-advice-opener-should","source":"spec/guard-lexicon.json","text":"Never should x."}
+{"id":"guard:never-advice-opener-so","source":"spec/guard-lexicon.json","text":"Never so x."}
+{"id":"guard:never-pass-through-again","source":"spec/guard-lexicon.json","text":"Never again share it."}
+{"id":"guard:never-pass-through-again-fragment","source":"spec/guard-lexicon.json","text":"Never again a x."}
+{"id":"guard:never-pass-through-ever","source":"spec/guard-lexicon.json","text":"Never ever share it."}
+{"id":"guard:never-pass-through-ever-fragment","source":"spec/guard-lexicon.json","text":"Never ever a x."}
+{"id":"guard:never-pass-through-once","source":"spec/guard-lexicon.json","text":"Never once share it."}
+{"id":"guard:never-pass-through-once-fragment","source":"spec/guard-lexicon.json","text":"Never once a x."}
+{"id":"guard:clause-break-u003b-never","source":"spec/guard-lexicon.json","text":"Check the link; never click it."}

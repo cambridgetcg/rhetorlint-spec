@@ -31,7 +31,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyze } from "../packages/core/index.mjs";
-import { boundaryProbes, lexiconProbes } from "./gen-agency-lexicon.mjs";
+import { boundaryProbes, guardProbes, lexiconProbes } from "./gen-agency-lexicon.mjs";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const at = (path) => join(ROOT, path);
@@ -297,7 +297,7 @@ function contrastRows(data) {
 function collectInputs() {
   const rows = [];
   const seen = new Set();
-  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, lexicon: 0, boundary: 0, duplicates: 0 };
+  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, lexicon: 0, boundary: 0, guard: 0, duplicates: 0 };
   const add = (kind, id, source, text) => {
     if (typeof text !== "string" || text.trim() === "") return;
     if (loneSurrogate.test(text)) throw new Error(`${id}: lone surrogate; the engines cannot share it`);
@@ -337,6 +337,11 @@ function collectInputs() {
   // character and the whitespace between words.
   // A one-token change to one engine's walk parts it from the other two here.
   for (const [id, text] of boundaryProbes()) add("boundary", id, "spec/agency-lexicon.json", text);
+  // One sentence per word of the guard lexicon and per clause break: each
+  // negator before an intensifier and before an absolute, each word after a
+  // clause-initial "Never". The lists themselves are held by the generator's
+  // --check; these hold the walks that read them.
+  for (const [id, text] of guardProbes()) add("guard", id, "spec/guard-lexicon.json", text);
   return { rows, counts };
 }
 
@@ -573,7 +578,7 @@ async function check({ write }) {
   const results = await differential(rows);
   const s = summarise(results);
   printCounts("xengine", s);
-  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes (${counts.duplicates} duplicates dropped)`);
+  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes, ${counts.guard} guard probes (${counts.duplicates} duplicates dropped)`);
 
   for (const r of results) {
     if (isPlain(r.text) && r.divergence) failures.push(`plain-ASCII difference (never recordable)\n  ${describe(r.id, r.divergence)}`);
@@ -644,7 +649,7 @@ async function main(argv) {
   if (argv[0] === "--build-inputs" && argv.length === 1) {
     const { rows, counts } = collectInputs();
     writeFileSync(at(INPUTS), serialiseInputs(rows));
-    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes; ${counts.duplicates} duplicates dropped)`);
+    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes, ${counts.guard} guard probes; ${counts.duplicates} duplicates dropped)`);
     return 0;
   }
   let failures;
