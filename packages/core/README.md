@@ -61,7 +61,7 @@ strengthen a negated claim or edit someone's words:
   unclosed `“`: `"It was utterly devastating," she said.` strips to itself.
 
 Both checks read words and quote marks, not offsets, so the Python and Go
-engines reach the same decision on any input.
+engines reach the same decision for the same mark on any input.
 
 ### `toSarif(result) → sarifLog` (`@rhetorlint/core/sarif`)
 

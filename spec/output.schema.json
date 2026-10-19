@@ -38,7 +38,7 @@
     },
     "strip": {
       "type": "string",
-      "description": "Deterministic reading aid: loaded intensifiers removed and agentless passives flagged with [who?]. An intensifier stays, still marked, when a negator (not, never, no, nor, cannot, without, hardly or an n't contraction) is one of the two words before it in the same clause, or when it sits inside a quotation on its line: deleting it would strengthen the claim or edit quoted words. Modality, attribution, verb-phrase hedges, and other tells remain marked rather than being deleted or paraphrased. This is not a guarantee of grammatical or meaning-preserving revision. On-device, no model required."
+      "description": "Deterministic reading aid: loaded intensifiers removed and agentless passives flagged with [who?]. An intensifier stays, still marked, when a negator (not, never, no, nor, cannot, without, hardly or an n't contraction) is one of the two words before it with no . ; : ! or ? between them, or when it sits inside a quotation opened earlier on its line (an odd number of straight double quotes, or an unclosed “): deleting it would strengthen the claim or edit quoted words. Modality, attribution, verb-phrase hedges, and other tells remain marked rather than being deleted or paraphrased. This is not a guarantee of grammatical or meaning-preserving revision. On-device, no model required."
     },
     "rewrite": {
       "type": ["string", "null"],
