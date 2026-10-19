@@ -142,8 +142,14 @@ class StripTests(unittest.TestCase):
                 "This is an incredibly important update for every customer.",
                 "This is an important update for every customer.",
             ),
+            # The negator is the third word back: the window is two words.
+            ("Not bad, and extremely cheap.", "Not bad, and cheap."),
             ("No doubt the team is extremely proud.", "No doubt the team is proud."),
-            ("Not one bit: it is extremely clear.", "Not one bit: it is clear."),
+            # The negator is the word before, but a clause break stands between them.
+            *[
+                ("We said no%s extremely few agreed." % brk, "We said no%s few agreed." % brk)
+                for brk in ".;:!?"
+            ],
             ("\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."),
             (
                 "He said \u201chello\u201d and was extremely calm.",

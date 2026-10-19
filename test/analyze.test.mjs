@@ -161,10 +161,12 @@ test("strip still subtracts an intensifier the negator and quotation guards do n
   for (const [text, expected] of [
     ["This is an incredibly important update for every customer.",
       "This is an important update for every customer."],
-    // The negator is more than two words back.
+    // The negator is the third word back: the window is two words.
+    ["Not bad, and extremely cheap.", "Not bad, and cheap."],
     ["No doubt the team is extremely proud.", "No doubt the team is proud."],
-    // A clause break stands between the negator and the intensifier.
-    ["Not one bit: it is extremely clear.", "Not one bit: it is clear."],
+    // The negator is the word before, but a clause break stands between them.
+    ...[".", ";", ":", "!", "?"].map((brk) =>
+      [`We said no${brk} extremely few agreed.`, `We said no${brk} few agreed.`]),
     // The quotation closed before the intensifier.
     ["\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."],
     ["He said \u201chello\u201d and was extremely calm.", "He said \u201chello\u201d and was calm."],

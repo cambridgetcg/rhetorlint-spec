@@ -340,14 +340,22 @@ func TestStripKeepsNegatedOrQuotedIntensifier(t *testing.T) {
 	})
 
 	t.Run("unguarded intensifier is still removed", func(t *testing.T) {
-		for _, test := range []struct{ input, want string }{
+		tests := []struct{ input, want string }{
 			{"This is an incredibly important update for every customer.", "This is an important update for every customer."},
+			// The negator is the third word back: the window is two words.
+			{"Not bad, and extremely cheap.", "Not bad, and cheap."},
 			{"No doubt the team is extremely proud.", "No doubt the team is proud."},
-			{"Not one bit: it is extremely clear.", "Not one bit: it is clear."},
 			{"\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."},
 			{"He said \u201chello\u201d and was extremely calm.", "He said \u201chello\u201d and was calm."},
 			{"He said \"hello\nand it was extremely loud.", "He said \"hello\nand it was loud."},
-		} {
+		}
+		// The negator is the word before, but a clause break stands between them.
+		for _, brk := range []string{".", ";", ":", "!", "?"} {
+			tests = append(tests, struct{ input, want string }{
+				"We said no" + brk + " extremely few agreed.", "We said no" + brk + " few agreed.",
+			})
+		}
+		for _, test := range tests {
 			if got := Analyze(test.input, pack).Strip; got != test.want {
 				t.Errorf("strip %q: got %q want %q", test.input, got, test.want)
 			}
