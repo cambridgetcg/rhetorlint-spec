@@ -31,7 +31,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyze } from "../packages/core/index.mjs";
-import { lexiconProbes } from "./gen-agency-lexicon.mjs";
+import { boundaryProbes, lexiconProbes } from "./gen-agency-lexicon.mjs";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const at = (path) => join(ROOT, path);
@@ -110,7 +110,8 @@ const PROBES = [
   // Non-ASCII away from any match: the engines must agree on every mark.
   // These put predicate adjectives, numerals and irregular participles after
   // a be-verb; the agency lexicon's own words are probed one by one below
-  // (lexiconProbes, from scripts/gen-agency-lexicon.mjs).
+  // (lexiconProbes, from scripts/gen-agency-lexicon.mjs), and the edges of the
+  // detector's walks by boundaryProbes, from the same file.
   ["context-tired-glad-aware-open", "Zo\u00eb was tired, Zo\u00eb was glad, and Zo\u00eb was aware that the caf\u00e9 was open."],
   ["context-worried-excited-interested", "Ren\u00e9e was worried; later she was excited and was interested."],
   ["context-scared-bored-pleased", "The ni\u00f1os were scared, then were bored, and were pleased at noon."],
@@ -258,7 +259,7 @@ function contrastRows(data) {
 function collectInputs() {
   const rows = [];
   const seen = new Set();
-  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, lexicon: 0, duplicates: 0 };
+  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, lexicon: 0, boundary: 0, duplicates: 0 };
   const add = (kind, id, source, text) => {
     if (typeof text !== "string" || text.trim() === "") return;
     if (loneSurrogate.test(text)) throw new Error(`${id}: lone surrogate; the engines cannot share it`);
@@ -291,6 +292,11 @@ function collectInputs() {
   // and the same with a 'by' agent, which it must not: a word dropped from, or
   // added to, one engine's generated copy parts the engines here.
   for (const [id, text] of lexiconProbes()) add("lexicon", id, "spec/agency-lexicon.json", text);
+  // The edges of the detector's hand-written walks, built from the lexicon's
+  // numbers and character sets: the 'by' window, the head and negator walks,
+  // the chain's length, the n't contraction and the whitespace between words.
+  // A one-token change to one engine's walk parts it from the other two here.
+  for (const [id, text] of boundaryProbes()) add("boundary", id, "spec/agency-lexicon.json", text);
   return { rows, counts };
 }
 
@@ -527,7 +533,7 @@ async function check({ write }) {
   const results = await differential(rows);
   const s = summarise(results);
   printCounts("xengine", s);
-  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes (${counts.duplicates} duplicates dropped)`);
+  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes (${counts.duplicates} duplicates dropped)`);
 
   for (const r of results) {
     if (isPlain(r.text) && r.divergence) failures.push(`plain-ASCII difference (never recordable)\n  ${describe(r.id, r.divergence)}`);
@@ -598,7 +604,7 @@ async function main(argv) {
   if (argv[0] === "--build-inputs" && argv.length === 1) {
     const { rows, counts } = collectInputs();
     writeFileSync(at(INPUTS), serialiseInputs(rows));
-    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes; ${counts.duplicates} duplicates dropped)`);
+    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes; ${counts.duplicates} duplicates dropped)`);
     return 0;
   }
   let failures;
