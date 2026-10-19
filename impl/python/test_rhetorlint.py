@@ -1,6 +1,7 @@
 """Focused behavioral regressions for the Python reference engine."""
 
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -275,6 +276,100 @@ class AbsoluteGuardTests(unittest.TestCase):
                     self.assertEqual(actuals("Never %s %s x." % (adverb, word)), ["Never"], word)
                 self.assertEqual(actuals("Never %s." % adverb), ["Never"])
                 self.assertEqual(actuals("Never %s Share it." % adverb), ["Never"])
+
+
+def agency_spans(text, rules):
+    marks = rhetorlint.analyze(text, rules)["marks"]
+    return [
+        (mark["actual"], mark["position"]["start"]["offset"], mark["position"]["end"]["offset"])
+        for mark in marks
+        if mark["ruleId"] == "agency-hiding.deleted-subject"
+    ]
+
+
+class AgencyDetectorTests(unittest.TestCase):
+    def test_accountable_past_passives_are_marked_auxiliary_through_participle(self):
+        rules = rhetorlint.load_default_rules()
+        cases = [
+            ("Mistakes were made.", "were made"),
+            ("Mistakes, frankly, were made.", "were made"),
+            ("Customer data was quietly accessed.", "was quietly accessed"),
+            ("Your data was shared with partners.", "was shared"),
+            ("PII may have been compromised.", "been compromised"),
+            ("Records were withheld from investigators.", "were withheld"),
+            ("It was decided that the program would end.", "was decided"),
+            ("Hundreds of workers were laid off.", "were laid off"),
+            ("Additional safeguards have been put in place.", "been put"),
+            ("Concerns were raised about the audit.", "were raised"),
+            ("MISTAKES WERE MADE.", "WERE MADE"),
+        ]
+        for text, actual in cases:
+            with self.subTest(text=text):
+                at = text.index(actual)
+                self.assertEqual(agency_spans(text, rules), [(actual, at, at + len(actual))])
+
+    def test_procedure_named_agents_harm_verbs_and_idioms_stay_unmarked(self):
+        rules = rhetorlint.load_default_rules()
+        for text in [
+            "My name is Fred.",
+            "JavaScript is required.",
+            "Soil water content was measured at 5 cm depth.",
+            "The soup can be frozen for up to 3 months.",
+            "This option is ignored when the flag is unset.",
+            "The startup has been described as the next big thing by Forbes.",
+            "The report was shelved by Friday.",
+            "Lives were lost in the earthquake.",
+            "Your account was closed at your request.",
+            "He got fired up about the album.",
+            "Data were collected from 200 participants.",
+            "Information was collected via a survey.",
+            "Records were retained for seven years.",
+            "If no error was raised, the call succeeded.",
+            "Records were being withheld.",
+            "Mistakes were made\nby the board.",
+            "Mistakes were made.",
+            "Civilians were Killed.",
+            "Your data was ſhared.",
+        ]:
+            with self.subTest(text=text):
+                self.assertEqual(agency_spans(text, rules), [])
+
+    def test_guards_read_at_the_participle_not_at_the_start_of_the_text(self):
+        """Regression pin for a Python-only bug in an earlier prototype: a
+        '^'-anchored pattern applied through pattern.match(text, pos) never
+        matches at pos > 0, so the 'in place' requirement never held and the
+        'exposed to' guard never fired. Every guard reads at the participle's
+        end, which is never 0, so each must be seen to work there."""
+        rules = rhetorlint.load_default_rules()
+        self.assertEqual(
+            [span[0] for span in agency_spans("Additional safeguards have been put in place.", rules)],
+            ["been put"],
+        )
+        self.assertEqual(agency_spans("Safeguards were put in a box.", rules), [])
+        self.assertEqual(agency_spans("Workers were exposed to asbestos.", rules), [])
+        self.assertEqual(
+            [span[0] for span in agency_spans("Customer records were exposed.", rules)],
+            ["were exposed"],
+        )
+        low = "x safeguards were put in place."
+        self.assertTrue(rhetorlint._agency_phrase_follows(low, low.index(" in"), "in place"))
+        self.assertFalse(rhetorlint._agency_phrase_follows(low, low.index("in"), "in place"))
+        self.assertTrue(rhetorlint._agency_by_follows("x were made by them", len("x were made")))
+        # An anchored pattern applied at an offset is the bug itself: show it.
+        self.assertIsNone(re.compile(r"^\s+in").match(low, low.index(" in")))
+
+    def test_generated_lexicon_matches_the_spec(self):
+        lexicon = json.loads((ROOT / "spec" / "agency-lexicon.json").read_text(encoding="utf-8"))
+        self.assertEqual(list(rhetorlint.AGENCY_AUXILIARIES), lexicon["auxiliaries"])
+        self.assertEqual(sorted(rhetorlint.AGENCY_SKIP), lexicon["skip"])
+        self.assertEqual(
+            {name: sorted(words) for name, words in rhetorlint.AGENCY_HEADS.items()},
+            lexicon["heads"],
+        )
+        self.assertEqual(
+            [(cls, head, list(participles)) for cls, head, participles in rhetorlint.AGENCY_CLASSES],
+            [(c["id"], c["head"] or "", c["participles"]) for c in lexicon["classes"]],
+        )
 
 
 class EngineLabelTests(unittest.TestCase):

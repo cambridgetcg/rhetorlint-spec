@@ -34,27 +34,243 @@ const specVersion = "0.1"
 // coreVersion labels the engine: the core revision whose behaviour it reproduces.
 const coreVersion = "0.1.4"
 
-// Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
-// would otherwise swallow, and "often" so bare "is often" never reads passive.
-var notPassive = map[string]bool{
-	"tired": true, "glad": true, "aware": true, "worried": true, "excited": true,
-	"interested": true, "scared": true, "bored": true, "pleased": true, "married": true,
-	"gifted": true, "talented": true, "detailed": true, "limited": true, "dedicated": true,
-	"committed": true, "supposed": true, "used": true, "based": true,
-	"open": true, "even": true, "sudden": true, "seven": true, "ten": true,
-	"eleven": true, "golden": true, "wooden": true, "often": true,
+// agencyClass is one participle class of spec/agency-lexicon.json: the
+// participles, and the head class they need ("" for none).
+type agencyClass struct {
+	id, head    string
+	participles []string
 }
 
-const irregularPP = `made|taken|done|given|seen|known|held|shown|drawn|chosen|written|broken|spoken|` +
-	`built|sent|kept|left|lost|found|told|brought|dealt|put|set|paid|felt|met|led|read|` +
-	`hit|cut|hurt|shut|split|spread|cast|cost|let`
+// BEGIN GENERATED AGENCY LEXICON
+// spec/agency-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// Edit the lexicon and rerun the generator; --check fails when this block drifts.
+var agencyAuxiliaries = []string{"been", "was", "were"}
+var agencyAdverbs = []string{"already", "always", "never", "often", "still"}
 
-// RE2 has no lookahead, so the "not followed by 'by <agent>'" rule is applied
-// in code after this matches the be-verb + participle. The by-phrase may sit
-// past a particle or adverb ("carried out collectively by the network").
-var agentlessPassive = regexp.MustCompile(
-	`(?i)\b(is|are|was|were|been|being|be)\s+(?:(?:\w+ly|often|never|always|still|already)\s+)?(\w+(?:ed|en)|` + irregularPP + `)\b`)
-var byFollows = regexp.MustCompile(`(?i)^\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b`)
+const agencyAdverbSuffix = "ly"
+
+var agencySkip = map[string]bool{
+	"all": true, "already": true, "also": true, "can": true, "could": true, "had": true, "has": true,
+	"have": true, "may": true, "might": true, "must": true, "never": true, "not": true, "now": true,
+	"shall": true, "should": true, "since": true, "then": true, "will": true, "would": true,
+}
+
+const agencySkipSuffix = "ly"
+const agencySkipMax = 4
+const agencyByWindow = 7
+
+var agencyHeads = map[string]map[string]bool{
+	"challenge": map[string]bool{
+		"allegations": true, "concerns": true, "questions": true,
+	},
+	"data": map[string]bool{
+		"address": true, "addresses": true, "credentials": true, "data": true, "details": true,
+		"information": true, "password": true, "passwords": true, "pii": true, "records": true,
+	},
+	"dummy": map[string]bool{
+		"it": true,
+	},
+	"error": map[string]bool{
+		"action": true, "actions": true, "allegations": true, "choices": true, "comments": true,
+		"concerns": true, "cuts": true, "decision": true, "decisions": true, "error": true,
+		"errors": true, "measures": true, "miscalculation": true, "miscalculations": true,
+		"misjudgement": true, "misjudgements": true, "misjudgment": true, "misjudgments": true,
+		"misstep": true, "missteps": true, "mistake": true, "mistakes": true, "omissions": true,
+		"promises": true, "questions": true, "remarks": true, "safeguards": true, "statements": true,
+		"steps": true, "things": true, "threats": true, "words": true,
+	},
+}
+
+// agencyClasses holds {class, head class or "" for none, participles}.
+var agencyClasses = []agencyClass{
+	{"fault", "", []string{
+		"botched", "bungled", "doctored", "falsified", "ignored", "misappropriated", "miscalculated",
+		"mischaracterised", "mischaracterized", "mishandled", "misinformed", "misinterpreted",
+		"misjudged", "mislabeled", "mislabelled", "misled", "mismanaged", "misplaced", "misquoted",
+		"misreported", "misrepresented", "misstated", "misused", "neglected", "overcharged", "overlooked",
+		"tampered", "underpaid",
+	}},
+	{"breach", "", []string{
+		"accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked", "impacted",
+		"leaked", "stolen",
+	}},
+	{"conceal", "", []string{
+		"axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
+		"withheld",
+	}},
+	{"light", "error", []string{
+		"characterised", "characterized", "done", "given", "interpreted", "made", "perceived", "put",
+		"said", "taken",
+	}},
+	{"raise", "challenge", []string{
+		"raised",
+	}},
+	{"impersonal", "dummy", []string{
+		"agreed", "decided", "determined",
+	}},
+	{"data", "data", []string{
+		"disclosed", "shared", "sold",
+	}},
+}
+
+var agencyRequires = map[string]string{"put": "in place"}
+var agencyUnless = map[string]string{"exposed": "to"}
+
+// END GENERATED AGENCY LEXICON
+
+// The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
+// clause leaves unstated, exactly as packages/core/index.mjs does (its comment
+// there is the full statement). A mark needs a past auxiliary (was, were,
+// been), at most one adverb, a participle from a closed class, the head word
+// its class names, its agencyRequires phrase and not its agencyUnless word,
+// and no "by" among the next agencyByWindow words of the clause.
+//
+// Matching runs on an ASCII-lowercased copy with no (?i), so RE2 cannot fold
+// U+212A KELVIN SIGN or U+017F LONG S into a participle, with explicit
+// [ \t\n\r\f] whitespace and RE2's ASCII \b. The guards walk bytes; every
+// character they look for is ASCII, so a multi-byte character reads as one
+// non-word run, as it does in JavaScript and Python.
+const (
+	agencyWhitespace   = " \t\n\r\f"
+	agencySpace        = `[ \t\n\r\f]+`
+	agencyHeadStops    = ".;:!?\n"
+	agencyClauseBreaks = ".;:!?"
+)
+
+// agencyHeadOf maps each participle to the head class it needs ("" for none).
+var agencyHeadOf = func() map[string]string {
+	out := map[string]string{}
+	for _, c := range agencyClasses {
+		for _, p := range c.participles {
+			out[p] = c.head
+		}
+	}
+	return out
+}()
+
+var agencyCandidate = func() *regexp.Regexp {
+	participles := make([]string, 0, len(agencyHeadOf))
+	for p := range agencyHeadOf {
+		participles = append(participles, p)
+	}
+	sort.Slice(participles, func(i, j int) bool {
+		if len(participles[i]) != len(participles[j]) {
+			return len(participles[i]) > len(participles[j])
+		}
+		return participles[i] < participles[j]
+	})
+	for i, p := range participles {
+		participles[i] = strings.Join(strings.Split(p, " "), agencySpace)
+	}
+	return regexp.MustCompile(`\b(` + strings.Join(agencyAuxiliaries, "|") + `)` + agencySpace +
+		`(?:(?:[a-z]+` + agencyAdverbSuffix + `|` + strings.Join(agencyAdverbs, "|") + `)` + agencySpace + `)?` +
+		`(` + strings.Join(participles, "|") + `)\b`)
+}()
+
+var agencySpaceRun = regexp.MustCompile(agencySpace)
+
+// isAgencyWordByte reports an ASCII letter, digit or underscore: what \b
+// counts as a word character.
+func isAgencyWordByte(c byte) bool {
+	return c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '_'
+}
+
+// agencyHeadWord returns the nearest word before index, stepping back over at
+// most agencySkipMax words of agencySkip or ending in -ly, never past
+// . ; : ! ? or a line break; "" when there is none.
+func agencyHeadWord(low string, index int) string {
+	i := index
+	for seen := 0; seen <= agencySkipMax; seen++ {
+		for i > 0 && !isAgencyWordByte(low[i-1]) {
+			if strings.IndexByte(agencyHeadStops, low[i-1]) >= 0 {
+				return ""
+			}
+			i--
+		}
+		end := i
+		for i > 0 && isAgencyWordByte(low[i-1]) {
+			i--
+		}
+		if i == end {
+			return ""
+		}
+		word := low[i:end]
+		if !agencySkip[word] && !strings.HasSuffix(word, agencySkipSuffix) {
+			return word
+		}
+	}
+	return ""
+}
+
+// agencyByFollows reports whether "by" is one of the next agencyByWindow
+// words after index, before . ; : ! or ?. A line break does not end the window.
+func agencyByFollows(low string, index int) bool {
+	i := index
+	for words := 0; words < agencyByWindow; words++ {
+		for i < len(low) && !isAgencyWordByte(low[i]) {
+			if strings.IndexByte(agencyClauseBreaks, low[i]) >= 0 {
+				return false
+			}
+			i++
+		}
+		if i == len(low) {
+			return false
+		}
+		start := i
+		for i < len(low) && isAgencyWordByte(low[i]) {
+			i++
+		}
+		if low[start:i] == "by" {
+			return true
+		}
+	}
+	return false
+}
+
+// agencyPhraseFollows reports whether the words of phrase follow index, each
+// after [ \t\n\r\f]+ and each whole.
+func agencyPhraseFollows(low string, index int, phrase string) bool {
+	i := index
+	for _, word := range strings.Split(phrase, " ") {
+		gap := i
+		for i < len(low) && strings.IndexByte(agencyWhitespace, low[i]) >= 0 {
+			i++
+		}
+		if i == gap || !strings.HasPrefix(low[i:], word) {
+			return false
+		}
+		i += len(word)
+		if i < len(low) && isAgencyWordByte(low[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+// agentlessPassives returns every accountable agentless passive in text,
+// spanning auxiliary through participle.
+func agentlessPassives(text string) []hit {
+	low := asciiLower(text)
+	var out []hit
+	for _, m := range agencyCandidate.FindAllStringSubmatchIndex(low, -1) {
+		start, end := m[0], m[1]
+		participle := agencySpaceRun.ReplaceAllString(low[m[4]:m[5]], " ")
+		if unless, ok := agencyUnless[participle]; ok && agencyPhraseFollows(low, end, unless) {
+			continue
+		}
+		if requires, ok := agencyRequires[participle]; ok && !agencyPhraseFollows(low, end, requires) {
+			continue
+		}
+		if agencyByFollows(low, end) {
+			continue
+		}
+		if head := agencyHeadOf[participle]; head != "" && !agencyHeads[head][agencyHeadWord(low, start)] {
+			continue
+		}
+		out = append(out, hit{start, end - start, text[start:end]})
+	}
+	return out
+}
 
 var removable = map[string]bool{"intensifier.loaded": true}
 
@@ -223,17 +439,7 @@ func matchesFor(rule Rule, text string) []hit {
 			out = append(out, hit{loc[0], loc[1] - loc[0], text[loc[0]:loc[1]]})
 		}
 	case rule.Type == "structural" && rule.Detector == "agentless-passive":
-		for _, m := range agentlessPassive.FindAllStringSubmatchIndex(text, -1) {
-			full := text[m[0]:m[1]]
-			participle := strings.ToLower(text[m[4]:m[5]])
-			if notPassive[participle] {
-				continue
-			}
-			if byFollows.MatchString(text[m[1]:]) { // "... by <agent>" names who acted
-				continue
-			}
-			out = append(out, hit{m[0], m[1] - m[0], full})
-		}
+		out = append(out, agentlessPassives(text)...)
 	}
 	return out
 }

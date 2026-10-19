@@ -26,32 +26,192 @@ SPEC_VERSION = "0.1"
 NAME = "rhetorlint (python)"
 CORE_VERSION = "0.1.4"
 
-# Words the -ed/-en passive heuristic should treat as predicate adjectives.
-# Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
-# would otherwise swallow, and "often" so bare "is often" never reads passive.
-NOT_PASSIVE = {
-    "tired", "glad", "aware", "worried", "excited", "interested", "scared",
-    "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
-    "dedicated", "committed", "supposed", "used", "based",
-    "open", "even", "sudden", "seven", "ten", "eleven", "golden", "wooden", "often",
+# BEGIN GENERATED AGENCY LEXICON
+# spec/agency-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+# Edit the lexicon and rerun the generator; --check fails when this block drifts.
+AGENCY_AUXILIARIES = ("been", "was", "were")
+AGENCY_ADVERBS = ("already", "always", "never", "often", "still")
+AGENCY_ADVERB_SUFFIX = "ly"
+AGENCY_SKIP = frozenset({
+    "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never",
+    "not", "now", "shall", "should", "since", "then", "will", "would"
+})
+AGENCY_SKIP_SUFFIX = "ly"
+AGENCY_SKIP_MAX = 4
+AGENCY_BY_WINDOW = 7
+AGENCY_HEADS = {
+    "challenge": frozenset({
+        "allegations", "concerns", "questions"
+    }),
+    "data": frozenset({
+        "address", "addresses", "credentials", "data", "details", "information", "password",
+        "passwords", "pii", "records"
+    }),
+    "dummy": frozenset({
+        "it"
+    }),
+    "error": frozenset({
+        "action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision",
+        "decisions", "error", "errors", "measures", "miscalculation", "miscalculations",
+        "misjudgement", "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps",
+        "mistake", "mistakes", "omissions", "promises", "questions", "remarks", "safeguards",
+        "statements", "steps", "things", "threats", "words"
+    }),
+}
+# (class, head class or "" for none, participles)
+AGENCY_CLASSES = (
+    ("fault", "", (
+        "botched", "bungled", "doctored", "falsified", "ignored", "misappropriated",
+        "miscalculated", "mischaracterised", "mischaracterized", "mishandled", "misinformed",
+        "misinterpreted", "misjudged", "mislabeled", "mislabelled", "misled", "mismanaged",
+        "misplaced", "misquoted", "misreported", "misrepresented", "misstated", "misused",
+        "neglected", "overcharged", "overlooked", "tampered", "underpaid",
+    )),
+    ("breach", "", (
+        "accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked",
+        "impacted", "leaked", "stolen",
+    )),
+    ("conceal", "", (
+        "axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
+        "withheld",
+    )),
+    ("light", "error", (
+        "characterised", "characterized", "done", "given", "interpreted", "made", "perceived",
+        "put", "said", "taken",
+    )),
+    ("raise", "challenge", (
+        "raised",
+    )),
+    ("impersonal", "dummy", (
+        "agreed", "decided", "determined",
+    )),
+    ("data", "data", (
+        "disclosed", "shared", "sold",
+    )),
+)
+AGENCY_REQUIRES = {"put": "in place"}
+AGENCY_UNLESS = {"exposed": "to"}
+# END GENERATED AGENCY LEXICON
+
+# The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
+# clause leaves unstated, exactly as packages/core/index.mjs does (its comment
+# there is the full statement). A mark needs a past auxiliary (was, were,
+# been), at most one adverb, a participle from a closed class, the head word
+# its class names, its AGENCY_REQUIRES phrase and not its AGENCY_UNLESS word,
+# and no "by" among the next AGENCY_BY_WINDOW words of the clause.
+#
+# Matching runs on an ASCII-lowercased copy with no IGNORECASE, explicit
+# [ \t\n\r\f] whitespace and re.ASCII word boundaries, so a non-ASCII letter
+# is never folded into a word and a no-break space never joins two. The guards
+# walk characters from the match; none applies an anchored pattern at an
+# offset (re.match(text, pos) never matches '^' at pos > 0).
+_AGENCY_WHITESPACE = " \t\n\r\f"
+_AGENCY_SPACE = r"[ \t\n\r\f]+"
+_AGENCY_HEAD_STOPS = ".;:!?\n"
+_AGENCY_CLAUSE_BREAKS = ".;:!?"
+
+# Each participle and the head class it needs ("" for none).
+_AGENCY_HEAD_OF = {
+    participle: head
+    for _cls, head, participles in AGENCY_CLASSES
+    for participle in participles
 }
 
-# Irregular past participles the "\w+ed|\w+en" pattern would otherwise miss.
-_IRREGULAR_PP = (
-    "made|taken|done|given|seen|known|held|shown|drawn|chosen|written|broken|spoken|"
-    "built|sent|kept|left|lost|found|told|brought|dealt|put|set|paid|felt|met|led|read|"
-    "hit|cut|hurt|shut|split|spread|cast|cost|let"
+AGENCY_CANDIDATE = re.compile(
+    r"\b(" + "|".join(AGENCY_AUXILIARIES) + ")" + _AGENCY_SPACE
+    + "(?:(?:[a-z]+" + AGENCY_ADVERB_SUFFIX + "|" + "|".join(AGENCY_ADVERBS) + ")"
+    + _AGENCY_SPACE + ")?"
+    + "(" + "|".join(
+        _AGENCY_SPACE.join(p.split(" "))
+        for p in sorted(_AGENCY_HEAD_OF, key=lambda p: (-len(p), p))
+    ) + r")\b",
+    re.ASCII,
 )
+_AGENCY_SPACE_RUN = re.compile(_AGENCY_SPACE)
 
-# be-verb (+ optional adverb, -ly or a common frequency word) + participle,
-# NOT followed by "by <agent>" — the by-phrase may sit past a particle or
-# adverb ("carried out collectively by the network" still names the agent).
-AGENTLESS_PASSIVE = re.compile(
-    r"\b(is|are|was|were|been|being|be)\s+(?:(?:\w+ly|often|never|always|still|already)\s+)?"
-    r"(\w+(?:ed|en)|" + _IRREGULAR_PP + r")\b"
-    r"(?!\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b)",
-    re.IGNORECASE,
-)
+
+def _is_agency_word_char(char):
+    """An ASCII letter, digit or underscore: what \\b counts as a word character."""
+    return "a" <= char <= "z" or "0" <= char <= "9" or char == "_"
+
+
+def _agency_head_word(low, index):
+    """The nearest word before index, stepping back over at most
+    AGENCY_SKIP_MAX words of AGENCY_SKIP or ending in -ly, never past
+    . ; : ! ? or a line break; "" when there is none."""
+    i = index
+    for _ in range(AGENCY_SKIP_MAX + 1):
+        while i > 0 and not _is_agency_word_char(low[i - 1]):
+            if low[i - 1] in _AGENCY_HEAD_STOPS:
+                return ""
+            i -= 1
+        end = i
+        while i > 0 and _is_agency_word_char(low[i - 1]):
+            i -= 1
+        if i == end:
+            return ""
+        word = low[i:end]
+        if word not in AGENCY_SKIP and not word.endswith(AGENCY_SKIP_SUFFIX):
+            return word
+    return ""
+
+
+def _agency_by_follows(low, index):
+    """True when "by" is one of the next AGENCY_BY_WINDOW words after index,
+    before . ; : ! or ?. A line break does not end the window."""
+    i, n = index, len(low)
+    for _ in range(AGENCY_BY_WINDOW):
+        while i < n and not _is_agency_word_char(low[i]):
+            if low[i] in _AGENCY_CLAUSE_BREAKS:
+                return False
+            i += 1
+        if i == n:
+            return False
+        start = i
+        while i < n and _is_agency_word_char(low[i]):
+            i += 1
+        if low[start:i] == "by":
+            return True
+    return False
+
+
+def _agency_phrase_follows(low, index, phrase):
+    """True when the words of phrase follow index, each after [ \\t\\n\\r\\f]+
+    and each whole. It compares with str.startswith at an offset, never an
+    anchored regex."""
+    i, n = index, len(low)
+    for word in phrase.split(" "):
+        gap = i
+        while i < n and low[i] in _AGENCY_WHITESPACE:
+            i += 1
+        if i == gap or not low.startswith(word, i):
+            return False
+        i += len(word)
+        if i < n and _is_agency_word_char(low[i]):
+            return False
+    return True
+
+
+def _agentless_passives(text):
+    """Every accountable agentless passive, as (index, length, actual)."""
+    low = text.translate(_ASCII_LOWER)
+    out = []
+    for m in AGENCY_CANDIDATE.finditer(low):
+        start, end = m.start(), m.end()
+        participle = _AGENCY_SPACE_RUN.sub(" ", m.group(2))
+        unless = AGENCY_UNLESS.get(participle)
+        if unless is not None and _agency_phrase_follows(low, end, unless):
+            continue
+        requires = AGENCY_REQUIRES.get(participle)
+        if requires is not None and not _agency_phrase_follows(low, end, requires):
+            continue
+        if _agency_by_follows(low, end):
+            continue
+        head = _AGENCY_HEAD_OF[participle]
+        if head and _agency_head_word(low, start) not in AGENCY_HEADS[head]:
+            continue
+        out.append((start, end - start, text[start:end]))
+    return out
 
 # The sole ruleId eligible under the conservative strip counterfactual.
 REMOVABLE = {"intensifier.loaded"}
@@ -104,11 +264,7 @@ def _matches_for(rule, text):
                 continue
             out.append((m.start(), len(m.group(0)), m.group(0)))
     elif kind == "structural" and rule.get("detector") == "agentless-passive":
-        for m in AGENTLESS_PASSIVE.finditer(text):
-            participle = (m.group(2) or "").lower()
-            if participle in NOT_PASSIVE:
-                continue
-            out.append((m.start(), len(m.group(0)), m.group(0)))
+        out.extend(_agentless_passives(text))
     return out
 
 

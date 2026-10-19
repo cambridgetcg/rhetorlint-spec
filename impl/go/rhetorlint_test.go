@@ -507,6 +507,124 @@ func TestAbsoluteGuard(t *testing.T) {
 	})
 }
 
+func agencySpans(text string, pack RulePack) []string {
+	var out []string
+	for _, m := range Analyze(text, pack).Marks {
+		if m.RuleID == "agency-hiding.deleted-subject" {
+			out = append(out, fmt.Sprintf("%s@%d-%d", m.Actual, m.Position.Start.Offset, m.Position.End.Offset))
+		}
+	}
+	return out
+}
+
+func TestAgencyDetector(t *testing.T) {
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	t.Run("accountable past passives are marked auxiliary through participle", func(t *testing.T) {
+		cases := [][2]string{
+			{"Mistakes were made.", "were made"},
+			{"Mistakes, frankly, were made.", "were made"},
+			{"Customer data was quietly accessed.", "was quietly accessed"},
+			{"Your data was shared with partners.", "was shared"},
+			{"PII may have been compromised.", "been compromised"},
+			{"Records were withheld from investigators.", "were withheld"},
+			{"It was decided that the program would end.", "was decided"},
+			{"Hundreds of workers were laid off.", "were laid off"},
+			{"Additional safeguards have been put in place.", "been put"},
+			{"Concerns were raised about the audit.", "were raised"},
+			{"MISTAKES WERE MADE.", "WERE MADE"},
+			{"Customer records were exposed.", "were exposed"},
+		}
+		for _, c := range cases {
+			at := strings.Index(c[0], c[1])
+			want := []string{fmt.Sprintf("%s@%d-%d", c[1], at, at+len(c[1]))}
+			if got := agencySpans(c[0], pack); !reflect.DeepEqual(got, want) {
+				t.Errorf("%q: agency marks %q, want %q", c[0], got, want)
+			}
+		}
+	})
+
+	t.Run("procedure, named agents, harm verbs and idioms stay unmarked", func(t *testing.T) {
+		for _, text := range []string{
+			"My name is Fred.",
+			"JavaScript is required.",
+			"Soil water content was measured at 5 cm depth.",
+			"The soup can be frozen for up to 3 months.",
+			"This option is ignored when the flag is unset.",
+			"The startup has been described as the next big thing by Forbes.",
+			"The report was shelved by Friday.",
+			"Lives were lost in the earthquake.",
+			"Your account was closed at your request.",
+			"He got fired up about the album.",
+			"Data were collected from 200 participants.",
+			"Information was collected via a survey.",
+			"Records were retained for seven years.",
+			"If no error was raised, the call succeeded.",
+			"Records were being withheld.",
+			"Safeguards were put in a box.",
+			"Workers were exposed to asbestos.",
+			"Mistakes were made\nby the board.",
+			// RE2's (?i)\w would fold U+212A and U+017F into a participle; the
+			// detector matches an ASCII-lowercased copy with no (?i), so neither
+			// does, and a no-break space joins no words.
+			"Mistakes were made.",
+			"Civilians were Killed.",
+			"Your data was ſhared.",
+		} {
+			if got := agencySpans(text, pack); len(got) != 0 {
+				t.Errorf("%q: agency marks %q, want none", text, got)
+			}
+		}
+	})
+
+	t.Run("the generated lexicon matches the spec", func(t *testing.T) {
+		raw, err := os.ReadFile(filepath.Join(repoRoot(), "spec", "agency-lexicon.json"))
+		if err != nil {
+			t.Fatalf("read spec/agency-lexicon.json: %v", err)
+		}
+		var lex struct {
+			Auxiliaries []string            `json:"auxiliaries"`
+			Heads       map[string][]string `json:"heads"`
+			Classes     []struct {
+				ID          string   `json:"id"`
+				Head        *string  `json:"head"`
+				Participles []string `json:"participles"`
+			} `json:"classes"`
+		}
+		if err := json.Unmarshal(raw, &lex); err != nil {
+			t.Fatalf("parse spec/agency-lexicon.json: %v", err)
+		}
+		if !reflect.DeepEqual(agencyAuxiliaries, lex.Auxiliaries) {
+			t.Errorf("auxiliaries %q, spec %q", agencyAuxiliaries, lex.Auxiliaries)
+		}
+		for name, words := range lex.Heads {
+			if len(agencyHeads[name]) != len(words) {
+				t.Errorf("head class %s: %d words, spec %d", name, len(agencyHeads[name]), len(words))
+			}
+			for _, w := range words {
+				if !agencyHeads[name][w] {
+					t.Errorf("head class %s lacks %q", name, w)
+				}
+			}
+		}
+		if len(agencyClasses) != len(lex.Classes) {
+			t.Fatalf("%d classes, spec %d", len(agencyClasses), len(lex.Classes))
+		}
+		for i, c := range lex.Classes {
+			head := ""
+			if c.Head != nil {
+				head = *c.Head
+			}
+			got := agencyClasses[i]
+			if got.id != c.ID || got.head != head || !reflect.DeepEqual(got.participles, c.Participles) {
+				t.Errorf("class %d: %+v, spec %s/%s/%q", i, got, c.ID, head, c.Participles)
+			}
+		}
+	})
+}
+
 func TestEngineVersionNamesTheCoreRevision(t *testing.T) {
 	raw, err := os.ReadFile(filepath.Join(repoRoot(), "packages", "core", "package.json"))
 	if err != nil {
