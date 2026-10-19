@@ -247,7 +247,24 @@ const PROBES = [
   ["abs-fullwidth-comma", "No risk\uff0c guaranteed."],
   ["abs-never-nbsp-after-adverb", "Never again\u00a0will prices fall."],
   ["abs-never-accented-next", "Never \u00e9t\u00e9 again."],
-  ["abs-never-rsquo-in-next", "Never can\u2019t stop."]
+  ["abs-never-rsquo-in-next", "Never can\u2019t stop."],
+  // The agency detector's clause negator, and the tests a one-engine change
+  // once slipped past, in natural sentences (boundaryProbes builds the same
+  // edges from the lexicon): breach notices that deny the act however long the
+  // subject; the whole-word test after 'exposed' ('to' is not 'today') and
+  // after 'put' ('in place' is not 'into place'); a line break that starts the
+  // clause after a carriage return; and non-ASCII characters that start no
+  // clause.
+  ["agency-denial-card-numbers", "No credit card numbers, bank account details or passwords were stolen."],
+  ["agency-denial-ssn", "No Social Security numbers or other sensitive personal information were exposed."],
+  ["agency-denial-earlier-clause", "No one called, but data were stolen."],
+  ["agency-exposed-today", "Customer data was exposed today."],
+  ["agency-put-into-place", "Safeguards were put into place."],
+  ["agency-negator-crlf", "No one called\r\ndata were stolen."],
+  ["agency-negator-nbsp", "No\u00a0card numbers were stolen."],
+  ["agency-negator-ideographic-stop", "No\u3002data was accessed."],
+  ["agency-negator-line-separator", "No\u2028data was accessed."],
+  ["agency-negator-emoji", "No \ud83d\ude00 data was accessed."]
 ];
 
 const isAscii = (text) => /^[\x00-\x7f]*$/.test(text);
@@ -312,8 +329,10 @@ function collectInputs() {
   // added to, one engine's generated copy parts the engines here.
   for (const [id, text] of lexiconProbes()) add("lexicon", id, "spec/agency-lexicon.json", text);
   // The edges of the detector's hand-written walks, built from the lexicon's
-  // numbers and character sets: the 'by' window, the head and negator walks,
-  // the chain's length, the n't contraction and the whitespace between words.
+  // words, numbers and character sets: the 'by' window, the head walk and the
+  // chain's length, the clause the negator reader reads, the n't contraction,
+  // the adverb slot, the whole-word test after a phrase, what counts as a word
+  // character and the whitespace between words.
   // A one-token change to one engine's walk parts it from the other two here.
   for (const [id, text] of boundaryProbes()) add("boundary", id, "spec/agency-lexicon.json", text);
   return { rows, counts };

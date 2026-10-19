@@ -323,11 +323,13 @@ export function lexiconProbes(lex = loadLexicon()) {
  * check the code that reads them: the 'by' window's length and where it ends,
  * where the head walk stops and how many auxiliary-chain words it steps over,
  * where the negator reader's clause starts and that it reads all of it, the
- * n't contraction and the whitespace that may separate the words of a match.
- * Each is built from the lexicon's own numbers and character sets, so it
- * follows a change to them, and a one-token change to any engine's walk parts
- * that engine from the expected span here or from the other two in the
- * differential.
+ * n't contraction, the adverb slot, the whole-word test after a requires or
+ * unless phrase, what counts as a word character (an ASCII letter, digit or
+ * underscore, as \b has it) and the whitespace that may separate the words of
+ * a match. Each is built from the lexicon's own words, numbers and character
+ * sets, so it follows a change to them, and a one-token change to any engine's
+ * walk parts that engine from the expected span here or from the other two in
+ * the differential.
  */
 export function boundaryProbes(lex = loadLexicon()) {
   const out = [];
@@ -382,6 +384,40 @@ export function boundaryProbes(lex = loadLexicon()) {
   add("contraction-not-n", "Data has't been accessed.", "been accessed");
   add("contraction-spaced", "Data hasn' t been accessed.", "been accessed");
   add("contraction-no-apostrophe", "Data hasn t been accessed.", "been accessed");
+  // The adverb slot: each listed adverb, or one word ending in the suffix after
+  // at least one letter; not two adverbs, an unlisted word, a negator or a digit.
+  if (lex.adverbs.includes("soon") || "soon".endsWith(lex.adverbSuffix)) throw new Error("the unlisted-adverb probe needs another word");
+  for (const a of lex.adverbs) add(`adverb-${a}`, `Customer data was ${a} accessed.`, `was ${a} accessed`);
+  add("adverb-suffix", `Customer data was quiet${lex.adverbSuffix} accessed.`, `was quiet${lex.adverbSuffix} accessed`);
+  add("adverb-suffix-alone", `Customer data was ${lex.adverbSuffix} accessed.`, null);
+  add("adverb-suffix-digit", `Customer data was 2${lex.adverbSuffix} accessed.`, null);
+  add("adverb-two", `Customer data was quiet${lex.adverbSuffix} ${lex.adverbs[0]} accessed.`, null);
+  add("adverb-unlisted", "Customer data was soon accessed.", null);
+  for (const n of lex.negators) add(`adverb-negator-${n}`, `Customer data was ${n} accessed.`, null);
+  // A requires or unless phrase holds only as whole words: its last word with a
+  // letter after it is another word.
+  const frameOf = (p) => PROBE_FRAME[lex.classes.find((c) => c.participles.includes(p)).head ?? ""];
+  for (const [p, phrase] of Object.entries(lex.requires)) {
+    add(`requires-partial-${p}`, frameOf(p)(`${p} ${phrase}s`), null);
+  }
+  for (const [p, phrase] of Object.entries(lex.unless)) {
+    const be = frameOf(p)(p).match(/\b(?:was|were) /)[0];
+    add(`unless-${p}`, frameOf(p)(`${p} ${phrase} it`), null);
+    add(`unless-partial-${p}`, frameOf(p)(`${p} ${phrase}s`), be + p);
+  }
+  // A word character is an ASCII letter, digit or underscore, as \b has it, in
+  // every walk: the head word, the negator reader, the 'by' window and the
+  // whole-word test after a phrase.
+  add("word-underscore-head", "Your user_data was shared.", null);
+  add("word-digit-head", "Your data2 was shared.", null);
+  add("word-underscore-negator", "No_data was accessed.", "was accessed");
+  add("word-digit-negator", "No2 data was accessed.", "was accessed");
+  add("word-underscore-before-negator", "Data_no was accessed.", "was accessed");
+  add("word-digit-before-negator", "Data2no was accessed.", "was accessed");
+  add("word-underscore-by", "Mistakes were made by_them.", "were made");
+  add("word-digit-by", "Mistakes were made by2.", "were made");
+  add("word-underscore-requires", "Safeguards were put in place_now.", null);
+  add("word-underscore-unless", "Customer data was exposed to_all.", "was exposed");
   // Whitespace: each listed character separates the words of a match and of a
   // requires phrase; a vertical tab, unless listed, separates neither.
   for (const c of [...new Set([...lex.whitespace, "\v"])]) {
