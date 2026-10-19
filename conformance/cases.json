@@ -46,9 +46,9 @@
           "actual": "were made",
           "start": 68,
           "end": 77,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
           "expected": [
             "(name who did it: 'I/we + verb')"
           ]
@@ -201,9 +201,9 @@
           "actual": "were made",
           "start": 9,
           "end": 18,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
           "expected": [
             "(name who did it: 'I/we + verb')"
           ]
@@ -215,9 +215,9 @@
           "actual": "were raised",
           "start": 32,
           "end": 43,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
           "expected": [
             "(name who did it: 'I/we + verb')"
           ]
@@ -227,10 +227,10 @@
     {
       "input": "It is widely believed that experts agree.",
       "density": {
-        "tells": 3,
-        "per100Words": 42.9
+        "tells": 2,
+        "per100Words": 28.6
       },
-      "strip": "It [who?] is widely believed that experts agree.",
+      "strip": "It is widely believed that experts agree.",
       "marks": [
         {
           "ruleId": "weasel.attribution",
@@ -244,20 +244,6 @@
           "level": "note",
           "expected": [
             "(name the source, or drop the appeal)"
-          ]
-        },
-        {
-          "ruleId": "agency-hiding.deleted-subject",
-          "family": "agency-hiding",
-          "technique": "Obfuscation (structural — RhetorLint extension)",
-          "actual": "is widely believed",
-          "start": 3,
-          "end": 21,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
-          "expected": [
-            "(name who did it: 'I/we + verb')"
           ]
         },
         {
@@ -453,26 +439,11 @@
     {
       "input": "Shipments are often delayed.",
       "density": {
-        "tells": 1,
-        "per100Words": 25
+        "tells": 0,
+        "per100Words": 0
       },
-      "strip": "Shipments [who?] are often delayed.",
-      "marks": [
-        {
-          "ruleId": "agency-hiding.deleted-subject",
-          "family": "agency-hiding",
-          "technique": "Obfuscation (structural — RhetorLint extension)",
-          "actual": "are often delayed",
-          "start": 10,
-          "end": 27,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
-          "expected": [
-            "(name who did it: 'I/we + verb')"
-          ]
-        }
-      ]
+      "strip": "Shipments are often delayed.",
+      "marks": []
     },
     {
       "input": "It works every time, without exception.",
@@ -687,10 +658,10 @@
     {
       "input": "Tellingly, the report was released on a Friday.",
       "density": {
-        "tells": 2,
-        "per100Words": 25
+        "tells": 1,
+        "per100Words": 12.5
       },
-      "strip": "Tellingly, the report [who?] was released on a Friday.",
+      "strip": "Tellingly, the report was released on a Friday.",
       "marks": [
         {
           "ruleId": "editorializing.stance",
@@ -704,20 +675,6 @@
           "level": "info",
           "expected": [
             "(delete the stance word; state the fact and let the reader weigh it)"
-          ]
-        },
-        {
-          "ruleId": "agency-hiding.deleted-subject",
-          "family": "agency-hiding",
-          "technique": "Obfuscation (structural — RhetorLint extension)",
-          "actual": "was released",
-          "start": 22,
-          "end": 34,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
-          "expected": [
-            "(name who did it: 'I/we + verb')"
           ]
         }
       ]
@@ -751,9 +708,9 @@
           "actual": "was shelved",
           "start": 33,
           "end": 44,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
           "expected": [
             "(name who did it: 'I/we + verb')"
           ]
@@ -801,10 +758,10 @@
     {
       "input": "The minister claimed that the figures were audited.",
       "density": {
-        "tells": 2,
-        "per100Words": 25
+        "tells": 1,
+        "per100Words": 12.5
       },
-      "strip": "The minister claimed that the figures [who?] were audited.",
+      "strip": "The minister claimed that the figures were audited.",
       "marks": [
         {
           "ruleId": "attribution.doubt-verb",
@@ -818,20 +775,6 @@
           "level": "note",
           "expected": [
             "(swap in 'said' — report the words and let the reader judge them)"
-          ]
-        },
-        {
-          "ruleId": "agency-hiding.deleted-subject",
-          "family": "agency-hiding",
-          "technique": "Obfuscation (structural — RhetorLint extension)",
-          "actual": "were audited",
-          "start": 38,
-          "end": 50,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
-          "expected": [
-            "(name who did it: 'I/we + verb')"
           ]
         }
       ]
@@ -911,10 +854,10 @@
     {
       "input": "The plan has been widely described as a visionary gamble.",
       "density": {
-        "tells": 3,
-        "per100Words": 30
+        "tells": 2,
+        "per100Words": 20
       },
-      "strip": "The plan has [who?] been widely described as a visionary gamble.",
+      "strip": "The plan has been widely described as a visionary gamble.",
       "marks": [
         {
           "ruleId": "weasel.attribution",
@@ -928,20 +871,6 @@
           "level": "note",
           "expected": [
             "(name the source, or drop the appeal)"
-          ]
-        },
-        {
-          "ruleId": "agency-hiding.deleted-subject",
-          "family": "agency-hiding",
-          "technique": "Obfuscation (structural — RhetorLint extension)",
-          "actual": "been widely described",
-          "start": 13,
-          "end": 34,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
-          "expected": [
-            "(name who did it: 'I/we + verb')"
           ]
         },
         {
@@ -987,26 +916,11 @@
     {
       "input": "The startup has been described as the next big thing by Forbes.",
       "density": {
-        "tells": 1,
-        "per100Words": 8.3
+        "tells": 0,
+        "per100Words": 0
       },
-      "strip": "The startup has [who?] been described as the next big thing by Forbes.",
-      "marks": [
-        {
-          "ruleId": "agency-hiding.deleted-subject",
-          "family": "agency-hiding",
-          "technique": "Obfuscation (structural — RhetorLint extension)",
-          "actual": "been described",
-          "start": 16,
-          "end": 30,
-          "note": "an agentless passive — who acted is deleted from the sentence",
-          "confidence": 0.7,
-          "level": "warning",
-          "expected": [
-            "(name who did it: 'I/we + verb')"
-          ]
-        }
-      ]
+      "strip": "The startup has been described as the next big thing by Forbes.",
+      "marks": []
     },
     {
       "input": "The risk is not extremely high.",
@@ -1146,6 +1060,326 @@
           "actual": "Never",
           "start": 0,
           "end": 5,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Mistakes, frankly, were made.",
+      "density": {
+        "tells": 1,
+        "per100Words": 25
+      },
+      "strip": "Mistakes, frankly, [who?] were made.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were made",
+          "start": 19,
+          "end": 28,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Customer data was quietly accessed.",
+      "density": {
+        "tells": 1,
+        "per100Words": 20
+      },
+      "strip": "Customer data [who?] was quietly accessed.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "was quietly accessed",
+          "start": 14,
+          "end": 34,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Your data was shared with partners.",
+      "density": {
+        "tells": 1,
+        "per100Words": 16.7
+      },
+      "strip": "Your data [who?] was shared with partners.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "was shared",
+          "start": 10,
+          "end": 20,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "PII may have been compromised.",
+      "density": {
+        "tells": 2,
+        "per100Words": 40
+      },
+      "strip": "PII may have [who?] been compromised.",
+      "marks": [
+        {
+          "ruleId": "hedge.deniable",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "may have been",
+          "start": 4,
+          "end": 17,
+          "note": "a deniable modal — leaves room to say you never promised",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(state what you know, and what you don't)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "been compromised",
+          "start": 13,
+          "end": 29,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Records were withheld from investigators.",
+      "density": {
+        "tells": 1,
+        "per100Words": 20
+      },
+      "strip": "Records [who?] were withheld from investigators.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were withheld",
+          "start": 8,
+          "end": 21,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "It was decided that the program would end.",
+      "density": {
+        "tells": 1,
+        "per100Words": 12.5
+      },
+      "strip": "It [who?] was decided that the program would end.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "was decided",
+          "start": 3,
+          "end": 14,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Hundreds of workers were laid off.",
+      "density": {
+        "tells": 1,
+        "per100Words": 16.7
+      },
+      "strip": "Hundreds of workers [who?] were laid off.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were laid off",
+          "start": 20,
+          "end": 33,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Additional safeguards have been put in place.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "Additional safeguards have [who?] been put in place.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "been put",
+          "start": 27,
+          "end": 35,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "My name is Fred.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "My name is Fred.",
+      "marks": []
+    },
+    {
+      "input": "JavaScript is required.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "JavaScript is required.",
+      "marks": []
+    },
+    {
+      "input": "Soil water content was measured at 5 cm depth.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Soil water content was measured at 5 cm depth.",
+      "marks": []
+    },
+    {
+      "input": "The soup can be frozen for up to 3 months.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "The soup can be frozen for up to 3 months.",
+      "marks": []
+    },
+    {
+      "input": "This option is ignored when the flag is unset.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "This option is ignored when the flag is unset.",
+      "marks": []
+    },
+    {
+      "input": "The report was shelved by Friday.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "The report was shelved by Friday.",
+      "marks": []
+    },
+    {
+      "input": "Lives were lost in the earthquake.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Lives were lost in the earthquake.",
+      "marks": []
+    },
+    {
+      "input": "Your account was closed at your request.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Your account was closed at your request.",
+      "marks": []
+    },
+    {
+      "input": "He got fired up about the album.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "He got fired up about the album.",
+      "marks": []
+    },
+    {
+      "input": "Data were collected from 200 participants.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Data were collected from 200 participants.",
+      "marks": []
+    },
+    {
+      "input": "This is guaranteed to double your savings.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "This is guaranteed to double your savings.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "guaranteed",
+          "start": 8,
+          "end": 18,
           "note": "an absolute — claims more than anyone could actually know",
           "confidence": 0.6,
           "level": "info",

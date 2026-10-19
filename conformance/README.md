@@ -38,7 +38,7 @@ demand otherwise across languages.
   "marks": [
     { "ruleId": "agency-hiding.deleted-subject", "family": "agency-hiding",
       "technique": "…", "actual": "were made", "start": 9, "end": 18,
-      "note": "…", "confidence": 0.7, "level": "warning", "expected": ["…"] }
+      "note": "…", "confidence": 0.6, "level": "note", "expected": ["…"] }
     // the second mark — "were raised", 32–43 — elided here; the real case carries both
   ]
 }
@@ -47,6 +47,75 @@ demand otherwise across languages.
 Marks in a case are flattened: `start` and `end` sit on the mark, not inside a
 `position` object. That is a fixture convenience, not the output shape — an
 engine emits the nested `position` of `spec/output.schema.json`.
+
+## The agency semantics change in core 0.1.4
+
+Core 0.1.4 narrows `agency-hiding.deleted-subject`. Before, it marked a be-verb
+followed by any `-ed`/`-en` word or a listed irregular participle, unless `by`
+followed. Now it marks an accountable past passive whose doer the clause does
+not name: `was`, `were` or `been`, at most one adverb, a participle from a
+closed class (a fault, a breach, a concealment; a light verb after an error or
+decision noun, as in `mistakes were made`; `raised` after `concerns`,
+`questions` or `allegations`; `decided` after `it`; `shared`, `sold` or
+`disclosed` after a data noun), and no `by` among the next seven words of the
+clause. The words live in `spec/agency-lexicon.json`, and
+`scripts/gen-agency-lexicon.mjs` writes them into all three engines. The pack
+says the same thing: the rule's note now names those verbs, its level is
+`note` and its confidence 0.6.
+
+Regenerating the corpus changed nine of the 39 cases, each read by hand:
+
+- Cases 0, 6 and 22 keep their agency marks (`were made`, `were raised`, `was
+  shelved`). Only each mark's note, level and confidence changed.
+- Six cases lose their agency mark and nothing else; their density and strip
+  follow.
+  - Case 7, `It is widely believed that experts agree.`: weasel.attribution
+    already marks the unnamed authority twice, and the agency mark counted the
+    same words a third time.
+  - Case 13, `Shipments are often delayed.`: a present-tense habitual with no
+    act to attribute. It is now a clean control.
+  - Case 21, `Tellingly, the report was released on a Friday.`: releasing a
+    report is not an accountable act from the words alone.
+    editorializing.stance remains.
+  - Case 24, `The minister claimed that the figures were audited.`: auditing is
+    a neutral procedure. attribution.doubt-verb remains.
+  - Case 28, `The plan has been widely described as a visionary gamble.`:
+    description is not an accountable act. weasel.attribution and
+    puffery.peacock remain.
+  - Case 30, `...the next big thing by Forbes.`: the agent is named. The old
+    corpus pinned this false positive as ground truth; it is now a clean
+    control.
+
+Cases 39 to 57 are new. Eight are positives: `Mistakes,
+frankly, were made.`, `Customer data was quietly accessed.`, `Your data was
+shared with partners.`, `PII may have been compromised.`, `Records were
+withheld from investigators.`, `It was decided that the program would end.`,
+`Hundreds of workers were laid off.` and `Additional safeguards have been put
+in place.` (the span is `been put`). Eleven are unmarked controls:
+
+- `My name is Fred.`, `JavaScript is required.` and `This option is ignored
+  when the flag is unset.`: no past passive, or a present procedural one;
+- `Soil water content was measured at 5 cm depth.` and `Data were collected
+  from 200 participants.`: methods-section procedure. `collected`, `retained`
+  and `transferred` are left out of the lexicon on purpose;
+- `The soup can be frozen for up to 3 months.`: a modal passive;
+- `The report was shelved by Friday.`: a pinned under-mark. `by` names when,
+  not who, and the rule stays silent rather than guess;
+- `Lives were lost in the earthquake.` and `Your account was closed at your
+  request.`: harm and news verbs, silent by design, because the words alone
+  cannot say a doer exists;
+- `He got fired up about the album.`: `got` is not an auxiliary the detector
+  reads;
+- `This is guaranteed to double your savings.`: absolute.universal still marks
+  `guaranteed`, and the `is guaranteed` agency mark it once drew is gone. The
+  absolute.universal guard's cases used `Guaranteed to double your savings.`
+  (case 36) to avoid it.
+
+The recall given up is stated, not hidden: `Your account was closed`, `Jobs
+were cut`, `Lives were lost` and other harm verbs, relative clauses (`the
+mistakes that have been made`), progressive passives (`were being
+withheld`), and a passive whose words a no-break space separates are no
+longer marked.
 
 ## Known portability caveats (honest)
 
@@ -67,11 +136,11 @@ astral-plane edge case:
 | input | JS | Python | Go |
 |-------|----|--------|----|
 | `Mistakes were made.` | 9–18 | 9–18 | 9–18 |
-| `Des décisions regrettables were made.` | 27–36 | 27–36 | **28–37** |
+| `Café mistakes were made.` | 14–23 | 14–23 | **15–24** |
 | `Mistakes 😀 were made.` | **12–21** | **11–20** | **14–23** |
 
 (offsets of the single `were made` mark; `source.chars` parts the same way —
-37/37/38 and 22/21/24.) Any non-ASCII character at all shifts Go against the
+24/24/25 and 22/21/24.) Any non-ASCII character at all shifts Go against the
 other two; an astral character parts all three. A future spec version must pin
 offsets to one unit — likely code points — and until it does, offsets are
 comparable across engines only on ASCII text.
@@ -99,18 +168,23 @@ their whole case orbits, so `(?i)\w` takes U+212A KELVIN SIGN and U+017F LONG S
 (`ſ`). Where no `\b` stands in the way, Go then sides with Python against JS:
 
 ```
-Civilians were Killed.     Python: agency "were Killed"    Go: agency "were Killed"    JS: nothing
-Lives were loſt.           Python: agency "were loſt"      Go: agency "were loſt"      JS: nothing
+It may have ſeen the file.     Python: hedge.deniable "may have ſeen"    Go: hedge.deniable "may have ſeen"    JS: nothing
 ```
 
-(`K` is U+212A again.) Both are agency marks that JS does not make, so here
-the safe direction is JS's alone.
+That is a mark JS does not make, so here the safe direction is JS's alone.
+The agency detector no longer parts this way: since core 0.1.4 it matches an
+ASCII-lowercased copy with no case-insensitive flag, explicit `[ \t\n\r\f]`
+whitespace and closed ASCII word lists, so `Civilians were Killed.` (U+212A)
+and `Lives were loſt.`, once agency marks in Python and Go, are unmarked in
+all three.
 
 ### 3. `\s` is three different whitespace classes
 
 Every rule that spells a phrase as `act\s+now` inherits its language's idea of
-whitespace, and so does the passive detector's `\s+` between the be-verb and
-the participle. The three classes differ:
+whitespace. (The agency detector does not: it spells whitespace as
+`[ \t\n\r\f]`, so a no-break space, a vertical tab or U+0085 between the
+auxiliary and the participle joins nothing in any engine, a documented
+under-mark.) The three classes differ:
 
 | character | JS `\s` | Python `\s` | Go `\s` |
 |-----------|:-------:|:-----------:|:-------:|
@@ -123,9 +197,9 @@ the participle. The three classes differ:
 Go's RE2 `\s` is exactly `[\t\n\f\r ]`. JS and Python are Unicode-aware but
 not identically so: Python's class is whatever `str.isspace()` accepts.
 
-So `Mistakes were made.` with a no-break space before `made` is an agency mark
-in JS and Python and nothing in Go, and `Let us act now.` with a no-break space
-is an urgency mark in JS and Python only. Text pasted from a word processor or
+So `Let us act now.` with a no-break space is an urgency mark in JS and Python
+and nothing in Go; `Mistakes were made.` with a no-break space before `made`
+is nothing in all three. Text pasted from a word processor or
 a web page carries U+00A0 often. A vertical tab does the same thing inside
 ASCII. Word counts, and so `density.per100Words`, also use each language's own
 whitespace: JS's `\S+`, Python's `\S+` and Go's `strings.Fields` already
@@ -133,10 +207,10 @@ disagree on U+FEFF and U+0085.
 
 Under-marking is the doctrine, so in each of these splits the engine that marks
 less fails in the safe direction. No one engine is always that engine. JS and
-Go under-mark on accented letters. JS alone does on long s, and on a Kelvin
-sign inside a participle. Go alone does on the vertical tab and on the spaces
-JS and Python share, U+00A0 among them. On U+FEFF only JS marks, and on U+0085
-and U+001F only Python does. And
+Go under-mark on accented letters. JS alone does on long s and on a Kelvin
+sign inside a word. Go alone does on the vertical tab and on the spaces JS and
+Python share, U+00A0 among them. On U+FEFF only JS marks, and on U+0085 and
+U+001F only Python does. And
 failing safe is not agreeing: no locale pack with non-ASCII orthography can be
 conformance-tested until the spec pins matching semantics as well as offsets.
 Do not read the ASCII corpus as evidence that these engines agree on French,
@@ -144,7 +218,7 @@ Turkish, or Greek. They do not.
 
 ## Beyond the cases: the three-engine differential
 
-The 39 cases pin values. The differential asks a wider question: do the three
+The 58 cases pin values. The differential asks a wider question: do the three
 engines agree with each other on input nobody wrote an expectation for?
 
 ```
@@ -169,9 +243,13 @@ It is built from committed, licence-clean sources only:
 - the constructed probes in `scripts/xengine-diff.mjs`. These are non-ASCII
   text built around the characters above: U+00A0 and other spaces, U+2019,
   U+2011, dashes, accented letters, emoji, U+017F, U+212A, plus vertical tab
-  and other ASCII controls. They also include non-ASCII sentences that put
-  every word of the passive detector's `NOT_PASSIVE` list after a be-verb, so
-  that word lists drifting apart between engines shows up.
+  and other ASCII controls. They also put predicate adjectives, numerals and
+  irregular participles after a be-verb inside non-ASCII sentences;
+- two sentences per participle of `spec/agency-lexicon.json`, from
+  `lexiconProbes()` in `scripts/gen-agency-lexicon.mjs`: one the agency
+  detector must mark, and the same with `by the board` after the participle,
+  which it must not. A word dropped from or added to one engine's generated
+  copy of the lexicon parts the engines here.
 
 Duplicate texts are kept once. The file holds inputs only, never expected
 values, and the check fails when it is stale against its sources. It sits
