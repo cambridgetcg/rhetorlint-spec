@@ -40,6 +40,42 @@ class LexicalMatcherTests(unittest.TestCase):
         self.assertEqual(terms, ["kind", "kind of"])
 
 
+# Smart punctuation must not silence a tell. rules-en spells the typographic
+# variants in the pack; these twelve probes mirror test/typography.test.mjs and
+# impl/go/rhetorlint_test.go (ruleId and actual only: offsets differ by engine
+# outside ASCII, so they stay out of conformance/cases.json).
+TYPOGRAPHY_PROBES = [
+    ("Let\u2019s not forget their record.", "deflection.whataboutism", "Let\u2019s not forget"),
+    ("Don\u2019t miss out on this deal.", "urgency.appeal-to-time", "Don\u2019t miss out"),
+    ("It\u2019s worth noting the date.", "editorializing.stance", "It\u2019s worth noting"),
+    ("He didn\u2019t even bother to reply.", "implicative.shortfall", "didn\u2019t even bother to"),
+    ("Try it risk\u2011free today.", "lure.free-offer", "risk\u2011free"),
+    ("These so\u2011called experts.", "distancing.doubt-marker", "so\u2011called"),
+    ("An officer\u2013involved shooting.", "exoneration.formula", "officer\u2013involved shooting"),
+    ("A world\u2011class team.", "puffery.peacock", "world\u2011class"),
+    (
+        "Sources with first\u2011hand knowledge of the matter.",
+        "sourcing.anonymous",
+        "Sources with first\u2011hand knowledge of the matter",
+    ),
+    ("It\u2019s important to note the timing.", "editorializing.stance", "It\u2019s important to note"),
+    ("Act before it\u2019s too late.", "urgency.appeal-to-time", "before it\u2019s too late"),
+    ("A self\u2011proclaimed expert.", "distancing.doubt-marker", "self\u2011proclaimed"),
+]
+
+
+class TypographyProbeTests(unittest.TestCase):
+    def test_typographic_variants_mark_like_their_ascii_spelling(self):
+        rules = rhetorlint.load_default_rules()
+        for text, rule_id, actual in TYPOGRAPHY_PROBES:
+            with self.subTest(text=text):
+                result = rhetorlint.analyze(text, rules)
+                self.assertEqual(
+                    [(mark["ruleId"], mark["actual"]) for mark in result["marks"]],
+                    [(rule_id, actual)],
+                )
+
+
 class StripTests(unittest.TestCase):
     def test_no_marks_is_exact_identity(self):
         text = "  Untouched  text.\n"
