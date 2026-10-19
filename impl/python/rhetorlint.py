@@ -24,7 +24,7 @@ from pathlib import Path
 
 SPEC_VERSION = "0.1"
 NAME = "rhetorlint (python)"
-CORE_VERSION = "0.1.2"
+CORE_VERSION = "0.1.4"
 
 # Words the -ed/-en passive heuristic should treat as predicate adjectives.
 # Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
@@ -55,6 +55,13 @@ AGENTLESS_PASSIVE = re.compile(
 
 # The sole ruleId eligible under the conservative strip counterfactual.
 REMOVABLE = {"intensifier.loaded"}
+
+# Words that negate an intensifier after them ("not extremely high"). With any
+# "n't" contraction, they are what _negated_at looks for.
+_NEGATORS = frozenset({"not", "never", "no", "nor", "without", "hardly", "cannot"})
+_CLAUSE_BREAKS = frozenset(".;:!?")
+# ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
+_ASCII_LOWER = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
 _REGEX_META = frozenset(r"\^$.*+?()[]{}|")
 
 
@@ -122,8 +129,51 @@ def _js_round(x):
     return math.floor(x + 0.5)
 
 
+def _is_guard_word_char(char):
+    """An ASCII letter or digit, or an apostrophe (U+0027 or U+2019)."""
+    return (
+        "a" <= char <= "z" or "A" <= char <= "Z" or "0" <= char <= "9"
+        or char == "'" or char == "\u2019"
+    )
+
+
+def _is_negator(word):
+    word = word.translate(_ASCII_LOWER).strip("'\u2019")
+    return word in _NEGATORS or word.endswith(("n't", "n\u2019t"))
+
+
+def _negated_at(text, offset):
+    """True when a negator is one of the two words before offset, with no
+    . ; : ! or ? between them. It walks back over characters and words, never
+    a count of units, so the JS, Python and Go engines decide alike."""
+    i = offset
+    for _ in range(2):
+        while i > 0 and not _is_guard_word_char(text[i - 1]):
+            if text[i - 1] in _CLAUSE_BREAKS:
+                return False
+            i -= 1
+        if i == 0:
+            return False
+        end = i
+        while i > 0 and _is_guard_word_char(text[i - 1]):
+            i -= 1
+        if _is_negator(text[i:end]):
+            return True
+    return False
+
+
+def _quoted_at(text, offset):
+    """True when offset sits inside a quotation on its own line: an odd number
+    of straight double quotes before it, or an unclosed U+201C."""
+    line = text[text.rfind("\n", 0, offset) + 1 : offset]
+    return line.count('"') % 2 == 1 or line.rfind("\u201c") > line.rfind("\u201d")
+
+
 def strip(text, marks):
-    """Remove loaded intensifiers and flag hidden agents; preserve modality."""
+    """Remove loaded intensifiers and flag hidden agents; preserve modality.
+
+    An intensifier under a negator, or inside a quotation, stays: deleting it
+    would strengthen the claim or edit someone's words."""
     if not any(
         m["ruleId"] in REMOVABLE or m["ruleId"] == "agency-hiding.deleted-subject"
         for m in marks
@@ -136,6 +186,9 @@ def strip(text, marks):
         s = m["position"]["start"]["offset"]
         e = m["position"]["end"]["offset"]
         if m["ruleId"] in REMOVABLE:
+            # Judged on the source text: edits so far all lie at or after s.
+            if _negated_at(text, s) or _quoted_at(text, s):
+                continue
             out = _join_removal_seam(out[:s], out[e:])
         elif m["ruleId"] == "agency-hiding.deleted-subject":
             out = out[:s] + "[who?] " + out[s:]

@@ -304,6 +304,73 @@ func TestStripSemanticBoundaryAndIdentity(t *testing.T) {
 	})
 }
 
+func TestStripKeepsNegatedOrQuotedIntensifier(t *testing.T) {
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	t.Run("negated or quoted intensifier is kept", func(t *testing.T) {
+		for _, text := range []string{
+			"The risk is not extremely high, but it is not negligible.",
+			"The update isn't hugely different.",
+			"The update isn\u2019t hugely different.",
+			"We are not deeply sorry.",
+			"The risk cannot be extremely high.",
+			"NOT EXTREMELY HIGH",
+			"\"It was utterly devastating,\" the flood survivor told reporters.",
+			"He said \u201cwe are deeply sorry\u201d and left.",
+		} {
+			result := Analyze(text, pack)
+			intensifiers := 0
+			for _, mark := range result.Marks {
+				if mark.RuleID == "intensifier.loaded" {
+					intensifiers++
+				}
+			}
+			if intensifiers != 1 {
+				t.Errorf("%q: %d intensifier marks, want 1 (preservation must not disable detection)", text, intensifiers)
+			}
+			if result.Strip != text {
+				t.Errorf("strip changed %q: got %q", text, result.Strip)
+			}
+			if got := Strip(text, result.Marks); got != text {
+				t.Errorf("Strip changed %q: got %q", text, got)
+			}
+		}
+	})
+
+	t.Run("unguarded intensifier is still removed", func(t *testing.T) {
+		for _, test := range []struct{ input, want string }{
+			{"This is an incredibly important update for every customer.", "This is an important update for every customer."},
+			{"No doubt the team is extremely proud.", "No doubt the team is proud."},
+			{"Not one bit: it is extremely clear.", "Not one bit: it is clear."},
+			{"\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."},
+			{"He said \u201chello\u201d and was extremely calm.", "He said \u201chello\u201d and was calm."},
+			{"He said \"hello\nand it was extremely loud.", "He said \"hello\nand it was loud."},
+		} {
+			if got := Analyze(test.input, pack).Strip; got != test.want {
+				t.Errorf("strip %q: got %q want %q", test.input, got, test.want)
+			}
+		}
+	})
+}
+
+func TestEngineVersionNamesTheCoreRevision(t *testing.T) {
+	raw, err := os.ReadFile(filepath.Join(repoRoot(), "packages", "core", "package.json"))
+	if err != nil {
+		t.Fatalf("read packages/core/package.json: %v", err)
+	}
+	var core struct {
+		Version string `json:"version"`
+	}
+	if err := json.Unmarshal(raw, &core); err != nil {
+		t.Fatalf("parse packages/core/package.json: %v", err)
+	}
+	if got := Analyze("", RulePack{ID: "empty", Version: "1", Locale: "en"}).Engine.Version; got != core.Version {
+		t.Fatalf("engine.version %q, want the core revision %q it reproduces", got, core.Version)
+	}
+}
+
 // schemaNode is the subset of JSON Schema that spec/output.schema.json actually
 // uses: object required/properties/additionalProperties, array items, local
 // $ref into $defs, and enums. Value constraints (minimum, pattern) are out of

@@ -26,9 +26,13 @@ import (
 	"sort"
 	"strings"
 	"unicode/utf16"
+	"unicode/utf8"
 )
 
 const specVersion = "0.1"
+
+// coreVersion labels the engine: the core revision whose behaviour it reproduces.
+const coreVersion = "0.1.4"
 
 // Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
 // would otherwise swallow, and "often" so bare "is often" never reads passive.
@@ -53,6 +57,13 @@ var agentlessPassive = regexp.MustCompile(
 var byFollows = regexp.MustCompile(`(?i)^\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b`)
 
 var removable = map[string]bool{"intensifier.loaded": true}
+
+// negators negate an intensifier after them ("not extremely high"). With any
+// "n't" contraction, they are what negatedAt looks for.
+var negators = map[string]bool{
+	"not": true, "never": true, "no": true, "nor": true,
+	"without": true, "hardly": true, "cannot": true,
+}
 
 // Rule mirrors one entry of rules.json. Fields not relevant to a rule's type
 // are simply absent in the JSON and stay at their zero value.
@@ -300,13 +311,76 @@ func Analyze(text string, pack RulePack) Result {
 	r.Strip = Strip(text, deduped)
 	r.Rewrite = nil
 	r.Engine.Name = "rhetorlint (go)"
-	r.Engine.Version = "0.1.2"
+	r.Engine.Version = coreVersion
 	r.Engine.Rules = pack.ID + "@" + pack.Version
 	return r
 }
 
+// isGuardWordRune reports an ASCII letter or digit, or an apostrophe (U+0027
+// or U+2019). Every other character separates words.
+func isGuardWordRune(r rune) bool {
+	return r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' ||
+		r == '\'' || r == '\u2019'
+}
+
+func isNegator(word string) bool {
+	// ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
+	lower := []byte(word)
+	for i, c := range lower {
+		if c >= 'A' && c <= 'Z' {
+			lower[i] = c + ('a' - 'A')
+		}
+	}
+	w := strings.Trim(string(lower), "'\u2019")
+	return negators[w] || strings.HasSuffix(w, "n't") || strings.HasSuffix(w, "n\u2019t")
+}
+
+// negatedAt reports whether a negator is one of the two words before offset,
+// with no . ; : ! or ? between them. It walks back over characters and words,
+// never a count of bytes, so the JS, Python and Go engines decide alike.
+func negatedAt(text string, offset int) bool {
+	i := offset
+	for words := 0; words < 2; words++ {
+		for i > 0 {
+			r, size := utf8.DecodeLastRuneInString(text[:i])
+			if isGuardWordRune(r) {
+				break
+			}
+			if strings.ContainsRune(".;:!?", r) {
+				return false
+			}
+			i -= size
+		}
+		if i == 0 {
+			return false
+		}
+		end := i
+		for i > 0 {
+			r, size := utf8.DecodeLastRuneInString(text[:i])
+			if !isGuardWordRune(r) {
+				break
+			}
+			i -= size
+		}
+		if isNegator(text[i:end]) {
+			return true
+		}
+	}
+	return false
+}
+
+// quotedAt reports whether offset sits inside a quotation on its own line: an
+// odd number of straight double quotes before it, or an unclosed U+201C.
+func quotedAt(text string, offset int) bool {
+	line := text[strings.LastIndexByte(text[:offset], '\n')+1 : offset]
+	return strings.Count(line, `"`)%2 == 1 ||
+		strings.LastIndex(line, "\u201c") > strings.LastIndex(line, "\u201d")
+}
+
 // Strip removes loaded intensifiers and flags agentless passives [who?].
-// It preserves modality and attribution and never paraphrases.
+// It preserves modality and attribution and never paraphrases. An intensifier
+// under a negator, or inside a quotation, stays: deleting it would strengthen
+// the claim or edit someone's words.
 func Strip(text string, marks []Mark) string {
 	hasEdit := false
 	for _, mark := range marks {
@@ -328,6 +402,10 @@ func Strip(text string, marks []Mark) string {
 	for _, m := range ordered {
 		s, e := m.Position.Start.Offset, m.Position.End.Offset
 		if removable[m.RuleID] {
+			// Judged on the source text: edits so far all lie at or after s.
+			if negatedAt(text, s) || quotedAt(text, s) {
+				continue
+			}
 			out = joinRemovalSeam(out[:s], out[e:])
 		} else if m.RuleID == "agency-hiding.deleted-subject" {
 			out = out[:s] + "[who?] " + out[s:]

@@ -1,11 +1,14 @@
 """Focused behavioral regressions for the Python reference engine."""
 
+import json
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import rhetorlint  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_pack(rule=None):
@@ -109,6 +112,55 @@ class StripTests(unittest.TestCase):
             with self.subTest(text=text):
                 result = rhetorlint.analyze(text, test_pack(rule))
                 self.assertEqual(result["strip"], expected)
+
+    def test_negated_or_quoted_intensifier_is_kept(self):
+        rules = rhetorlint.load_default_rules()
+        cases = [
+            "The risk is not extremely high, but it is not negligible.",
+            "The update isn't hugely different.",
+            "The update isn\u2019t hugely different.",
+            "We are not deeply sorry.",
+            "The risk cannot be extremely high.",
+            "NOT EXTREMELY HIGH",
+            "\"It was utterly devastating,\" the flood survivor told reporters.",
+            "He said \u201cwe are deeply sorry\u201d and left.",
+        ]
+        for text in cases:
+            with self.subTest(text=text):
+                result = rhetorlint.analyze(text, rules)
+                intensifiers = [
+                    mark for mark in result["marks"] if mark["ruleId"] == "intensifier.loaded"
+                ]
+                self.assertEqual(len(intensifiers), 1, "preservation must not disable detection")
+                self.assertEqual(result["strip"], text)
+                self.assertEqual(rhetorlint.strip(text, result["marks"]), text)
+
+    def test_unguarded_intensifier_is_still_removed(self):
+        rules = rhetorlint.load_default_rules()
+        cases = [
+            (
+                "This is an incredibly important update for every customer.",
+                "This is an important update for every customer.",
+            ),
+            ("No doubt the team is extremely proud.", "No doubt the team is proud."),
+            ("Not one bit: it is extremely clear.", "Not one bit: it is clear."),
+            ("\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."),
+            (
+                "He said \u201chello\u201d and was extremely calm.",
+                "He said \u201chello\u201d and was calm.",
+            ),
+            ("He said \"hello\nand it was extremely loud.", "He said \"hello\nand it was loud."),
+        ]
+        for text, expected in cases:
+            with self.subTest(text=text):
+                self.assertEqual(rhetorlint.analyze(text, rules)["strip"], expected)
+
+
+class EngineLabelTests(unittest.TestCase):
+    def test_engine_version_names_the_core_revision_it_reproduces(self):
+        core = json.loads((ROOT / "packages" / "core" / "package.json").read_text(encoding="utf-8"))
+        result = rhetorlint.analyze("marked", test_pack())
+        self.assertEqual(result["engine"]["version"], core["version"])
 
 
 class RewriteAdapterTests(unittest.TestCase):
