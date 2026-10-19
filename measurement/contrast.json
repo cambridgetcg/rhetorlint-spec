@@ -553,6 +553,50 @@
       "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
     },
     {
+      "id": "twin.absolute-universal.never-the-less",
+      "text": "Never the less, we shipped on time.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'Never the less' is 'nevertheless' written as three words: a concession, not a claim that something never happens. The imperative guard reads 'the' after a clause-initial 'Never', one of the words it keeps marked because they open a fragment ('Never the same twice.'), and its list cannot tell the two apart.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "twin.absolute-universal.never-can-tell",
+      "text": "Never can tell with these things.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "The idiom '(you) never can tell' with its subject dropped admits uncertainty, the opposite of an overclaim. 'can' is on the imperative guard's list because it opens an inversion ('Never can we accept this.'), and the guard does not read the word after it.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "twin.absolute-universal.never-is-a-long-time",
+      "text": "Never is a long time.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'Never' is the subject here, the word itself, not a claim that something never happens. 'is' is on the imperative guard's list because it opens an inversion ('Never is it acceptable to lie.'), and both readings begin with the same two words.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "twin.absolute-universal.never-being-late",
+      "text": "Never being late is the secret to keeping a job.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "A gerund subject: 'never being late' names a habit and claims nothing about what never happens. 'being' is on the imperative guard's list beside 'been' ('Never been better.') because neither can begin advice, and the guard cannot tell a gerund subject from a fragment that claims.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
       "id": "probe.hedge-softener.01",
       "text": "We believe this update will fix most issues.",
       "ruleId": "hedge.softener",
@@ -1746,8 +1790,9 @@
       "expect": "mark",
       "actual": "were made",
       "kind": "specimen",
-      "status": "holds",
-      "reason": "'serious mistakes were made': an agentless past passive of a fault in an official address; no maker of the mistakes appears.",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "'serious mistakes were made': an agentless past passive of a fault in an official address; no maker of the mistakes appears. The detector reads every word from the start of the clause (after the last . ; : ! ? or line break) to the auxiliary, and the 'not' of 'did not achieve', which negates an earlier verb, stands in that span with only a comma between. It cannot tell which verb a negator negates, so it stays silent: a recorded miss in the safe direction. Reading the whole clause is what keeps long breach-notice denials ('No credit card numbers, bank account details or passwords were stolen.') unmarked.",
       "source": "https://www.reaganlibrary.gov/archives/speech/address-joint-session-congress-state-union-1987 (1987-01-27), as quoted in the Open Lens lexicon OL.AGENTDEL (cambridgetcg/open-lens)"
     },
     {
@@ -1901,7 +1946,7 @@
       "kind": "negation",
       "status": "holds",
       "tag": "O2",
-      "reason": "'No' heads the subject: the sentence says no access happened. A negator among the five words before the head silences the passive.",
+      "reason": "'No' heads the subject: the sentence says no access happened. A negator anywhere in the clause before the auxiliary silences the passive.",
       "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
     },
     {
@@ -1945,7 +1990,7 @@
       "kind": "negation",
       "status": "holds",
       "tag": "O2",
-      "reason": "The negator is the fifth word before the head 'information': the window is sized for a subject this long.",
+      "reason": "The negator is the fifth word before the head 'information'. The detector reads the whole clause before the auxiliary, so a subject of any length is covered.",
       "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
     },
     {
@@ -1969,6 +2014,62 @@
       "tag": "O2",
       "reason": "'with no one' denies the sharing, but the negator comes after the participle and the detector reads negators only before it. A recorded over-mark.",
       "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.breach-notice-card-numbers",
+      "text": "No credit card numbers, bank account details or passwords were stolen.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A breach notice's denial: 'No' heads a subject of three listed nouns and stands eight words before 'were'. A denial is not an agentless accusation, and a negator anywhere in the clause before the auxiliary silences the passive.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.breach-notice-ssn",
+      "text": "No Social Security numbers or other sensitive personal information were exposed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A breach notice's denial with a seven-word subject after 'No': nothing was exposed, so no doer is hidden.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.do-not-believe-far",
+      "text": "At this time, we do not believe that any of your personal information has been compromised.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A negated belief about the breach, the breach-notice form of do-not-believe: 'not' stands seven words before the head 'information', in the same clause as the passive.",
+      "source": "constructed probe (package E4b, 2026-10-19)"
+    },
+    {
+      "id": "lesson.agency.negator-earlier-clause",
+      "text": "No one called, but data were stolen.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "mark",
+      "actual": "were stolen",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "'data were stolen' is an accountable passive with no doer, and the 'No' belongs to the earlier clause 'No one called'. The detector reads every word from the clause's start (after the last . ; : ! ? or line break) to the auxiliary, and a comma starts no clause, because a long subject is a comma list; so it reads 'No' and stays silent. A recorded miss, in the safe direction.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.nobody-possessive",
+      "text": "Nobody's data was accessed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A denial: no one's data was accessed. 'nobody' is not among the lexicon's negators (cannot, neither, never, no, none, nor, not, nothing), so the breach passive is marked; 'No one's data was accessed.' is not.",
+      "source": "constructed probe (package E4b, 2026-10-19)"
     },
     {
       "id": "lesson.agency.accounts-affected",
