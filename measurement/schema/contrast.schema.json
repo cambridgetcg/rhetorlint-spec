@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/cambridgetcg/rhetorlint-spec/main/measurement/schema/contrast.schema.json",
+  "title": "RhetorLint contrast set",
+  "description": "Minimal pairs for every rule: sentences that must be marked, innocent twins that must not, and strip probes whose output must keep every truth-bearing word. Each row records what the WORDS should get (expect) and whether the engine at this revision does (status). The data is engine-neutral: no offsets, so a JS, Python or Go runner reads it unchanged. test/contrast.test.mjs enforces this schema plus the rules it cannot express (the validator in test/helpers implements no conditionals): 'actual' goes with expect 'mark' and only with it; 'strip' goes with expect 'strip-preserves' and only with it; a known-defect row carries a tag; a priced-in row expects 'silent' and cites a file:line that resolves; text is ASCII unless kind is 'typography'; the file itself is ASCII, with smart punctuation written as \\u escapes.",
+  "type": "object",
+  "required": ["version", "note", "tags", "rows"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1,
+      "description": "Format version of this file."
+    },
+    "note": { "type": "string", "minLength": 1 },
+    "tags": {
+      "type": "object",
+      "description": "One line per opportunity tag, saying which kind of fix closes its rows. The keys equal the row 'tag' enum.",
+      "required": ["O2", "O2-twin", "O3", "O4", "O6", "O7"],
+      "additionalProperties": false,
+      "properties": {
+        "O2": { "type": "string", "minLength": 1 },
+        "O2-twin": { "type": "string", "minLength": 1 },
+        "O3": { "type": "string", "minLength": 1 },
+        "O4": { "type": "string", "minLength": 1 },
+        "O6": { "type": "string", "minLength": 1 },
+        "O7": { "type": "string", "minLength": 1 }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/row" }
+    }
+  },
+  "$defs": {
+    "row": {
+      "type": "object",
+      "required": ["id", "text", "ruleId", "expect", "kind", "status", "reason", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+          "maxLength": 80,
+          "description": "Stable, unique row id. It never changes when the row's status flips."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400,
+          "description": "The sentence under test. ASCII unless kind is 'typography'."
+        },
+        "ruleId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$",
+          "description": "The one rule this row is about. Marks from other rules on the same text are not judged here."
+        },
+        "expect": {
+          "enum": ["mark", "silent", "strip-preserves"],
+          "description": "mark: the rule marks exactly 'actual'. silent: the rule makes no mark at all on the text. strip-preserves: analyze(text).strip equals 'strip' exactly, so strip subtracts spin and never strengthens a claim or edits a quotation (for a negated or quoted intensifier, 'strip' equals 'text')."
+        },
+        "actual": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Required with expect 'mark': the exact marked span, which must occur in text. On a known-defect miss it is the span a fix should produce."
+        },
+        "strip": {
+          "type": "string",
+          "description": "Required with expect 'strip-preserves': the exact strip output."
+        },
+        "kind": {
+          "enum": [
+            "lesson",
+            "innocent-twin",
+            "typography",
+            "negation",
+            "quotation",
+            "named-agent",
+            "unjudgeable-verb",
+            "term-of-art",
+            "specimen"
+          ],
+          "description": "What the row exercises. lesson: the tell used as the rule teaches it. innocent-twin: a sentence near the tell that should not be marked. typography: the tell spelt with smart punctuation. negation: the tell under a negator or a negative imperative. quotation: the tell inside quoted or mentioned words. named-agent: the source or doer is named in the sentence. unjudgeable-verb: a verb the words alone cannot judge. term-of-art: a technical or legal phrase that contains the tell's words. specimen: a real, attributed public sentence."
+        },
+        "status": {
+          "enum": ["holds", "known-defect", "priced-in"],
+          "description": "holds: the engine meets expect. known-defect: it does not yet, and tag names the opportunity that fixes it; when a fix makes the row hold, the test fails until status is flipped. priced-in: a false positive the repo documents and accepts, cited in 'cite'."
+        },
+        "tag": {
+          "enum": ["O2", "O2-twin", "O3", "O4", "O6", "O7"],
+          "description": "Opportunity id from the motif atlas. Required on known-defect rows; it stays when a row flips to holds, so fixed rows remain countable."
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 20,
+          "description": "Why expect is right, in terms of the words, never the person."
+        },
+        "cite": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9._/-]*:[1-9][0-9]*$",
+          "description": "repo-relative path:line. Required on priced-in rows (the line that accepts the false positive); optional elsewhere."
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the sentence came from: constructed (by whom), or the public document it quotes."
+        }
+      }
+    }
+  }
+}
