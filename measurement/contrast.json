@@ -661,9 +661,9 @@
       "expect": "mark",
       "actual": "Let\u2019s not forget",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Let\u2019s not forget'; the ASCII-only pattern let'?s goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Let\u2019s not forget'; the pack spells the pattern let['\u2019]?s.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -864,9 +864,9 @@
       "expect": "mark",
       "actual": "risk\u2011free",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the class [- ] admits only ASCII hyphen and space.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack widens the class to [-\u2010\u2011\u2013 ].",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -942,9 +942,9 @@
       "expect": "mark",
       "actual": "Don\u2019t miss out",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Don\u2019t miss out'; the ASCII-only pattern don'?t goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Don\u2019t miss out'; the pack spells the pattern don['\u2019]?t.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -954,9 +954,9 @@
       "expect": "mark",
       "actual": "before it\u2019s too late",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'it\u2019s'; the ASCII-only pattern it'?s goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'it\u2019s'; the pack spells the pattern it['\u2019]?s.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1749,9 +1749,9 @@
       "expect": "mark",
       "actual": "It\u2019s worth noting",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the lexical term is spelt only with an ASCII apostrophe.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the pack lists the term with U+2019 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1761,9 +1761,9 @@
       "expect": "mark",
       "actual": "It\u2019s important to note",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the lexical term is spelt only with an ASCII apostrophe.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the pack lists the term with U+2019 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1918,9 +1918,9 @@
       "expect": "mark",
       "actual": "so\u2011called",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the lexical term is spelt only with an ASCII hyphen.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack lists the term with U+2010, U+2011 and U+2013 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1930,9 +1930,9 @@
       "expect": "mark",
       "actual": "self\u2011proclaimed",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the lexical term is spelt only with an ASCII hyphen.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack lists the term with U+2010, U+2011 and U+2013 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2074,9 +2074,9 @@
       "expect": "mark",
       "actual": "didn\u2019t even bother to",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in the n't contraction; the pattern n'?t goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in the n't contraction; the pack spells the pattern n['\u2019]?t.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2152,9 +2152,9 @@
       "expect": "mark",
       "actual": "Sources with first\u2011hand knowledge of the matter",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen in 'first\u2011hand'; the class [- ] admits only ASCII hyphen and space.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen in 'first\u2011hand'; the pack widens the class to [-\u2010\u2011\u2013 ].",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2296,9 +2296,9 @@
       "expect": "mark",
       "actual": "officer\u2013involved shooting",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2013 en dash; the class [- ] admits only ASCII hyphen and space.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2013 en dash; the pack widens the class to [-\u2010\u2011\u2013 ].",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2440,9 +2440,9 @@
       "expect": "mark",
       "actual": "world\u2011class",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the lexical term is spelt only with an ASCII hyphen.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack lists the term with U+2010, U+2011 and U+2013 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     }
   ]
