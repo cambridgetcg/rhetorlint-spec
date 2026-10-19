@@ -30,3 +30,7 @@ jobs:
       - name: cross-engine conformance — the Go engine must match the JS ground truth
         working-directory: impl/go
         run: go test ./...
+      - name: three-engine differential — JS, Python and Go must agree beyond the cases
+        run: node scripts/xengine-diff.mjs
+      - name: Python engine unit tests
+        run: python3 -m unittest discover -s impl/python -p 'test_rhetorlint.py'
