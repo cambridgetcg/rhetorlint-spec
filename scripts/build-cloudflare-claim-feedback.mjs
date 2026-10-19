@@ -5,6 +5,7 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -511,7 +512,9 @@ export function checkCloudflareBundles() {
   ];
 }
 
-const directPath = process.argv[1] ? resolve(process.argv[1]) : null;
+// Compare real paths: on macOS /tmp is a symlink to /private/tmp, and --check
+// run through it must still check (and fail when it should), not exit 0 silently.
+const directPath = process.argv[1] ? realpathSync(process.argv[1]) : null;
 if (directPath === fileURLToPath(import.meta.url)) {
   if (process.argv.length > 3 || (process.argv[2] && process.argv[2] !== "--check")) {
     process.stderr.write("usage: node scripts/build-cloudflare-claim-feedback.mjs [--check]\n");

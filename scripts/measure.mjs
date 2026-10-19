@@ -14,7 +14,7 @@
 //
 // Floors are reported and never gate: a rule's precision is one reader's
 // judgement on a small corpus, not proof.
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdtempSync, rmSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdtempSync, realpathSync, rmSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -467,7 +467,9 @@ async function main(argv) {
   if (flag("--local")) localStrata(analyze, corpus.rules);
 }
 
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+// Compare real paths: on macOS /tmp is a symlink to /private/tmp, and --check
+// run through it must still check (and fail when it should), not exit 0 silently.
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main(process.argv.slice(2)).catch((error) => {
     console.error(error.stack || String(error));
     process.exitCode = 1;

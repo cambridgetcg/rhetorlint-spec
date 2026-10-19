@@ -23,9 +23,9 @@
 // the lexicon's numbers and character sets. The three-engine differential
 // (scripts/xengine-diff.mjs) takes both as inputs, and
 // test/agency-lexicon.test.mjs holds the JavaScript engine to their spans.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 export const LEXICON = "spec/agency-lexicon.json";
 export const BEGIN = "BEGIN GENERATED AGENCY LEXICON";
@@ -422,7 +422,9 @@ function usage() {
   return 2;
 }
 
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+// Compare real paths: on macOS /tmp is a symlink to /private/tmp, and a script
+// run through it must still run (and fail when it should), not exit 0 silently.
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     process.exitCode = main(process.argv.slice(2));
   } catch (error) {
