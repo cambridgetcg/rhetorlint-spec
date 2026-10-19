@@ -134,6 +134,14 @@ const AGENCY_REQUIRES = new Map([["put", "in place"]]);
 const AGENCY_UNLESS = new Map([["exposed", "to"]]);
 // END GENERATED AGENCY LEXICON
 
+/**
+ * ASCII-only lowercasing: A-Z to a-z and nothing else. The agency matcher and
+ * the guards read words through it, so no engine folds a non-ASCII letter into
+ * a word it looks for, and the lowercased copy keeps the text's length in
+ * every offset unit.
+ */
+const asciiLower = (s) => s.replace(/[A-Z]/g, (c) => c.toLowerCase());
+
 /*
  * The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
  * clause leaves unstated: "Mistakes were made", "Customer data was quietly
@@ -616,8 +624,7 @@ function isGuardWordChar(code) {
 }
 
 function isNegator(word) {
-  // ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
-  const w = word.replace(/[A-Z]/g, (c) => c.toLowerCase()).replace(/^['\u2019]+|['\u2019]+$/g, "");
+  const w = asciiLower(word).replace(/^['\u2019]+|['\u2019]+$/g, "");
   return NEGATORS.has(w) || w.endsWith("n't") || w.endsWith("n\u2019t");
 }
 
@@ -668,8 +675,6 @@ const NEGATION_SCOPED = new Set(["absolute.universal"]);
 function negationScopedAt(text, start, end) {
   return negatedAt(text, start, true) || imperativeNeverAt(text, start, end);
 }
-
-const asciiLower = (s) => s.replace(/[A-Z]/g, (c) => c.toLowerCase());
 
 /**
  * True when [start, end) is the word "never", in any letter case, that opens
