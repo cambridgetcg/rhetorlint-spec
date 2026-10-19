@@ -16,7 +16,7 @@ echo "We take your privacy extremely seriously." | go -C impl/go run .
 ## Conformance
 
 ```bash
-go -C impl/go test ./...  # 68/68 ASCII cases identical to the JS ground truth
+go -C impl/go test ./...  # 76/76 ASCII cases identical to the JS ground truth
 ```
 
 ## The RE2 lesson

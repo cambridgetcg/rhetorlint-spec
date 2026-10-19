@@ -58,10 +58,11 @@ closed class (a fault, a breach, a concealment; a light verb after an error or
 decision noun, as in `mistakes were made`; `raised` after `concerns`,
 `questions` or `allegations`; `decided` after `it`; `shared`, `sold` or
 `disclosed` after a data noun; `affected` or `impacted` after a data or account
-noun), no `by` among the next seven words of the clause, and no negator in the
-auxiliary chain, as the head noun or among the five words before it (`Your
-data was never sold`, `No customer data was accessed`). The words, those two
-numbers and the characters the walks stop at live in
+noun), no `by` among the next seven words of the clause, and no negator
+anywhere in its clause before the auxiliary (`Your data was never sold`, `No
+customer data was accessed`, `No credit card numbers, bank account details or
+passwords were stolen`). The words, the numbers and the characters the walks
+stop at live in
 `spec/agency-lexicon.json`, and `scripts/gen-agency-lexicon.mjs` writes them
 into all three engines. The pack says the same thing: the rule's note now
 names those verbs, its level is `note` and its confidence 0.6.
@@ -127,6 +128,25 @@ keeps its absolute.universal `never`) are negated passives, unmarked.
 after a held-in-trust head, and `Twelve patients were affected.` is silent.
 `Never have more than two drinks.` is advice: `have` can begin an imperative,
 so the absolute.universal guard leaves it unmarked.
+
+Cases 68 to 75 pin the negator reading of `spec/agency-lexicon.json` version
+3, which replaced a five-word window before the head noun with the whole
+clause: every word from the last `.`, `;`, `:`, `!`, `?` or line break (or the
+start of the text) up to the auxiliary. A breach notice's denial is not an
+agentless accusation, however long its subject: `No credit card numbers, bank
+account details or passwords were stolen.`, `No Social Security numbers or
+other sensitive personal information were exposed.` and `At this time, we do
+not believe that any of your personal information has been compromised.` are
+silent, where the window marked all three. A comma starts no clause, because a
+long subject is a comma list, so `We saw no alerts, but data were stolen.` is
+silent too: a pinned under-mark, recorded in `measurement/contrast.json`
+beside the Reagan specimen (`But we did not achieve what we wished, and serious
+mistakes were made...`), which the clause reading also leaves unmarked. `We
+saw no alerts; data were stolen.` and the same with a line break mark `were
+stolen`: a new clause starts there. `Data was accessed and no records were
+leaked.` marks only `was accessed`, since a negator after a passive is not
+read for it. `Customer data was exposed today.` marks `was exposed`: the
+`exposed to` exception wants the whole word `to`.
 
 The recall given up is stated, not hidden: `Your account was closed`, `Jobs
 were cut`, `Lives were lost` and other harm verbs, relative clauses (`the
@@ -248,7 +268,7 @@ Turkish, or Greek. They do not.
 
 ## Beyond the cases: the three-engine differential
 
-The 68 cases pin values. The differential asks a wider question: do the three
+The 76 cases pin values. The differential asks a wider question: do the three
 engines agree with each other on input nobody wrote an expectation for?
 
 ```

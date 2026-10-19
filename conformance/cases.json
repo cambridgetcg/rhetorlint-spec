@@ -1552,6 +1552,138 @@
       },
       "strip": "Never have more than two drinks.",
       "marks": []
+    },
+    {
+      "input": "No credit card numbers, bank account details or passwords were stolen.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "No credit card numbers, bank account details or passwords were stolen.",
+      "marks": []
+    },
+    {
+      "input": "No Social Security numbers or other sensitive personal information were exposed.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "No Social Security numbers or other sensitive personal information were exposed.",
+      "marks": []
+    },
+    {
+      "input": "At this time, we do not believe that any of your personal information has been compromised.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "At this time, we do not believe that any of your personal information has been compromised.",
+      "marks": []
+    },
+    {
+      "input": "We saw no alerts, but data were stolen.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "We saw no alerts, but data were stolen.",
+      "marks": []
+    },
+    {
+      "input": "We saw no alerts; data were stolen.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "We saw no alerts; data [who?] were stolen.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were stolen",
+          "start": 23,
+          "end": 34,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "We saw no alerts\ndata were stolen.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "We saw no alerts\ndata [who?] were stolen.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were stolen",
+          "start": 22,
+          "end": 33,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Data was accessed and no records were leaked.",
+      "density": {
+        "tells": 1,
+        "per100Words": 12.5
+      },
+      "strip": "Data [who?] was accessed and no records were leaked.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "was accessed",
+          "start": 5,
+          "end": 17,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Customer data was exposed today.",
+      "density": {
+        "tells": 1,
+        "per100Words": 20
+      },
+      "strip": "Customer data [who?] was exposed today.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "was exposed",
+          "start": 14,
+          "end": 25,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
     }
   ]
 }
