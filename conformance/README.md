@@ -144,7 +144,7 @@ Turkish, or Greek. They do not.
 
 ## Beyond the cases: the three-engine differential
 
-The 33 cases pin values. The differential asks a wider question: do the three
+The 37 cases pin values. The differential asks a wider question: do the three
 engines agree with each other on input nobody wrote an expectation for?
 
 ```

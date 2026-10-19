@@ -1055,6 +1055,57 @@
           ]
         }
       ]
+    },
+    {
+      "input": "Returns are not guaranteed; past performance is no indicator.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Returns are not guaranteed; past performance is no indicator.",
+      "marks": []
+    },
+    {
+      "input": "Results aren't always typical.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Results aren't always typical.",
+      "marks": []
+    },
+    {
+      "input": "Never share your password with anyone.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Never share your password with anyone.",
+      "marks": []
+    },
+    {
+      "input": "Guaranteed to double your savings.",
+      "density": {
+        "tells": 1,
+        "per100Words": 20
+      },
+      "strip": "Guaranteed to double your savings.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "Guaranteed",
+          "start": 0,
+          "end": 10,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        }
+      ]
     }
   ]
 }
