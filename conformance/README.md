@@ -57,11 +57,14 @@ not name: `was`, `were` or `been`, at most one adverb, a participle from a
 closed class (a fault, a breach, a concealment; a light verb after an error or
 decision noun, as in `mistakes were made`; `raised` after `concerns`,
 `questions` or `allegations`; `decided` after `it`; `shared`, `sold` or
-`disclosed` after a data noun), and no `by` among the next seven words of the
-clause. The words live in `spec/agency-lexicon.json`, and
-`scripts/gen-agency-lexicon.mjs` writes them into all three engines. The pack
-says the same thing: the rule's note now names those verbs, its level is
-`note` and its confidence 0.6.
+`disclosed` after a data noun; `affected` or `impacted` after a data or account
+noun), no `by` among the next seven words of the clause, and no negator in the
+auxiliary chain, as the head noun or among the five words before it (`Your
+data was never sold`, `No customer data was accessed`). The words, those two
+numbers and the characters the walks stop at live in
+`spec/agency-lexicon.json`, and `scripts/gen-agency-lexicon.mjs` writes them
+into all three engines. The pack says the same thing: the rule's note now
+names those verbs, its level is `note` and its confidence 0.6.
 
 Regenerating the corpus changed nine of the 39 cases, each read by hand:
 
@@ -111,11 +114,35 @@ in place.` (the span is `been put`). Eleven are unmarked controls:
   absolute.universal guard's cases used `Guaranteed to double your savings.`
   (case 36) to avoid it.
 
+Cases 58 to 67 pin the edges of the detector's walks and its later
+narrowing. `Mistakes were made a b c d e f by them.` is silent and the same
+with one more word marks `were made`: `by` as the seventh word after the
+participle still names an agent, as the eighth it does not. `Mistakes have
+also since then been made.` marks `been made` and `Mistakes may also since
+then have been made.` is silent: the head walk steps back over four
+auxiliary-chain words and no more. `No customer data was accessed.`,
+`Passwords haven't been compromised.` and `Your data was never sold.` (which
+keeps its absolute.universal `never`) are negated passives, unmarked.
+`Approximately 4,000 accounts may have been affected.` marks `been affected`
+after a held-in-trust head, and `Twelve patients were affected.` is silent.
+`Never have more than two drinks.` is advice: `have` can begin an imperative,
+so the absolute.universal guard leaves it unmarked.
+
 The recall given up is stated, not hidden: `Your account was closed`, `Jobs
 were cut`, `Lives were lost` and other harm verbs, relative clauses (`the
 mistakes that have been made`), progressive passives (`were being
 withheld`), and a passive whose words a no-break space separates are no
-longer marked.
+longer marked. On the committed gold annotations, the accountable-passive set
+(`node scripts/measure.mjs`, `gold recall`) falls from 39 to 20 of 41 spans
+found by any rule, against the guard revision just before the detector; by
+the agency rule itself, 19 of 41. The spans lost include disclosure and
+publication true positives in the target genre (`was inadvertently
+published`, `was emailed` outside official systems, `should not have been
+made public`) and a vague remedy (`appropriate steps will be taken`); they
+wait for a fresh bench. The negator reading also silences a hedged denial the
+committed labels still call a true positive (`There is currently no evidence
+that this information has been misused.`), so any-rule recall on the legacy
+gold set falls from 18 to 17 of 59.
 
 ## Known portability caveats (honest)
 
@@ -218,7 +245,7 @@ Turkish, or Greek. They do not.
 
 ## Beyond the cases: the three-engine differential
 
-The 58 cases pin values. The differential asks a wider question: do the three
+The 68 cases pin values. The differential asks a wider question: do the three
 engines agree with each other on input nobody wrote an expectation for?
 
 ```

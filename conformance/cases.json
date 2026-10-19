@@ -1388,6 +1388,170 @@
           ]
         }
       ]
+    },
+    {
+      "input": "Mistakes were made a b c d e f by them.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Mistakes were made a b c d e f by them.",
+      "marks": []
+    },
+    {
+      "input": "Mistakes were made a b c d e f g by them.",
+      "density": {
+        "tells": 1,
+        "per100Words": 8.3
+      },
+      "strip": "Mistakes [who?] were made a b c d e f g by them.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "were made",
+          "start": 9,
+          "end": 18,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Mistakes have also since then been made.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "Mistakes have also since then [who?] been made.",
+      "marks": [
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "been made",
+          "start": 30,
+          "end": 39,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Mistakes may also since then have been made.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Mistakes may also since then have been made.",
+      "marks": []
+    },
+    {
+      "input": "No customer data was accessed.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "No customer data was accessed.",
+      "marks": []
+    },
+    {
+      "input": "Passwords haven't been compromised.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Passwords haven't been compromised.",
+      "marks": []
+    },
+    {
+      "input": "Your data was never sold.",
+      "density": {
+        "tells": 1,
+        "per100Words": 20
+      },
+      "strip": "Your data was never sold.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "never",
+          "start": 14,
+          "end": 19,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Approximately 4,000 accounts may have been affected.",
+      "density": {
+        "tells": 2,
+        "per100Words": 28.6
+      },
+      "strip": "Approximately 4,000 accounts may have [who?] been affected.",
+      "marks": [
+        {
+          "ruleId": "hedge.deniable",
+          "family": "manipulative-wording",
+          "technique": "Obfuscation, Intentional Vagueness, Confusion",
+          "actual": "may have been",
+          "start": 29,
+          "end": 42,
+          "note": "a deniable modal — leaves room to say you never promised",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(state what you know, and what you don't)"
+          ]
+        },
+        {
+          "ruleId": "agency-hiding.deleted-subject",
+          "family": "agency-hiding",
+          "technique": "Obfuscation (structural — RhetorLint extension)",
+          "actual": "been affected",
+          "start": 38,
+          "end": 51,
+          "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
+          "confidence": 0.6,
+          "level": "note",
+          "expected": [
+            "(name who did it: 'I/we + verb')"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Twelve patients were affected.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Twelve patients were affected.",
+      "marks": []
+    },
+    {
+      "input": "Never have more than two drinks.",
+      "density": {
+        "tells": 0,
+        "per100Words": 0
+      },
+      "strip": "Never have more than two drinks.",
+      "marks": []
     }
   ]
 }

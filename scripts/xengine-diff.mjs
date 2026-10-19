@@ -1,7 +1,7 @@
 // The three-engine differential: JavaScript, Python and Go must agree beyond
 // the conformance cases.
 //
-// conformance/cases.json pins 58 inputs value for value. This script feeds a
+// conformance/cases.json pins 68 inputs value for value. This script feeds a
 // wider, committed input set (conformance/differential/inputs.jsonl) to all
 // three engines and compares, per input:
 //   - the multiset of marks as (ruleId, actual), on every input;
