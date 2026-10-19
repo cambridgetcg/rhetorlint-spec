@@ -766,6 +766,9 @@
 {"id":"contrast:lesson.absolute-universal.undeniable","source":"measurement/contrast.json","text":"Our results are undeniable."}
 {"id":"contrast:lesson.absolute-universal.never-again","source":"measurement/contrast.json","text":"Never again will prices be this low."}
 {"id":"contrast:lesson.absolute-universal.no-doubt-everyone","source":"measurement/contrast.json","text":"There's no doubt everyone loves it."}
+{"id":"contrast:lesson.absolute-universal.colon-never-sold","source":"measurement/contrast.json","text":"Your data: never sold."}
+{"id":"contrast:lesson.absolute-universal.no-risk-guaranteed","source":"measurement/contrast.json","text":"No risk, guaranteed."}
+{"id":"contrast:lesson.absolute-universal.no-exceptions-list","source":"measurement/contrast.json","text":"No contracts, no fees, no exceptions."}
 {"id":"contrast:probe.hedge-softener.01","source":"measurement/contrast.json","text":"We believe this update will fix most issues."}
 {"id":"contrast:probe.hedge-softener.02","source":"measurement/contrast.json","text":"It seems the outage is sort of resolved."}
 {"id":"contrast:probe.hedge-softener.03","source":"measurement/contrast.json","text":"To some extent, the rollout went well."}
