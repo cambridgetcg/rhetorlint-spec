@@ -319,6 +319,10 @@ func TestStripKeepsNegatedOrQuotedIntensifier(t *testing.T) {
 			"NOT EXTREMELY HIGH",
 			"\"It was utterly devastating,\" the flood survivor told reporters.",
 			"He said \u201cwe are deeply sorry\u201d and left.",
+			// A comma is not a break for Strip's negator: only absolute.universal's
+			// guard ends a negator's reach there.
+			"It isn\u2019t, frankly, extremely high.",
+			"We said no, extremely few agreed.",
 		} {
 			result := Analyze(text, pack)
 			intensifiers := 0
@@ -393,6 +397,15 @@ func TestAbsoluteGuard(t *testing.T) {
 			"Never\tshare it.",
 			"\"Never share it,\" he said.",
 			"Explain real constraints; never manufacture the shortage.",
+			// A negator followed directly by a comma reaches past the aside.
+			"Past performance is not, however, always a guide.",
+			"No, never.",
+			// An adverb between 'Never' and its verb hands the decision to the verb.
+			"Never ever share your password.",
+			"Never again leave it unlocked.",
+			"Never once doubt it.",
+			// A word is compared whole: 'answer' is not 'an'.
+			"Never answer it.",
 		}
 		for _, brk := range []string{".", ";", ":", "!", "?"} {
 			texts = append(texts, "Check the link"+brk+" never click it.")
@@ -420,6 +433,20 @@ func TestAbsoluteGuard(t *testing.T) {
 			{"Never\nshare it.", "Never"},
 			// A line break is not a clause break.
 			{"We will\nnever share it.", "never"},
+			// A comma ends a negator's reach once a word stands between them.
+			{"No risk, guaranteed.", "guaranteed"},
+			{"Don't wait, everyone is buying.", "everyone"},
+			{"No fees, always free.", "always"},
+			{"No contracts, no fees, no exceptions.", "no exceptions"},
+			// A clause-initial 'Never' before a word that cannot be its verb is a
+			// fragment or an inversion.
+			{"Battery life? Never an issue.", "Never"},
+			{"Never again will prices be this low.", "Never"},
+			{"Never has a product been this good.", "Never"},
+			{"Never before have prices been this low.", "Never"},
+			{"Never again.", "Never"},
+			{"Never ever again.", "Never"},
+			{"Never again\nshare it.", "Never"},
 		}
 		// The negator is the word before, but a clause break stands between them.
 		for _, brk := range []string{".", ";", ":", "!", "?"} {
@@ -443,6 +470,39 @@ func TestAbsoluteGuard(t *testing.T) {
 		}
 		if !peacock {
 			t.Errorf("puffery.peacock lost its mark under a negator")
+		}
+	})
+
+	t.Run("the word after a clause-initial never is read against two closed lists", func(t *testing.T) {
+		// The imperative 'Never' guard's two closed lists, declared here so an
+		// engine that drops or adds a word fails.
+		nonVerbs := []string{
+			"a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
+			"has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
+			"should", "can", "did", "does", "been", "being",
+		}
+		passThrough := []string{"again", "ever", "once"}
+		expect := func(text string, want ...string) {
+			t.Helper()
+			actuals, _ := absoluteActuals(text, pack)
+			if len(actuals) != len(want) || (len(want) == 1 && actuals[0] != want[0]) {
+				t.Errorf("%q: absolute.universal marks %q, want %q", text, actuals, want)
+			}
+		}
+		for _, word := range nonVerbs {
+			expect("Never "+word+" x.", "Never")
+			// After its lowercase first letter, the word is compared in ASCII
+			// lower case: "hAS" is "has".
+			expect("Go; never "+word[:1]+strings.ToUpper(word[1:])+" x.", "never")
+		}
+		for _, adverb := range passThrough {
+			expect("Never " + adverb + " share it.")
+			expect("Never " + adverb + " " + passThrough[0] + " share it.")
+			for _, word := range nonVerbs {
+				expect("Never "+adverb+" "+word+" x.", "Never")
+			}
+			expect("Never "+adverb+".", "Never")
+			expect("Never "+adverb+" Share it.", "Never")
 		}
 	})
 }

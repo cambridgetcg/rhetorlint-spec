@@ -143,15 +143,25 @@ def _is_negator(word):
     return word in _NEGATORS or word.endswith(("n't", "n\u2019t"))
 
 
-def _negated_at(text, offset):
+def _negated_at(text, offset, comma_ends_scope=False):
     """True when a negator is one of the two words before offset, with no
     . ; : ! or ? between them. It walks back over characters and words, never
-    a count of units, so the JS, Python and Go engines decide alike."""
+    a count of units, so the JS, Python and Go engines decide alike.
+
+    With comma_ends_scope (the absolute.universal guard; strip leaves it off),
+    a comma also ends the negator's reach once a word stands between them: the
+    "No" of "No risk, guaranteed." negates "risk", not "guaranteed". A negator
+    followed directly by a comma reaches past the aside, so "not, however,
+    guaranteed" and "No, never" stay negated."""
     i = offset
+    comma_before = False  # a comma between the term and the word being read
     for _ in range(2):
+        comma = False
         while i > 0 and not _is_guard_word_char(text[i - 1]):
             if text[i - 1] in _CLAUSE_BREAKS:
                 return False
+            if text[i - 1] == ",":
+                comma = True
             i -= 1
         if i == 0:
             return False
@@ -159,23 +169,40 @@ def _negated_at(text, offset):
         while i > 0 and _is_guard_word_char(text[i - 1]):
             i -= 1
         if _is_negator(text[i:end]):
-            return True
+            return not comma_ends_scope or not comma_before or comma
+        comma_before = comma_before or comma
     return False
 
 
 # The ruleIds whose matches are read in their clause before they are marked:
 # a negated absolute ("not guaranteed", "Not everyone") is a disclaimer, and a
-# clause-initial "Never" before a lowercase word ("Never share your password.")
+# clause-initial "Never" before a lowercase verb ("Never share your password.")
 # is advice, not a claim. Engine-side, like REMOVABLE, so the pack stays
 # readable by older engines; spec/taxonomy.yaml declares it as guard_examples.
 NEGATION_SCOPED = {"absolute.universal"}
 
 
+# Words that cannot be the verb of an imperative "Never <verb>": after a
+# clause-initial "never" they make a fragment ("Never an issue.") or an
+# inversion ("Never has a product been this good."), both claims.
+_NEVER_NON_VERBS = frozenset({
+    "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
+    "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
+    "should", "can", "did", "does", "been", "being",
+})
+# Adverbs that may stand between "Never" and its verb: the word after them
+# decides. "Never ever share it." is advice; "Never again will prices be this
+# low." is an inversion; "Never again." is a fragment.
+_NEVER_PASS_THROUGH = frozenset({"again", "ever", "once"})
+
+
 def _imperative_never_at(text, start, end):
     """True when text[start:end] is "never", in any letter case, opening its
     clause (only non-word characters between it and the start of the text or
-    one of . ; : ! ?) and followed by spaces or tabs and an ASCII lowercase
-    letter. Like _negated_at it walks characters, never a count of units."""
+    one of . ; : ! ?) and followed by a verb: spaces or tabs, then a word that
+    starts with an ASCII lowercase letter and is not one of _NEVER_NON_VERBS.
+    _NEVER_PASS_THROUGH words are stepped over the same way first. Like
+    _negated_at it walks characters, never a count of units."""
     if text[start:end].translate(_ASCII_LOWER) != "never":
         return False
     i = start
@@ -184,14 +211,23 @@ def _imperative_never_at(text, start, end):
     if i > 0 and _is_guard_word_char(text[i - 1]):
         return False
     j = end
-    while j < len(text) and text[j] in " \t":
-        j += 1
-    return end < j < len(text) and "a" <= text[j] <= "z"
+    while True:
+        gap = j
+        while j < len(text) and text[j] in " \t":
+            j += 1
+        if j == gap or j == len(text) or not "a" <= text[j] <= "z":
+            return False
+        word = j
+        while j < len(text) and _is_guard_word_char(text[j]):
+            j += 1
+        w = text[word:j].translate(_ASCII_LOWER)
+        if w not in _NEVER_PASS_THROUGH:
+            return w not in _NEVER_NON_VERBS
 
 
 def _negation_scoped_at(text, start, end):
     """True when a NEGATION_SCOPED match is negated or an imperative "Never"."""
-    return _negated_at(text, start) or _imperative_never_at(text, start, end)
+    return _negated_at(text, start, True) or _imperative_never_at(text, start, end)
 
 
 def _quoted_at(text, offset):

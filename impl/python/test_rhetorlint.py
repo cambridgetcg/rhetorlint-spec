@@ -124,6 +124,10 @@ class StripTests(unittest.TestCase):
             "NOT EXTREMELY HIGH",
             "\"It was utterly devastating,\" the flood survivor told reporters.",
             "He said \u201cwe are deeply sorry\u201d and left.",
+            # A comma is not a break for strip's negator: only absolute.universal's
+            # guard ends a negator's reach there.
+            "It isn\u2019t, frankly, extremely high.",
+            "We said no, extremely few agreed.",
         ]
         for text in cases:
             with self.subTest(text=text):
@@ -183,6 +187,15 @@ class AbsoluteGuardTests(unittest.TestCase):
             "\"Never share it,\" he said.",
             "Explain real constraints; never manufacture the shortage.",
             *["Check the link%s never click it." % brk for brk in ".;:!?"],
+            # A negator followed directly by a comma reaches past the aside.
+            "Past performance is not, however, always a guide.",
+            "No, never.",
+            # An adverb between 'Never' and its verb hands the decision to the verb.
+            "Never ever share your password.",
+            "Never again leave it unlocked.",
+            "Never once doubt it.",
+            # A word is compared whole: 'answer' is not 'an'.
+            "Never answer it.",
         ]
         for text in cases:
             with self.subTest(text=text):
@@ -207,6 +220,20 @@ class AbsoluteGuardTests(unittest.TestCase):
             ("Never\nshare it.", "Never"),
             # A line break is not a clause break.
             ("We will\nnever share it.", "never"),
+            # A comma ends a negator's reach once a word stands between them.
+            ("No risk, guaranteed.", "guaranteed"),
+            ("Don't wait, everyone is buying.", "everyone"),
+            ("No fees, always free.", "always"),
+            ("No contracts, no fees, no exceptions.", "no exceptions"),
+            # A clause-initial 'Never' before a word that cannot be its verb is a
+            # fragment or an inversion.
+            ("Battery life? Never an issue.", "Never"),
+            ("Never again will prices be this low.", "Never"),
+            ("Never has a product been this good.", "Never"),
+            ("Never before have prices been this low.", "Never"),
+            ("Never again.", "Never"),
+            ("Never ever again.", "Never"),
+            ("Never again\nshare it.", "Never"),
         ]
         for text, actual in cases:
             with self.subTest(text=text):
@@ -218,6 +245,36 @@ class AbsoluteGuardTests(unittest.TestCase):
         # The guard reads absolute.universal only: other rules keep their marks under a negator.
         marks = rhetorlint.analyze("It is not world-class.", rules)["marks"]
         self.assertTrue(any(mark["ruleId"] == "puffery.peacock" for mark in marks))
+
+    def test_word_after_never_is_read_against_two_closed_lists(self):
+        # The imperative 'Never' guard's two closed lists, declared here so an
+        # engine that drops or adds a word fails.
+        non_verbs = [
+            "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
+            "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
+            "should", "can", "did", "does", "been", "being",
+        ]
+        pass_through = ["again", "ever", "once"]
+        rules = rhetorlint.load_default_rules()
+
+        def actuals(text):
+            return [mark["actual"] for mark in absolutes(text, rules)]
+
+        for word in non_verbs:
+            with self.subTest(word=word):
+                self.assertEqual(actuals("Never %s x." % word), ["Never"])
+                # After its lowercase first letter, the word is compared in ASCII
+                # lower case: "hAS" is "has".
+                mixed = word[0] + word[1:].upper()
+                self.assertEqual(actuals("Go; never %s x." % mixed), ["never"])
+        for adverb in pass_through:
+            with self.subTest(adverb=adverb):
+                self.assertEqual(actuals("Never %s share it." % adverb), [])
+                self.assertEqual(actuals("Never %s %s share it." % (adverb, pass_through[0])), [])
+                for word in non_verbs:
+                    self.assertEqual(actuals("Never %s %s x." % (adverb, word)), ["Never"], word)
+                self.assertEqual(actuals("Never %s." % adverb), ["Never"])
+                self.assertEqual(actuals("Never %s Share it." % adverb), ["Never"])
 
 
 class EngineLabelTests(unittest.TestCase):

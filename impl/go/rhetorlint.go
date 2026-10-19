@@ -60,7 +60,7 @@ var removable = map[string]bool{"intensifier.loaded": true}
 
 // negationScoped names the rules whose matches are read in their clause before
 // they are marked: a negated absolute ("not guaranteed", "Not everyone") is a
-// disclaimer, and a clause-initial "Never" before a lowercase word ("Never
+// disclaimer, and a clause-initial "Never" before a lowercase verb ("Never
 // share your password.") is advice, not a claim. Engine-side, like removable,
 // so the pack stays readable by older engines; spec/taxonomy.yaml declares it
 // as guard_examples.
@@ -348,19 +348,33 @@ func isNegator(word string) bool {
 	return negators[w] || strings.HasSuffix(w, "n't") || strings.HasSuffix(w, "n\u2019t")
 }
 
+// clauseBreaks end a clause, for the negator window and the imperative "Never".
+const clauseBreaks = ".;:!?"
+
 // negatedAt reports whether a negator is one of the two words before offset,
 // with no . ; : ! or ? between them. It walks back over characters and words,
 // never a count of bytes, so the JS, Python and Go engines decide alike.
-func negatedAt(text string, offset int) bool {
+//
+// With commaEndsScope (the absolute.universal guard; Strip leaves it off), a
+// comma also ends the negator's reach once a word stands between them: the
+// "No" of "No risk, guaranteed." negates "risk", not "guaranteed". A negator
+// followed directly by a comma reaches past the aside, so "not, however,
+// guaranteed" and "No, never" stay negated.
+func negatedAt(text string, offset int, commaEndsScope bool) bool {
 	i := offset
+	commaBefore := false // a comma between the term and the word being read
 	for words := 0; words < 2; words++ {
+		comma := false
 		for i > 0 {
 			r, size := utf8.DecodeLastRuneInString(text[:i])
 			if isGuardWordRune(r) {
 				break
 			}
-			if strings.ContainsRune(".;:!?", r) {
+			if strings.ContainsRune(clauseBreaks, r) {
 				return false
+			}
+			if r == ',' {
+				comma = true
 			}
 			i -= size
 		}
@@ -376,24 +390,49 @@ func negatedAt(text string, offset int) bool {
 			i -= size
 		}
 		if isNegator(text[i:end]) {
-			return true
+			return !commaEndsScope || !commaBefore || comma
 		}
+		commaBefore = commaBefore || comma
 	}
 	return false
 }
 
-// imperativeNeverAt reports whether text[start:end] is "never", in any letter
-// case, opening its clause (only non-word characters between it and the start
-// of the text or one of . ; : ! ?) and followed by spaces or tabs and an ASCII
-// lowercase letter. Like negatedAt it walks characters, never a count of bytes.
-func imperativeNeverAt(text string, start, end int) bool {
-	word := []byte(text[start:end])
-	for i, c := range word {
+// neverNonVerbs cannot be the verb of an imperative "Never <verb>": after a
+// clause-initial "never" they make a fragment ("Never an issue.") or an
+// inversion ("Never has a product been this good."), both claims.
+var neverNonVerbs = map[string]bool{
+	"a": true, "an": true, "the": true, "any": true, "before": true, "so": true,
+	"such": true, "in": true, "at": true, "on": true, "has": true, "have": true,
+	"had": true, "is": true, "are": true, "was": true, "were": true, "will": true,
+	"would": true, "could": true, "should": true, "can": true, "did": true,
+	"does": true, "been": true, "being": true,
+}
+
+// neverPassThrough adverbs may stand between "Never" and its verb: the word
+// after them decides. "Never ever share it." is advice; "Never again will
+// prices be this low." is an inversion; "Never again." is a fragment.
+var neverPassThrough = map[string]bool{"again": true, "ever": true, "once": true}
+
+// asciiLower lowercases ASCII letters only, so no engine folds a non-ASCII
+// letter into a word it looks for.
+func asciiLower(s string) string {
+	b := []byte(s)
+	for i, c := range b {
 		if c >= 'A' && c <= 'Z' {
-			word[i] = c + ('a' - 'A')
+			b[i] = c + ('a' - 'A')
 		}
 	}
-	if string(word) != "never" {
+	return string(b)
+}
+
+// imperativeNeverAt reports whether text[start:end] is "never", in any letter
+// case, opening its clause (only non-word characters between it and the start
+// of the text or one of . ; : ! ?) and followed by a verb: spaces or tabs, then
+// a word that starts with an ASCII lowercase letter and is not one of
+// neverNonVerbs. neverPassThrough words are stepped over the same way first.
+// Like negatedAt it walks characters, never a count of bytes.
+func imperativeNeverAt(text string, start, end int) bool {
+	if asciiLower(text[start:end]) != "never" {
 		return false
 	}
 	i := start
@@ -402,22 +441,39 @@ func imperativeNeverAt(text string, start, end int) bool {
 		if isGuardWordRune(r) {
 			return false
 		}
-		if strings.ContainsRune(".;:!?", r) {
+		if strings.ContainsRune(clauseBreaks, r) {
 			break
 		}
 		i -= size
 	}
 	j := end
-	for j < len(text) && (text[j] == ' ' || text[j] == '\t') {
-		j++
+	for {
+		gap := j
+		for j < len(text) && (text[j] == ' ' || text[j] == '\t') {
+			j++
+		}
+		if j == gap || j == len(text) || text[j] < 'a' || text[j] > 'z' {
+			return false
+		}
+		word := j
+		for j < len(text) {
+			r, size := utf8.DecodeRuneInString(text[j:])
+			if !isGuardWordRune(r) {
+				break
+			}
+			j += size
+		}
+		w := asciiLower(text[word:j])
+		if !neverPassThrough[w] {
+			return !neverNonVerbs[w]
+		}
 	}
-	return j > end && j < len(text) && text[j] >= 'a' && text[j] <= 'z'
 }
 
 // negationScopedAt reports whether a negationScoped match is negated or an
 // imperative "Never".
 func negationScopedAt(text string, start, end int) bool {
-	return negatedAt(text, start) || imperativeNeverAt(text, start, end)
+	return negatedAt(text, start, true) || imperativeNeverAt(text, start, end)
 }
 
 // quotedAt reports whether offset sits inside a quotation on its own line: an
@@ -454,7 +510,7 @@ func Strip(text string, marks []Mark) string {
 		s, e := m.Position.Start.Offset, m.Position.End.Offset
 		if removable[m.RuleID] {
 			// Judged on the source text: edits so far all lie at or after s.
-			if negatedAt(text, s) || quotedAt(text, s) {
+			if negatedAt(text, s, false) || quotedAt(text, s) {
 				continue
 			}
 			out = joinRemovalSeam(out[:s], out[e:])
