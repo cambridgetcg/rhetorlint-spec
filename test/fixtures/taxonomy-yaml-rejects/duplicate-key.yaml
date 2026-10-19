@@ -1,0 +1,6 @@
+# reject: line 6: duplicate key 'what'
+version: "0.1"
+families:
+  - id: call
+    what: "Driving you to act now."
+    what: "Closing the topic down."

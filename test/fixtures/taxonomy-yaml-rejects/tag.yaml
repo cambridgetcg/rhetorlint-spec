@@ -1,0 +1,5 @@
+# reject: line 5: tags are outside the subset
+version: "0.1"
+families:
+  - id: call
+    seeded_tells: !!int "1"

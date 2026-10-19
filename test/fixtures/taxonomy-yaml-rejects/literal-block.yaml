@@ -1,0 +1,6 @@
+# reject: line 5: literal '|' block scalars are outside the subset
+version: "0.1"
+families:
+  - id: attack-on-reputation
+    why_seeding_is_narrow: |
+      Reputation attacks usually need a target.
