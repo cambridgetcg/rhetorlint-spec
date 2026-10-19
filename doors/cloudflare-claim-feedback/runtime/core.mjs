@@ -54,31 +54,192 @@ const RULE_KEYS = {
 };
 const ZERO_LENGTH_PATTERN_PROBES = ["", "a", "A", "0", "_", " ", "\n", "word", "example"];
 
-/** Words the -ed/-en passive heuristic should treat as predicate adjectives, not passives.
- *  Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern would
- *  otherwise swallow, and "often" so the bare "is often" never reads as a passive. */
-const NOT_PASSIVE = new Set([
-  "tired", "glad", "aware", "worried", "excited", "interested", "scared",
-  "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
-  "dedicated", "committed", "supposed", "used", "based",
-  "open", "even", "sudden", "seven", "ten", "eleven", "golden", "wooden", "often"
+// BEGIN GENERATED AGENCY LEXICON
+// spec/agency-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// Edit the lexicon and rerun the generator; --check fails when this block drifts.
+const AGENCY_AUXILIARIES = ["been", "was", "were"];
+const AGENCY_ADVERBS = ["already", "always", "never", "often", "still"];
+const AGENCY_ADVERB_SUFFIX = "ly";
+const AGENCY_SKIP = new Set([
+  "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never",
+  "not", "now", "shall", "should", "since", "then", "will", "would"
 ]);
+const AGENCY_SKIP_SUFFIX = "ly";
+const AGENCY_SKIP_MAX = 4;
+const AGENCY_BY_WINDOW = 7;
+const AGENCY_HEADS = new Map([
+  ["challenge", new Set([
+    "allegations", "concerns", "questions"
+  ])],
+  ["data", new Set([
+    "address", "addresses", "credentials", "data", "details", "information", "password",
+    "passwords", "pii", "records"
+  ])],
+  ["dummy", new Set([
+    "it"
+  ])],
+  ["error", new Set([
+    "action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision",
+    "decisions", "error", "errors", "measures", "miscalculation", "miscalculations", "misjudgement",
+    "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps", "mistake", "mistakes",
+    "omissions", "promises", "questions", "remarks", "safeguards", "statements", "steps", "things",
+    "threats", "words"
+  ])]
+]);
+/** [class, head class or "" for none, participles]. */
+const AGENCY_CLASSES = [
+  ["fault", "", [
+    "botched", "bungled", "doctored", "falsified", "ignored", "misappropriated", "miscalculated",
+    "mischaracterised", "mischaracterized", "mishandled", "misinformed", "misinterpreted",
+    "misjudged", "mislabeled", "mislabelled", "misled", "mismanaged", "misplaced", "misquoted",
+    "misreported", "misrepresented", "misstated", "misused", "neglected", "overcharged",
+    "overlooked", "tampered", "underpaid"
+  ]],
+  ["breach", "", [
+    "accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked",
+    "impacted", "leaked", "stolen"
+  ]],
+  ["conceal", "", [
+    "axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
+    "withheld"
+  ]],
+  ["light", "error", [
+    "characterised", "characterized", "done", "given", "interpreted", "made", "perceived", "put",
+    "said", "taken"
+  ]],
+  ["raise", "challenge", [
+    "raised"
+  ]],
+  ["impersonal", "dummy", [
+    "agreed", "decided", "determined"
+  ]],
+  ["data", "data", [
+    "disclosed", "shared", "sold"
+  ]]
+];
+const AGENCY_REQUIRES = new Map([["put", "in place"]]);
+const AGENCY_UNLESS = new Map([["exposed", "to"]]);
+// END GENERATED AGENCY LEXICON
 
-/** Irregular past participles the "\w+ed|\w+en" pattern would otherwise miss. */
-const IRREGULAR_PP =
-  "made|taken|done|given|seen|known|held|shown|drawn|chosen|written|broken|spoken|" +
-  "built|sent|kept|left|lost|found|told|brought|dealt|put|set|paid|felt|met|led|read|" +
-  "hit|cut|hurt|shut|split|spread|cast|cost|let";
+/*
+ * The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
+ * clause leaves unstated: "Mistakes were made", "Customer data was quietly
+ * accessed", "Records were withheld". Subject absence alone is not the tell:
+ * methods sections, documentation and news are full of honest passives. So a
+ * mark needs all of:
+ *   1. a past passive auxiliary (AGENCY_AUXILIARIES: was, were, been), then at
+ *      most one adverb (an ASCII word ending in -ly, or AGENCY_ADVERBS), then
+ *   2. a participle from a closed class: a fault, a breach, a concealment (no
+ *      head word needed); a light verb after an error, decision or statement
+ *      noun ("mistakes were made"); "decided" after "it"; or a verb that hands
+ *      data to someone else after a data noun ("your data was shared");
+ *   3. its AGENCY_REQUIRES phrase ("put" only in "put in place"), and not its
+ *      AGENCY_UNLESS word ("exposed to" names an exposure, not a breach);
+ *   4. no "by" among the next AGENCY_BY_WINDOW words of the clause: the agent
+ *      is named ("...by Forbes"), or the clause says when ("by Friday"), and
+ *      either way the rule stays silent.
+ * The head word is the nearest word before the auxiliary, stepping back over
+ * at most AGENCY_SKIP_MAX words of AGENCY_SKIP or ending in -ly, never past
+ * . ; : ! ? or a line break. The "by" window ends at . ; : ! ? but reads on
+ * across a line break, since hard-wrapped text breaks lines mid-clause: each
+ * window stops where stopping marks less.
+ *
+ * Portability: matching runs on an ASCII-lowercased copy (A-Z to a-z and
+ * nothing else, so its length is the text's in every offset unit), with no
+ * case-insensitive flag, explicit [ \t\n\r\f] whitespace and ASCII word
+ * boundaries. A no-break space or a vertical tab does not join two words, and
+ * a non-ASCII letter is never folded into one, so JavaScript, Python and Go
+ * read the same words. The lists are generated from spec/agency-lexicon.json.
+ */
+const AGENCY_WHITESPACE = " \t\n\r\f";
+const AGENCY_SPACE = "[ \\t\\n\\r\\f]+";
+const AGENCY_HEAD_STOPS = ".;:!?\n";
+const AGENCY_CLAUSE_BREAKS = ".;:!?";
 
-const AGENTLESS_PASSIVE = new RegExp(
-  // be-verb  (+ optional adverb, -ly or a common frequency word)  + participle,
-  // NOT followed by "by <agent>" — where the by-phrase may sit past a particle
-  // or adverb ("carried out collectively by the network" still names the agent).
-  "\\b(is|are|was|were|been|being|be)\\s+(?:(?:\\w+ly|often|never|always|still|already)\\s+)?" +
-  "(\\w+(?:ed|en)|" + IRREGULAR_PP + ")\\b" +
-  "(?!\\s+(?:(?:\\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\\s+)*by\\b)",
-  "gi"
+/** Each participle and the head class it needs ("" for none). */
+const AGENCY_HEAD_OF = new Map(
+  AGENCY_CLASSES.flatMap(([, head, participles]) => participles.map((p) => [p, head]))
 );
+
+const AGENCY_CANDIDATE = new RegExp(
+  "\\b(" + AGENCY_AUXILIARIES.join("|") + ")" + AGENCY_SPACE +
+  "(?:(?:[a-z]+" + AGENCY_ADVERB_SUFFIX + "|" + AGENCY_ADVERBS.join("|") + ")" + AGENCY_SPACE + ")?" +
+  "(" + [...AGENCY_HEAD_OF.keys()]
+    .sort((a, b) => b.length - a.length || (a < b ? -1 : a > b ? 1 : 0))
+    .map((p) => p.split(" ").join(AGENCY_SPACE))
+    .join("|") + ")\\b",
+  "g"
+);
+
+/** An ASCII letter, digit or underscore: what \b counts as a word character. */
+function isAgencyWordCode(code) {
+  return (code >= 97 && code <= 122) || (code >= 48 && code <= 57) || code === 95;
+}
+
+/** The head word before `index` in the lowercased text, or "" (see above). */
+function agencyHeadWord(low, index) {
+  let i = index;
+  for (let seen = 0; seen <= AGENCY_SKIP_MAX; seen++) {
+    while (i > 0 && !isAgencyWordCode(low.charCodeAt(i - 1))) {
+      if (AGENCY_HEAD_STOPS.includes(low[i - 1])) return "";
+      i--;
+    }
+    const end = i;
+    while (i > 0 && isAgencyWordCode(low.charCodeAt(i - 1))) i--;
+    if (i === end) return "";
+    const word = low.slice(i, end);
+    if (!AGENCY_SKIP.has(word) && !word.endsWith(AGENCY_SKIP_SUFFIX)) return word;
+  }
+  return "";
+}
+
+/** True when "by" is one of the next AGENCY_BY_WINDOW words after `index`, before . ; : ! or ?. */
+function agencyByFollows(low, index) {
+  let i = index;
+  for (let words = 0; words < AGENCY_BY_WINDOW; words++) {
+    while (i < low.length && !isAgencyWordCode(low.charCodeAt(i))) {
+      if (AGENCY_CLAUSE_BREAKS.includes(low[i])) return false;
+      i++;
+    }
+    if (i === low.length) return false;
+    const start = i;
+    while (i < low.length && isAgencyWordCode(low.charCodeAt(i))) i++;
+    if (low.slice(start, i) === "by") return true;
+  }
+  return false;
+}
+
+/** True when the words of `phrase` follow `index`, each after [ \t\n\r\f]+, each whole. */
+function agencyPhraseFollows(low, index, phrase) {
+  let i = index;
+  for (const word of phrase.split(" ")) {
+    const gap = i;
+    while (i < low.length && AGENCY_WHITESPACE.includes(low[i])) i++;
+    if (i === gap || !low.startsWith(word, i)) return false;
+    i += word.length;
+    if (i < low.length && isAgencyWordCode(low.charCodeAt(i))) return false;
+  }
+  return true;
+}
+
+/** Every accountable agentless passive in `text`, spanning auxiliary through participle. */
+function agentlessPassives(text) {
+  const low = asciiLower(text);
+  const out = [];
+  for (const m of low.matchAll(AGENCY_CANDIDATE)) {
+    const start = m.index, end = start + m[0].length;
+    const participle = m[2].split(/[ \t\n\r\f]+/).join(" ");
+    const unless = AGENCY_UNLESS.get(participle);
+    if (unless !== undefined && agencyPhraseFollows(low, end, unless)) continue;
+    const requires = AGENCY_REQUIRES.get(participle);
+    if (requires !== undefined && !agencyPhraseFollows(low, end, requires)) continue;
+    if (agencyByFollows(low, end)) continue;
+    const head = AGENCY_HEAD_OF.get(participle);
+    if (head !== "" && !AGENCY_HEADS.get(head).has(agencyHeadWord(low, start))) continue;
+    out.push({ index: start, length: end - start, actual: text.slice(start, end) });
+  }
+  return out;
+}
 
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -332,11 +493,7 @@ function matchesFor(rule, text) {
       out.push({ index: m.index, length: m[0].length, actual: m[0] });
     }
   } else if (rule.type === "structural" && rule.detector === "agentless-passive") {
-    for (const m of text.matchAll(AGENTLESS_PASSIVE)) {
-      const participle = (m[2] || "").toLowerCase();
-      if (NOT_PASSIVE.has(participle)) continue;
-      out.push({ index: m.index, length: m[0].length, actual: m[0] });
-    }
+    for (const hit of agentlessPassives(text)) out.push(hit);
   }
   return out;
 }

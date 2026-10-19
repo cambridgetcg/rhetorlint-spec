@@ -2,7 +2,7 @@ export default {
   "engine": {
     "name": "@rhetorlint/core",
     "version": "0.1.4",
-    "source_sha256": "sha256:a8289a8c01dc7ff301076783c0ec3866743e0c261fe75ad9f4cc92f605e8158c"
+    "source_sha256": "sha256:90c3434a418021b2558cba6f00bf367c80ed10000e5715edb2e3cbd877d9e22b"
   },
   "signal_projection": {
     "name": "@rhetorlint/core/signals",
@@ -12,7 +12,7 @@ export default {
   "rules": {
     "id": "@rhetorlint/rules-en",
     "version": "0.2.1",
-    "source_sha256": "sha256:e2c829641413bdf3fa60e4ab80485ef54a02b40cb86f84a061fd5e1953d15b8c"
+    "source_sha256": "sha256:b2201836c8d0050600066215fa73bb93fb1560f7bec54c35a7d4a87dd28f000a"
   },
   "packet_projection": {
     "schema": "claim-feedback.packet/0.2",

@@ -183,9 +183,9 @@ export default {
       "technique": "Obfuscation (structural — RhetorLint extension)",
       "type": "structural",
       "detector": "agentless-passive",
-      "level": "warning",
-      "confidence": 0.7,
-      "note": "an agentless passive — who acted is deleted from the sentence",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
       "expected": [
         "(name who did it: 'I/we + verb')"
       ]

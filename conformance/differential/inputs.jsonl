@@ -37,6 +37,25 @@
 {"id":"case:36","source":"conformance/cases.json","text":"Guaranteed to double your savings."}
 {"id":"case:37","source":"conformance/cases.json","text":"No risk, guaranteed."}
 {"id":"case:38","source":"conformance/cases.json","text":"Never again will prices be this low."}
+{"id":"case:39","source":"conformance/cases.json","text":"Mistakes, frankly, were made."}
+{"id":"case:40","source":"conformance/cases.json","text":"Customer data was quietly accessed."}
+{"id":"case:41","source":"conformance/cases.json","text":"Your data was shared with partners."}
+{"id":"case:42","source":"conformance/cases.json","text":"PII may have been compromised."}
+{"id":"case:43","source":"conformance/cases.json","text":"Records were withheld from investigators."}
+{"id":"case:44","source":"conformance/cases.json","text":"It was decided that the program would end."}
+{"id":"case:45","source":"conformance/cases.json","text":"Hundreds of workers were laid off."}
+{"id":"case:46","source":"conformance/cases.json","text":"Additional safeguards have been put in place."}
+{"id":"case:47","source":"conformance/cases.json","text":"My name is Fred."}
+{"id":"case:48","source":"conformance/cases.json","text":"JavaScript is required."}
+{"id":"case:49","source":"conformance/cases.json","text":"Soil water content was measured at 5 cm depth."}
+{"id":"case:50","source":"conformance/cases.json","text":"The soup can be frozen for up to 3 months."}
+{"id":"case:51","source":"conformance/cases.json","text":"This option is ignored when the flag is unset."}
+{"id":"case:52","source":"conformance/cases.json","text":"The report was shelved by Friday."}
+{"id":"case:53","source":"conformance/cases.json","text":"Lives were lost in the earthquake."}
+{"id":"case:54","source":"conformance/cases.json","text":"Your account was closed at your request."}
+{"id":"case:55","source":"conformance/cases.json","text":"He got fired up about the album."}
+{"id":"case:56","source":"conformance/cases.json","text":"Data were collected from 200 participants."}
+{"id":"case:57","source":"conformance/cases.json","text":"This is guaranteed to double your savings."}
 {"id":"item:inv-breach-apology#1","source":"measurement/items/inv-breach-apology.txt","text":"Subject: An important update about your account"}
 {"id":"item:inv-breach-apology#2","source":"measurement/items/inv-breach-apology.txt","text":"Dear Valued Customer,"}
 {"id":"item:inv-breach-apology#3","source":"measurement/items/inv-breach-apology.txt","text":"At Brightwell, the trust you place in us is the foundation of everything we do. We are writing to let you know about a recent security incident that may have involved some of your information."}
@@ -757,7 +776,6 @@
 {"id":"contrast:twin.intensifier-loaded.plain","source":"measurement/contrast.json","text":"This is an important update for every customer."}
 {"id":"contrast:probe.absolute-universal.01","source":"measurement/contrast.json","text":"Everyone knows this policy works."}
 {"id":"contrast:probe.absolute-universal.02","source":"measurement/contrast.json","text":"Our product will always be the best choice."}
-{"id":"contrast:probe.absolute-universal.03","source":"measurement/contrast.json","text":"This is guaranteed to double your savings."}
 {"id":"contrast:probe.absolute-universal.04","source":"measurement/contrast.json","text":"This is the only option."}
 {"id":"contrast:probe.absolute-universal.05","source":"measurement/contrast.json","text":"No-one could have predicted this."}
 {"id":"contrast:probe.absolute-universal.07","source":"measurement/contrast.json","text":"Speak clearly into the microphone."}
@@ -835,19 +853,12 @@
 {"id":"contrast:probe.agency-hiding-deleted-subject.02","source":"measurement/contrast.json","text":"Errors were made in the billing process."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.03","source":"measurement/contrast.json","text":"The data was shared with partners."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.04","source":"measurement/contrast.json","text":"The barn is red and the gate is green."}
-{"id":"contrast:probe.agency-hiding-deleted-subject.05","source":"measurement/contrast.json","text":"My name is Fred."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.06","source":"measurement/contrast.json","text":"Both of the twins were fifteen."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.07","source":"measurement/contrast.json","text":"The museum is located in Paris."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.08","source":"measurement/contrast.json","text":"Eggs are beaten until stiff, then folded into the batter."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.09","source":"measurement/contrast.json","text":"The issue was raised again by the auditor."}
-{"id":"contrast:wild.agency.javascript","source":"measurement/contrast.json","text":"JavaScript is required."}
 {"id":"contrast:wild.agency.helen","source":"measurement/contrast.json","text":"Who is Helen Haines?"}
-{"id":"contrast:wild.agency.soil","source":"measurement/contrast.json","text":"Soil water content was measured at 5 cm depth."}
-{"id":"contrast:wild.agency.soup","source":"measurement/contrast.json","text":"The soup can be frozen for up to 3 months."}
-{"id":"contrast:wild.agency.option-ignored","source":"measurement/contrast.json","text":"This option is ignored when the flag is unset."}
-{"id":"contrast:unjudgeable.agency.account-request","source":"measurement/contrast.json","text":"Your account was closed at your request."}
 {"id":"contrast:twin.agency.01","source":"measurement/contrast.json","text":"Three people were killed when the bus overturned on the ice."}
-{"id":"contrast:twin.agency.02","source":"measurement/contrast.json","text":"Lives were lost in the earthquake."}
 {"id":"contrast:twin.agency.03","source":"measurement/contrast.json","text":"Two climbers were injured in a fall near the summit."}
 {"id":"contrast:twin.agency.04","source":"measurement/contrast.json","text":"The suspect was arrested on Tuesday, police said."}
 {"id":"contrast:twin.agency.05","source":"measurement/contrast.json","text":"Police said the suspect was arrested on Tuesday."}
@@ -878,6 +889,11 @@
 {"id":"contrast:twin.agency.30","source":"measurement/contrast.json","text":"The report was shelved by the committee chair."}
 {"id":"contrast:specimen.agency.reagan-1987","source":"measurement/contrast.json","text":"But we did not achieve what we wished, and serious mistakes were made in trying to do so."}
 {"id":"contrast:specimen.agency.clinton-1997","source":"measurement/contrast.json","text":"no one is blameless here; it costs so much money to pay for these campaigns, that mistakes were made here by people who either did it deliberately or inadvertently"}
+{"id":"contrast:procedure.agency.collected-information","source":"measurement/contrast.json","text":"Information was collected via a survey."}
+{"id":"contrast:procedure.agency.retained","source":"measurement/contrast.json","text":"Records were retained for seven years."}
+{"id":"contrast:procedure.agency.transferred","source":"measurement/contrast.json","text":"Data were transferred to a secure server."}
+{"id":"contrast:term-of-art.agency.error-raised","source":"measurement/contrast.json","text":"If no error was raised, the call succeeded."}
+{"id":"contrast:procedure.agency.shared-on-request","source":"measurement/contrast.json","text":"Data were shared on request."}
 {"id":"contrast:specimen.agency.target-2013","source":"measurement/contrast.json","text":"Approximately 40 million credit and debit card accounts may have been impacted between Nov. 27 and Dec. 15, 2013."}
 {"id":"contrast:specimen.agency.opm-2015","source":"measurement/contrast.json","text":"As a result of the incident, OPM will send notifications to approximately 4 million individuals whose PII may have been compromised."}
 {"id":"contrast:specimen.agency.equifax-2017","source":"measurement/contrast.json","text":"In addition, credit card numbers for approximately 209,000 U.S. consumers, and certain dispute documents with personal identifying information for approximately 182,000 U.S. consumers, were accessed."}
@@ -1100,3 +1116,131 @@
 {"id":"probe:abs-never-nbsp-after-adverb","source":"scripts/xengine-diff.mjs","text":"Never again\u00a0will prices fall."}
 {"id":"probe:abs-never-accented-next","source":"scripts/xengine-diff.mjs","text":"Never \u00e9t\u00e9 again."}
 {"id":"probe:abs-never-rsquo-in-next","source":"scripts/xengine-diff.mjs","text":"Never can\u2019t stop."}
+{"id":"lexicon:botched","source":"spec/agency-lexicon.json","text":"The files were botched."}
+{"id":"lexicon:botched:by","source":"spec/agency-lexicon.json","text":"The files were botched by the board."}
+{"id":"lexicon:bungled","source":"spec/agency-lexicon.json","text":"The files were bungled."}
+{"id":"lexicon:bungled:by","source":"spec/agency-lexicon.json","text":"The files were bungled by the board."}
+{"id":"lexicon:doctored","source":"spec/agency-lexicon.json","text":"The files were doctored."}
+{"id":"lexicon:doctored:by","source":"spec/agency-lexicon.json","text":"The files were doctored by the board."}
+{"id":"lexicon:falsified","source":"spec/agency-lexicon.json","text":"The files were falsified."}
+{"id":"lexicon:falsified:by","source":"spec/agency-lexicon.json","text":"The files were falsified by the board."}
+{"id":"lexicon:ignored","source":"spec/agency-lexicon.json","text":"The files were ignored."}
+{"id":"lexicon:ignored:by","source":"spec/agency-lexicon.json","text":"The files were ignored by the board."}
+{"id":"lexicon:misappropriated","source":"spec/agency-lexicon.json","text":"The files were misappropriated."}
+{"id":"lexicon:misappropriated:by","source":"spec/agency-lexicon.json","text":"The files were misappropriated by the board."}
+{"id":"lexicon:miscalculated","source":"spec/agency-lexicon.json","text":"The files were miscalculated."}
+{"id":"lexicon:miscalculated:by","source":"spec/agency-lexicon.json","text":"The files were miscalculated by the board."}
+{"id":"lexicon:mischaracterised","source":"spec/agency-lexicon.json","text":"The files were mischaracterised."}
+{"id":"lexicon:mischaracterised:by","source":"spec/agency-lexicon.json","text":"The files were mischaracterised by the board."}
+{"id":"lexicon:mischaracterized","source":"spec/agency-lexicon.json","text":"The files were mischaracterized."}
+{"id":"lexicon:mischaracterized:by","source":"spec/agency-lexicon.json","text":"The files were mischaracterized by the board."}
+{"id":"lexicon:mishandled","source":"spec/agency-lexicon.json","text":"The files were mishandled."}
+{"id":"lexicon:mishandled:by","source":"spec/agency-lexicon.json","text":"The files were mishandled by the board."}
+{"id":"lexicon:misinformed","source":"spec/agency-lexicon.json","text":"The files were misinformed."}
+{"id":"lexicon:misinformed:by","source":"spec/agency-lexicon.json","text":"The files were misinformed by the board."}
+{"id":"lexicon:misinterpreted","source":"spec/agency-lexicon.json","text":"The files were misinterpreted."}
+{"id":"lexicon:misinterpreted:by","source":"spec/agency-lexicon.json","text":"The files were misinterpreted by the board."}
+{"id":"lexicon:misjudged","source":"spec/agency-lexicon.json","text":"The files were misjudged."}
+{"id":"lexicon:misjudged:by","source":"spec/agency-lexicon.json","text":"The files were misjudged by the board."}
+{"id":"lexicon:mislabeled","source":"spec/agency-lexicon.json","text":"The files were mislabeled."}
+{"id":"lexicon:mislabeled:by","source":"spec/agency-lexicon.json","text":"The files were mislabeled by the board."}
+{"id":"lexicon:mislabelled","source":"spec/agency-lexicon.json","text":"The files were mislabelled."}
+{"id":"lexicon:mislabelled:by","source":"spec/agency-lexicon.json","text":"The files were mislabelled by the board."}
+{"id":"lexicon:misled","source":"spec/agency-lexicon.json","text":"The files were misled."}
+{"id":"lexicon:misled:by","source":"spec/agency-lexicon.json","text":"The files were misled by the board."}
+{"id":"lexicon:mismanaged","source":"spec/agency-lexicon.json","text":"The files were mismanaged."}
+{"id":"lexicon:mismanaged:by","source":"spec/agency-lexicon.json","text":"The files were mismanaged by the board."}
+{"id":"lexicon:misplaced","source":"spec/agency-lexicon.json","text":"The files were misplaced."}
+{"id":"lexicon:misplaced:by","source":"spec/agency-lexicon.json","text":"The files were misplaced by the board."}
+{"id":"lexicon:misquoted","source":"spec/agency-lexicon.json","text":"The files were misquoted."}
+{"id":"lexicon:misquoted:by","source":"spec/agency-lexicon.json","text":"The files were misquoted by the board."}
+{"id":"lexicon:misreported","source":"spec/agency-lexicon.json","text":"The files were misreported."}
+{"id":"lexicon:misreported:by","source":"spec/agency-lexicon.json","text":"The files were misreported by the board."}
+{"id":"lexicon:misrepresented","source":"spec/agency-lexicon.json","text":"The files were misrepresented."}
+{"id":"lexicon:misrepresented:by","source":"spec/agency-lexicon.json","text":"The files were misrepresented by the board."}
+{"id":"lexicon:misstated","source":"spec/agency-lexicon.json","text":"The files were misstated."}
+{"id":"lexicon:misstated:by","source":"spec/agency-lexicon.json","text":"The files were misstated by the board."}
+{"id":"lexicon:misused","source":"spec/agency-lexicon.json","text":"The files were misused."}
+{"id":"lexicon:misused:by","source":"spec/agency-lexicon.json","text":"The files were misused by the board."}
+{"id":"lexicon:neglected","source":"spec/agency-lexicon.json","text":"The files were neglected."}
+{"id":"lexicon:neglected:by","source":"spec/agency-lexicon.json","text":"The files were neglected by the board."}
+{"id":"lexicon:overcharged","source":"spec/agency-lexicon.json","text":"The files were overcharged."}
+{"id":"lexicon:overcharged:by","source":"spec/agency-lexicon.json","text":"The files were overcharged by the board."}
+{"id":"lexicon:overlooked","source":"spec/agency-lexicon.json","text":"The files were overlooked."}
+{"id":"lexicon:overlooked:by","source":"spec/agency-lexicon.json","text":"The files were overlooked by the board."}
+{"id":"lexicon:tampered","source":"spec/agency-lexicon.json","text":"The files were tampered."}
+{"id":"lexicon:tampered:by","source":"spec/agency-lexicon.json","text":"The files were tampered by the board."}
+{"id":"lexicon:underpaid","source":"spec/agency-lexicon.json","text":"The files were underpaid."}
+{"id":"lexicon:underpaid:by","source":"spec/agency-lexicon.json","text":"The files were underpaid by the board."}
+{"id":"lexicon:accessed","source":"spec/agency-lexicon.json","text":"The files were accessed."}
+{"id":"lexicon:accessed:by","source":"spec/agency-lexicon.json","text":"The files were accessed by the board."}
+{"id":"lexicon:affected","source":"spec/agency-lexicon.json","text":"The files were affected."}
+{"id":"lexicon:affected:by","source":"spec/agency-lexicon.json","text":"The files were affected by the board."}
+{"id":"lexicon:breached","source":"spec/agency-lexicon.json","text":"The files were breached."}
+{"id":"lexicon:breached:by","source":"spec/agency-lexicon.json","text":"The files were breached by the board."}
+{"id":"lexicon:compromised","source":"spec/agency-lexicon.json","text":"The files were compromised."}
+{"id":"lexicon:compromised:by","source":"spec/agency-lexicon.json","text":"The files were compromised by the board."}
+{"id":"lexicon:exfiltrated","source":"spec/agency-lexicon.json","text":"The files were exfiltrated."}
+{"id":"lexicon:exfiltrated:by","source":"spec/agency-lexicon.json","text":"The files were exfiltrated by the board."}
+{"id":"lexicon:exposed","source":"spec/agency-lexicon.json","text":"The files were exposed."}
+{"id":"lexicon:exposed:by","source":"spec/agency-lexicon.json","text":"The files were exposed by the board."}
+{"id":"lexicon:hacked","source":"spec/agency-lexicon.json","text":"The files were hacked."}
+{"id":"lexicon:hacked:by","source":"spec/agency-lexicon.json","text":"The files were hacked by the board."}
+{"id":"lexicon:impacted","source":"spec/agency-lexicon.json","text":"The files were impacted."}
+{"id":"lexicon:impacted:by","source":"spec/agency-lexicon.json","text":"The files were impacted by the board."}
+{"id":"lexicon:leaked","source":"spec/agency-lexicon.json","text":"The files were leaked."}
+{"id":"lexicon:leaked:by","source":"spec/agency-lexicon.json","text":"The files were leaked by the board."}
+{"id":"lexicon:stolen","source":"spec/agency-lexicon.json","text":"The files were stolen."}
+{"id":"lexicon:stolen:by","source":"spec/agency-lexicon.json","text":"The files were stolen by the board."}
+{"id":"lexicon:axed","source":"spec/agency-lexicon.json","text":"The files were axed."}
+{"id":"lexicon:axed:by","source":"spec/agency-lexicon.json","text":"The files were axed by the board."}
+{"id":"lexicon:censored","source":"spec/agency-lexicon.json","text":"The files were censored."}
+{"id":"lexicon:censored:by","source":"spec/agency-lexicon.json","text":"The files were censored by the board."}
+{"id":"lexicon:concealed","source":"spec/agency-lexicon.json","text":"The files were concealed."}
+{"id":"lexicon:concealed:by","source":"spec/agency-lexicon.json","text":"The files were concealed by the board."}
+{"id":"lexicon:laid-off","source":"spec/agency-lexicon.json","text":"The files were laid off."}
+{"id":"lexicon:laid-off:by","source":"spec/agency-lexicon.json","text":"The files were laid off by the board."}
+{"id":"lexicon:let-go","source":"spec/agency-lexicon.json","text":"The files were let go."}
+{"id":"lexicon:let-go:by","source":"spec/agency-lexicon.json","text":"The files were let go by the board."}
+{"id":"lexicon:scrapped","source":"spec/agency-lexicon.json","text":"The files were scrapped."}
+{"id":"lexicon:scrapped:by","source":"spec/agency-lexicon.json","text":"The files were scrapped by the board."}
+{"id":"lexicon:shelved","source":"spec/agency-lexicon.json","text":"The files were shelved."}
+{"id":"lexicon:shelved:by","source":"spec/agency-lexicon.json","text":"The files were shelved by the board."}
+{"id":"lexicon:silenced","source":"spec/agency-lexicon.json","text":"The files were silenced."}
+{"id":"lexicon:silenced:by","source":"spec/agency-lexicon.json","text":"The files were silenced by the board."}
+{"id":"lexicon:withheld","source":"spec/agency-lexicon.json","text":"The files were withheld."}
+{"id":"lexicon:withheld:by","source":"spec/agency-lexicon.json","text":"The files were withheld by the board."}
+{"id":"lexicon:characterised","source":"spec/agency-lexicon.json","text":"Steps were characterised."}
+{"id":"lexicon:characterised:by","source":"spec/agency-lexicon.json","text":"Steps were characterised by the board."}
+{"id":"lexicon:characterized","source":"spec/agency-lexicon.json","text":"Steps were characterized."}
+{"id":"lexicon:characterized:by","source":"spec/agency-lexicon.json","text":"Steps were characterized by the board."}
+{"id":"lexicon:done","source":"spec/agency-lexicon.json","text":"Steps were done."}
+{"id":"lexicon:done:by","source":"spec/agency-lexicon.json","text":"Steps were done by the board."}
+{"id":"lexicon:given","source":"spec/agency-lexicon.json","text":"Steps were given."}
+{"id":"lexicon:given:by","source":"spec/agency-lexicon.json","text":"Steps were given by the board."}
+{"id":"lexicon:interpreted","source":"spec/agency-lexicon.json","text":"Steps were interpreted."}
+{"id":"lexicon:interpreted:by","source":"spec/agency-lexicon.json","text":"Steps were interpreted by the board."}
+{"id":"lexicon:made","source":"spec/agency-lexicon.json","text":"Steps were made."}
+{"id":"lexicon:made:by","source":"spec/agency-lexicon.json","text":"Steps were made by the board."}
+{"id":"lexicon:perceived","source":"spec/agency-lexicon.json","text":"Steps were perceived."}
+{"id":"lexicon:perceived:by","source":"spec/agency-lexicon.json","text":"Steps were perceived by the board."}
+{"id":"lexicon:put","source":"spec/agency-lexicon.json","text":"Steps were put in place."}
+{"id":"lexicon:put:by","source":"spec/agency-lexicon.json","text":"Steps were put in place by the board."}
+{"id":"lexicon:said","source":"spec/agency-lexicon.json","text":"Steps were said."}
+{"id":"lexicon:said:by","source":"spec/agency-lexicon.json","text":"Steps were said by the board."}
+{"id":"lexicon:taken","source":"spec/agency-lexicon.json","text":"Steps were taken."}
+{"id":"lexicon:taken:by","source":"spec/agency-lexicon.json","text":"Steps were taken by the board."}
+{"id":"lexicon:raised","source":"spec/agency-lexicon.json","text":"Concerns were raised."}
+{"id":"lexicon:raised:by","source":"spec/agency-lexicon.json","text":"Concerns were raised by the board."}
+{"id":"lexicon:agreed","source":"spec/agency-lexicon.json","text":"It was agreed that the plan would end."}
+{"id":"lexicon:agreed:by","source":"spec/agency-lexicon.json","text":"It was agreed by the board that the plan would end."}
+{"id":"lexicon:decided","source":"spec/agency-lexicon.json","text":"It was decided that the plan would end."}
+{"id":"lexicon:decided:by","source":"spec/agency-lexicon.json","text":"It was decided by the board that the plan would end."}
+{"id":"lexicon:determined","source":"spec/agency-lexicon.json","text":"It was determined that the plan would end."}
+{"id":"lexicon:determined:by","source":"spec/agency-lexicon.json","text":"It was determined by the board that the plan would end."}
+{"id":"lexicon:disclosed","source":"spec/agency-lexicon.json","text":"Your data was disclosed."}
+{"id":"lexicon:disclosed:by","source":"spec/agency-lexicon.json","text":"Your data was disclosed by the board."}
+{"id":"lexicon:shared","source":"spec/agency-lexicon.json","text":"Your data was shared."}
+{"id":"lexicon:shared:by","source":"spec/agency-lexicon.json","text":"Your data was shared by the board."}
+{"id":"lexicon:sold","source":"spec/agency-lexicon.json","text":"Your data was sold."}
+{"id":"lexicon:sold:by","source":"spec/agency-lexicon.json","text":"Your data was sold by the board."}

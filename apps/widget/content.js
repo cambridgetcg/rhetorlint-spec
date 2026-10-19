@@ -60,31 +60,192 @@ const RULE_KEYS = {
 };
 const ZERO_LENGTH_PATTERN_PROBES = ["", "a", "A", "0", "_", " ", "\n", "word", "example"];
 
-/** Words the -ed/-en passive heuristic should treat as predicate adjectives, not passives.
- *  Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern would
- *  otherwise swallow, and "often" so the bare "is often" never reads as a passive. */
-const NOT_PASSIVE = new Set([
-  "tired", "glad", "aware", "worried", "excited", "interested", "scared",
-  "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
-  "dedicated", "committed", "supposed", "used", "based",
-  "open", "even", "sudden", "seven", "ten", "eleven", "golden", "wooden", "often"
+// BEGIN GENERATED AGENCY LEXICON
+// spec/agency-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// Edit the lexicon and rerun the generator; --check fails when this block drifts.
+const AGENCY_AUXILIARIES = ["been", "was", "were"];
+const AGENCY_ADVERBS = ["already", "always", "never", "often", "still"];
+const AGENCY_ADVERB_SUFFIX = "ly";
+const AGENCY_SKIP = new Set([
+  "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never",
+  "not", "now", "shall", "should", "since", "then", "will", "would"
 ]);
+const AGENCY_SKIP_SUFFIX = "ly";
+const AGENCY_SKIP_MAX = 4;
+const AGENCY_BY_WINDOW = 7;
+const AGENCY_HEADS = new Map([
+  ["challenge", new Set([
+    "allegations", "concerns", "questions"
+  ])],
+  ["data", new Set([
+    "address", "addresses", "credentials", "data", "details", "information", "password",
+    "passwords", "pii", "records"
+  ])],
+  ["dummy", new Set([
+    "it"
+  ])],
+  ["error", new Set([
+    "action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision",
+    "decisions", "error", "errors", "measures", "miscalculation", "miscalculations", "misjudgement",
+    "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps", "mistake", "mistakes",
+    "omissions", "promises", "questions", "remarks", "safeguards", "statements", "steps", "things",
+    "threats", "words"
+  ])]
+]);
+/** [class, head class or "" for none, participles]. */
+const AGENCY_CLASSES = [
+  ["fault", "", [
+    "botched", "bungled", "doctored", "falsified", "ignored", "misappropriated", "miscalculated",
+    "mischaracterised", "mischaracterized", "mishandled", "misinformed", "misinterpreted",
+    "misjudged", "mislabeled", "mislabelled", "misled", "mismanaged", "misplaced", "misquoted",
+    "misreported", "misrepresented", "misstated", "misused", "neglected", "overcharged",
+    "overlooked", "tampered", "underpaid"
+  ]],
+  ["breach", "", [
+    "accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked",
+    "impacted", "leaked", "stolen"
+  ]],
+  ["conceal", "", [
+    "axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
+    "withheld"
+  ]],
+  ["light", "error", [
+    "characterised", "characterized", "done", "given", "interpreted", "made", "perceived", "put",
+    "said", "taken"
+  ]],
+  ["raise", "challenge", [
+    "raised"
+  ]],
+  ["impersonal", "dummy", [
+    "agreed", "decided", "determined"
+  ]],
+  ["data", "data", [
+    "disclosed", "shared", "sold"
+  ]]
+];
+const AGENCY_REQUIRES = new Map([["put", "in place"]]);
+const AGENCY_UNLESS = new Map([["exposed", "to"]]);
+// END GENERATED AGENCY LEXICON
 
-/** Irregular past participles the "\w+ed|\w+en" pattern would otherwise miss. */
-const IRREGULAR_PP =
-  "made|taken|done|given|seen|known|held|shown|drawn|chosen|written|broken|spoken|" +
-  "built|sent|kept|left|lost|found|told|brought|dealt|put|set|paid|felt|met|led|read|" +
-  "hit|cut|hurt|shut|split|spread|cast|cost|let";
+/*
+ * The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
+ * clause leaves unstated: "Mistakes were made", "Customer data was quietly
+ * accessed", "Records were withheld". Subject absence alone is not the tell:
+ * methods sections, documentation and news are full of honest passives. So a
+ * mark needs all of:
+ *   1. a past passive auxiliary (AGENCY_AUXILIARIES: was, were, been), then at
+ *      most one adverb (an ASCII word ending in -ly, or AGENCY_ADVERBS), then
+ *   2. a participle from a closed class: a fault, a breach, a concealment (no
+ *      head word needed); a light verb after an error, decision or statement
+ *      noun ("mistakes were made"); "decided" after "it"; or a verb that hands
+ *      data to someone else after a data noun ("your data was shared");
+ *   3. its AGENCY_REQUIRES phrase ("put" only in "put in place"), and not its
+ *      AGENCY_UNLESS word ("exposed to" names an exposure, not a breach);
+ *   4. no "by" among the next AGENCY_BY_WINDOW words of the clause: the agent
+ *      is named ("...by Forbes"), or the clause says when ("by Friday"), and
+ *      either way the rule stays silent.
+ * The head word is the nearest word before the auxiliary, stepping back over
+ * at most AGENCY_SKIP_MAX words of AGENCY_SKIP or ending in -ly, never past
+ * . ; : ! ? or a line break. The "by" window ends at . ; : ! ? but reads on
+ * across a line break, since hard-wrapped text breaks lines mid-clause: each
+ * window stops where stopping marks less.
+ *
+ * Portability: matching runs on an ASCII-lowercased copy (A-Z to a-z and
+ * nothing else, so its length is the text's in every offset unit), with no
+ * case-insensitive flag, explicit [ \t\n\r\f] whitespace and ASCII word
+ * boundaries. A no-break space or a vertical tab does not join two words, and
+ * a non-ASCII letter is never folded into one, so JavaScript, Python and Go
+ * read the same words. The lists are generated from spec/agency-lexicon.json.
+ */
+const AGENCY_WHITESPACE = " \t\n\r\f";
+const AGENCY_SPACE = "[ \\t\\n\\r\\f]+";
+const AGENCY_HEAD_STOPS = ".;:!?\n";
+const AGENCY_CLAUSE_BREAKS = ".;:!?";
 
-const AGENTLESS_PASSIVE = new RegExp(
-  // be-verb  (+ optional adverb, -ly or a common frequency word)  + participle,
-  // NOT followed by "by <agent>" — where the by-phrase may sit past a particle
-  // or adverb ("carried out collectively by the network" still names the agent).
-  "\\b(is|are|was|were|been|being|be)\\s+(?:(?:\\w+ly|often|never|always|still|already)\\s+)?" +
-  "(\\w+(?:ed|en)|" + IRREGULAR_PP + ")\\b" +
-  "(?!\\s+(?:(?:\\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\\s+)*by\\b)",
-  "gi"
+/** Each participle and the head class it needs ("" for none). */
+const AGENCY_HEAD_OF = new Map(
+  AGENCY_CLASSES.flatMap(([, head, participles]) => participles.map((p) => [p, head]))
 );
+
+const AGENCY_CANDIDATE = new RegExp(
+  "\\b(" + AGENCY_AUXILIARIES.join("|") + ")" + AGENCY_SPACE +
+  "(?:(?:[a-z]+" + AGENCY_ADVERB_SUFFIX + "|" + AGENCY_ADVERBS.join("|") + ")" + AGENCY_SPACE + ")?" +
+  "(" + [...AGENCY_HEAD_OF.keys()]
+    .sort((a, b) => b.length - a.length || (a < b ? -1 : a > b ? 1 : 0))
+    .map((p) => p.split(" ").join(AGENCY_SPACE))
+    .join("|") + ")\\b",
+  "g"
+);
+
+/** An ASCII letter, digit or underscore: what \b counts as a word character. */
+function isAgencyWordCode(code) {
+  return (code >= 97 && code <= 122) || (code >= 48 && code <= 57) || code === 95;
+}
+
+/** The head word before `index` in the lowercased text, or "" (see above). */
+function agencyHeadWord(low, index) {
+  let i = index;
+  for (let seen = 0; seen <= AGENCY_SKIP_MAX; seen++) {
+    while (i > 0 && !isAgencyWordCode(low.charCodeAt(i - 1))) {
+      if (AGENCY_HEAD_STOPS.includes(low[i - 1])) return "";
+      i--;
+    }
+    const end = i;
+    while (i > 0 && isAgencyWordCode(low.charCodeAt(i - 1))) i--;
+    if (i === end) return "";
+    const word = low.slice(i, end);
+    if (!AGENCY_SKIP.has(word) && !word.endsWith(AGENCY_SKIP_SUFFIX)) return word;
+  }
+  return "";
+}
+
+/** True when "by" is one of the next AGENCY_BY_WINDOW words after `index`, before . ; : ! or ?. */
+function agencyByFollows(low, index) {
+  let i = index;
+  for (let words = 0; words < AGENCY_BY_WINDOW; words++) {
+    while (i < low.length && !isAgencyWordCode(low.charCodeAt(i))) {
+      if (AGENCY_CLAUSE_BREAKS.includes(low[i])) return false;
+      i++;
+    }
+    if (i === low.length) return false;
+    const start = i;
+    while (i < low.length && isAgencyWordCode(low.charCodeAt(i))) i++;
+    if (low.slice(start, i) === "by") return true;
+  }
+  return false;
+}
+
+/** True when the words of `phrase` follow `index`, each after [ \t\n\r\f]+, each whole. */
+function agencyPhraseFollows(low, index, phrase) {
+  let i = index;
+  for (const word of phrase.split(" ")) {
+    const gap = i;
+    while (i < low.length && AGENCY_WHITESPACE.includes(low[i])) i++;
+    if (i === gap || !low.startsWith(word, i)) return false;
+    i += word.length;
+    if (i < low.length && isAgencyWordCode(low.charCodeAt(i))) return false;
+  }
+  return true;
+}
+
+/** Every accountable agentless passive in `text`, spanning auxiliary through participle. */
+function agentlessPassives(text) {
+  const low = asciiLower(text);
+  const out = [];
+  for (const m of low.matchAll(AGENCY_CANDIDATE)) {
+    const start = m.index, end = start + m[0].length;
+    const participle = m[2].split(/[ \t\n\r\f]+/).join(" ");
+    const unless = AGENCY_UNLESS.get(participle);
+    if (unless !== undefined && agencyPhraseFollows(low, end, unless)) continue;
+    const requires = AGENCY_REQUIRES.get(participle);
+    if (requires !== undefined && !agencyPhraseFollows(low, end, requires)) continue;
+    if (agencyByFollows(low, end)) continue;
+    const head = AGENCY_HEAD_OF.get(participle);
+    if (head !== "" && !AGENCY_HEADS.get(head).has(agencyHeadWord(low, start))) continue;
+    out.push({ index: start, length: end - start, actual: text.slice(start, end) });
+  }
+  return out;
+}
 
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -338,11 +499,7 @@ function matchesFor(rule, text) {
       out.push({ index: m.index, length: m[0].length, actual: m[0] });
     }
   } else if (rule.type === "structural" && rule.detector === "agentless-passive") {
-    for (const m of text.matchAll(AGENTLESS_PASSIVE)) {
-      const participle = (m[2] || "").toLowerCase();
-      if (NOT_PASSIVE.has(participle)) continue;
-      out.push({ index: m.index, length: m[0].length, actual: m[0] });
-    }
+    for (const hit of agentlessPassives(text)) out.push(hit);
   }
   return out;
 }
@@ -670,7 +827,7 @@ function joinRemovalSeam(left, right) {
 }
 
 
-const RULES = {"id":"@rhetorlint/rules-en","version":"0.2.1","locale":"en","note":"Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.","rules":[{"ruleId":"intensifier.loaded","family":"manipulative-wording","technique":"Loaded Language","type":"lexical","level":"info","confidence":0.55,"note":"an intensifier — turns up the emotional volume without adding fact","terms":["extremely","incredibly","deeply","tremendously","utterly","wholeheartedly","profoundly","massively","hugely"],"expected":["(state the fact without the intensifier)"]},{"ruleId":"absolute.universal","family":"simplification","technique":"False Dilemma or No Choice","type":"lexical","level":"info","confidence":0.6,"note":"an absolute — claims more than anyone could actually know","terms":["always","never","everyone","no one","nobody","everybody","undeniable","guaranteed","without a doubt","obviously","clearly","of course","there is no question","forever","every time","without exception","no exceptions"],"expected":["(qualify: how often, who exactly, how certain)"]},{"ruleId":"hedge.softener","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"lexical","level":"info","confidence":0.55,"note":"a hedge — lowers a promise you can later deny","terms":["reaching out to","sort of","kind of","we believe","we feel","it seems","to some extent","somewhat","if anything","as it were","in a sense","for the most part"],"expected":["(say the concrete commitment, or drop the claim)"]},{"ruleId":"hedge.deniable","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"info","confidence":0.6,"note":"a deniable modal — leaves room to say you never promised","pattern":"\\b(?:may|might|could)\\s+(?:have\\s+\\w+|be\\s+\\w+|possibly|potentially)\\b|\\b(?:reportedly|allegedly|purportedly)\\b","expected":["(state what you know, and what you don't)"]},{"ruleId":"weasel.attribution","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"note","confidence":0.65,"note":"an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)","pattern":"\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|observers?|commentators?|economists?|historians?|scholars?|pundits?|reports|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests|warn|warns|warned|fear|feared|note|noted|predict|predicts|predicted|caution|cautioned)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b|\\bit\\s+is\\s+often\\s+(?:said|reported)\\b|\\b(?:is|are|was|were)\\s+widely\\s+(?:regarded|described|seen|considered)\\s+as\\b|\\b(?:has|have)\\s+been\\s+(?:widely|often|repeatedly|variously)\\s+described\\s+as\\b","expected":["(name the source, or drop the appeal)"]},{"ruleId":"deflection.whataboutism","family":"distraction","technique":"Whataboutism","type":"pattern","level":"note","confidence":0.6,"note":"a deflection — points away from the question just asked","pattern":"\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let['’]?s\\s+not\\s+forget|whatabout)\\b","expected":["(answer the original question first)"]},{"ruleId":"contrition.rehearsed","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"warning","confidence":0.7,"note":"rehearsed contrition — the shape of an apology with the substance removed","pattern":"\\bwe\\s+take\\s+(?:your\\s+|the\\s+)?[a-z ]{0,24}?\\bseriously\\b|\\bwe\\s+(?:sincerely\\s+)?apologi[sz]e\\s+for\\s+any\\b|\\bwe\\s+are\\s+committed\\s+to\\b|\\bwe\\s+value\\s+your\\b|\\bout\\s+of\\s+an\\s+abundance\\s+of\\s+caution\\b|\\bwe\\s+hear\\s+you\\b","expected":["(say the specific thing you did wrong and the specific thing you will do)"]},{"ruleId":"lure.free-offer","family":"manipulative-wording","technique":"Exaggeration or Minimisation","type":"pattern","level":"info","confidence":0.55,"note":"a free-offer lure — minimises the cost or inflates the bundle to rush the yes","pattern":"\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[-‐‑– ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b","expected":["(state the price, the terms, and what is actually included)"]},{"ruleId":"urgency.appeal-to-time","family":"call","technique":"Appeal to Time","type":"pattern","level":"note","confidence":0.6,"note":"manufactured urgency — pressure to act before you can weigh it","pattern":"\\b(?:act\\s+now|act\\s+fast|don['’]?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it['’]?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b","expected":["(state the real deadline and what actually happens after it, or drop the clock)"]},{"ruleId":"shouting.caps","family":"manipulative-wording","technique":"Loaded Language","type":"pattern","caseSensitive":true,"minEngine":"0.1.2","level":"info","confidence":0.6,"note":"sustained ALL-CAPS — volume standing in for argument","pattern":"\\b[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z](?:\\s+[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z])+\\b","expected":["(make the point in sentence case; let the facts carry the emphasis)"]},{"ruleId":"agency-hiding.deleted-subject","family":"agency-hiding","technique":"Obfuscation (structural — RhetorLint extension)","type":"structural","detector":"agentless-passive","level":"warning","confidence":0.7,"note":"an agentless passive — who acted is deleted from the sentence","expected":["(name who did it: 'I/we + verb')"]},{"ruleId":"euphemism.institutional","family":"manipulative-wording","technique":"Exaggeration or Minimisation","type":"lexical","level":"note","confidence":0.6,"note":"an institutional euphemism — a fixed administrative phrase standing where the plain event would be","terms":["collateral damage","enhanced interrogation","surgical strike","surgical strikes","workforce reduction","workforce reductions"],"expected":["(name the plain event in plain words: what happened, to whom)"]},{"ruleId":"editorializing.stance","family":"manipulative-wording","technique":"Loaded Language","type":"lexical","level":"info","confidence":0.6,"note":"an editorializing stance marker — instructs the reader how to judge the fact before the fact arrives","terms":["it should be noted","it is worth noting","it's worth noting","it’s worth noting","it is important to note","it's important to note","it’s important to note","needless to say","tellingly","unsurprisingly","in a stunning move","in a bizarre twist","in a shocking turn","make no mistake"],"expected":["(delete the stance word; state the fact and let the reader weigh it)"]},{"ruleId":"attribution.doubt-verb","family":"attack-on-reputation","technique":"Doubt","type":"pattern","level":"note","confidence":0.6,"note":"a doubt-casting attribution verb — 'said' reports the speech; 'claimed that' / 'insisted that' ship a verdict on the speaker inside the report","pattern":"\\b(?:claim(?:ed|ing)|insist(?:ed|ing))\\s+that\\b|\\b(?:he|she|it|they)\\s+(?:claims?|insists?)\\s+that\\b","expected":["(swap in 'said' — report the words and let the reader judge them)"]},{"ruleId":"distancing.doubt-marker","family":"attack-on-reputation","technique":"Doubt","type":"lexical","level":"info","confidence":0.55,"note":"a doubt marker — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute (technical 'so-called' = 'known as' is the known false positive; 'allegedly/purportedly' belong to hedge.deniable)","terms":["so-called","so‐called","so‑called","so–called","self-styled","self‐styled","self‑styled","self–styled","self-proclaimed","self‐proclaimed","self‑proclaimed","self–proclaimed","self-appointed","self‐appointed","self‑appointed","self–appointed","self-anointed","self‐anointed","self‑anointed","self–anointed","styles himself as","styles herself as","styles itself as","styles themselves as","quote-unquote","quote‐unquote","quote‑unquote","quote–unquote","quote unquote"],"expected":["(argue the dispute: say who holds the title, who contests it, and why — or accept the label)"]},{"ruleId":"attribution.factive","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"info","confidence":0.5,"note":"a factive attribution — a said-substitute whose verb presupposes the attributed claim is true, endorsing it inside what reads as neutral reporting","pattern":"\\brevealed\\s+that\\b|\\bpoint(?:s|ed)\\s+out\\s+that\\b|\\bdebunk(?:s|ed)\\b|\\brefut(?:es|ed)\\b","expected":["(attribute neutrally — 'said', 'stated', 'disputed' — or assert the fact in your own voice with the evidence that earns it)"]},{"ruleId":"implicative.shortfall","family":"manipulative-wording","technique":"Loaded Language","type":"pattern","level":"info","confidence":0.55,"note":"an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')","pattern":"\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n['’]?t)\\s+(?:even\\s+)?bother\\s+to\\b","expected":["(report the event without the verdict: 'did not comment', 'declined to say')"]},{"ruleId":"sourcing.anonymous","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"info","confidence":0.6,"note":"an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check","pattern":"\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[-‐‑– ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b","expected":["(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"]},{"ruleId":"combat.attack-verb","family":"manipulative-wording","technique":"Loaded Language","type":"pattern","level":"info","confidence":0.55,"note":"combat framing — wording that stages a disagreement as an attack scene; the violence lives in the verb, not in any reported act","pattern":"\\b(?:rip|rips|ripped|ripping)\\s+into\\b|\\b(?:lash|lashes|lashed|lashing)\\s+out\\s+at\\b|\\b(?:hit|hits|hitting)\\s+(?:out|back)\\s+at\\b|\\b(?:fire|fires|fired|firing)\\s+back\\s+at\\b|\\b(?:clap|claps|clapped|clapping)\\s+back\\s+at\\b|\\b(?:spark|sparks|sparked|sparking)\\s+(?:outrage|fury|backlash)\\b","expected":["(report the speech act: said, criticized, responded — and quote what was actually said)"]},{"ruleId":"exoneration.formula","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"note","confidence":0.7,"note":"an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)","pattern":"\\b(?:officer|police|deputy|trooper)[-‐‑– ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[-‐‑– ]of[-‐‑– ]force\\s+incidents?\\b","expected":["(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"]},{"ruleId":"insinuation.raises-questions","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"note","confidence":0.6,"note":"a question-frame — the words assert that questions or doubts exist while the asker and the question itself are deleted","pattern":"\\brais(?:es|ed|ing|e)\\s+(?:serious|troubling|disturbing|grave)\\s+(?:questions?|doubts?)\\s+(?:about|over)\\b|\\bquestions\\s+(?:linger(?:s|ed|ing)?|swirl(?:s|ed|ing)?)\\s+(?:about|over|around)\\b","expected":["(state the actual question and who is asking it, or make the claim outright)"]},{"ruleId":"puffery.peacock","family":"manipulative-wording","technique":"Exaggeration or Minimisation","type":"lexical","level":"info","confidence":0.5,"note":"a puffery epithet — the praise sits in the adjective, not in a checkable fact","terms":["world-class","world‐class","world‑class","world–class","critically acclaimed","award-winning","award‐winning","award‑winning","award–winning","renowned","famed","storied","visionary","cutting-edge","cutting‐edge","cutting‑edge","cutting–edge","game-changing","game‐changing","game‑changing","game–changing","state-of-the-art","state‐of‐the‐art","state‑of‑the‑art","state–of–the–art","best-in-class","best‐in‐class","best‑in‑class","best–in–class","iconic"],"expected":["(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"]}]};
+const RULES = {"id":"@rhetorlint/rules-en","version":"0.2.1","locale":"en","note":"Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.","rules":[{"ruleId":"intensifier.loaded","family":"manipulative-wording","technique":"Loaded Language","type":"lexical","level":"info","confidence":0.55,"note":"an intensifier — turns up the emotional volume without adding fact","terms":["extremely","incredibly","deeply","tremendously","utterly","wholeheartedly","profoundly","massively","hugely"],"expected":["(state the fact without the intensifier)"]},{"ruleId":"absolute.universal","family":"simplification","technique":"False Dilemma or No Choice","type":"lexical","level":"info","confidence":0.6,"note":"an absolute — claims more than anyone could actually know","terms":["always","never","everyone","no one","nobody","everybody","undeniable","guaranteed","without a doubt","obviously","clearly","of course","there is no question","forever","every time","without exception","no exceptions"],"expected":["(qualify: how often, who exactly, how certain)"]},{"ruleId":"hedge.softener","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"lexical","level":"info","confidence":0.55,"note":"a hedge — lowers a promise you can later deny","terms":["reaching out to","sort of","kind of","we believe","we feel","it seems","to some extent","somewhat","if anything","as it were","in a sense","for the most part"],"expected":["(say the concrete commitment, or drop the claim)"]},{"ruleId":"hedge.deniable","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"info","confidence":0.6,"note":"a deniable modal — leaves room to say you never promised","pattern":"\\b(?:may|might|could)\\s+(?:have\\s+\\w+|be\\s+\\w+|possibly|potentially)\\b|\\b(?:reportedly|allegedly|purportedly)\\b","expected":["(state what you know, and what you don't)"]},{"ruleId":"weasel.attribution","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"note","confidence":0.65,"note":"an unnamed authority — 'who says?' is deleted (a named source would instead be SemEval's Appeal to Authority, under Justification)","pattern":"\\b(?:experts?|scientists?|studies|research|sources?|critics?|analysts?|observers?|commentators?|economists?|historians?|scholars?|pundits?|reports|many(?:\\s+people)?|some(?:\\s+people)?)\\s+(?:say|says|said|agree|agrees|show|shows|claim|claims|believe|believes|argue|argues|suggest|suggests|warn|warns|warned|fear|feared|note|noted|predict|predicts|predicted|caution|cautioned)\\b|\\bit\\s+is\\s+(?:widely\\s+)?(?:believed|thought|understood|known)\\b|\\bit\\s+is\\s+often\\s+(?:said|reported)\\b|\\b(?:is|are|was|were)\\s+widely\\s+(?:regarded|described|seen|considered)\\s+as\\b|\\b(?:has|have)\\s+been\\s+(?:widely|often|repeatedly|variously)\\s+described\\s+as\\b","expected":["(name the source, or drop the appeal)"]},{"ruleId":"deflection.whataboutism","family":"distraction","technique":"Whataboutism","type":"pattern","level":"note","confidence":0.6,"note":"a deflection — points away from the question just asked","pattern":"\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let['’]?s\\s+not\\s+forget|whatabout)\\b","expected":["(answer the original question first)"]},{"ruleId":"contrition.rehearsed","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"warning","confidence":0.7,"note":"rehearsed contrition — the shape of an apology with the substance removed","pattern":"\\bwe\\s+take\\s+(?:your\\s+|the\\s+)?[a-z ]{0,24}?\\bseriously\\b|\\bwe\\s+(?:sincerely\\s+)?apologi[sz]e\\s+for\\s+any\\b|\\bwe\\s+are\\s+committed\\s+to\\b|\\bwe\\s+value\\s+your\\b|\\bout\\s+of\\s+an\\s+abundance\\s+of\\s+caution\\b|\\bwe\\s+hear\\s+you\\b","expected":["(say the specific thing you did wrong and the specific thing you will do)"]},{"ruleId":"lure.free-offer","family":"manipulative-wording","technique":"Exaggeration or Minimisation","type":"pattern","level":"info","confidence":0.55,"note":"a free-offer lure — minimises the cost or inflates the bundle to rush the yes","pattern":"\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[-‐‑– ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b","expected":["(state the price, the terms, and what is actually included)"]},{"ruleId":"urgency.appeal-to-time","family":"call","technique":"Appeal to Time","type":"pattern","level":"note","confidence":0.6,"note":"manufactured urgency — pressure to act before you can weigh it","pattern":"\\b(?:act\\s+now|act\\s+fast|don['’]?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it['’]?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b","expected":["(state the real deadline and what actually happens after it, or drop the clock)"]},{"ruleId":"shouting.caps","family":"manipulative-wording","technique":"Loaded Language","type":"pattern","caseSensitive":true,"minEngine":"0.1.2","level":"info","confidence":0.6,"note":"sustained ALL-CAPS — volume standing in for argument","pattern":"\\b[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z](?:\\s+[A-Z][^\\x00-\\x40\\x5b-\\x7f]+[A-Z])+\\b","expected":["(make the point in sentence case; let the facts carry the emphasis)"]},{"ruleId":"agency-hiding.deleted-subject","family":"agency-hiding","technique":"Obfuscation (structural — RhetorLint extension)","type":"structural","detector":"agentless-passive","level":"note","confidence":0.6,"note":"a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause","expected":["(name who did it: 'I/we + verb')"]},{"ruleId":"euphemism.institutional","family":"manipulative-wording","technique":"Exaggeration or Minimisation","type":"lexical","level":"note","confidence":0.6,"note":"an institutional euphemism — a fixed administrative phrase standing where the plain event would be","terms":["collateral damage","enhanced interrogation","surgical strike","surgical strikes","workforce reduction","workforce reductions"],"expected":["(name the plain event in plain words: what happened, to whom)"]},{"ruleId":"editorializing.stance","family":"manipulative-wording","technique":"Loaded Language","type":"lexical","level":"info","confidence":0.6,"note":"an editorializing stance marker — instructs the reader how to judge the fact before the fact arrives","terms":["it should be noted","it is worth noting","it's worth noting","it’s worth noting","it is important to note","it's important to note","it’s important to note","needless to say","tellingly","unsurprisingly","in a stunning move","in a bizarre twist","in a shocking turn","make no mistake"],"expected":["(delete the stance word; state the fact and let the reader weigh it)"]},{"ruleId":"attribution.doubt-verb","family":"attack-on-reputation","technique":"Doubt","type":"pattern","level":"note","confidence":0.6,"note":"a doubt-casting attribution verb — 'said' reports the speech; 'claimed that' / 'insisted that' ship a verdict on the speaker inside the report","pattern":"\\b(?:claim(?:ed|ing)|insist(?:ed|ing))\\s+that\\b|\\b(?:he|she|it|they)\\s+(?:claims?|insists?)\\s+that\\b","expected":["(swap in 'said' — report the words and let the reader judge them)"]},{"ruleId":"distancing.doubt-marker","family":"attack-on-reputation","technique":"Doubt","type":"lexical","level":"info","confidence":0.55,"note":"a doubt marker — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute (technical 'so-called' = 'known as' is the known false positive; 'allegedly/purportedly' belong to hedge.deniable)","terms":["so-called","so‐called","so‑called","so–called","self-styled","self‐styled","self‑styled","self–styled","self-proclaimed","self‐proclaimed","self‑proclaimed","self–proclaimed","self-appointed","self‐appointed","self‑appointed","self–appointed","self-anointed","self‐anointed","self‑anointed","self–anointed","styles himself as","styles herself as","styles itself as","styles themselves as","quote-unquote","quote‐unquote","quote‑unquote","quote–unquote","quote unquote"],"expected":["(argue the dispute: say who holds the title, who contests it, and why — or accept the label)"]},{"ruleId":"attribution.factive","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"info","confidence":0.5,"note":"a factive attribution — a said-substitute whose verb presupposes the attributed claim is true, endorsing it inside what reads as neutral reporting","pattern":"\\brevealed\\s+that\\b|\\bpoint(?:s|ed)\\s+out\\s+that\\b|\\bdebunk(?:s|ed)\\b|\\brefut(?:es|ed)\\b","expected":["(attribute neutrally — 'said', 'stated', 'disputed' — or assert the fact in your own voice with the evidence that earns it)"]},{"ruleId":"implicative.shortfall","family":"manipulative-wording","technique":"Loaded Language","type":"pattern","level":"info","confidence":0.55,"note":"an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')","pattern":"\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n['’]?t)\\s+(?:even\\s+)?bother\\s+to\\b","expected":["(report the event without the verdict: 'did not comment', 'declined to say')"]},{"ruleId":"sourcing.anonymous","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"info","confidence":0.6,"note":"an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check","pattern":"\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[-‐‑– ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b","expected":["(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"]},{"ruleId":"combat.attack-verb","family":"manipulative-wording","technique":"Loaded Language","type":"pattern","level":"info","confidence":0.55,"note":"combat framing — wording that stages a disagreement as an attack scene; the violence lives in the verb, not in any reported act","pattern":"\\b(?:rip|rips|ripped|ripping)\\s+into\\b|\\b(?:lash|lashes|lashed|lashing)\\s+out\\s+at\\b|\\b(?:hit|hits|hitting)\\s+(?:out|back)\\s+at\\b|\\b(?:fire|fires|fired|firing)\\s+back\\s+at\\b|\\b(?:clap|claps|clapped|clapping)\\s+back\\s+at\\b|\\b(?:spark|sparks|sparked|sparking)\\s+(?:outrage|fury|backlash)\\b","expected":["(report the speech act: said, criticized, responded — and quote what was actually said)"]},{"ruleId":"exoneration.formula","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"note","confidence":0.7,"note":"an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)","pattern":"\\b(?:officer|police|deputy|trooper)[-‐‑– ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[-‐‑– ]of[-‐‑– ]force\\s+incidents?\\b","expected":["(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"]},{"ruleId":"insinuation.raises-questions","family":"manipulative-wording","technique":"Obfuscation, Intentional Vagueness, Confusion","type":"pattern","level":"note","confidence":0.6,"note":"a question-frame — the words assert that questions or doubts exist while the asker and the question itself are deleted","pattern":"\\brais(?:es|ed|ing|e)\\s+(?:serious|troubling|disturbing|grave)\\s+(?:questions?|doubts?)\\s+(?:about|over)\\b|\\bquestions\\s+(?:linger(?:s|ed|ing)?|swirl(?:s|ed|ing)?)\\s+(?:about|over|around)\\b","expected":["(state the actual question and who is asking it, or make the claim outright)"]},{"ruleId":"puffery.peacock","family":"manipulative-wording","technique":"Exaggeration or Minimisation","type":"lexical","level":"info","confidence":0.5,"note":"a puffery epithet — the praise sits in the adjective, not in a checkable fact","terms":["world-class","world‐class","world‑class","world–class","critically acclaimed","award-winning","award‐winning","award‑winning","award–winning","renowned","famed","storied","visionary","cutting-edge","cutting‐edge","cutting‑edge","cutting–edge","game-changing","game‐changing","game‑changing","game–changing","state-of-the-art","state‐of‐the‐art","state‑of‑the‑art","state–of–the–art","best-in-class","best‐in‐class","best‑in‑class","best–in–class","iconic"],"expected":["(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"]}]};
 
 /* RhetorLint widget panel — the in-page UI.
  *
