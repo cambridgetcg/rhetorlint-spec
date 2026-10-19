@@ -31,6 +31,10 @@
 {"id":"case:30","source":"conformance/cases.json","text":"The startup has been described as the next big thing by Forbes."}
 {"id":"case:31","source":"conformance/cases.json","text":"The risk is not extremely high."}
 {"id":"case:32","source":"conformance/cases.json","text":"\"It was utterly devastating,\" she said."}
+{"id":"case:33","source":"conformance/cases.json","text":"Returns are not guaranteed; past performance is no indicator."}
+{"id":"case:34","source":"conformance/cases.json","text":"Results aren't always typical."}
+{"id":"case:35","source":"conformance/cases.json","text":"Never share your password with anyone."}
+{"id":"case:36","source":"conformance/cases.json","text":"Guaranteed to double your savings."}
 {"id":"item:inv-breach-apology#1","source":"measurement/items/inv-breach-apology.txt","text":"Subject: An important update about your account"}
 {"id":"item:inv-breach-apology#2","source":"measurement/items/inv-breach-apology.txt","text":"Dear Valued Customer,"}
 {"id":"item:inv-breach-apology#3","source":"measurement/items/inv-breach-apology.txt","text":"At Brightwell, the trust you place in us is the foundation of everything we do. We are writing to let you know about a recent security incident that may have involved some of your information."}
@@ -754,15 +758,14 @@
 {"id":"contrast:probe.absolute-universal.03","source":"measurement/contrast.json","text":"This is guaranteed to double your savings."}
 {"id":"contrast:probe.absolute-universal.04","source":"measurement/contrast.json","text":"This is the only option."}
 {"id":"contrast:probe.absolute-universal.05","source":"measurement/contrast.json","text":"No-one could have predicted this."}
-{"id":"contrast:probe.absolute-universal.06","source":"measurement/contrast.json","text":"Never share your password with anyone."}
 {"id":"contrast:probe.absolute-universal.07","source":"measurement/contrast.json","text":"Speak clearly into the microphone."}
-{"id":"contrast:probe.absolute-universal.08","source":"measurement/contrast.json","text":"Returns are not guaranteed; past performance is no indicator."}
 {"id":"contrast:probe.absolute-universal.09","source":"measurement/contrast.json","text":"No one was injured in the fire, the fire service said."}
-{"id":"contrast:negation.absolute-universal.arent-always","source":"measurement/contrast.json","text":"Results aren't always typical."}
 {"id":"contrast:negation.absolute-universal.not-everyone","source":"measurement/contrast.json","text":"Not everyone qualifies."}
 {"id":"contrast:negation.absolute-universal.never-manufacture","source":"measurement/contrast.json","text":"Explain real constraints; never manufacture the shortage."}
 {"id":"contrast:lesson.absolute-universal.nobody","source":"measurement/contrast.json","text":"Nobody beats our prices."}
 {"id":"contrast:lesson.absolute-universal.undeniable","source":"measurement/contrast.json","text":"Our results are undeniable."}
+{"id":"contrast:lesson.absolute-universal.never-again","source":"measurement/contrast.json","text":"Never again will prices be this low."}
+{"id":"contrast:lesson.absolute-universal.no-doubt-everyone","source":"measurement/contrast.json","text":"There's no doubt everyone loves it."}
 {"id":"contrast:probe.hedge-softener.01","source":"measurement/contrast.json","text":"We believe this update will fix most issues."}
 {"id":"contrast:probe.hedge-softener.02","source":"measurement/contrast.json","text":"It seems the outage is sort of resolved."}
 {"id":"contrast:probe.hedge-softener.03","source":"measurement/contrast.json","text":"To some extent, the rollout went well."}
@@ -1039,3 +1042,35 @@
 {"id":"probe:strip-quote-previous-line","source":"scripts/xengine-diff.mjs","text":"He said \"hello\nand it was extremely loud."}
 {"id":"probe:strip-quote-crlf","source":"scripts/xengine-diff.mjs","text":"He said \"we are\r\nextremely sorry\" and left."}
 {"id":"probe:strip-curly-quote-closed","source":"scripts/xengine-diff.mjs","text":"He said \u201chello\u201d and was extremely calm."}
+{"id":"probe:abs-negator-uppercase","source":"scripts/xengine-diff.mjs","text":"NOT EVERYONE QUALIFIES."}
+{"id":"probe:abs-negator-second-word","source":"scripts/xengine-diff.mjs","text":"The risk cannot always be priced."}
+{"id":"probe:abs-negator-third-word","source":"scripts/xengine-diff.mjs","text":"Not bad, and always cheap."}
+{"id":"probe:abs-negator-behind-period","source":"scripts/xengine-diff.mjs","text":"We said no. everyone agreed."}
+{"id":"probe:abs-negator-behind-semicolon","source":"scripts/xengine-diff.mjs","text":"We said no; everyone agreed."}
+{"id":"probe:abs-negator-behind-colon","source":"scripts/xengine-diff.mjs","text":"We said no: everyone agreed."}
+{"id":"probe:abs-negator-behind-bang","source":"scripts/xengine-diff.mjs","text":"We said no! everyone agreed."}
+{"id":"probe:abs-negator-behind-question","source":"scripts/xengine-diff.mjs","text":"We said no? everyone agreed."}
+{"id":"probe:abs-negator-behind-comma","source":"scripts/xengine-diff.mjs","text":"We said no, everyone agreed."}
+{"id":"probe:abs-never-imperative-uppercase","source":"scripts/xengine-diff.mjs","text":"NEVER share it."}
+{"id":"probe:abs-never-after-period","source":"scripts/xengine-diff.mjs","text":"Check the link. never click it."}
+{"id":"probe:abs-never-after-colon","source":"scripts/xengine-diff.mjs","text":"Check the link: never click it."}
+{"id":"probe:abs-never-after-bang","source":"scripts/xengine-diff.mjs","text":"Check the link! never click it."}
+{"id":"probe:abs-never-after-question","source":"scripts/xengine-diff.mjs","text":"Check the link? never click it."}
+{"id":"probe:abs-never-after-comma","source":"scripts/xengine-diff.mjs","text":"Love begins with choice, never obligation."}
+{"id":"probe:abs-never-mid-clause","source":"scripts/xengine-diff.mjs","text":"We never share data."}
+{"id":"probe:abs-never-quoted-start","source":"scripts/xengine-diff.mjs","text":"\"Never share it,\" he said."}
+{"id":"probe:abs-never-tab-after","source":"scripts/xengine-diff.mjs","text":"Never\tshare it."}
+{"id":"probe:abs-never-newline-after","source":"scripts/xengine-diff.mjs","text":"Never\nshare it."}
+{"id":"probe:abs-never-newline-before","source":"scripts/xengine-diff.mjs","text":"We will\nnever share it."}
+{"id":"probe:abs-never-capital-next","source":"scripts/xengine-diff.mjs","text":"Never Again."}
+{"id":"probe:abs-never-digit-next","source":"scripts/xengine-diff.mjs","text":"Never 2 late."}
+{"id":"probe:abs-never-alone","source":"scripts/xengine-diff.mjs","text":"Never."}
+{"id":"probe:abs-never-text-end","source":"scripts/xengine-diff.mjs","text":"We said never"}
+{"id":"probe:abs-rsquo-contraction","source":"scripts/xengine-diff.mjs","text":"Results aren\u2019t always typical."}
+{"id":"probe:abs-nbsp-after-negator","source":"scripts/xengine-diff.mjs","text":"Not\u00a0everyone qualifies."}
+{"id":"probe:abs-emoji-between-negator","source":"scripts/xengine-diff.mjs","text":"Not \ud83d\ude00 always."}
+{"id":"probe:abs-curly-quote-never","source":"scripts/xengine-diff.mjs","text":"\u201cNever share it,\u201d he said."}
+{"id":"probe:abs-emoji-before-never","source":"scripts/xengine-diff.mjs","text":"\ud83d\udd12 Never share your password."}
+{"id":"probe:abs-nbsp-after-never","source":"scripts/xengine-diff.mjs","text":"Never\u00a0share it."}
+{"id":"probe:abs-accented-word-before-never","source":"scripts/xengine-diff.mjs","text":"Caf\u00e9 never closes."}
+{"id":"probe:abs-greek-word-before-never","source":"scripts/xengine-diff.mjs","text":"\u03a9 never fails."}

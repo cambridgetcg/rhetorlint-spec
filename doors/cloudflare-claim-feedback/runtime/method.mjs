@@ -2,7 +2,7 @@ export default {
   "engine": {
     "name": "@rhetorlint/core",
     "version": "0.1.4",
-    "source_sha256": "sha256:3efab445f2570b7da1f8eb3bd70d5f7de88ca680bdfe7324128797fc5d770aa9"
+    "source_sha256": "sha256:825124e08c92977367cf92c21ed24589ad7bbe725fc8da032b19e8c73ed77fbb"
   },
   "signal_projection": {
     "name": "@rhetorlint/core/signals",
