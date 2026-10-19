@@ -118,7 +118,7 @@ go -C impl/go test ./...     # the third engine; CI runs all three on every push
 
 Agreement is on **values**, not on serialised bytes: the same density that JS and Go write as `"per100Words": 25` Python writes as `25.0`, because that is what each language's JSON encoder does with a whole-numbered float. The suites compare parsed values, which is the only comparison a spec can fairly demand across languages. Offsets agree over the corpus because the corpus is ASCII; [`conformance/README.md`](conformance/README.md) sets out exactly where non-ASCII input parts the engines.
 
-`conformance/cases.json` is the ground truth. The Go engine is the sharpest proof: Go's RE2 regex has **no lookahead**, so it can't express the `(?!by)` agent-check the other two use — it reimplements that check in code and *still* produces identical output. That's precisely what a conformance suite is for: it pins the output, not the implementation. Point a fourth engine in any language at `cases.json` and you'll know instantly whether it conforms — which is what makes RhetorLint a spec, not just one library.
+`conformance/cases.json` is the ground truth. The Go engine is the sharpest proof: Go's RE2 regex has **no lookahead** and folds case differently from JavaScript, so the passive detector's agent check is a word walk in code in all three engines, over word lists generated from one file — and the output is identical. That's precisely what a conformance suite is for: it pins the output, not the implementation. Point a fourth engine in any language at `cases.json` and you'll know instantly whether it conforms — which is what makes RhetorLint a spec, not just one library.
 
 ## Layout
 
