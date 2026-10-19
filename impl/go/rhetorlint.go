@@ -667,14 +667,16 @@ func negatedAt(text string, offset int, commaEndsScope bool) bool {
 	return false
 }
 
-// neverNonVerbs cannot be the verb of an imperative "Never <verb>": after a
-// clause-initial "never" they make a fragment ("Never an issue.") or an
-// inversion ("Never has a product been this good."), both claims.
+// neverNonVerbs, after a clause-initial "never", open a fragment ("Never an
+// issue.") or an inversion ("Never has a product been this good."), both
+// claims, and do not begin advice. A word that can also begin advice (so, in,
+// at, on, have, should: "Never have regrets.", "Never at any time disclose
+// your PIN.") is left out, so its inversions ("Never have I seen...") go
+// unmarked too: recorded misses, the safe direction.
 var neverNonVerbs = map[string]bool{
-	"a": true, "an": true, "the": true, "any": true, "before": true, "so": true,
-	"such": true, "in": true, "at": true, "on": true, "has": true, "have": true,
-	"had": true, "is": true, "are": true, "was": true, "were": true, "will": true,
-	"would": true, "could": true, "should": true, "can": true, "did": true,
+	"a": true, "an": true, "the": true, "any": true, "before": true, "such": true,
+	"has": true, "had": true, "is": true, "are": true, "was": true, "were": true,
+	"will": true, "would": true, "could": true, "can": true, "did": true,
 	"does": true, "been": true, "being": true,
 }
 

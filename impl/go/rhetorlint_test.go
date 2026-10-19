@@ -477,11 +477,13 @@ func TestAbsoluteGuard(t *testing.T) {
 		// The imperative 'Never' guard's two closed lists, declared here so an
 		// engine that drops or adds a word fails.
 		nonVerbs := []string{
-			"a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
-			"has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
-			"should", "can", "did", "does", "been", "being",
+			"a", "an", "the", "any", "before", "such",
+			"has", "had", "is", "are", "was", "were", "will", "would", "could",
+			"can", "did", "does", "been", "being",
 		}
 		passThrough := []string{"again", "ever", "once"}
+		// Words that can begin advice after "Never", so they are not on the list.
+		adviceOpeners := []string{"so", "in", "at", "on", "have", "should"}
 		expect := func(text string, want ...string) {
 			t.Helper()
 			actuals, _ := absoluteActuals(text, pack)
@@ -494,6 +496,19 @@ func TestAbsoluteGuard(t *testing.T) {
 			// After its lowercase first letter, the word is compared in ASCII
 			// lower case: "hAS" is "has".
 			expect("Go; never "+word[:1]+strings.ToUpper(word[1:])+" x.", "never")
+		}
+		for _, word := range adviceOpeners {
+			expect("Never " + word + " x.")
+		}
+		for _, text := range []string{
+			"Never at any time disclose your password.",
+			"Never in any circumstances share your PIN.",
+			"Never on any account reply to this email.",
+			"Never have more than two drinks.",
+			"Never so much as glance at it.",
+			"Never should you share your password.",
+		} {
+			expect(text)
 		}
 		for _, adverb := range passThrough {
 			expect("Never " + adverb + " share it.")

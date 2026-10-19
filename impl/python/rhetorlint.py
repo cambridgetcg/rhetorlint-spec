@@ -390,13 +390,16 @@ def _negated_at(text, offset, comma_ends_scope=False):
 NEGATION_SCOPED = {"absolute.universal"}
 
 
-# Words that cannot be the verb of an imperative "Never <verb>": after a
-# clause-initial "never" they make a fragment ("Never an issue.") or an
-# inversion ("Never has a product been this good."), both claims.
+# Words that, after a clause-initial "never", open a fragment ("Never an
+# issue.") or an inversion ("Never has a product been this good."), both
+# claims, and do not begin advice. A word that can also begin advice (so, in,
+# at, on, have, should: "Never have regrets.", "Never at any time disclose your
+# PIN.") is left out, so its inversions ("Never have I seen...") go unmarked
+# too: recorded misses, the safe direction.
 _NEVER_NON_VERBS = frozenset({
-    "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
-    "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
-    "should", "can", "did", "does", "been", "being",
+    "a", "an", "the", "any", "before", "such",
+    "has", "had", "is", "are", "was", "were", "will", "would", "could",
+    "can", "did", "does", "been", "being",
 })
 # Adverbs that may stand between "Never" and its verb: the word after them
 # decides. "Never ever share it." is advice; "Never again will prices be this

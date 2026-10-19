@@ -251,11 +251,13 @@ class AbsoluteGuardTests(unittest.TestCase):
         # The imperative 'Never' guard's two closed lists, declared here so an
         # engine that drops or adds a word fails.
         non_verbs = [
-            "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
-            "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
-            "should", "can", "did", "does", "been", "being",
+            "a", "an", "the", "any", "before", "such",
+            "has", "had", "is", "are", "was", "were", "will", "would", "could",
+            "can", "did", "does", "been", "being",
         ]
         pass_through = ["again", "ever", "once"]
+        # Words that can begin advice after "Never", so they are not on the list.
+        advice_openers = ["so", "in", "at", "on", "have", "should"]
         rules = rhetorlint.load_default_rules()
 
         def actuals(text):
@@ -268,6 +270,19 @@ class AbsoluteGuardTests(unittest.TestCase):
                 # lower case: "hAS" is "has".
                 mixed = word[0] + word[1:].upper()
                 self.assertEqual(actuals("Go; never %s x." % mixed), ["never"])
+        for word in advice_openers:
+            with self.subTest(word=word):
+                self.assertEqual(actuals("Never %s x." % word), [])
+        for text in [
+            "Never at any time disclose your password.",
+            "Never in any circumstances share your PIN.",
+            "Never on any account reply to this email.",
+            "Never have more than two drinks.",
+            "Never so much as glance at it.",
+            "Never should you share your password.",
+        ]:
+            with self.subTest(text=text):
+                self.assertEqual(actuals(text), [])
         for adverb in pass_through:
             with self.subTest(adverb=adverb):
                 self.assertEqual(actuals("Never %s share it." % adverb), [])
