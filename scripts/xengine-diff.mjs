@@ -156,7 +156,50 @@ const PROBES = [
   ["strip-quote-closed", "\"Fine,\" she said, extremely calmly."],
   ["strip-quote-previous-line", "He said \"hello\nand it was extremely loud."],
   ["strip-quote-crlf", "He said \"we are\r\nextremely sorry\" and left."],
-  ["strip-curly-quote-closed", "He said \u201chello\u201d and was extremely calm."]
+  ["strip-curly-quote-closed", "He said \u201chello\u201d and was extremely calm."],
+  // The absolute.universal guard: an absolute under a negator, or a
+  // clause-initial "Never" before a lowercase word, is not marked. It reuses
+  // the strip guards' word walk, so the same edges apply, plus the imperative's:
+  // what may stand before "Never" and what must follow it.
+  ["abs-negated", "Returns are not guaranteed; past performance is no indicator."],
+  ["abs-negated-contraction", "Results aren't always typical."],
+  ["abs-negated-capital", "Not everyone qualifies."],
+  ["abs-negator-uppercase", "NOT EVERYONE QUALIFIES."],
+  ["abs-negator-second-word", "The risk cannot always be priced."],
+  ["abs-negator-third-word", "Not bad, and always cheap."],
+  ["abs-negator-behind-period", "We said no. everyone agreed."],
+  ["abs-negator-behind-semicolon", "We said no; everyone agreed."],
+  ["abs-negator-behind-colon", "We said no: everyone agreed."],
+  ["abs-negator-behind-bang", "We said no! everyone agreed."],
+  ["abs-negator-behind-question", "We said no? everyone agreed."],
+  ["abs-negator-behind-comma", "We said no, everyone agreed."],
+  ["abs-never-imperative", "Never share your password with anyone."],
+  ["abs-never-imperative-uppercase", "NEVER share it."],
+  ["abs-never-after-period", "Check the link. never click it."],
+  ["abs-never-after-semicolon", "Explain real constraints; never manufacture the shortage."],
+  ["abs-never-after-colon", "Check the link: never click it."],
+  ["abs-never-after-bang", "Check the link! never click it."],
+  ["abs-never-after-question", "Check the link? never click it."],
+  ["abs-never-after-comma", "Love begins with choice, never obligation."],
+  ["abs-never-mid-clause", "We never share data."],
+  ["abs-never-quoted-start", "\"Never share it,\" he said."],
+  ["abs-never-tab-after", "Never\tshare it."],
+  ["abs-never-newline-after", "Never\nshare it."],
+  ["abs-never-newline-before", "We will\nnever share it."],
+  ["abs-never-capital-next", "Never Again."],
+  ["abs-never-digit-next", "Never 2 late."],
+  ["abs-never-alone", "Never."],
+  ["abs-never-text-end", "We said never"],
+  ["abs-never-inversion", "Never again will prices be this low."],
+  ["abs-unguarded", "This is guaranteed to double your savings."],
+  ["abs-rsquo-contraction", "Results aren\u2019t always typical."],
+  ["abs-nbsp-after-negator", "Not\u00a0everyone qualifies."],
+  ["abs-emoji-between-negator", "Not \ud83d\ude00 always."],
+  ["abs-curly-quote-never", "\u201cNever share it,\u201d he said."],
+  ["abs-emoji-before-never", "\ud83d\udd12 Never share your password."],
+  ["abs-nbsp-after-never", "Never\u00a0share it."],
+  ["abs-accented-word-before-never", "Caf\u00e9 never closes."],
+  ["abs-greek-word-before-never", "\u03a9 never fails."]
 ];
 
 const isAscii = (text) => /^[\x00-\x7f]*$/.test(text);
