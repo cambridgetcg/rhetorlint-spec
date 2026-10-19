@@ -1,10 +1,15 @@
 # Handoff: honest marks — core 0.1.4 + rules-en 0.2.1, a letter for whoever holds the keys
 
 Yu, or the agent at your keyboard — hello. This was written on 2026-10-19, on
-the device that built the work. None of it has left that device. Nothing has
-been pushed, no PR is open, and nothing is published or deployed. Every step
-below is yours to take or refuse, in whatever order you choose. If anything
-here reads wrong, stop and say so. Don't push past it.
+the device that built the work. Step 1 is done: the agent that wrote this
+pushed both branches and opened the two stacked PRs. It read your standing
+word, "Always push and deploy when done" (2026-07-13), as covering a push of
+finished branches for review. That reading is the agent's choice, not a
+decision you made. It left everything after step 1 to you, because a merge,
+a publish or a deploy also settles the decisions in step 3. Nothing is merged,
+published or deployed. Every remaining step is yours to take or refuse, in
+whatever order you choose. If anything here reads wrong, stop and say so.
+Don't push past it.
 
 ## What this is
 
@@ -70,18 +75,16 @@ If `origin/main` has moved, merge it into `motifs/measure` and then into
 `motifs/honest-marks`, and re-run the gates. A rebase would orphan the dataset's
 source revision.
 
-The PR bodies were written into the session scratchpad, not the repository.
-`/private/tmp` may not survive a reboot, so copy both somewhere durable, outside
-the repository, before relying on this path:
+The PR bodies were written in the session scratchpad and now live as the two
+PRs' descriptions, so GitHub holds the durable copy.
+
+## 1 · Push and open the two PRs (private repo, paid Actions): done 2026-10-19
+
+The agent ran these after the checks above passed at the pushed heads
+(origin/main was still 1a16766). They stay here as the record:
 
 ```bash
 SCRATCH=/private/tmp/claude-501/-Users-yournameisai/d24ce363-78c8-45fe-b7c4-98b46e277978/scratchpad
-ls "$SCRATCH/pr-a.md" "$SCRATCH/pr-b.md"
-```
-
-## 1 · Push and open the two PRs (private repo, paid Actions)
-
-```bash
 git -C ~/Desktop/rhetorlint-spec-motifs push -u origin motifs/measure
 gh pr create -R cambridgetcg/rhetorlint-spec --base main --head motifs/measure \
   --title 'measurement: committed precision ratchet, contrast set, taxonomy agreement (no ground-truth change)' \
@@ -349,5 +352,9 @@ rules-en 0.1.2 exactly, so nothing here reaches them until someone bumps them.
 
 Leave a line under this one saying what you pushed, merged, published,
 deprecated and deployed, and what you skipped, so the record stays true.
+
+- 2026-10-19, Claude Code (an agent, not Yu): pushed `motifs/measure` and
+  `motifs/honest-marks` and opened the two stacked PRs. Nothing was merged,
+  published, deprecated, deployed or uploaded.
 
 — Claude (Claude Code, Opus 5.5), for the motifs session, 2026-10-19
