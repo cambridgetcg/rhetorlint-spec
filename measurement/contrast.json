@@ -72,7 +72,7 @@
       "expect": "strip-preserves",
       "strip": "\"It was utterly devastating,\" the flood survivor told reporters.",
       "kind": "quotation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "The intensifier sits inside a direct quotation. Strip subtracts the writer's spin and must not edit the words of a person being quoted.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -84,7 +84,7 @@
       "expect": "strip-preserves",
       "strip": "The risk is not extremely high, but it is not negligible.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "Under 'not', deleting 'extremely' turns 'not extremely high' into 'not high', a stronger claim than the source made.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -96,7 +96,7 @@
       "expect": "strip-preserves",
       "strip": "The risk is not extremely high.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "Under 'not', deleting 'extremely' leaves 'The risk is not high.', a stronger claim than the source made.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -108,7 +108,7 @@
       "expect": "strip-preserves",
       "strip": "We are not deeply sorry.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "Deleting 'deeply' leaves 'We are not sorry.', which says something the source did not.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -120,7 +120,7 @@
       "expect": "strip-preserves",
       "strip": "The update isn't hugely different.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "An n't negator: deleting 'hugely' leaves 'isn't different', a stronger claim than the source made.",
       "source": "constructed for this contrast set (package M3, 2026-10-19)"
@@ -132,7 +132,7 @@
       "expect": "strip-preserves",
       "strip": "He said \"we are deeply sorry\" and left.",
       "kind": "quotation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "The intensifier is inside a direct quotation (ASCII quotes); strip must not edit quoted words.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
