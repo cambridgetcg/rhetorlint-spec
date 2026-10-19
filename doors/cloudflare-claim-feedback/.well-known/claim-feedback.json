@@ -46,7 +46,7 @@
       "examples/claim-feedback/claim-feedback.mjs": "fcc44e5e3851c436e6cc447aaa38c90cbbc232eb10905e65a1822a73e3baf08a",
       "examples/claim-feedback/claim-feedback-projection.mjs": "cdcf6d07e4ab2dc5d368d769e506d2080996de959c03fe74d4422aa7e499a005",
       "examples/claim-feedback/fixtures/corrected-claim.json": "cc8cbca3750d4bf7917c2161c95db3abc2787ee0995463470f79143f924a9e5c",
-      "packages/core/index.mjs": "4f5c3329cc677c5d02e08884523d56d239ae3a0c1d09f8983ccf810d6fd92a72",
+      "packages/core/index.mjs": "7dd2d7f9d8437e9883962591e34285229f5df8f4ccfdc31478a3bf8642037472",
       "packages/core/package.json": "a0dee9cb364b816bc7af49bb34a387fe6836ee193e4b720842cbc207564d36ac",
       "packages/core/signals.mjs": "727a6f310dd6424beb72a4b2ffd7f1cbb712ea9aba6b8573078242f20af295d7",
       "packages/rules-en/rules.json": "b2201836c8d0050600066215fa73bb93fb1560f7bec54c35a7d4a87dd28f000a",

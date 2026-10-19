@@ -786,6 +786,12 @@
 {"id":"contrast:strip.intensifier-loaded.02","source":"measurement/contrast.json","text":"We are not deeply sorry."}
 {"id":"contrast:strip.intensifier-loaded.03","source":"measurement/contrast.json","text":"The update isn't hugely different."}
 {"id":"contrast:strip.intensifier-loaded.04","source":"measurement/contrast.json","text":"He said \"we are deeply sorry\" and left."}
+{"id":"contrast:strip.intensifier-loaded.06","source":"measurement/contrast.json","text":"Nothing extremely bad happened."}
+{"id":"contrast:strip.intensifier-loaded.07","source":"measurement/contrast.json","text":"Nobody was extremely hurt."}
+{"id":"contrast:strip.intensifier-loaded.08","source":"measurement/contrast.json","text":"None of it was extremely bad."}
+{"id":"contrast:strip.intensifier-loaded.09","source":"measurement/contrast.json","text":"The risk is not at all extremely high."}
+{"id":"contrast:strip.intensifier-loaded.10","source":"measurement/contrast.json","text":"It is rarely extremely hot here."}
+{"id":"contrast:strip.intensifier-loaded.11","source":"measurement/contrast.json","text":"He called it 'utterly devastating' on air."}
 {"id":"contrast:lesson.intensifier-loaded.tremendously","source":"measurement/contrast.json","text":"We are tremendously excited to announce our partnership."}
 {"id":"contrast:lesson.intensifier-loaded.profoundly","source":"measurement/contrast.json","text":"The response to our launch has been profoundly moving."}
 {"id":"contrast:twin.intensifier-loaded.profoundly-deaf","source":"measurement/contrast.json","text":"Profoundly deaf children may qualify for cochlear implants."}
@@ -937,6 +943,7 @@
 {"id":"contrast:negation.agency.after-participle","source":"measurement/contrast.json","text":"Your data was shared with no one."}
 {"id":"contrast:lesson.agency.negator-earlier-clause","source":"measurement/contrast.json","text":"No one called, but data were stolen."}
 {"id":"contrast:negation.agency.nobody-possessive","source":"measurement/contrast.json","text":"Nobody's data was accessed."}
+{"id":"contrast:negation.agency.without-is-local","source":"measurement/contrast.json","text":"Without warning, customer data was exposed."}
 {"id":"contrast:lesson.agency.information-impacted","source":"measurement/contrast.json","text":"Your personal information may have been impacted."}
 {"id":"contrast:innocent.agency.flights-impacted","source":"measurement/contrast.json","text":"Roughly 2,000 flights were impacted after the storm."}
 {"id":"contrast:innocent.agency.earnings-affected","source":"measurement/contrast.json","text":"Earnings were affected this quarter."}
@@ -1349,6 +1356,8 @@
 {"id":"boundary:negator-head-never","source":"spec/agency-lexicon.json","text":"Never data was accessed."}
 {"id":"boundary:negator-chain-no","source":"spec/agency-lexicon.json","text":"Data has no been accessed."}
 {"id":"boundary:negator-head-no","source":"spec/agency-lexicon.json","text":"No data was accessed."}
+{"id":"boundary:negator-chain-nobody","source":"spec/agency-lexicon.json","text":"Data has nobody been accessed."}
+{"id":"boundary:negator-head-nobody","source":"spec/agency-lexicon.json","text":"Nobody data was accessed."}
 {"id":"boundary:negator-chain-none","source":"spec/agency-lexicon.json","text":"Data has none been accessed."}
 {"id":"boundary:negator-head-none","source":"spec/agency-lexicon.json","text":"None data was accessed."}
 {"id":"boundary:negator-chain-nor","source":"spec/agency-lexicon.json","text":"Data has nor been accessed."}
@@ -1393,6 +1402,7 @@
 {"id":"boundary:adverb-negator-neither","source":"spec/agency-lexicon.json","text":"Customer data was neither accessed."}
 {"id":"boundary:adverb-negator-never","source":"spec/agency-lexicon.json","text":"Customer data was never accessed."}
 {"id":"boundary:adverb-negator-no","source":"spec/agency-lexicon.json","text":"Customer data was no accessed."}
+{"id":"boundary:adverb-negator-nobody","source":"spec/agency-lexicon.json","text":"Customer data was nobody accessed."}
 {"id":"boundary:adverb-negator-none","source":"spec/agency-lexicon.json","text":"Customer data was none accessed."}
 {"id":"boundary:adverb-negator-nor","source":"spec/agency-lexicon.json","text":"Customer data was nor accessed."}
 {"id":"boundary:adverb-negator-not","source":"spec/agency-lexicon.json","text":"Customer data was not accessed."}
@@ -1426,14 +1436,22 @@
 {"id":"guard:negator-cannot-absolute","source":"spec/guard-lexicon.json","text":"It is cannot always so."}
 {"id":"guard:negator-hardly-strip","source":"spec/guard-lexicon.json","text":"It was hardly extremely bad."}
 {"id":"guard:negator-hardly-absolute","source":"spec/guard-lexicon.json","text":"It is hardly always so."}
+{"id":"guard:negator-neither-strip","source":"spec/guard-lexicon.json","text":"It was neither extremely bad."}
+{"id":"guard:negator-neither-absolute","source":"spec/guard-lexicon.json","text":"It is neither always so."}
 {"id":"guard:negator-never-strip","source":"spec/guard-lexicon.json","text":"It was never extremely bad."}
 {"id":"guard:negator-never-absolute","source":"spec/guard-lexicon.json","text":"It is never always so."}
 {"id":"guard:negator-no-strip","source":"spec/guard-lexicon.json","text":"It was no extremely bad."}
 {"id":"guard:negator-no-absolute","source":"spec/guard-lexicon.json","text":"It is no always so."}
+{"id":"guard:negator-nobody-strip","source":"spec/guard-lexicon.json","text":"It was nobody extremely bad."}
+{"id":"guard:negator-nobody-absolute","source":"spec/guard-lexicon.json","text":"It is nobody always so."}
+{"id":"guard:negator-none-strip","source":"spec/guard-lexicon.json","text":"It was none extremely bad."}
+{"id":"guard:negator-none-absolute","source":"spec/guard-lexicon.json","text":"It is none always so."}
 {"id":"guard:negator-nor-strip","source":"spec/guard-lexicon.json","text":"It was nor extremely bad."}
 {"id":"guard:negator-nor-absolute","source":"spec/guard-lexicon.json","text":"It is nor always so."}
 {"id":"guard:negator-not-strip","source":"spec/guard-lexicon.json","text":"It was not extremely bad."}
 {"id":"guard:negator-not-absolute","source":"spec/guard-lexicon.json","text":"It is not always so."}
+{"id":"guard:negator-nothing-strip","source":"spec/guard-lexicon.json","text":"It was nothing extremely bad."}
+{"id":"guard:negator-nothing-absolute","source":"spec/guard-lexicon.json","text":"It is nothing always so."}
 {"id":"guard:negator-without-strip","source":"spec/guard-lexicon.json","text":"It was without extremely bad."}
 {"id":"guard:negator-without-absolute","source":"spec/guard-lexicon.json","text":"It is without always so."}
 {"id":"guard:never-non-verb-a","source":"spec/guard-lexicon.json","text":"Never a x."}

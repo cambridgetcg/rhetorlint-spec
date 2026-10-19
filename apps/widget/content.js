@@ -61,7 +61,7 @@ const RULE_KEYS = {
 const ZERO_LENGTH_PATTERN_PROBES = ["", "a", "A", "0", "_", " ", "\n", "word", "example"];
 
 // BEGIN GENERATED AGENCY LEXICON
-// spec/agency-lexicon.json version 3, written by scripts/gen-agency-lexicon.mjs.
+// spec/agency-lexicon.json version 5, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
 const AGENCY_WHITESPACE = " \t\n\r\f";
 const AGENCY_SPACE = "[ \\t\\n\\r\\f]+";
@@ -71,14 +71,14 @@ const AGENCY_AUXILIARIES = ["been", "was", "were"];
 const AGENCY_ADVERBS = ["already", "always", "often", "still"];
 const AGENCY_ADVERB_SUFFIX = "ly";
 const AGENCY_SKIP = new Set([
-  "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never",
-  "not", "now", "shall", "should", "since", "then", "will", "would"
+  "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "now",
+  "shall", "should", "since", "then", "will", "would"
 ]);
 const AGENCY_SKIP_SUFFIX = "ly";
 const AGENCY_SKIP_MAX = 4;
 const AGENCY_BY_WINDOW = 7;
 const AGENCY_NEGATORS = new Set([
-  "cannot", "neither", "never", "no", "none", "nor", "not", "nothing"
+  "cannot", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing"
 ]);
 const AGENCY_HEADS = new Map([
   ["challenge", new Set([
@@ -139,6 +139,14 @@ const AGENCY_CLASSES = [
 const AGENCY_REQUIRES = new Map([["put", "in place"]]);
 const AGENCY_UNLESS = new Map([["exposed", "to"]]);
 // END GENERATED AGENCY LEXICON
+
+/**
+ * ASCII-only lowercasing: A-Z to a-z and nothing else. The agency matcher and
+ * the guards read words through it, so no engine folds a non-ASCII letter into
+ * a word it looks for, and the lowercased copy keeps the text's length in
+ * every offset unit.
+ */
+const asciiLower = (s) => s.replace(/[A-Z]/g, (c) => c.toLowerCase());
 
 /*
  * The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
@@ -581,10 +589,40 @@ function countWords(text) {
  */
 const REMOVABLE = new Set(["intensifier.loaded"]);
 
-/** Words that negate an intensifier or an absolute after them ("not extremely
- *  high", "not always"). With any "n't" contraction, they are what `negatedAt`
- *  looks for. */
-const NEGATORS = new Set(["not", "never", "no", "nor", "without", "hardly", "cannot"]);
+/*
+ * The guards' word lists, generated from spec/guard-lexicon.json, whose why
+ * fields say why each word is there:
+ *   NEGATORS            words that negate the intensifier or absolute after
+ *                       them ("not extremely high", "not always"); with any
+ *                       "n't" contraction, they are what `negatedAt` looks for;
+ *   CLAUSE_BREAKS       the characters that end a clause, for the negator
+ *                       window and the imperative "Never";
+ *   NEVER_NON_VERBS     words that, after a clause-initial "never", open a
+ *                       fragment ("Never an issue.") or an inversion ("Never
+ *                       has a product been this good."), so "Never" stays
+ *                       marked; a word that can also begin advice ("Never have
+ *                       regrets.") is left out, a recorded miss;
+ *   NEVER_PASS_THROUGH  adverbs that may stand between "Never" and its verb,
+ *                       so the word after them decides ("Never ever share it.",
+ *                       "Never again will prices be this low.").
+ */
+// BEGIN GENERATED GUARD LEXICON
+// spec/guard-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
+// Edit the lexicon and rerun the generator; --check fails when this block drifts.
+// NEGATORS: spec/agency-lexicon.json version 5's negators, and localNegators.
+const NEGATORS = new Set([
+  "cannot", "hardly", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing",
+  "without"
+]);
+const CLAUSE_BREAKS = ".;:!?";
+const NEVER_NON_VERBS = new Set([
+  "a", "an", "any", "are", "been", "before", "being", "can", "could", "did", "does", "had", "has",
+  "is", "such", "the", "was", "were", "will", "would"
+]);
+const NEVER_PASS_THROUGH = new Set([
+  "again", "ever", "once"
+]);
+// END GENERATED GUARD LEXICON
 
 /** A word character for the strip and mark guards: an ASCII letter or digit,
  *  or an apostrophe (U+0027 or U+2019). Every other character separates words. */
@@ -594,13 +632,9 @@ function isGuardWordChar(code) {
 }
 
 function isNegator(word) {
-  // ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
-  const w = word.replace(/[A-Z]/g, (c) => c.toLowerCase()).replace(/^['\u2019]+|['\u2019]+$/g, "");
+  const w = asciiLower(word).replace(/^['\u2019]+|['\u2019]+$/g, "");
   return NEGATORS.has(w) || w.endsWith("n't") || w.endsWith("n\u2019t");
 }
-
-/** The characters that end a clause, for the negator window and the imperative "Never". */
-const CLAUSE_BREAKS = ".;:!?";
 
 /**
  * True when a negator is one of the two words before `offset`, with no
@@ -649,27 +683,6 @@ const NEGATION_SCOPED = new Set(["absolute.universal"]);
 function negationScopedAt(text, start, end) {
   return negatedAt(text, start, true) || imperativeNeverAt(text, start, end);
 }
-
-/** Words that, after a clause-initial "never", open a fragment ("Never an
- *  issue.") or an inversion ("Never has a product been this good."), both
- *  claims, and do not begin advice. A word that can also begin advice is left
- *  out, so the advice stays unmarked and the claim goes unmarked with it:
- *  "Never have regrets." but "Never have I seen…"; "Never at any time
- *  disclose your PIN." but "Never in history has…"; "Never so much as glance
- *  at it."; "Never should you share it." (so, in, at, on, have and should are
- *  not listed: recorded misses, the safe direction). */
-const NEVER_NON_VERBS = new Set([
-  "a", "an", "the", "any", "before", "such",
-  "has", "had", "is", "are", "was", "were", "will", "would", "could",
-  "can", "did", "does", "been", "being"
-]);
-
-/** Adverbs that may stand between "Never" and its verb: the word after them
- *  decides. "Never ever share it." is advice; "Never again will prices be
- *  this low." is an inversion; "Never again." is a fragment. */
-const NEVER_PASS_THROUGH = new Set(["again", "ever", "once"]);
-
-const asciiLower = (s) => s.replace(/[A-Z]/g, (c) => c.toLowerCase());
 
 /**
  * True when [start, end) is the word "never", in any letter case, that opens
