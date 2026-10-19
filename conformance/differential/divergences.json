@@ -58,6 +58,20 @@
       "reason": "\\s matches U+2009 THIN SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
     },
     {
+      "text": "Let us act\ufeffnow.",
+      "engine": "js",
+      "fields": ["marks"],
+      "marks": {"js": ["urgency.appeal-to-time: act\ufeffnow"], "python": [], "go": []},
+      "reason": "JS's \\s includes U+FEFF ZERO WIDTH NO-BREAK SPACE; Python's (str.isspace) and Go's RE2 \\s ([\\t\\n\\f\\r ]) do not, so only JS reads 'act now'."
+    },
+    {
+      "text": "Let us act\u0085now.",
+      "engine": "python",
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["urgency.appeal-to-time: act\u0085now"], "go": []},
+      "reason": "Python's \\s includes U+0085 NEXT LINE (str.isspace); JS's \\s and Go's RE2 \\s do not, so only Python reads 'act now'."
+    },
+    {
       "text": "It may have \u00e9t\u00e9 confirmed.",
       "engine": "python",
       "fields": ["marks"],
@@ -86,11 +100,39 @@
       "reason": "Python folds U+212A KELVIN SIGN to 'k' and counts it as a word character, so 'kind of' matches. JS folds nothing outside ASCII; Go folds the letter, but its ASCII \\b refuses the boundary before it."
     },
     {
+      "text": "It may have \u017feen the file.",
+      "engine": "js",
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["hedge.deniable: may have \u017feen"], "go": ["hedge.deniable: may have \u017feen"]},
+      "reason": "Under (?i) Python and Go fold U+017F LONG S into \\w, so 'have \\w+' takes 'seen' spelt with a long s; JS folds only within ASCII and its \\w is ASCII. Go sides with Python here because no \\b stands in the way."
+    },
+    {
+      "text": "Caf\u00e9Never fails.",
+      "engine": "python",
+      "fields": ["marks"],
+      "marks": {"js": ["absolute.universal: Never"], "python": [], "go": ["absolute.universal: Never"]},
+      "reason": "Python's \\b is Unicode: the e-acute is a word character there, so no boundary sits before 'Never' and absolute.universal finds no term. JS's and Go's ASCII \\b see one and mark it."
+    },
+    {
+      "text": "No fees, alway\u017f free.",
+      "engine": "python",
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["absolute.universal: alway\u017f"], "go": []},
+      "reason": "Python folds U+017F LONG S to 's' and counts it as a word character, so 'always' matches with its closing \\b. JS folds nothing outside ASCII; Go folds the letter, but its ASCII \\b refuses the boundary after it. The comma rule leaves the term unguarded in Python."
+    },
+    {
       "text": "Act\u000bnow.",
       "engine": "go",
       "fields": ["marks"],
       "marks": {"js": ["urgency.appeal-to-time: Act\u000bnow"], "python": ["urgency.appeal-to-time: Act\u000bnow"], "go": []},
       "reason": "U+000B VERTICAL TAB is ASCII, yet the engines part on it: JS's and Python's \\s include it, Go's RE2 \\s ([\\t\\n\\f\\r ]) does not."
+    },
+    {
+      "text": "Let us act\u001fnow.",
+      "engine": "python",
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["urgency.appeal-to-time: act\u001fnow"], "go": []},
+      "reason": "U+001F UNIT SEPARATOR is ASCII, yet the engines part on it: only Python's \\s (str.isspace) takes the U+001C to U+001F information separators."
     }
   ]
 }

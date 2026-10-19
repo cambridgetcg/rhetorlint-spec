@@ -201,9 +201,12 @@ It may have ſeen the file.     Python: hedge.deniable "may have ſeen"    Go: h
 That is a mark JS does not make, so here the safe direction is JS's alone.
 The agency detector no longer parts this way: since core 0.1.4 it matches an
 ASCII-lowercased copy with no case-insensitive flag, explicit `[ \t\n\r\f]`
-whitespace and closed ASCII word lists, so `Civilians were Killed.` (U+212A)
-and `Lives were loſt.`, once agency marks in Python and Go, are unmarked in
-all three.
+whitespace and closed ASCII word lists, so a look-alike letter inside one of
+its own participles joins nothing: `Your data was ſhared.` and `Data was
+acceſſed.` (long s) and `Customer data was leaKed.` (U+212A) are unmarked in
+all three (Python and Go once folded the long s of `ſhared` and marked).
+absolute.universal still parts on `\b`: `CaféNever fails.` is marked by JS
+and Go, not by Python, and `No fees, alwayſ free.` by Python alone.
 
 ### 3. `\s` is three different whitespace classes
 

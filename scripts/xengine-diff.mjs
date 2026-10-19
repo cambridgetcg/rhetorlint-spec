@@ -65,6 +65,11 @@ const PROBES = [
   ["line-separator-agency", "Your data was\u2028shared."],
   ["nel-agency", "Your data was\u0085shared."],
   ["bom-agency", "Your data was\ufeffshared."],
+  // The same three characters in a rule spelt with \s: here the engines part
+  // (conformance/README.md caveat 3), where the agency detector's own
+  // whitespace class keeps them together above.
+  ["bom-urgency", "Let us act\ufeffnow."],
+  ["nel-urgency", "Let us act\u0085now."],
   ["zero-width-space-agency", "Your data was\u200bshared."],
   // Quotation marks and apostrophes.
   ["rsquo-urgency", "Don\u2019t miss out on this deal."],
@@ -107,6 +112,19 @@ const PROBES = [
   ["long-s-lexical", "It \u017feems the plan worked."],
   ["kelvin-participle", "Civilians were \u212ailled."],
   ["kelvin-lexical", "This is \u212aind of a problem."],
+  // A look-alike letter inside a lexicon participle: the agency detector folds
+  // only A-Z, so no engine marks these (killed and lost, above, are excluded
+  // verbs and would be silent anyway). A long s inside a \w+ that no \b
+  // guards parts JS from Python and Go (caveat 2).
+  ["long-s-lexicon-participle", "Data was acce\u017f\u017fed."],
+  ["kelvin-lexicon-participle", "Accounts were hac\u212aed."],
+  ["kelvin-lexicon-participle-leaked", "Customer data was lea\u212aed."],
+  ["long-s-hedge-word", "It may have \u017feen the file."],
+  // absolute.universal finds its terms with \b: Python's is Unicode, so a
+  // letter like e-acute against the term hides it from Python alone, and a
+  // long s folds into the term in Python alone.
+  ["accent-against-absolute", "Caf\u00e9Never fails."],
+  ["long-s-absolute", "No fees, alway\u017f free."],
   // Non-ASCII away from any match: the engines must agree on every mark.
   // These put predicate adjectives, numerals and irregular participles after
   // a be-verb; the agency lexicon's own words are probed one by one below
@@ -131,6 +149,7 @@ const PROBES = [
   ["vertical-tab-urgency", "Act\u000bnow."],
   ["form-feed-agency", "Your data was\u000cshared."],
   ["unit-separator-agency", "Your data was\u001fshared."],
+  ["unit-separator-urgency", "Let us act\u001fnow."],
   // Strip guards: an intensifier under a negator, or inside a quotation, is
   // kept. The guards read words and quote marks, never a count of units, so
   // the engines must agree even where their offsets part. (Probes that repeat
