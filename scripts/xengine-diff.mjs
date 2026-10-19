@@ -1,7 +1,7 @@
 // The three-engine differential: JavaScript, Python and Go must agree beyond
 // the conformance cases.
 //
-// conformance/cases.json pins 31 inputs value for value. This script feeds a
+// conformance/cases.json pins 33 inputs value for value. This script feeds a
 // wider, committed input set (conformance/differential/inputs.jsonl) to all
 // three engines and compares, per input:
 //   - the multiset of marks as (ruleId, actual), on every input;
@@ -127,7 +127,21 @@ const PROBES = [
   ["vertical-tab-agency", "Your data was\u000bshared."],
   ["vertical-tab-urgency", "Act\u000bnow."],
   ["form-feed-agency", "Your data was\u000cshared."],
-  ["unit-separator-agency", "Your data was\u001fshared."]
+  ["unit-separator-agency", "Your data was\u001fshared."],
+  // Strip guards: an intensifier under a negator, or inside a quotation, is
+  // kept. The guards read words and quote marks, never a count of units, so
+  // the engines must agree even where their offsets part. (Probes that repeat
+  // a contrast row are dropped as duplicates; they stay here as the set.)
+  ["strip-negated", "The risk is not extremely high, but it is not negligible."],
+  ["strip-negated-contraction", "The update isn't hugely different."],
+  ["strip-negated-sorry", "We are not deeply sorry."],
+  ["strip-quoted", "\"It was utterly devastating,\" the flood survivor told reporters."],
+  ["strip-curly-quoted", "He said \u201cwe are deeply sorry\u201d and left."],
+  ["strip-unguarded", "This is an incredibly important update for every customer."],
+  ["strip-rsquo-contraction", "The update isn\u2019t hugely different."],
+  ["strip-emoji-between-negator", "Not \ud83d\ude00 extremely high."],
+  ["strip-nbsp-after-negator", "Not\u00a0extremely high."],
+  ["strip-emoji-in-curly-quote", "He said \u201c\ud83d\ude00 we are deeply sorry\u201d and left."]
 ];
 
 const isAscii = (text) => /^[\x00-\x7f]*$/.test(text);
