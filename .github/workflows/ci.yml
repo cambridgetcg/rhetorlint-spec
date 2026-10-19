@@ -13,6 +13,10 @@ jobs:
           node-version: 20
       - name: run the JS reference-engine test suite (zero dependencies)
         run: npm test
+      - name: measurement ratchet, contrast set and taxonomy agreement
+        # Run here, not in npm test: package.json is a hashed source of the
+        # Cloudflare door, so listing them there means regenerating doors/.
+        run: node --test test/measurement.test.mjs test/contrast.test.mjs test/taxonomy-agreement.test.mjs test/claims.test.mjs
       - name: prove the generated Claim Feedback worksheet in headless Chrome
         run: |
           google-chrome --version

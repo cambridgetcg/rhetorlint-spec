@@ -7,8 +7,7 @@ full YAML parser does: same keys, same values, same types (a bool is not an
 int, an int is not a str). It is not part of npm test or CI, because PyYAML
 is not a dependency of this repository.
 
-Run:  npm run check:taxonomy-yaml
-      python3 scripts/check-taxonomy-yaml.py [file.yaml ...]
+Run:  python3 scripts/check-taxonomy-yaml.py [file.yaml ...]
 
 Exit 0: every file reads identically in both parsers.
 Exit 1: a file differs, or the subset reader rejected it.
