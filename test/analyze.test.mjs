@@ -191,7 +191,7 @@ test("absolute.universal leaves a negated absolute and an imperative 'Never' unm
   for (const text of [
     "Returns are not guaranteed; past performance is no indicator.",
     "Results aren't always typical.",
-    "Results aren’t always typical.",
+    "Results aren\u2019t always typical.",
     "Not everyone qualifies.",
     "NOT EVERYONE QUALIFIES.",
     "The risk cannot always be priced.",
@@ -453,7 +453,9 @@ test("the agency detector leaves a negated passive, and 'affected' after an unhe
 });
 
 test("a no-break space or a folded look-alike letter joins no passive", () => {
-  for (const text of ["Mistakes were made.", "Your data was\u000bshared.", "Civilians were Killed.", "Your data was ſhared."]) {
+  // U+212A KELVIN SIGN and U+017F LONG S fold to ASCII under a case-insensitive
+  // \w; "hacked" and "shared" are lexicon participles, so a fold would mark.
+  for (const text of ["Mistakes were\u00a0made.", "Your data was\u000bshared.", "Accounts were hac\u212aed.", "Your data was \u017fhared."]) {
     assert.deepEqual(agencySpans(text), [], JSON.stringify(text));
   }
 });

@@ -177,7 +177,7 @@ class AbsoluteGuardTests(unittest.TestCase):
         cases = [
             "Returns are not guaranteed; past performance is no indicator.",
             "Results aren't always typical.",
-            "Results aren’t always typical.",
+            "Results aren\u2019t always typical.",
             "Not everyone qualifies.",
             "NOT EVERYONE QUALIFIES.",
             "The risk cannot always be priced.",
@@ -357,9 +357,11 @@ class AgencyDetectorTests(unittest.TestCase):
             "If no error was raised, the call succeeded.",
             "Records were being withheld.",
             "Mistakes were made\nby the board.",
-            "Mistakes were made.",
-            "Civilians were Killed.",
-            "Your data was ſhared.",
+            # U+212A KELVIN SIGN and U+017F LONG S fold to ASCII under a
+            # case-insensitive \w; "hacked" and "shared" are lexicon participles.
+            "Mistakes were\u00a0made.",
+            "Accounts were hac\u212aed.",
+            "Your data was \u017fhared.",
         ]:
             with self.subTest(text=text):
                 self.assertEqual(agency_spans(text, rules), [])

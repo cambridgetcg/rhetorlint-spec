@@ -388,7 +388,7 @@ func TestAbsoluteGuard(t *testing.T) {
 		texts := []string{
 			"Returns are not guaranteed; past performance is no indicator.",
 			"Results aren't always typical.",
-			"Results aren’t always typical.",
+			"Results aren\u2019t always typical.",
 			"Not everyone qualifies.",
 			"NOT EVERYONE QUALIFIES.",
 			"The risk cannot always be priced.",
@@ -644,10 +644,11 @@ func TestAgencyDetector(t *testing.T) {
 			"Mistakes were made\nby the board.",
 			// RE2's (?i)\w would fold U+212A and U+017F into a participle; the
 			// detector matches an ASCII-lowercased copy with no (?i), so neither
-			// does, and a no-break space joins no words.
-			"Mistakes were made.",
-			"Civilians were Killed.",
-			"Your data was ſhared.",
+			// does, and a no-break space joins no words. "hacked" and "shared"
+			// are lexicon participles, so a fold would mark.
+			"Mistakes were\u00a0made.",
+			"Accounts were hac\u212aed.",
+			"Your data was \u017fhared.",
 		} {
 			if got := agencySpans(text, pack); len(got) != 0 {
 				t.Errorf("%q: agency marks %q, want none", text, got)
