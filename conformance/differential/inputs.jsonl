@@ -66,6 +66,14 @@
 {"id":"case:65","source":"conformance/cases.json","text":"Approximately 4,000 accounts may have been affected."}
 {"id":"case:66","source":"conformance/cases.json","text":"Twelve patients were affected."}
 {"id":"case:67","source":"conformance/cases.json","text":"Never have more than two drinks."}
+{"id":"case:68","source":"conformance/cases.json","text":"No credit card numbers, bank account details or passwords were stolen."}
+{"id":"case:69","source":"conformance/cases.json","text":"No Social Security numbers or other sensitive personal information were exposed."}
+{"id":"case:70","source":"conformance/cases.json","text":"At this time, we do not believe that any of your personal information has been compromised."}
+{"id":"case:71","source":"conformance/cases.json","text":"We saw no alerts, but data were stolen."}
+{"id":"case:72","source":"conformance/cases.json","text":"We saw no alerts; data were stolen."}
+{"id":"case:73","source":"conformance/cases.json","text":"We saw no alerts\ndata were stolen."}
+{"id":"case:74","source":"conformance/cases.json","text":"Data was accessed and no records were leaked."}
+{"id":"case:75","source":"conformance/cases.json","text":"Customer data was exposed today."}
 {"id":"item:inv-breach-apology#1","source":"measurement/items/inv-breach-apology.txt","text":"Subject: An important update about your account"}
 {"id":"item:inv-breach-apology#2","source":"measurement/items/inv-breach-apology.txt","text":"Dear Valued Customer,"}
 {"id":"item:inv-breach-apology#3","source":"measurement/items/inv-breach-apology.txt","text":"At Brightwell, the trust you place in us is the foundation of everything we do. We are writing to let you know about a recent security incident that may have involved some of your information."}
@@ -807,6 +815,10 @@
 {"id":"contrast:imperative.absolute-universal.comma-never-fix","source":"measurement/contrast.json","text":"If it isn't broken, never fix it."}
 {"id":"contrast:imperative.absolute-universal.never-comma-ever","source":"measurement/contrast.json","text":"Never, ever share your PIN."}
 {"id":"contrast:negation.absolute-universal.nothing-guaranteed","source":"measurement/contrast.json","text":"Nothing is guaranteed."}
+{"id":"contrast:twin.absolute-universal.never-the-less","source":"measurement/contrast.json","text":"Never the less, we shipped on time."}
+{"id":"contrast:twin.absolute-universal.never-can-tell","source":"measurement/contrast.json","text":"Never can tell with these things."}
+{"id":"contrast:twin.absolute-universal.never-is-a-long-time","source":"measurement/contrast.json","text":"Never is a long time."}
+{"id":"contrast:twin.absolute-universal.never-being-late","source":"measurement/contrast.json","text":"Never being late is the secret to keeping a job."}
 {"id":"contrast:probe.hedge-softener.01","source":"measurement/contrast.json","text":"We believe this update will fix most issues."}
 {"id":"contrast:probe.hedge-softener.02","source":"measurement/contrast.json","text":"It seems the outage is sort of resolved."}
 {"id":"contrast:probe.hedge-softener.03","source":"measurement/contrast.json","text":"To some extent, the rollout went well."}
@@ -923,6 +935,8 @@
 {"id":"contrast:negation.agency.long-subject","source":"measurement/contrast.json","text":"No personal, financial or health information was accessed."}
 {"id":"contrast:negation.agency.do-not-believe","source":"measurement/contrast.json","text":"We do not believe their information has been stolen."}
 {"id":"contrast:negation.agency.after-participle","source":"measurement/contrast.json","text":"Your data was shared with no one."}
+{"id":"contrast:lesson.agency.negator-earlier-clause","source":"measurement/contrast.json","text":"No one called, but data were stolen."}
+{"id":"contrast:negation.agency.nobody-possessive","source":"measurement/contrast.json","text":"Nobody's data was accessed."}
 {"id":"contrast:lesson.agency.information-impacted","source":"measurement/contrast.json","text":"Your personal information may have been impacted."}
 {"id":"contrast:innocent.agency.flights-impacted","source":"measurement/contrast.json","text":"Roughly 2,000 flights were impacted after the storm."}
 {"id":"contrast:innocent.agency.earnings-affected","source":"measurement/contrast.json","text":"Earnings were affected this quarter."}
@@ -1176,6 +1190,12 @@
 {"id":"probe:abs-never-nbsp-after-adverb","source":"scripts/xengine-diff.mjs","text":"Never again\u00a0will prices fall."}
 {"id":"probe:abs-never-accented-next","source":"scripts/xengine-diff.mjs","text":"Never \u00e9t\u00e9 again."}
 {"id":"probe:abs-never-rsquo-in-next","source":"scripts/xengine-diff.mjs","text":"Never can\u2019t stop."}
+{"id":"probe:agency-put-into-place","source":"scripts/xengine-diff.mjs","text":"Safeguards were put into place."}
+{"id":"probe:agency-negator-crlf","source":"scripts/xengine-diff.mjs","text":"No one called\r\ndata were stolen."}
+{"id":"probe:agency-negator-nbsp","source":"scripts/xengine-diff.mjs","text":"No\u00a0card numbers were stolen."}
+{"id":"probe:agency-negator-ideographic-stop","source":"scripts/xengine-diff.mjs","text":"No\u3002data was accessed."}
+{"id":"probe:agency-negator-line-separator","source":"scripts/xengine-diff.mjs","text":"No\u2028data was accessed."}
+{"id":"probe:agency-negator-emoji","source":"scripts/xengine-diff.mjs","text":"No \ud83d\ude00 data was accessed."}
 {"id":"lexicon:botched","source":"spec/agency-lexicon.json","text":"The files were botched."}
 {"id":"lexicon:botched:by","source":"spec/agency-lexicon.json","text":"The files were botched by the board."}
 {"id":"lexicon:bungled","source":"spec/agency-lexicon.json","text":"The files were bungled."}
@@ -1339,20 +1359,57 @@
 {"id":"boundary:negator-head-nothing","source":"spec/agency-lexicon.json","text":"Nothing data was accessed."}
 {"id":"boundary:negator-skip-max","source":"spec/agency-lexicon.json","text":"No data all already also can been accessed."}
 {"id":"boundary:negator-skip-max-past","source":"spec/agency-lexicon.json","text":"No data all already also can could been accessed."}
-{"id":"boundary:negator-window-last","source":"spec/agency-lexicon.json","text":"No a b c d data was accessed."}
-{"id":"boundary:negator-window-past","source":"spec/agency-lexicon.json","text":"No a b c d e data was accessed."}
+{"id":"boundary:negator-clause-far","source":"spec/agency-lexicon.json","text":"No a b c d e f g h i j k l m n o p q r s t u v w x y z data was accessed."}
+{"id":"boundary:negator-subject-list","source":"spec/agency-lexicon.json","text":"No card numbers, bank details or passwords were stolen."}
 {"id":"boundary:negator-after-u002e","source":"spec/agency-lexicon.json","text":"No.data was accessed."}
+{"id":"boundary:negator-earlier-clause-u002e","source":"spec/agency-lexicon.json","text":"No one called. but data were stolen."}
 {"id":"boundary:negator-after-u003b","source":"spec/agency-lexicon.json","text":"No;data was accessed."}
+{"id":"boundary:negator-earlier-clause-u003b","source":"spec/agency-lexicon.json","text":"No one called; but data were stolen."}
 {"id":"boundary:negator-after-u003a","source":"spec/agency-lexicon.json","text":"No:data was accessed."}
+{"id":"boundary:negator-earlier-clause-u003a","source":"spec/agency-lexicon.json","text":"No one called: but data were stolen."}
 {"id":"boundary:negator-after-u0021","source":"spec/agency-lexicon.json","text":"No!data was accessed."}
+{"id":"boundary:negator-earlier-clause-u0021","source":"spec/agency-lexicon.json","text":"No one called! but data were stolen."}
 {"id":"boundary:negator-after-u003f","source":"spec/agency-lexicon.json","text":"No?data was accessed."}
+{"id":"boundary:negator-earlier-clause-u003f","source":"spec/agency-lexicon.json","text":"No one called? but data were stolen."}
 {"id":"boundary:negator-after-line-break","source":"spec/agency-lexicon.json","text":"No\ndata was accessed."}
+{"id":"boundary:negator-earlier-clause-line-break","source":"spec/agency-lexicon.json","text":"No one called\n but data were stolen."}
 {"id":"boundary:negator-after-u002c","source":"spec/agency-lexicon.json","text":"No,data was accessed."}
+{"id":"boundary:negator-first-passive","source":"spec/agency-lexicon.json","text":"No data was accessed and records were leaked."}
+{"id":"boundary:negator-clause-reset","source":"spec/agency-lexicon.json","text":"No data was accessed. Records were leaked."}
 {"id":"boundary:contraction-ascii","source":"spec/agency-lexicon.json","text":"Data hasn't been accessed."}
 {"id":"boundary:contraction-rsquo","source":"spec/agency-lexicon.json","text":"Data hasn\u2019t been accessed."}
 {"id":"boundary:contraction-not-n","source":"spec/agency-lexicon.json","text":"Data has't been accessed."}
 {"id":"boundary:contraction-spaced","source":"spec/agency-lexicon.json","text":"Data hasn' t been accessed."}
 {"id":"boundary:contraction-no-apostrophe","source":"spec/agency-lexicon.json","text":"Data hasn t been accessed."}
+{"id":"boundary:adverb-already","source":"spec/agency-lexicon.json","text":"Customer data was already accessed."}
+{"id":"boundary:adverb-always","source":"spec/agency-lexicon.json","text":"Customer data was always accessed."}
+{"id":"boundary:adverb-often","source":"spec/agency-lexicon.json","text":"Customer data was often accessed."}
+{"id":"boundary:adverb-still","source":"spec/agency-lexicon.json","text":"Customer data was still accessed."}
+{"id":"boundary:adverb-suffix-alone","source":"spec/agency-lexicon.json","text":"Customer data was ly accessed."}
+{"id":"boundary:adverb-suffix-digit","source":"spec/agency-lexicon.json","text":"Customer data was 2ly accessed."}
+{"id":"boundary:adverb-two","source":"spec/agency-lexicon.json","text":"Customer data was quietly already accessed."}
+{"id":"boundary:adverb-unlisted","source":"spec/agency-lexicon.json","text":"Customer data was soon accessed."}
+{"id":"boundary:adverb-negator-cannot","source":"spec/agency-lexicon.json","text":"Customer data was cannot accessed."}
+{"id":"boundary:adverb-negator-neither","source":"spec/agency-lexicon.json","text":"Customer data was neither accessed."}
+{"id":"boundary:adverb-negator-never","source":"spec/agency-lexicon.json","text":"Customer data was never accessed."}
+{"id":"boundary:adverb-negator-no","source":"spec/agency-lexicon.json","text":"Customer data was no accessed."}
+{"id":"boundary:adverb-negator-none","source":"spec/agency-lexicon.json","text":"Customer data was none accessed."}
+{"id":"boundary:adverb-negator-nor","source":"spec/agency-lexicon.json","text":"Customer data was nor accessed."}
+{"id":"boundary:adverb-negator-not","source":"spec/agency-lexicon.json","text":"Customer data was not accessed."}
+{"id":"boundary:adverb-negator-nothing","source":"spec/agency-lexicon.json","text":"Customer data was nothing accessed."}
+{"id":"boundary:requires-partial-put","source":"spec/agency-lexicon.json","text":"Steps were put in places."}
+{"id":"boundary:unless-exposed","source":"spec/agency-lexicon.json","text":"The files were exposed to it."}
+{"id":"boundary:unless-partial-exposed","source":"spec/agency-lexicon.json","text":"The files were exposed tos."}
+{"id":"boundary:word-underscore-head","source":"spec/agency-lexicon.json","text":"Your user_data was shared."}
+{"id":"boundary:word-digit-head","source":"spec/agency-lexicon.json","text":"Your data2 was shared."}
+{"id":"boundary:word-underscore-negator","source":"spec/agency-lexicon.json","text":"No_data was accessed."}
+{"id":"boundary:word-digit-negator","source":"spec/agency-lexicon.json","text":"No2 data was accessed."}
+{"id":"boundary:word-underscore-before-negator","source":"spec/agency-lexicon.json","text":"Data_no was accessed."}
+{"id":"boundary:word-digit-before-negator","source":"spec/agency-lexicon.json","text":"Data2no was accessed."}
+{"id":"boundary:word-underscore-by","source":"spec/agency-lexicon.json","text":"Mistakes were made by_them."}
+{"id":"boundary:word-digit-by","source":"spec/agency-lexicon.json","text":"Mistakes were made by2."}
+{"id":"boundary:word-underscore-requires","source":"spec/agency-lexicon.json","text":"Safeguards were put in place_now."}
+{"id":"boundary:word-underscore-unless","source":"spec/agency-lexicon.json","text":"Customer data was exposed to_all."}
 {"id":"boundary:space-u0020","source":"spec/agency-lexicon.json","text":"Mistakes were made."}
 {"id":"boundary:space-requires-u0020","source":"spec/agency-lexicon.json","text":"Safeguards were put in place."}
 {"id":"boundary:space-u0009","source":"spec/agency-lexicon.json","text":"Mistakes were\tmade."}
