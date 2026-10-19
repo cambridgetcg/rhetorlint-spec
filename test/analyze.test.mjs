@@ -329,6 +329,75 @@ test("predicate adjectives are not mistaken for passives", () => {
   assert.equal(passive.length, 0, "'were tired' / 'were committed' are not agentless passives");
 });
 
+const agencySpans = (text) => analyze(text, { rules: RULES }).marks
+  .filter((m) => m.ruleId === "agency-hiding.deleted-subject")
+  .map((m) => [m.actual, m.position.start.offset, m.position.end.offset]);
+
+test("the agency detector marks an accountable past passive, auxiliary through participle", () => {
+  const cases = [
+    ["Mistakes were made.", "were made"],
+    ["Mistakes, frankly, were made.", "were made"],
+    ["Customer data was quietly accessed.", "was quietly accessed"],
+    ["Your data was shared with partners.", "was shared"],
+    ["PII may have been compromised.", "been compromised"],
+    ["Records were withheld from investigators.", "were withheld"],
+    ["It was decided that the program would end.", "was decided"],
+    ["Hundreds of workers were laid off.", "were laid off"],
+    ["Additional safeguards have been put in place.", "been put"],
+    ["Concerns were raised about the audit.", "were raised"],
+    ["MISTAKES WERE MADE.", "WERE MADE"]
+  ];
+  for (const [text, actual] of cases) {
+    const at = text.indexOf(actual);
+    assert.deepEqual(agencySpans(text), [[actual, at, at + actual.length]], text);
+  }
+});
+
+test("the agency detector leaves procedure, named agents, harm verbs and idioms unmarked", () => {
+  for (const text of [
+    "My name is Fred.",
+    "JavaScript is required.",
+    "Soil water content was measured at 5 cm depth.",
+    "The soup can be frozen for up to 3 months.",
+    "This option is ignored when the flag is unset.",
+    "The startup has been described as the next big thing by Forbes.",
+    // A pinned under-mark: "by" names when, not who, and the rule stays silent.
+    "The report was shelved by Friday.",
+    "Lives were lost in the earthquake.",
+    "Your account was closed at your request.",
+    "He got fired up about the album.",
+    "We won’t be utterly ruined.",
+    "This is guaranteed to double your savings.",
+    // Methods-section procedure: collected, retained and transferred are not in
+    // the lexicon, and a light verb needs an error or decision noun before it.
+    "Data were collected from 200 participants.",
+    "Information was collected via a survey.",
+    "Samples were collected at dawn.",
+    "Records were retained for seven years.",
+    "Data were transferred to a secure server.",
+    "If no error was raised, the call succeeded.",
+    // Present, modal, progressive and relative-clause passives are out of reach.
+    "Mistakes are made every day.",
+    "Records were being withheld.",
+    "The mistakes that have been made are regrettable.",
+    "Workers were exposed to asbestos.",
+    "Mistakes were made\nby the board."
+  ]) {
+    assert.deepEqual(agencySpans(text), [], text);
+  }
+});
+
+test("a no-break space or a folded look-alike letter joins no passive", () => {
+  for (const text of ["Mistakes were made.", "Your data was\u000bshared.", "Civilians were Killed.", "Your data was ſhared."]) {
+    assert.deepEqual(agencySpans(text), [], JSON.stringify(text));
+  }
+});
+
+test("strip flags exactly the agency marks it is given", () => {
+  assert.equal(analyze("My name is Fred.", { rules: RULES }).strip, "My name is Fred.");
+  assert.equal(analyze("Mistakes were made.", { rules: RULES }).strip, "Mistakes [who?] were made.");
+});
+
 test("the core never fabricates a rewrite", () => {
   const r = analyze(SPECIMEN, { rules: RULES });
   assert.equal(r.rewrite, null, "rewrite stays null without a model adapter");
