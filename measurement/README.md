@@ -37,7 +37,7 @@ not proof, and the rows say who made it (`by`) and when (`date`).
 | label | meaning | example from the committed items |
 |---|---|---|
 | `TP` | right construction, in use, doing the work the rule names | `was inadvertently published` (us-irs-form-990t-2022): the agency's own disclosure error, with the doer deleted and the act softened |
-| `MENTION` | right construction, but the text quotes or exhibits it, as a specimen or in critique | a page that quotes "mistakes were made" to show what a non-apology looks like |
+| `MENTION` | right construction, but the text quotes or exhibits it, as a specimen or in critique | none in the committed items yet; it would be a page that quotes "mistakes were made" to show what a non-apology looks like |
 | `DEBATABLE` | right construction; whether it does that work here is a judgement call | `whose accounts were accessed` (us-irs-get-transcript-2015-05): a breach passive, but the statement names the criminals a few sentences earlier |
 | `FPB` | right surface construction, benign in context | `the except clause is executed` (py-tutorial-errors): a procedural passive with no actor worth naming |
 | `FPW` | wrong construction: the match is not the thing the rule describes | `sections of TEOS are unaffected` (us-irs-form-990t-2022): `unaffected` is an adjective, not a passive |
