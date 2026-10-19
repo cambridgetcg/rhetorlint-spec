@@ -23,71 +23,71 @@
  "labels": {
   "rows": 471,
   "unlabelled_marks": 0,
-  "not_produced_by_engine": 4
+  "not_produced_by_engine": 351
  },
  "strata": {
   "pastiche": {
    "items": 6,
    "words": 925,
-   "marks": 26,
-   "per100": 2.81,
-   "agency_marks": 9,
-   "agency_per100": 0.97,
-   "agency_share": 0.35
+   "marks": 21,
+   "per100": 2.27,
+   "agency_marks": 4,
+   "agency_per100": 0.43,
+   "agency_share": 0.19
   },
   "wild-pd": {
    "items": 1,
    "words": 456,
-   "marks": 5,
-   "per100": 1.1,
-   "agency_marks": 5,
-   "agency_per100": 1.1,
-   "agency_share": 1
+   "marks": 0,
+   "per100": 0,
+   "agency_marks": 0,
+   "agency_per100": 0,
+   "agency_share": null
   },
   "target-genre": {
    "items": 13,
    "words": 8896,
-   "marks": 175,
-   "per100": 1.97,
-   "agency_marks": 129,
-   "agency_per100": 1.45,
-   "agency_share": 0.74
+   "marks": 72,
+   "per100": 0.81,
+   "agency_marks": 26,
+   "agency_per100": 0.29,
+   "agency_share": 0.36
   },
   "technical": {
    "items": 6,
    "words": 10952,
-   "marks": 261,
-   "per100": 2.38,
-   "agency_marks": 234,
-   "agency_per100": 2.14,
-   "agency_share": 0.9
+   "marks": 27,
+   "per100": 0.25,
+   "agency_marks": 0,
+   "agency_per100": 0,
+   "agency_share": 0
   },
   "legacy": {
    "items": 7,
    "words": 1381,
-   "marks": 31,
-   "per100": 2.24,
-   "agency_marks": 14,
-   "agency_per100": 1.01,
-   "agency_share": 0.45
+   "marks": 21,
+   "per100": 1.52,
+   "agency_marks": 4,
+   "agency_per100": 0.29,
+   "agency_share": 0.19
   },
   "wild": {
    "items": 20,
    "words": 20304,
-   "marks": 441,
-   "per100": 2.17,
-   "agency_marks": 368,
-   "agency_per100": 1.81,
-   "agency_share": 0.83
+   "marks": 99,
+   "per100": 0.49,
+   "agency_marks": 26,
+   "agency_per100": 0.13,
+   "agency_share": 0.26
   },
   "all": {
    "items": 26,
    "words": 21229,
-   "marks": 467,
-   "per100": 2.2,
-   "agency_marks": 377,
-   "agency_per100": 1.78,
-   "agency_share": 0.81
+   "marks": 120,
+   "per100": 0.57,
+   "agency_marks": 30,
+   "agency_per100": 0.14,
+   "agency_share": 0.25
   }
  },
  "rules": [
@@ -219,145 +219,105 @@
   },
   {
    "ruleId": "agency-hiding.deleted-subject",
-   "level": "warning",
+   "level": "note",
    "strata": {
     "pastiche": {
-     "n": 9,
+     "n": 4,
      "TP": 4,
      "MENTION": 0,
      "DEBATABLE": 0,
-     "FPB": 4,
-     "FPW": 1,
+     "FPB": 0,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.444,
+     "strict": 1,
      "strict_ci": [
-      0.189,
-      0.733
+      0.51,
+      1
      ],
-     "lenient": 0.444,
+     "lenient": 1,
      "lenient_ci": [
-      0.189,
-      0.733
+      0.51,
+      1
      ],
-     "status": "measured"
-    },
-    "wild-pd": {
-     "n": 5,
-     "TP": 0,
-     "MENTION": 0,
-     "DEBATABLE": 0,
-     "FPB": 4,
-     "FPW": 1,
-     "unlabelled": 0,
-     "strict": 0,
-     "strict_ci": [
-      0,
-      0.434
-     ],
-     "lenient": 0,
-     "lenient_ci": [
-      0,
-      0.434
-     ],
-     "status": "measured"
+     "status": "unmeasured"
     },
     "target-genre": {
-     "n": 129,
-     "TP": 9,
+     "n": 26,
+     "TP": 3,
      "MENTION": 0,
-     "DEBATABLE": 30,
-     "FPB": 70,
-     "FPW": 20,
+     "DEBATABLE": 16,
+     "FPB": 7,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.07,
+     "strict": 0.115,
      "strict_ci": [
-      0.037,
-      0.127
+      0.04,
+      0.29
      ],
-     "lenient": 0.302,
+     "lenient": 0.731,
      "lenient_ci": [
-      0.23,
-      0.386
-     ],
-     "status": "measured"
-    },
-    "technical": {
-     "n": 234,
-     "TP": 0,
-     "MENTION": 0,
-     "DEBATABLE": 0,
-     "FPB": 225,
-     "FPW": 9,
-     "unlabelled": 0,
-     "strict": 0,
-     "strict_ci": [
-      0,
-      0.016
-     ],
-     "lenient": 0,
-     "lenient_ci": [
-      0,
-      0.016
+      0.539,
+      0.863
      ],
      "status": "measured"
     },
     "legacy": {
-     "n": 14,
+     "n": 4,
      "TP": 4,
      "MENTION": 0,
      "DEBATABLE": 0,
-     "FPB": 8,
-     "FPW": 2,
+     "FPB": 0,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.286,
+     "strict": 1,
      "strict_ci": [
-      0.117,
-      0.546
+      0.51,
+      1
      ],
-     "lenient": 0.286,
+     "lenient": 1,
      "lenient_ci": [
-      0.117,
-      0.546
+      0.51,
+      1
      ],
-     "status": "measured"
+     "status": "unmeasured"
     },
     "wild": {
-     "n": 368,
-     "TP": 9,
+     "n": 26,
+     "TP": 3,
      "MENTION": 0,
-     "DEBATABLE": 30,
-     "FPB": 299,
-     "FPW": 30,
+     "DEBATABLE": 16,
+     "FPB": 7,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.024,
+     "strict": 0.115,
      "strict_ci": [
-      0.013,
-      0.046
+      0.04,
+      0.29
      ],
-     "lenient": 0.106,
+     "lenient": 0.731,
      "lenient_ci": [
-      0.078,
-      0.142
+      0.539,
+      0.863
      ],
      "status": "measured"
     },
     "all": {
-     "n": 377,
-     "TP": 13,
+     "n": 30,
+     "TP": 7,
      "MENTION": 0,
-     "DEBATABLE": 30,
-     "FPB": 303,
-     "FPW": 31,
+     "DEBATABLE": 16,
+     "FPB": 7,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.034,
+     "strict": 0.233,
      "strict_ci": [
-      0.02,
-      0.058
+      0.118,
+      0.409
      ],
-     "lenient": 0.114,
+     "lenient": 0.767,
      "lenient_ci": [
-      0.086,
-      0.15
+      0.591,
+      0.882
      ],
      "status": "measured"
     }
@@ -1215,157 +1175,151 @@
  ],
  "totals": {
   "pastiche": {
-   "n": 26,
+   "n": 21,
    "TP": 20,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 5,
-   "FPW": 1,
+   "FPB": 1,
+   "FPW": 0,
    "unlabelled": 0,
-   "strict": 0.769,
+   "strict": 0.952,
    "strict_ci": [
-    0.579,
-    0.89
+    0.773,
+    0.992
    ],
-   "lenient": 0.769,
+   "lenient": 0.952,
    "lenient_ci": [
-    0.579,
-    0.89
+    0.773,
+    0.992
    ],
    "status": "measured"
   },
   "wild-pd": {
-   "n": 5,
+   "n": 0,
    "TP": 0,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 4,
-   "FPW": 1,
+   "FPB": 0,
+   "FPW": 0,
    "unlabelled": 0,
-   "strict": 0,
-   "strict_ci": [
-    0,
-    0.434
-   ],
-   "lenient": 0,
-   "lenient_ci": [
-    0,
-    0.434
-   ],
-   "status": "measured"
+   "strict": null,
+   "strict_ci": null,
+   "lenient": null,
+   "lenient_ci": null,
+   "status": "unmeasured"
   },
   "target-genre": {
-   "n": 175,
-   "TP": 19,
+   "n": 72,
+   "TP": 13,
    "MENTION": 0,
-   "DEBATABLE": 47,
-   "FPB": 84,
-   "FPW": 25,
+   "DEBATABLE": 33,
+   "FPB": 21,
+   "FPW": 5,
    "unlabelled": 0,
-   "strict": 0.109,
+   "strict": 0.181,
    "strict_ci": [
-    0.071,
-    0.163
+    0.109,
+    0.285
    ],
-   "lenient": 0.377,
+   "lenient": 0.639,
    "lenient_ci": [
-    0.309,
-    0.451
+    0.524,
+    0.74
    ],
    "status": "measured"
   },
   "technical": {
-   "n": 261,
+   "n": 27,
    "TP": 0,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 246,
-   "FPW": 15,
+   "FPB": 21,
+   "FPW": 6,
    "unlabelled": 0,
    "strict": 0,
    "strict_ci": [
     0,
-    0.015
+    0.125
    ],
    "lenient": 0,
    "lenient_ci": [
     0,
-    0.015
+    0.125
    ],
    "status": "measured"
   },
   "legacy": {
-   "n": 31,
+   "n": 21,
    "TP": 20,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 9,
-   "FPW": 2,
+   "FPB": 1,
+   "FPW": 0,
    "unlabelled": 0,
-   "strict": 0.645,
+   "strict": 0.952,
    "strict_ci": [
-    0.469,
-    0.789
+    0.773,
+    0.992
    ],
-   "lenient": 0.645,
+   "lenient": 0.952,
    "lenient_ci": [
-    0.469,
-    0.789
+    0.773,
+    0.992
    ],
    "status": "measured"
   },
   "wild": {
-   "n": 441,
-   "TP": 19,
+   "n": 99,
+   "TP": 13,
    "MENTION": 0,
-   "DEBATABLE": 47,
-   "FPB": 334,
-   "FPW": 41,
+   "DEBATABLE": 33,
+   "FPB": 42,
+   "FPW": 11,
    "unlabelled": 0,
-   "strict": 0.043,
+   "strict": 0.131,
    "strict_ci": [
-    0.028,
-    0.066
+    0.078,
+    0.212
    ],
-   "lenient": 0.15,
+   "lenient": 0.465,
    "lenient_ci": [
-    0.119,
-    0.186
+    0.37,
+    0.562
    ],
    "status": "measured"
   },
   "all": {
-   "n": 467,
-   "TP": 39,
+   "n": 120,
+   "TP": 33,
    "MENTION": 0,
-   "DEBATABLE": 47,
-   "FPB": 339,
-   "FPW": 42,
+   "DEBATABLE": 33,
+   "FPB": 43,
+   "FPW": 11,
    "unlabelled": 0,
-   "strict": 0.084,
+   "strict": 0.275,
    "strict_ci": [
-    0.062,
-    0.112
+    0.203,
+    0.361
    ],
-   "lenient": 0.184,
+   "lenient": 0.55,
    "lenient_ci": [
-    0.152,
-    0.222
+    0.461,
+    0.636
    ],
    "status": "measured"
   }
  },
  "gold": {
   "any_rule": {
-   "hit": 57,
+   "hit": 38,
    "n": 100,
-   "recall": 0.57
+   "recall": 0.38
   },
   "by_set": {
    "accountable-passive-v1": {
-    "hit": 39,
+    "hit": 20,
     "n": 41,
-    "recall": 0.951
+    "recall": 0.488
    },
    "legacy-semeval": {
     "hit": 18,
@@ -1375,10 +1329,18 @@
   },
   "by_rule": {
    "agency-hiding.deleted-subject": {
-    "hit": 39,
+    "hit": 19,
     "n": 41,
-    "incidental": [],
-    "recall": 0.951
+    "incidental": [
+     {
+      "item": "us-irs-get-transcript-2015-08",
+      "text": "may have been gathered",
+      "rules": [
+       "hedge.deniable"
+      ]
+     }
+    ],
+    "recall": 0.463
    }
   }
  },
@@ -1405,8 +1367,8 @@
     "stratum": "pastiche",
     "register": "spin",
     "words": 178,
-    "tells": 6,
-    "per100": 3.4
+    "tells": 5,
+    "per100": 2.8
    },
    {
     "id": "inv-scarcity-banner",
@@ -1421,189 +1383,182 @@
     "stratum": "pastiche",
     "register": "ham",
     "words": 171,
-    "tells": 1,
-    "per100": 0.6
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "inv-science-abstract",
     "stratum": "pastiche",
     "register": "ham",
     "words": 137,
-    "tells": 4,
-    "per100": 2.9
+    "tells": 1,
+    "per100": 0.7
    },
    {
     "id": "pd-declaration",
     "stratum": "wild-pd",
     "register": "mixed",
     "words": 456,
-    "tells": 5,
-    "per100": 1.1
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "us-irs-get-transcript-2015-05",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 833,
-    "tells": 11,
-    "per100": 1.3
+    "tells": 5,
+    "per100": 0.6
    },
    {
     "id": "us-irs-get-transcript-2015-08",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 629,
-    "tells": 12,
-    "per100": 1.9
+    "tells": 8,
+    "per100": 1.3
    },
    {
     "id": "us-irs-get-transcript-2016-02",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 781,
-    "tells": 19,
-    "per100": 2.4
+    "tells": 11,
+    "per100": 1.4
    },
    {
     "id": "us-irs-form-990t-2022",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 235,
-    "tells": 7,
-    "per100": 3
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "us-irs-data-safeguards-2024",
     "stratum": "target-genre",
     "register": "spin",
     "words": 442,
-    "tells": 4,
-    "per100": 0.9
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "us-cms-ffe-breach-2018",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 407,
-    "tells": 10,
-    "per100": 2.5
+    "tells": 4,
+    "per100": 1
    },
    {
     "id": "us-cms-agent-broker-2024-07",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 549,
-    "tells": 10,
-    "per100": 1.8
+    "tells": 1,
+    "per100": 0.2
    },
    {
     "id": "uk-laa-data-breach-2025",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 335,
-    "tells": 11,
-    "per100": 3.3
+    "tells": 6,
+    "per100": 1.8
    },
    {
     "id": "uk-laa-data-update-2026",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 443,
-    "tells": 11,
-    "per100": 2.5
+    "tells": 7,
+    "per100": 1.6
    },
    {
     "id": "uk-mod-payroll-incident-2024",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 825,
-    "tells": 14,
-    "per100": 1.7
+    "tells": 6,
+    "per100": 0.7
    },
    {
     "id": "uk-mod-afghan-statement-2025",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 1862,
-    "tells": 30,
-    "per100": 1.6
+    "tells": 13,
+    "per100": 0.7
    },
    {
     "id": "uk-mod-afghan-guidance-2025",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 1003,
-    "tells": 29,
-    "per100": 2.9
+    "tells": 10,
+    "per100": 1
    },
    {
     "id": "uk-nio-psni-breach-2023",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 552,
-    "tells": 7,
-    "per100": 1.3
+    "tells": 1,
+    "per100": 0.2
    },
    {
     "id": "py-tutorial-errors",
     "stratum": "technical",
     "register": "ham",
     "words": 2060,
-    "tells": 56,
-    "per100": 2.7
+    "tells": 7,
+    "per100": 0.3
    },
    {
     "id": "py-tutorial-inputoutput",
     "stratum": "technical",
     "register": "ham",
     "words": 2288,
-    "tells": 46,
-    "per100": 2
+    "tells": 3,
+    "per100": 0.1
    },
    {
     "id": "py-library-tempfile",
     "stratum": "technical",
     "register": "ham",
     "words": 2327,
-    "tells": 64,
-    "per100": 2.8
+    "tells": 8,
+    "per100": 0.3
    },
    {
     "id": "py-library-venv",
     "stratum": "technical",
     "register": "ham",
     "words": 1330,
-    "tells": 22,
-    "per100": 1.7
+    "tells": 2,
+    "per100": 0.2
    },
    {
     "id": "py-tutorial-modules",
     "stratum": "technical",
     "register": "ham",
     "words": 1640,
-    "tells": 38,
-    "per100": 2.3
+    "tells": 2,
+    "per100": 0.1
    },
    {
     "id": "py-reference-import",
     "stratum": "technical",
     "register": "ham",
     "words": 1307,
-    "tells": 35,
-    "per100": 2.7
+    "tells": 5,
+    "per100": 0.4
    }
   ],
   "spin_ham": {
    "pairs": 8,
-   "correct": 7,
-   "violations": [
-    {
-     "spin": "inv-crypto-launch",
-     "spin_per100": 1.2,
-     "ham": "inv-science-abstract",
-     "ham_per100": 2.9
-    }
-   ]
+   "correct": 8,
+   "violations": []
   }
  },
  "release_blockers": [
@@ -1616,17 +1571,6 @@
    "why": [
     "FPW 1 > 0",
     "lenient 0.118 < 0.5 (info)"
-   ]
-  },
-  {
-   "ruleId": "agency-hiding.deleted-subject",
-   "level": "warning",
-   "n": 368,
-   "lenient": 0.106,
-   "FPW": 30,
-   "why": [
-    "FPW 30 > 0",
-    "lenient 0.106 < 0.8 (warning)"
    ]
   },
   {
@@ -1668,8 +1612,8 @@
    "FPW": 1
   },
   "agency-hiding.deleted-subject": {
-   "FPB": 303,
-   "FPW": 31
+   "FPB": 7,
+   "FPW": 0
   },
   "hedge.deniable": {
    "FPB": 19,
@@ -1685,10 +1629,10 @@
   }
  },
  "contrast": {
-  "rows": 225,
+  "rows": 231,
   "known_defect_by_tag": {
-   "O2": 14,
-   "O2-twin": 22,
+   "O2": 2,
+   "O2-twin": 9,
    "O6": 7,
    "O7": 65
   }

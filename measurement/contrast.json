@@ -2,7 +2,7 @@
   "version": 1,
   "note": "Contrast set: minimal pairs for every rule. Each row states what the WORDS should get (expect) and whether the engine at this revision does (status). holds: the engine matches expect. known-defect: it does not yet; tag names the opportunity that would fix it. priced-in: a false positive the repo accepts, at the file:line in cite. test/contrast.test.mjs keeps status true: a fix that makes a known-defect row hold fails until the row is flipped. Engine-neutral data: no offsets, so any engine can run it.",
   "tags": {
-    "O2": "agency-hiding.deleted-subject precision: passive-shaped text with no hidden doer (adjectives, names, procedure, a named agent, verbs the words cannot judge).",
+    "O2": "agency-hiding.deleted-subject: passive-shaped text the detector reads wrongly. Marks with no hidden doer (adjectives, names, procedure, a named agent, verbs the words cannot judge), and accountable passives it gives up because the words alone cannot judge their verb.",
     "O2-twin": "frontier's 30 honest passive twins: an agentless-looking passive whose doer is named elsewhere in the sentence or whose cause is given.",
     "O3": "typography: smart punctuation (U+2019, U+2011, U+2013) silences an ASCII-spelt tell.",
     "O4": "strip honesty: strip must not strengthen a negated claim or edit a quotation.",
@@ -1127,9 +1127,10 @@
       "expect": "mark",
       "actual": "was closed",
       "kind": "lesson",
-      "status": "holds",
-      "reason": "An agentless past passive: who closed the account is not in the words (the taxonomy's own example). 'closed' is also a verb the words alone cannot judge; a detector narrowed to fault, breach and concealment verbs would stop marking it, and must then flip this row and record the recall it gives up.",
-      "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
+      "status": "known-defect",
+      "reason": "An agentless past passive: who closed the account is not in the words. Recall the accountable-passive detector (core 0.1.4) gives up: 'closed' is a harm or news verb the words alone cannot judge ('Your account was closed at your request.' must stay silent), so it is not in spec/agency-lexicon.json and this former taxonomy example goes unmarked. Kept open so the trade stays visible.",
+      "source": "constructed probe (motifs survey rules reader, 2026-10-19)",
+      "tag": "O2"
     },
     {
       "id": "probe.agency-hiding-deleted-subject.02",
@@ -1159,7 +1160,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "Colour adjectives that end in -ed/-en after 'is'; there is no passive and no deleted doer.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1170,9 +1171,9 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
-      "reason": "A proper name that ends in -ed; HEAD's strip writes 'My name [who?] is Fred.'",
+      "reason": "A proper name that ends in -ed; there is no passive. The old detector wrote 'My name [who?] is Fred.'; core 0.1.4 reads no participle here.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -1181,7 +1182,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A numeral that ends in -en, not a participle.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1192,7 +1193,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "Stative 'is located' gives a place; there is no action and no doer to delete.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1203,7 +1204,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A present-tense recipe step; the cook is the reader.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1214,7 +1215,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "named-agent",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "The doer is named ('by the auditor') just after the adverb 'again'.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1225,7 +1226,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "'is required' states a precondition; there is no act whose doer is hidden.",
       "source": "wild: the opening words of a boilerplate sentence ('JavaScript is required for the ...'), which marks the same span in full; estate site snapshot (zerone.ai; motifs survey, 2026-10-19)"
@@ -1236,7 +1237,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A proper name that ends in -en after 'is'; no passive at all.",
       "source": "wild: the opening words of a longer news headline that names a public figure, which marks the same span in full; front-page snapshot of theguardian.com/international (motifs survey supplementary news, 2026-10-19)"
@@ -1247,7 +1248,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A methods-section passive: the measuring is procedure, not a fault, breach or decision whose doer is hidden.",
       "source": "pastiche: shortened from a sentence of an invented science abstract (motifs survey item inv-science-abstract, 2026-10-19)"
@@ -1258,7 +1259,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A modal passive of instruction: the reader is the one who may freeze it.",
       "source": "constructed probe (frontier design proposal, 2026-10-19)"
@@ -1269,7 +1270,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "Present-tense procedural passive in documentation: the program is the doer, and nothing is hidden.",
       "source": "constructed probe (design synthesis, 2026-10-19)"
@@ -1280,9 +1281,9 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "named-agent",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
-      "reason": "The agent is named in the same clause ('by Forbes', six words after the participle). conformance/cases.json case 30 pins HEAD's mark as ground truth; this row records it as a defect without changing the case.",
+      "reason": "The agent is named in the same clause ('by Forbes', six words after the participle). conformance/cases.json case 30 pinned the old mark as ground truth; since core 0.1.4 it is a clean control.",
       "source": "conformance/cases.json case 30"
     },
     {
@@ -1291,7 +1292,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "unjudgeable-verb",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "'closed' is a verb the words alone cannot judge (routine closure or sanction). Here 'at your request' names the reader as the cause, so there is no hidden doer to point at.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -1302,7 +1303,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A harm verb with its cause given (the bus overturned on ice); no doer is hidden.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1313,7 +1314,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "unjudgeable-verb",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A harm verb ('lost') with a natural cause: the words alone cannot say a doer exists, so the rule cannot judge it.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1324,7 +1325,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "An injury with its cause given (a fall); there is no doer to name.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1335,7 +1336,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A routine arrest report; the arresting body is named in the attribution ('police said').",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1346,7 +1347,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A routine arrest report; the arresting body is named first ('Police said').",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1357,7 +1358,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The officers who did the detaining are the subject of the main clause.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1368,7 +1369,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "'at your request' names the reader as the cause of the closure.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1379,7 +1380,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "'As you asked' names the reader as the cause of the deletion.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1390,7 +1391,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The cause is named in the because-clause (the card issuer rejected the transfer).",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1423,7 +1424,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The doer ('I') is named in the previous sentence and again in the because-clause.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1434,7 +1435,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The doer ('We') is named in the previous sentence, and the reason is given.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1522,7 +1523,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "Firing at a range during a qualification exam: the shooters are the examinees, and no harm is hidden.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1544,7 +1545,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The cause is given in the when-clause: a flood, with no doer.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1566,7 +1567,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The doer is named in the same sentence ('an air strike it carried out').",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1577,9 +1578,9 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "holds",
+      "status": "known-defect",
       "tag": "O2-twin",
-      "reason": "The company names itself ('we closed') and its CEO in the same sentence.",
+      "reason": "The company names itself ('we closed') and its CEO in the same sentence. Since core 0.1.4 'laid off' is a concealment-class participle, and the detector reads the clause, not the sentence, so it asks 'who?' of 'were laid off'.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
     },
     {
@@ -1643,10 +1644,76 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "specimen",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "The passive has a by-phrase ('by people who either did it deliberately or inadvertently'): an indefinite agent, but one the clause names, so the words show no deleted doer.",
       "source": "https://www.presidency.ucsb.edu/documents/the-presidents-news-conference-1067 (1997-01-28), as quoted in the Open Lens lexicon OL.AGENTDEL (cambridgetcg/open-lens)"
+    },
+    {
+      "id": "procedure.agency.collected",
+      "text": "Data were collected from 200 participants.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A methods-section procedure: collecting data says no harm, fault or concealment. 'collected', 'retained' and 'transferred' are kept out of the data class of spec/agency-lexicon.json for this reason.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.collected-information",
+      "text": "Information was collected via a survey.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "Survey procedure; the same data noun and verb as a privacy complaint, which the words alone cannot tell apart, so the rule stays silent.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.retained",
+      "text": "Records were retained for seven years.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A retention schedule: keeping records is procedure, not an act whose doer is hidden.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.transferred",
+      "text": "Data were transferred to a secure server.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A transfer log: moving data between systems is procedure.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "term-of-art.agency.error-raised",
+      "text": "If no error was raised, the call succeeded.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "term-of-art",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "Software raises an error: the program is the doer. 'raised' marks only after a challenge noun ('concerns were raised'), not after 'error'.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.shared-on-request",
+      "text": "Data were shared on request.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A data-availability statement: sharing on request is procedure. The data class keeps 'shared' after a data noun for the taxonomy's lesson ('Your data was shared with partners'), and the words cannot tell the two apart, so this marks: a recorded over-mark.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
     },
     {
       "id": "specimen.agency.target-2013",
@@ -1891,7 +1958,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Legal term of art: a lawsuit 'claiming that' states the pleading. The taxonomy records it as a documented residual leak.",
-      "cite": "spec/taxonomy.yaml:501",
+      "cite": "spec/taxonomy.yaml:481",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -1957,7 +2024,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Technical 'so-called' means 'known as'. The taxonomy names it as this rule's priced-in false positive.",
-      "cite": "spec/taxonomy.yaml:514",
+      "cite": "spec/taxonomy.yaml:494",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -2501,7 +2568,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Academic 'state-of-the-art' with the benchmark figure given. The taxonomy records it as known noise.",
-      "cite": "spec/taxonomy.yaml:354",
+      "cite": "spec/taxonomy.yaml:340",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
