@@ -572,7 +572,7 @@ test("claim, challenge, reply, and correction wording stay separate and redacted
   const input = clone(FIXTURE);
   input.challenge.text = "ACT NOW and accept this guaranteed challenge.";
   input.response.text = "Obviously, this reply fixes everything.";
-  input.response.replacement_claim = "Every report is definitely fixed.";
+  input.response.replacement_claim = "Every report was definitely withheld.";
   input.reuse.applies_to_sha256 = [
     input.crawl.claim_sha256,
     input.crawl.body_sha256,
