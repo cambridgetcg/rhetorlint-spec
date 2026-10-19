@@ -2,10 +2,12 @@
 // Write spec/agency-lexicon.json into the three engines. Zero dependencies.
 //
 // The accountable-passive detector (agency-hiding.deleted-subject) reads closed
-// word lists: auxiliaries, adverbs, the head-word skip list, the participle
-// classes and their head nouns. Copied by hand into JavaScript, Python and Go,
-// three lists drift; generated from one file, they cannot drift unseen. Each
-// engine holds the lists between two marker lines:
+// word lists: auxiliaries, adverbs, the head-word skip list, the negators, the
+// participle classes and their head nouns, and three character sets (the
+// whitespace between words, the characters its walks never cross, and the
+// clause breaks that end the 'by' window). Copied by hand into JavaScript,
+// Python and Go, three lists drift; generated from one file, they cannot drift
+// unseen. Each engine holds the lists between two marker lines:
 //
 //   // BEGIN GENERATED AGENCY LEXICON      (# in Python)
 //   ...
@@ -16,8 +18,11 @@
 //   ... --root <dir>                               read and write another checkout (tests use it)
 //
 // The module also exports lexiconProbes(): one sentence per participle that the
-// detector must mark, and one with a 'by' agent that it must not. The three-engine
-// differential (scripts/xengine-diff.mjs) takes them as inputs.
+// detector must mark, and one with a 'by' agent that it must not; and
+// boundaryProbes(): sentences at each edge of the hand-written walks, built from
+// the lexicon's numbers and character sets. The three-engine differential
+// (scripts/xengine-diff.mjs) takes both as inputs, and
+// test/agency-lexicon.test.mjs holds the JavaScript engine to their spans.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -30,6 +35,11 @@ const WIDTH = 100;
 
 const WORD = /^[a-z]+$/;
 const PHRASE = /^[a-z]+(?: [a-z]+)*$/;
+
+/** The whitespace a lexicon may name, each with its escape inside a regex class. */
+const SPACE_ESCAPES = { " ": " ", "\t": "\\t", "\n": "\\n", "\r": "\\r", "\f": "\\f", "\v": "\\v" };
+/** What a stop or a clause break may be: ASCII punctuation, or a line break. */
+const STOP = /^[!-/:-@[-`{-~\n]$/;
 
 /** Every rule the lexicon must keep that JSON alone cannot express. */
 export function lexiconProblems(lex) {
@@ -45,15 +55,29 @@ export function lexiconProblems(lex) {
   const count = (value, where) => {
     if (!Number.isInteger(value) || value < 1) say(`${where}: must be a positive integer`);
   };
+  const chars = (value, where, allowed, what) => {
+    if (typeof value !== "string" || value.length === 0) return say(`${where}: must be a non-empty string`);
+    for (const c of value) if (!allowed(c)) say(`${where}: ${JSON.stringify(c)} is not ${what}`);
+    if (new Set(value).size !== value.length) say(`${where}: has duplicates`);
+  };
   count(lex.version, "version");
+  chars(lex.whitespace, "whitespace", (c) => Object.hasOwn(SPACE_ESCAPES, c), "one of space, tab, LF, CR, FF or VT");
+  chars(lex.headStops, "headStops", (c) => STOP.test(c), "ASCII punctuation or a line break");
+  chars(lex.clauseBreaks, "clauseBreaks", (c) => STOP.test(c), "ASCII punctuation or a line break");
   words(lex.auxiliaries, "auxiliaries");
   words(lex.adverbs, "adverbs");
   words(lex.skip, "skip");
+  words(lex.negators, "negators");
+  for (const w of lex.adverbs || []) {
+    if ((lex.negators || []).includes(w)) say(`adverbs: ${JSON.stringify(w)} is a negator, and a negated passive is not marked`);
+  }
+  if (typeof lex.negatorWhy !== "string" || !lex.negatorWhy.trim()) say("negatorWhy: needs a why");
   for (const key of ["adverbSuffix", "skipSuffix"]) {
     if (typeof lex[key] !== "string" || !WORD.test(lex[key])) say(`${key}: must be lowercase ASCII`);
   }
   count(lex.skipMax, "skipMax");
   count(lex.byWindow, "byWindow");
+  count(lex.negatorWindow, "negatorWindow");
   if (!lex.heads || typeof lex.heads !== "object") say("heads: must be an object");
   for (const [name, list] of Object.entries(lex.heads || {})) {
     if (!WORD.test(name)) say(`heads: class name ${JSON.stringify(name)} is not lowercase ASCII`);
@@ -98,6 +122,9 @@ export function loadLexicon(root = ROOT) {
 
 const q = (s) => JSON.stringify(s);
 
+/** The lexicon's whitespace as a regex source: one or more of its characters. */
+const spaceClass = (lex) => `[${[...lex.whitespace].map((c) => SPACE_ESCAPES[c]).join("")}]+`;
+
 /** Items joined by ", " and wrapped at WIDTH, each line indented by `pad`. */
 function wrap(items, pad) {
   const lines = [];
@@ -123,6 +150,10 @@ function renderJs(lex) {
   const set = (items) => `new Set([\n${wrap(items.map(q), "  ")}\n])`;
   return [
     ...header("//", lex),
+    `const AGENCY_WHITESPACE = ${q(lex.whitespace)};`,
+    `const AGENCY_SPACE = ${q(spaceClass(lex))};`,
+    `const AGENCY_HEAD_STOPS = ${q(lex.headStops)};`,
+    `const AGENCY_CLAUSE_BREAKS = ${q(lex.clauseBreaks)};`,
     `const AGENCY_AUXILIARIES = [${lex.auxiliaries.map(q).join(", ")}];`,
     `const AGENCY_ADVERBS = [${lex.adverbs.map(q).join(", ")}];`,
     `const AGENCY_ADVERB_SUFFIX = ${q(lex.adverbSuffix)};`,
@@ -130,6 +161,8 @@ function renderJs(lex) {
     `const AGENCY_SKIP_SUFFIX = ${q(lex.skipSuffix)};`,
     `const AGENCY_SKIP_MAX = ${lex.skipMax};`,
     `const AGENCY_BY_WINDOW = ${lex.byWindow};`,
+    `const AGENCY_NEGATORS = ${set(lex.negators)};`,
+    `const AGENCY_NEGATOR_WINDOW = ${lex.negatorWindow};`,
     "const AGENCY_HEADS = new Map([",
     Object.keys(lex.heads).sort().map((name) =>
       `  [${q(name)}, new Set([\n${wrap(lex.heads[name].map(q), "    ")}\n  ])]`).join(",\n"),
@@ -150,6 +183,10 @@ function renderPython(lex) {
   const map = (obj) => `{${Object.entries(obj).map(([k, v]) => `${q(k)}: ${q(v)}`).join(", ")}}`;
   return [
     ...header("#", lex),
+    `AGENCY_WHITESPACE = ${q(lex.whitespace)}`,
+    `AGENCY_SPACE = ${q(spaceClass(lex))}`,
+    `AGENCY_HEAD_STOPS = ${q(lex.headStops)}`,
+    `AGENCY_CLAUSE_BREAKS = ${q(lex.clauseBreaks)}`,
     `AGENCY_AUXILIARIES = (${lex.auxiliaries.map(q).join(", ")})`,
     `AGENCY_ADVERBS = (${lex.adverbs.map(q).join(", ")})`,
     `AGENCY_ADVERB_SUFFIX = ${q(lex.adverbSuffix)}`,
@@ -157,6 +194,8 @@ function renderPython(lex) {
     `AGENCY_SKIP_SUFFIX = ${q(lex.skipSuffix)}`,
     `AGENCY_SKIP_MAX = ${lex.skipMax}`,
     `AGENCY_BY_WINDOW = ${lex.byWindow}`,
+    `AGENCY_NEGATORS = ${set(lex.negators, "")}`,
+    `AGENCY_NEGATOR_WINDOW = ${lex.negatorWindow}`,
     "AGENCY_HEADS = {",
     Object.keys(lex.heads).sort().map((name) => `    ${q(name)}: ${set(lex.heads[name], "    ")},`).join("\n"),
     "}",
@@ -176,6 +215,13 @@ function renderGo(lex) {
   const map = (obj) => `map[string]string{${Object.entries(obj).map(([k, v]) => `${q(k)}: ${q(v)}`).join(", ")}}`;
   return [
     ...header("//", lex),
+    "const (",
+    `\tagencyWhitespace   = ${q(lex.whitespace)}`,
+    `\tagencySpace        = ${q(spaceClass(lex))}`,
+    `\tagencyHeadStops    = ${q(lex.headStops)}`,
+    `\tagencyClauseBreaks = ${q(lex.clauseBreaks)}`,
+    ")",
+    "",
     `var agencyAuxiliaries = []string{${lex.auxiliaries.map(q).join(", ")}}`,
     `var agencyAdverbs = []string{${lex.adverbs.map(q).join(", ")}}`,
     "",
@@ -186,6 +232,10 @@ function renderGo(lex) {
     `const agencySkipSuffix = ${q(lex.skipSuffix)}`,
     `const agencySkipMax = ${lex.skipMax}`,
     `const agencyByWindow = ${lex.byWindow}`,
+    "",
+    `var agencyNegators = ${set(lex.negators, "")}`,
+    "",
+    `const agencyNegatorWindow = ${lex.negatorWindow}`,
     "",
     "var agencyHeads = map[string]map[string]bool{",
     Object.keys(lex.heads).sort().map((name) => `\t${q(name)}: ${set(lex.heads[name], "\t")},`).join("\n"),
@@ -246,6 +296,7 @@ const PROBE_FRAME = {
   challenge: (p) => `Concerns were ${p}.`,
   error: (p) => `Steps were ${p}.`,
   data: (p) => `Your data was ${p}.`,
+  held: (p) => `Your account was ${p}.`,
   dummy: (p) => `It was ${p} that the plan would end.`
 };
 
@@ -266,6 +317,71 @@ export function lexiconProbes(lex = loadLexicon()) {
       out.push([`lexicon:${p.replace(/ /g, "-")}`, marked, be + p]);
       out.push([`lexicon:${p.replace(/ /g, "-")}:by`, frame(`${word} by the board`), null]);
     }
+  }
+  return out;
+}
+
+/**
+ * Sentences at each edge of the detector's hand-written walks, as [id, text,
+ * expected agency span or null]. The word lists are checked by --check; these
+ * check the code that reads them: the 'by' window's length and where it ends,
+ * where the head and negator walks stop, how many auxiliary-chain words the
+ * head walk steps over, the negator window's length, the n't contraction and
+ * the whitespace that may separate the words of a match. Each is built from
+ * the lexicon's own numbers and character sets, so it follows a change to them,
+ * and a one-token change to any engine's walk parts that engine from the
+ * expected span here or from the other two in the differential.
+ */
+export function boundaryProbes(lex = loadLexicon()) {
+  const out = [];
+  const add = (id, text, span) => out.push([`boundary:${id}`, text, span]);
+  const filler = (n) => Array.from({ length: n }, (_, i) => String.fromCharCode(97 + (i % 26))).join(" ");
+  const negators = new Set(lex.negators);
+  const chain = lex.skip.filter((w) => !negators.has(w));
+  if (chain.length < lex.skipMax + 1) throw new Error("boundary probes need skipMax + 1 skip words that are not negators");
+  const name = (c) => c === "\n" ? "line-break" : `u${c.charCodeAt(0).toString(16).padStart(4, "0")}`;
+  const edges = [...new Set([...lex.headStops, ...lex.clauseBreaks, ","])];
+
+  // The 'by' window: 'by' as its last word silences the passive; one word later it does not.
+  add("by-window-last", `Mistakes were made ${filler(lex.byWindow - 1)} by them.`, null);
+  add("by-window-past", `Mistakes were made ${filler(lex.byWindow)} by them.`, "were made");
+  // The 'by' window ends at a clause break, and reads on across anything else.
+  for (const c of edges) {
+    add(`by-window-after-${name(c)}`, `Mistakes were made${c}by them.`, lex.clauseBreaks.includes(c) ? "were made" : null);
+  }
+  // The head walk stops at a head stop: no head, so the error-noun class is silent.
+  for (const c of edges) {
+    add(`head-after-${name(c)}`, `Mistakes${c}were made.`, lex.headStops.includes(c) ? null : "were made");
+  }
+  // The head walk steps over skipMax chain words, and no more.
+  add("skip-max", `Mistakes ${chain.slice(0, lex.skipMax).join(" ")} been made.`, "been made");
+  add("skip-max-past", `Mistakes ${chain.slice(0, lex.skipMax + 1).join(" ")} been made.`, null);
+  add("skip-suffix", `Mistakes ${chain.slice(0, lex.skipMax - 1).join(" ")} sad${lex.skipSuffix} been made.`, "been made");
+  // The negator walk: a negator in the chain, as the head, or negatorWindow words before it.
+  for (const n of lex.negators) {
+    add(`negator-chain-${n}`, `Data has ${n} been accessed.`, null);
+    add(`negator-head-${n}`, `${n[0].toUpperCase()}${n.slice(1)} data was accessed.`, null);
+  }
+  // The negator walk reads the head after skipMax chain words, and with no head only the chain.
+  add("negator-skip-max", `No data ${chain.slice(0, lex.skipMax).join(" ")} been accessed.`, null);
+  add("negator-skip-max-past", `No data ${chain.slice(0, lex.skipMax + 1).join(" ")} been accessed.`, "been accessed");
+  add("negator-window-last", `No ${filler(lex.negatorWindow - 1)} data was accessed.`, null);
+  add("negator-window-past", `No ${filler(lex.negatorWindow)} data was accessed.`, "was accessed");
+  for (const c of edges) {
+    add(`negator-after-${name(c)}`, `No${c}data was accessed.`, lex.headStops.includes(c) ? "was accessed" : null);
+  }
+  // An n't contraction is a negator: "n", an apostrophe (U+0027 or U+2019), then "t".
+  add("contraction-ascii", "Data hasn't been accessed.", null);
+  add("contraction-rsquo", "Data hasn\u2019t been accessed.", null);
+  add("contraction-not-n", "Data has't been accessed.", "been accessed");
+  add("contraction-spaced", "Data hasn' t been accessed.", "been accessed");
+  add("contraction-no-apostrophe", "Data hasn t been accessed.", "been accessed");
+  // Whitespace: each listed character separates the words of a match and of a
+  // requires phrase; a vertical tab, unless listed, separates neither.
+  for (const c of [...new Set([...lex.whitespace, "\v"])]) {
+    const listed = lex.whitespace.includes(c);
+    add(`space-${name(c)}`, `Mistakes were${c}made.`, listed ? `were${c}made` : null);
+    add(`space-requires-${name(c)}`, `Safeguards were put${c}in place.`, listed ? "were put" : null);
   }
   return out;
 }

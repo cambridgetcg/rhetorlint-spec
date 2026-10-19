@@ -1,20 +1,27 @@
 {
   "lexicon": "agency-hiding.deleted-subject",
   "detector": "agentless-passive",
-  "version": 1,
-  "about": "The single source of the accountable-passive detector's word lists. scripts/gen-agency-lexicon.mjs writes it into the JavaScript, Python and Go engines between BEGIN and END GENERATED AGENCY LEXICON markers, and its --check (run by test/agency-lexicon.test.mjs) fails when any engine's copy drifts. A mark needs all of: a past passive auxiliary; at most one adverb; a participle from one of the classes; the head word its class names, when it names one; no 'by' in the next byWindow words of the clause; and the participle's requires and unless conditions. The matcher reads an ASCII-lowercased copy of the text, so every word here is lowercase ASCII, and a phrasal participle is written with one space.",
+  "version": 2,
+  "about": "The single source of the accountable-passive detector's word lists. scripts/gen-agency-lexicon.mjs writes it into the JavaScript, Python and Go engines between BEGIN and END GENERATED AGENCY LEXICON markers, and its --check (run by test/agency-lexicon.test.mjs) fails when any engine's copy drifts. A mark needs all of: a past passive auxiliary; at most one adverb; a participle from one of the classes; the head word its class names, when it names one; no 'by' in the next byWindow words of the clause; the participle's requires and unless conditions; and no negator in the auxiliary chain, as the head word or among the negatorWindow words before the head (an n't contraction counts as a negator wherever a negator does). The matcher reads an ASCII-lowercased copy of the text, so every word here is lowercase ASCII, and a phrasal participle is written with one space. The three character sets are written here too, so --check covers them: whitespace separates the words of a match and of a requires or unless phrase; the head and negator walks never cross a headStops character; the 'by' window ends at a clauseBreaks character but reads on across a line break.",
+  "whitespace": " \t\n\r\f",
+  "headStops": ".;:!?\n",
+  "clauseBreaks": ".;:!?",
   "auxiliaries": ["been", "was", "were"],
-  "adverbs": ["already", "always", "never", "often", "still"],
+  "adverbs": ["already", "always", "often", "still"],
   "adverbSuffix": "ly",
   "skip": ["all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never", "not", "now", "shall", "should", "since", "then", "will", "would"],
   "skipSuffix": "ly",
   "skipMax": 4,
   "byWindow": 7,
+  "negators": ["cannot", "neither", "never", "no", "none", "nor", "not", "nothing"],
+  "negatorWindow": 5,
+  "negatorWhy": "A negated passive denies the act instead of hiding its doer: 'Your data was never sold', 'Passwords have not been compromised', 'No customer data was accessed', 'None of the records were leaked'. So a negator in the auxiliary chain, or one that is the head word or stands among the negatorWindow words before it (long enough for a subject such as 'No personal, financial or health information'), leaves the passive unmarked, and 'never' is no adverb here. 'cannot' is listed because 'can not' and 'can't' already negate. The window cannot tell a subject's negator from a negated main clause, so it also silences 'There is no evidence that this information has been misused' and 'We do not believe their information has been stolen': both deny the act, and under-marking is the safe direction. A negator after the participle ('was shared with no one') is not read.",
   "heads": {
     "challenge": ["allegations", "concerns", "questions"],
     "data": ["address", "addresses", "credentials", "data", "details", "information", "password", "passwords", "pii", "records"],
     "dummy": ["it"],
-    "error": ["action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision", "decisions", "error", "errors", "measures", "miscalculation", "miscalculations", "misjudgement", "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps", "mistake", "mistakes", "omissions", "promises", "questions", "remarks", "safeguards", "statements", "steps", "things", "threats", "words"]
+    "error": ["action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision", "decisions", "error", "errors", "measures", "miscalculation", "miscalculations", "misjudgement", "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps", "mistake", "mistakes", "omissions", "promises", "questions", "remarks", "safeguards", "statements", "steps", "things", "threats", "words"],
+    "held": ["account", "accounts", "address", "addresses", "credentials", "data", "details", "information", "password", "passwords", "pii", "records"]
   },
   "classes": [
     {
@@ -27,7 +34,13 @@
       "id": "breach",
       "head": null,
       "why": "The participle names a breach of something held in trust, mostly someone's data.",
-      "participles": ["accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked", "impacted", "leaked", "stolen"]
+      "participles": ["accessed", "breached", "compromised", "exfiltrated", "exposed", "hacked", "leaked", "stolen"]
+    },
+    {
+      "id": "affect",
+      "head": "held",
+      "why": "'Affected' and 'impacted' name a breach only of something held in trust for someone: their data, their account. Patients, flights, earnings, crops and power supplies are affected by causes, not doers, so after any other head noun these words are not marked.",
+      "participles": ["affected", "impacted"]
     },
     {
       "id": "conceal",
