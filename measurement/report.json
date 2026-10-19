@@ -23,7 +23,7 @@
  "labels": {
   "rows": 471,
   "unlabelled_marks": 0,
-  "not_produced_by_engine": 1
+  "not_produced_by_engine": 4
  },
  "strata": {
   "pastiche": {
@@ -56,11 +56,11 @@
   "technical": {
    "items": 6,
    "words": 10952,
-   "marks": 264,
-   "per100": 2.41,
+   "marks": 261,
+   "per100": 2.38,
    "agency_marks": 234,
    "agency_per100": 2.14,
-   "agency_share": 0.89
+   "agency_share": 0.9
   },
   "legacy": {
    "items": 7,
@@ -74,8 +74,8 @@
   "wild": {
    "items": 20,
    "words": 20304,
-   "marks": 444,
-   "per100": 2.19,
+   "marks": 441,
+   "per100": 2.17,
    "agency_marks": 368,
    "agency_per100": 1.81,
    "agency_share": 0.83
@@ -83,11 +83,11 @@
   "all": {
    "items": 26,
    "words": 21229,
-   "marks": 470,
-   "per100": 2.21,
+   "marks": 467,
+   "per100": 2.2,
    "agency_marks": 377,
    "agency_per100": 1.78,
-   "agency_share": 0.8
+   "agency_share": 0.81
   }
  },
  "rules": [
@@ -136,22 +136,22 @@
      "status": "measured"
     },
     "technical": {
-     "n": 15,
+     "n": 12,
      "TP": 0,
      "MENTION": 0,
      "DEBATABLE": 0,
      "FPB": 12,
-     "FPW": 3,
+     "FPW": 0,
      "unlabelled": 0,
      "strict": 0,
      "strict_ci": [
       0,
-      0.204
+      0.242
      ],
      "lenient": 0,
      "lenient_ci": [
       0,
-      0.204
+      0.242
      ],
      "status": "measured"
     },
@@ -176,42 +176,42 @@
      "status": "measured"
     },
     "wild": {
-     "n": 20,
+     "n": 17,
      "TP": 1,
      "MENTION": 0,
      "DEBATABLE": 1,
      "FPB": 14,
-     "FPW": 4,
+     "FPW": 1,
      "unlabelled": 0,
-     "strict": 0.05,
+     "strict": 0.059,
      "strict_ci": [
-      0.009,
-      0.236
+      0.01,
+      0.27
      ],
-     "lenient": 0.1,
+     "lenient": 0.118,
      "lenient_ci": [
-      0.028,
-      0.301
+      0.033,
+      0.343
      ],
      "status": "measured"
     },
     "all": {
-     "n": 25,
+     "n": 22,
      "TP": 6,
      "MENTION": 0,
      "DEBATABLE": 1,
      "FPB": 14,
-     "FPW": 4,
+     "FPW": 1,
      "unlabelled": 0,
-     "strict": 0.24,
+     "strict": 0.273,
      "strict_ci": [
-      0.115,
-      0.434
+      0.132,
+      0.482
      ],
-     "lenient": 0.28,
+     "lenient": 0.318,
      "lenient_ci": [
-      0.143,
-      0.476
+      0.164,
+      0.527
      ],
      "status": "measured"
     }
@@ -1275,22 +1275,22 @@
    "status": "measured"
   },
   "technical": {
-   "n": 264,
+   "n": 261,
    "TP": 0,
    "MENTION": 0,
    "DEBATABLE": 0,
    "FPB": 246,
-   "FPW": 18,
+   "FPW": 15,
    "unlabelled": 0,
    "strict": 0,
    "strict_ci": [
     0,
-    0.014
+    0.015
    ],
    "lenient": 0,
    "lenient_ci": [
     0,
-    0.014
+    0.015
    ],
    "status": "measured"
   },
@@ -1315,42 +1315,42 @@
    "status": "measured"
   },
   "wild": {
-   "n": 444,
+   "n": 441,
    "TP": 19,
    "MENTION": 0,
    "DEBATABLE": 47,
    "FPB": 334,
-   "FPW": 44,
+   "FPW": 41,
    "unlabelled": 0,
    "strict": 0.043,
    "strict_ci": [
     0.028,
     0.066
    ],
-   "lenient": 0.149,
+   "lenient": 0.15,
    "lenient_ci": [
     0.119,
-    0.185
+    0.186
    ],
    "status": "measured"
   },
   "all": {
-   "n": 470,
+   "n": 467,
    "TP": 39,
    "MENTION": 0,
    "DEBATABLE": 47,
    "FPB": 339,
-   "FPW": 45,
+   "FPW": 42,
    "unlabelled": 0,
-   "strict": 0.083,
+   "strict": 0.084,
    "strict_ci": [
-    0.061,
-    0.111
+    0.062,
+    0.112
    ],
-   "lenient": 0.183,
+   "lenient": 0.184,
    "lenient_ci": [
-    0.151,
-    0.22
+    0.152,
+    0.222
    ],
    "status": "measured"
   }
@@ -1549,8 +1549,8 @@
     "stratum": "technical",
     "register": "ham",
     "words": 2060,
-    "tells": 57,
-    "per100": 2.8
+    "tells": 56,
+    "per100": 2.7
    },
    {
     "id": "py-tutorial-inputoutput",
@@ -1565,7 +1565,7 @@
     "stratum": "technical",
     "register": "ham",
     "words": 2327,
-    "tells": 66,
+    "tells": 64,
     "per100": 2.8
    },
    {
@@ -1610,12 +1610,12 @@
   {
    "ruleId": "absolute.universal",
    "level": "info",
-   "n": 20,
-   "lenient": 0.1,
-   "FPW": 4,
+   "n": 17,
+   "lenient": 0.118,
+   "FPW": 1,
    "why": [
-    "FPW 4 > 0",
-    "lenient 0.1 < 0.5 (info)"
+    "FPW 1 > 0",
+    "lenient 0.118 < 0.5 (info)"
    ]
   },
   {
@@ -1665,7 +1665,7 @@
  "false_positives": {
   "absolute.universal": {
    "FPB": 14,
-   "FPW": 4
+   "FPW": 1
   },
   "agency-hiding.deleted-subject": {
    "FPB": 303,
@@ -1685,11 +1685,11 @@
   }
  },
  "contrast": {
-  "rows": 219,
+  "rows": 221,
   "known_defect_by_tag": {
    "O2": 14,
    "O2-twin": 22,
-   "O6": 9,
+   "O6": 6,
    "O7": 65
   }
  }

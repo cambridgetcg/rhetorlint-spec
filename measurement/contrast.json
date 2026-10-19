@@ -6,7 +6,7 @@
     "O2-twin": "frontier's 30 honest passive twins: an agentless-looking passive whose doer is named elsewhere in the sentence or whose cause is given.",
     "O3": "typography: smart punctuation (U+2019, U+2011, U+2013) silences an ASCII-spelt tell.",
     "O4": "strip honesty: strip must not strengthen a negated claim or edit a quotation.",
-    "O6": "absolute.universal: negated and imperative absolutes, other false positives, and the lesson's own missing tell.",
+    "O6": "absolute.universal: negated and imperative absolutes, other false positives, the lesson's own missing tell, and the overclaims its negation and imperative guard leaves unmarked.",
     "O7": "precision and recall backlog for the other rules: pinned negative controls and recorded misses."
   },
   "rows": [
@@ -276,7 +276,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "A clause-initial imperative 'Never <verb>' is security advice to the reader, not a claim that something always or never happens.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -298,7 +298,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "A negated absolute is a disclaimer, the opposite of an overclaim.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -320,7 +320,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "'aren't always' denies the universal: the words limit a claim instead of inflating it.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -331,7 +331,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "'Not everyone' negates the universal: a statement of limits.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -342,7 +342,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "A clause-initial imperative 'never <verb>' after a semicolon is guidance to the reader, not a universal claim.",
       "source": "wild: one sentence from the fomoengine.io site snapshot (the estate's own text; motifs survey, 2026-10-19)"
@@ -368,6 +368,30 @@
       "status": "holds",
       "reason": "'undeniable' forecloses disagreement without giving a reason.",
       "source": "constructed for this contrast set (package M3, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.never-again",
+      "text": "Never again will prices be this low.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "Never",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "An inverted 'Never again will...' claims nothing will ever match this price: an overclaim, not advice. The engine's imperative guard reads any clause-initial 'Never' before a lowercase word as an imperative, so it leaves this one unmarked; the guard cannot tell an inversion from an imperative.",
+      "source": "constructed (motifs design plan, package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.no-doubt-everyone",
+      "text": "There's no doubt everyone loves it.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "everyone",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'no doubt' asserts certainty and 'everyone' claims every person: two absolutes, nothing negated. The engine's negation guard sees 'no' among the two words before 'everyone' and leaves it unmarked; the window counts words and cannot tell what a negator governs.",
+      "source": "constructed (motifs design plan, package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
     },
     {
       "id": "probe.hedge-softener.01",

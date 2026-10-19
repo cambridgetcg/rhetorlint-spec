@@ -41,6 +41,14 @@ future `minEngine` requirements, and patterns that are known or observed to
 match zero characters. These checks constrain shape and size; they do not
 certify the runtime complexity of an arbitrary regular expression.
 
+Since 0.1.4 one rule is read in its clause before it is marked:
+`absolute.universal` leaves a negated absolute ("not guaranteed", "isn't
+always", "Not everyone") and a clause-initial imperative "Never" before a
+lowercase word ("Never share your password.") unmarked. The guard is keyed by
+ruleId, so the rule pack is unchanged; the
+[rules-en README](../rules-en/README.md#the-engine-side-guard-on-absoluteuniversal)
+states exactly what it reads and what it misses.
+
 ### `strip(text, marks) → string`
 
 The deterministic, on-device de-spin removes only loaded intensifiers and flags

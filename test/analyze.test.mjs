@@ -180,6 +180,56 @@ test("strip still subtracts an intensifier the negator and quotation guards do n
   }
 });
 
+const absolutes = (text) =>
+  analyze(text, { rules: RULES }).marks.filter((mark) => mark.ruleId === "absolute.universal");
+
+test("absolute.universal leaves a negated absolute and an imperative 'Never' unmarked", () => {
+  for (const text of [
+    "Returns are not guaranteed; past performance is no indicator.",
+    "Results aren't always typical.",
+    "Results aren’t always typical.",
+    "Not everyone qualifies.",
+    "NOT EVERYONE QUALIFIES.",
+    "The risk cannot always be priced.",
+    "Never share your password with anyone.",
+    "NEVER share it.",
+    "Never\tshare it.",
+    "\"Never share it,\" he said.",
+    "Explain real constraints; never manufacture the shortage.",
+    ...[".", ";", ":", "!", "?"].map((brk) => `Check the link${brk} never click it.`)
+  ]) {
+    assert.deepEqual(absolutes(text).map((mark) => mark.actual), [], text);
+  }
+});
+
+test("absolute.universal still marks absolutes the negator and imperative guards do not reach", () => {
+  for (const [text, actual] of [
+    ["This is guaranteed to double your savings.", "guaranteed"],
+    ["Everyone knows this policy works.", "Everyone"],
+    ["Our product will always be the best choice.", "always"],
+    // The negator is the third word back: the window is two words.
+    ["Not bad, and always cheap.", "always"],
+    // The negator is the word before, but a clause break stands between them.
+    ...[".", ";", ":", "!", "?"].map((brk) => [`We said no${brk} everyone agreed.`, "everyone"]),
+    // 'never' that does not open its clause, or that no lowercase word follows.
+    ["We never share data.", "never"],
+    ["Love begins with choice, never obligation.", "never"],
+    ["Never Again.", "Never"],
+    ["Never.", "Never"],
+    ["Never, ever.", "Never"],
+    ["Never\nshare it.", "Never"],
+    // A line break is not a clause break.
+    ["We will\nnever share it.", "never"]
+  ]) {
+    const marks = absolutes(text);
+    assert.deepEqual(marks.map((mark) => mark.actual), [actual], text);
+    assert.equal(text.slice(marks[0].position.start.offset, marks[0].position.end.offset), actual);
+  }
+  // The guard reads absolute.universal only: other rules keep their marks under a negator.
+  assert.ok(analyze("It is not world-class.", { rules: RULES }).marks
+    .some((mark) => mark.ruleId === "puffery.peacock"));
+});
+
 test("strip is identity without an actionable mark and cleans only removal seams", () => {
   for (const text of ["a  b", "a\n\nb", "  a  ", "a\t\tb"]) {
     assert.equal(strip(text, []), text);
