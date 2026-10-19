@@ -387,6 +387,40 @@ test("the agency detector leaves procedure, named agents, harm verbs and idioms 
   }
 });
 
+test("the agency detector leaves a negated passive, and 'affected' after an unheld noun, unmarked", () => {
+  // A negator in the auxiliary chain, as the head word or among the five words
+  // before it denies the act; it hides no doer. 'affected' and 'impacted' need
+  // a head held in trust for someone (data, an account).
+  for (const text of [
+    "Your data was never sold.",
+    "Your information has never been sold.",
+    "Passwords have not been compromised.",
+    "Passwords haven't been compromised.",
+    "Passwords haven\u2019t been compromised.",
+    "No customer data was accessed.",
+    "Nothing was withheld from investigators.",
+    "None of the records were leaked.",
+    "Neither passwords nor card numbers were exposed.",
+    "No mistakes have been made.",
+    "No personal, financial or health information was accessed.",
+    "We do not believe their information has been stolen.",
+    "Twelve patients were affected.",
+    "Roughly 2,000 flights were impacted after the storm."
+  ]) {
+    assert.deepEqual(agencySpans(text), [], text);
+  }
+  for (const [text, actual] of [
+    ["Approximately 4,000 accounts may have been affected.", "been affected"],
+    ["Your personal information may have been impacted.", "been impacted"],
+    // A negator outside the window, or behind a head stop, is not read.
+    ["No: mistakes were made.", "were made"],
+    ["No a b c d e mistakes were made.", "were made"]
+  ]) {
+    const at = text.indexOf(actual);
+    assert.deepEqual(agencySpans(text), [[actual, at, at + actual.length]], text);
+  }
+});
+
 test("a no-break space or a folded look-alike letter joins no passive", () => {
   for (const text of ["Mistakes were made.", "Your data was\u000bshared.", "Civilians were Killed.", "Your data was ſhared."]) {
     assert.deepEqual(agencySpans(text), [], JSON.stringify(text));
