@@ -38,7 +38,7 @@ Every implementation, in any language, emits this one JSON shape. Analyzing the 
   "strip":   "We take your privacy seriously, and regrettably, mistakes [who?] were made. We are reaching out to affected users.",
   "rewrite": null,                                    // only non-null with a model adapter
   // `rules` is the pack's own `version` field verbatim; the engine hard-codes nothing
-  "engine":  { "name": "@rhetorlint/core", "version": "0.1.3", "rules": "@rhetorlint/rules-en@0.2.0" }
+  "engine":  { "name": "@rhetorlint/core", "version": "0.1.4", "rules": "@rhetorlint/rules-en@0.2.0" }
 }
 ```
 

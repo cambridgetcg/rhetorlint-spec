@@ -134,6 +134,50 @@ test("strip removes intensifiers without deleting adjacent qualifications", () =
   }
 });
 
+test("strip keeps an intensifier under a negator or inside a quotation", () => {
+  for (const text of [
+    "The risk is not extremely high, but it is not negligible.",
+    "The update isn't hugely different.",
+    "The update isn\u2019t hugely different.",
+    "We are not deeply sorry.",
+    "The risk cannot be extremely high.",
+    "NOT EXTREMELY HIGH",
+    "\"It was utterly devastating,\" the flood survivor told reporters.",
+    "He said \u201cwe are deeply sorry\u201d and left."
+  ]) {
+    const r = analyze(text, { rules: RULES });
+    const intensifiers = r.marks.filter((mark) => mark.ruleId === "intensifier.loaded");
+    assert.equal(intensifiers.length, 1, "preservation must not disable detection");
+    assert.equal(
+      text.slice(intensifiers[0].position.start.offset, intensifiers[0].position.end.offset),
+      intensifiers[0].actual
+    );
+    assert.equal(r.strip, text, "deleting it would strengthen the claim or edit quoted words");
+    assert.equal(strip(text, r.marks), text, "the direct strip API keeps it too");
+  }
+});
+
+test("strip still subtracts an intensifier the negator and quotation guards do not reach", () => {
+  for (const [text, expected] of [
+    ["This is an incredibly important update for every customer.",
+      "This is an important update for every customer."],
+    // The negator is more than two words back.
+    ["No doubt the team is extremely proud.", "No doubt the team is proud."],
+    // A clause break stands between the negator and the intensifier.
+    ["Not one bit: it is extremely clear.", "Not one bit: it is clear."],
+    // The quotation closed before the intensifier.
+    ["\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."],
+    ["He said \u201chello\u201d and was extremely calm.", "He said \u201chello\u201d and was calm."],
+    // A quotation opened on an earlier line does not reach this one.
+    ["He said \"hello\nand it was extremely loud.", "He said \"hello\nand it was loud."]
+  ]) {
+    const r = analyze(text, { rules: RULES });
+    assert.ok(r.marks.some((mark) => mark.ruleId === "intensifier.loaded"));
+    assert.equal(r.strip, expected);
+    assert.equal(strip(text, r.marks), expected);
+  }
+});
+
 test("strip is identity without an actionable mark and cleans only removal seams", () => {
   for (const text of ["a  b", "a\n\nb", "  a  ", "a\t\tb"]) {
     assert.equal(strip(text, []), text);

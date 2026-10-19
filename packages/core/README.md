@@ -50,6 +50,19 @@ strengthen or otherwise change a claim. `strip` is a conservative reading aid,
 not a guarantee of grammatical or meaning-preserving revision; all other tells
 remain *marked* for the reader to judge.
 
+Since 0.1.4 an intensifier also stays, still marked, when deleting it would
+strengthen a negated claim or edit someone's words:
+
+- a negator (`not`, `never`, `no`, `nor`, `cannot`, `without`, `hardly`, or an
+  `n't` contraction) is one of the two words before it, with no `. ; : ! ?`
+  between them: "The risk is not extremely high." strips to itself, not to
+  "The risk is not high.";
+- it sits inside a quotation on its line, after an odd number of `"` or an
+  unclosed `“`: `"It was utterly devastating," she said.` strips to itself.
+
+Both checks read words and quote marks, not offsets, so the Python and Go
+engines reach the same decision on any input.
+
 ### `toSarif(result) → sarifLog` (`@rhetorlint/core/sarif`)
 
 Converts a result to [SARIF 2.1.0](https://sarifweb.azurewebsites.net/) so marks flow into editors, CI, and code-scanning. The density metric has no native SARIF slot and rides in `run.properties` — RhetorLint-JSON stays canonical; SARIF is a standard, lossy export.
