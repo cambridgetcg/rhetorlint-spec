@@ -8,7 +8,8 @@ standalone interchange schema.
 
 The portable, human-readable catalogue of rhetorical tells, grouped into families and aligned to the SemEval-2023 persuasion taxonomy. It is simultaneously:
 
-- **the spec** an engine reads to know what to mark, and
+- **the spec** every rule pack is held to (no engine reads the YAML;
+  `test/taxonomy-agreement.test.mjs` checks `rules-en` against it), and
 - **the syllabus** a learner reads to know what to watch for.
 
 That is the highest-leverage decision in the framework: the cross-language artifact and the curriculum are the same file.
