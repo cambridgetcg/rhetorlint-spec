@@ -258,11 +258,13 @@ test("absolute.universal still marks absolutes the negator and imperative guards
 // The imperative 'Never' guard's two closed lists, declared here so an engine
 // that drops or adds a word fails.
 const NEVER_NON_VERBS = [
-  "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
-  "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
-  "should", "can", "did", "does", "been", "being"
+  "a", "an", "the", "any", "before", "such",
+  "has", "had", "is", "are", "was", "were", "will", "would", "could",
+  "can", "did", "does", "been", "being"
 ];
 const NEVER_PASS_THROUGH = ["again", "ever", "once"];
+// Words that can begin advice after "Never", so they are not on the list.
+const NEVER_ADVICE_OPENERS = ["so", "in", "at", "on", "have", "should"];
 
 test("absolute.universal reads the word after a clause-initial 'Never' against two closed lists", () => {
   const actuals = (text) => absolutes(text).map((mark) => mark.actual);
@@ -272,6 +274,12 @@ test("absolute.universal reads the word after a clause-initial 'Never' against t
     const mixed = word[0] + word.slice(1).toUpperCase();
     assert.deepEqual(actuals(`Go; never ${mixed} x.`), ["never"], mixed);
   }
+  for (const word of NEVER_ADVICE_OPENERS) assert.deepEqual(actuals(`Never ${word} x.`), [], word);
+  for (const text of [
+    "Never at any time disclose your password.", "Never in any circumstances share your PIN.",
+    "Never on any account reply to this email.", "Never have more than two drinks.",
+    "Never so much as glance at it.", "Never should you share your password."
+  ]) assert.deepEqual(actuals(text), [], text);
   for (const adverb of NEVER_PASS_THROUGH) {
     assert.deepEqual(actuals(`Never ${adverb} share it.`), [], adverb);
     assert.deepEqual(actuals(`Never ${adverb} ${NEVER_PASS_THROUGH[0]} share it.`), [], adverb);

@@ -640,13 +640,18 @@ function negationScopedAt(text, start, end) {
   return negatedAt(text, start, true) || imperativeNeverAt(text, start, end);
 }
 
-/** Words that cannot be the verb of an imperative "Never <verb>": after a
- *  clause-initial "never" they make a fragment ("Never an issue.") or an
- *  inversion ("Never has a product been this good."), both claims. */
+/** Words that, after a clause-initial "never", open a fragment ("Never an
+ *  issue.") or an inversion ("Never has a product been this good."), both
+ *  claims, and do not begin advice. A word that can also begin advice is left
+ *  out, so the advice stays unmarked and the claim goes unmarked with it:
+ *  "Never have regrets." but "Never have I seen…"; "Never at any time
+ *  disclose your PIN." but "Never in history has…"; "Never so much as glance
+ *  at it."; "Never should you share it." (so, in, at, on, have and should are
+ *  not listed: recorded misses, the safe direction). */
 const NEVER_NON_VERBS = new Set([
-  "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
-  "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
-  "should", "can", "did", "does", "been", "being"
+  "a", "an", "the", "any", "before", "such",
+  "has", "had", "is", "are", "was", "were", "will", "would", "could",
+  "can", "did", "does", "been", "being"
 ]);
 
 /** Adverbs that may stand between "Never" and its verb: the word after them
