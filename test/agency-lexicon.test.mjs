@@ -62,12 +62,10 @@ test("the lexicon checker refuses a negator in the adverb slot and a character s
   broken.adverbs = [...broken.adverbs, "never"].sort();
   broken.whitespace += "\u00a0";
   broken.headStops += "a";
-  broken.negatorWindow = 0;
   const problems = lexiconProblems(broken).join("\n");
   assert.match(problems, /adverbs: "never" is a negator/);
   assert.match(problems, /whitespace: "\u00a0" is not one of space, tab, LF, CR, FF or VT/);
   assert.match(problems, /headStops: "a" is not ASCII punctuation or a line break/);
-  assert.match(problems, /negatorWindow: must be a positive integer/);
 });
 
 test("every engine's generated block matches the lexicon (--check exits 0)", () => {

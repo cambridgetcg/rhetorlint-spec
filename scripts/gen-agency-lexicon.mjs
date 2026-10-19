@@ -4,10 +4,11 @@
 // The accountable-passive detector (agency-hiding.deleted-subject) reads closed
 // word lists: auxiliaries, adverbs, the head-word skip list, the negators, the
 // participle classes and their head nouns, and three character sets (the
-// whitespace between words, the characters its walks never cross, and the
-// clause breaks that end the 'by' window). Copied by hand into JavaScript,
-// Python and Go, three lists drift; generated from one file, they cannot drift
-// unseen. Each engine holds the lists between two marker lines:
+// whitespace between words, the characters that end the head walk and start
+// the clause the negator reader reads, and the clause breaks that end the 'by'
+// window). Copied by hand into JavaScript, Python and Go, three lists drift;
+// generated from one file, they cannot drift unseen. Each engine holds the
+// lists between two marker lines:
 //
 //   // BEGIN GENERATED AGENCY LEXICON      (# in Python)
 //   ...
@@ -77,7 +78,6 @@ export function lexiconProblems(lex) {
   }
   count(lex.skipMax, "skipMax");
   count(lex.byWindow, "byWindow");
-  count(lex.negatorWindow, "negatorWindow");
   if (!lex.heads || typeof lex.heads !== "object") say("heads: must be an object");
   for (const [name, list] of Object.entries(lex.heads || {})) {
     if (!WORD.test(name)) say(`heads: class name ${JSON.stringify(name)} is not lowercase ASCII`);
@@ -162,7 +162,6 @@ function renderJs(lex) {
     `const AGENCY_SKIP_MAX = ${lex.skipMax};`,
     `const AGENCY_BY_WINDOW = ${lex.byWindow};`,
     `const AGENCY_NEGATORS = ${set(lex.negators)};`,
-    `const AGENCY_NEGATOR_WINDOW = ${lex.negatorWindow};`,
     "const AGENCY_HEADS = new Map([",
     Object.keys(lex.heads).sort().map((name) =>
       `  [${q(name)}, new Set([\n${wrap(lex.heads[name].map(q), "    ")}\n  ])]`).join(",\n"),
@@ -195,7 +194,6 @@ function renderPython(lex) {
     `AGENCY_SKIP_MAX = ${lex.skipMax}`,
     `AGENCY_BY_WINDOW = ${lex.byWindow}`,
     `AGENCY_NEGATORS = ${set(lex.negators, "")}`,
-    `AGENCY_NEGATOR_WINDOW = ${lex.negatorWindow}`,
     "AGENCY_HEADS = {",
     Object.keys(lex.heads).sort().map((name) => `    ${q(name)}: ${set(lex.heads[name], "    ")},`).join("\n"),
     "}",
@@ -234,8 +232,6 @@ function renderGo(lex) {
     `const agencyByWindow = ${lex.byWindow}`,
     "",
     `var agencyNegators = ${set(lex.negators, "")}`,
-    "",
-    `const agencyNegatorWindow = ${lex.negatorWindow}`,
     "",
     "var agencyHeads = map[string]map[string]bool{",
     Object.keys(lex.heads).sort().map((name) => `\t${q(name)}: ${set(lex.heads[name], "\t")},`).join("\n"),
@@ -325,12 +321,13 @@ export function lexiconProbes(lex = loadLexicon()) {
  * Sentences at each edge of the detector's hand-written walks, as [id, text,
  * expected agency span or null]. The word lists are checked by --check; these
  * check the code that reads them: the 'by' window's length and where it ends,
- * where the head and negator walks stop, how many auxiliary-chain words the
- * head walk steps over, the negator window's length, the n't contraction and
- * the whitespace that may separate the words of a match. Each is built from
- * the lexicon's own numbers and character sets, so it follows a change to them,
- * and a one-token change to any engine's walk parts that engine from the
- * expected span here or from the other two in the differential.
+ * where the head walk stops and how many auxiliary-chain words it steps over,
+ * where the negator reader's clause starts and that it reads all of it, the
+ * n't contraction and the whitespace that may separate the words of a match.
+ * Each is built from the lexicon's own numbers and character sets, so it
+ * follows a change to them, and a one-token change to any engine's walk parts
+ * that engine from the expected span here or from the other two in the
+ * differential.
  */
 export function boundaryProbes(lex = loadLexicon()) {
   const out = [];
@@ -357,19 +354,28 @@ export function boundaryProbes(lex = loadLexicon()) {
   add("skip-max", `Mistakes ${chain.slice(0, lex.skipMax).join(" ")} been made.`, "been made");
   add("skip-max-past", `Mistakes ${chain.slice(0, lex.skipMax + 1).join(" ")} been made.`, null);
   add("skip-suffix", `Mistakes ${chain.slice(0, lex.skipMax - 1).join(" ")} sad${lex.skipSuffix} been made.`, "been made");
-  // The negator walk: a negator in the chain, as the head, or negatorWindow words before it.
+  // The negator reader: a negator anywhere in the clause before the auxiliary,
+  // in the chain, as the head word or before it however far back.
   for (const n of lex.negators) {
     add(`negator-chain-${n}`, `Data has ${n} been accessed.`, null);
     add(`negator-head-${n}`, `${n[0].toUpperCase()}${n.slice(1)} data was accessed.`, null);
   }
-  // The negator walk reads the head after skipMax chain words, and with no head only the chain.
   add("negator-skip-max", `No data ${chain.slice(0, lex.skipMax).join(" ")} been accessed.`, null);
-  add("negator-skip-max-past", `No data ${chain.slice(0, lex.skipMax + 1).join(" ")} been accessed.`, "been accessed");
-  add("negator-window-last", `No ${filler(lex.negatorWindow - 1)} data was accessed.`, null);
-  add("negator-window-past", `No ${filler(lex.negatorWindow)} data was accessed.`, "was accessed");
+  add("negator-skip-max-past", `No data ${chain.slice(0, lex.skipMax + 1).join(" ")} been accessed.`, null);
+  add("negator-clause-far", `No ${filler(26)} data was accessed.`, null);
+  add("negator-subject-list", "No card numbers, bank details or passwords were stolen.", null);
+  // The clause starts after a head stop, or at the start of the text; a comma starts none.
   for (const c of edges) {
     add(`negator-after-${name(c)}`, `No${c}data was accessed.`, lex.headStops.includes(c) ? "was accessed" : null);
+    add(`negator-earlier-clause-${name(c)}`, `No one called${c} but data were stolen.`, lex.headStops.includes(c) ? "were stolen" : null);
   }
+  // Each passive reads its own clause: a negator after the first silences only
+  // the second, and a head stop between them starts a new clause.
+  add("negator-second-passive", "Data was accessed and no records were leaked.", "was accessed");
+  add("negator-first-passive", "No data was accessed and records were leaked.", null);
+  add("negator-clause-reset", "No data was accessed. Records were leaked.", "were leaked");
+  // A negator after the participle is not read (a recorded over-mark).
+  add("negator-after-participle", "Your data was shared with no one.", "was shared");
   // An n't contraction is a negator: "n", an apostrophe (U+0027 or U+2019), then "t".
   add("contraction-ascii", "Data hasn't been accessed.", null);
   add("contraction-rsquo", "Data hasn\u2019t been accessed.", null);
