@@ -383,9 +383,12 @@ families:
             tag: "O6"
             reason: "'the only option' is not among absolute.universal's terms, so the False Dilemma phrase this lesson teaches goes unmarked; the rule marks the same sentence's 'Everyone' instead."
         # A negated absolute is a disclaimer, and a clause-initial 'Never' before
-        # a lowercase word is advice, so the engine leaves both unmarked. The
-        # guard lives in the engine, not the pack (packages/rules-en/README.md
-        # says why); these sentences hold every engine to it.
+        # a lowercase verb is advice, so the engine leaves both unmarked. A
+        # comma ends a negator's reach once a word stands between them, and a
+        # 'Never' before a word that cannot be its verb opens a fragment or an
+        # inversion, so those absolutes stay marked. The guard lives in the
+        # engine, not the pack (packages/rules-en/README.md says why); these
+        # sentences hold every engine to it.
         guard_examples:
           - text: "Returns are not guaranteed; past performance is no indicator."
             expect: unmarked
@@ -406,6 +409,34 @@ families:
           - text: "Our product will always be the best choice."
             expect: marked
             actual: "always"
+          - text: "Past performance is not, however, always a guide."
+            expect: unmarked
+          - text: "Never ever share your password."
+            expect: unmarked
+          - text: "No risk, guaranteed."
+            expect: marked
+            actual: "guaranteed"
+          - text: "Don't wait, everyone is buying."
+            expect: marked
+            actual: "everyone"
+          - text: "No fees, always free."
+            expect: marked
+            actual: "always"
+          - text: "No contracts, no fees, no exceptions."
+            expect: marked
+            actual: "no exceptions"
+          - text: "Battery life? Never an issue."
+            expect: marked
+            actual: "Never"
+          - text: "Never again will prices be this low."
+            expect: marked
+            actual: "Never"
+          - text: "Never has a product been this good."
+            expect: marked
+            actual: "Never"
+          - text: "Never before have prices been this low."
+            expect: marked
+            actual: "Never"
         lineage: "SemEval-2023 · Simplification › False Dilemma or No Choice"
 
   # ==========================================================================

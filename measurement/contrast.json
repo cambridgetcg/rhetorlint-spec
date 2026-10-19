@@ -1891,7 +1891,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Legal term of art: a lawsuit 'claiming that' states the pleading. The taxonomy records it as a documented residual leak.",
-      "cite": "spec/taxonomy.yaml:470",
+      "cite": "spec/taxonomy.yaml:501",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -1957,7 +1957,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Technical 'so-called' means 'known as'. The taxonomy names it as this rule's priced-in false positive.",
-      "cite": "spec/taxonomy.yaml:483",
+      "cite": "spec/taxonomy.yaml:514",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
