@@ -1684,5 +1684,15 @@
    "FPW": 1
   }
  },
- "contrast": null
+ "contrast": {
+  "rows": 219,
+  "known_defect_by_tag": {
+   "O2": 14,
+   "O2-twin": 22,
+   "O3": 12,
+   "O4": 6,
+   "O6": 9,
+   "O7": 65
+  }
+ }
 }
