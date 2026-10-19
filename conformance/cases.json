@@ -1106,6 +1106,54 @@
           ]
         }
       ]
+    },
+    {
+      "input": "No risk, guaranteed.",
+      "density": {
+        "tells": 1,
+        "per100Words": 33.3
+      },
+      "strip": "No risk, guaranteed.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "guaranteed",
+          "start": 9,
+          "end": 19,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        }
+      ]
+    },
+    {
+      "input": "Never again will prices be this low.",
+      "density": {
+        "tells": 1,
+        "per100Words": 14.3
+      },
+      "strip": "Never again will prices be this low.",
+      "marks": [
+        {
+          "ruleId": "absolute.universal",
+          "family": "simplification",
+          "technique": "False Dilemma or No Choice",
+          "actual": "Never",
+          "start": 0,
+          "end": 5,
+          "note": "an absolute — claims more than anyone could actually know",
+          "confidence": 0.6,
+          "level": "info",
+          "expected": [
+            "(qualify: how often, who exactly, how certain)"
+          ]
+        }
+      ]
     }
   ]
 }
