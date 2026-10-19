@@ -1,0 +1,1688 @@
+{
+ "measurement": 1,
+ "about": "Does the engine agree with one reader? Precision per rule x stratum on the committed items. Labels are one reader's judgement, not proof; floors are reported and never gate.",
+ "engine": {
+  "core": "@rhetorlint/core@0.1.3",
+  "rules": "@rhetorlint/rules-en@0.2.0"
+ },
+ "floors": {
+  "lenient": {
+   "warning": 0.8,
+   "note": 0.67,
+   "info": 0.5
+  },
+  "FPW": 0,
+  "min_n": 5,
+  "binds_on": [
+   "wild-pd",
+   "target-genre",
+   "technical"
+  ],
+  "gates": false
+ },
+ "labels": {
+  "rows": 471,
+  "unlabelled_marks": 0,
+  "not_produced_by_engine": 1
+ },
+ "strata": {
+  "pastiche": {
+   "items": 6,
+   "words": 925,
+   "marks": 26,
+   "per100": 2.81,
+   "agency_marks": 9,
+   "agency_per100": 0.97,
+   "agency_share": 0.35
+  },
+  "wild-pd": {
+   "items": 1,
+   "words": 456,
+   "marks": 5,
+   "per100": 1.1,
+   "agency_marks": 5,
+   "agency_per100": 1.1,
+   "agency_share": 1
+  },
+  "target-genre": {
+   "items": 13,
+   "words": 8896,
+   "marks": 175,
+   "per100": 1.97,
+   "agency_marks": 129,
+   "agency_per100": 1.45,
+   "agency_share": 0.74
+  },
+  "technical": {
+   "items": 6,
+   "words": 10952,
+   "marks": 264,
+   "per100": 2.41,
+   "agency_marks": 234,
+   "agency_per100": 2.14,
+   "agency_share": 0.89
+  },
+  "legacy": {
+   "items": 7,
+   "words": 1381,
+   "marks": 31,
+   "per100": 2.24,
+   "agency_marks": 14,
+   "agency_per100": 1.01,
+   "agency_share": 0.45
+  },
+  "wild": {
+   "items": 20,
+   "words": 20304,
+   "marks": 444,
+   "per100": 2.19,
+   "agency_marks": 368,
+   "agency_per100": 1.81,
+   "agency_share": 0.83
+  },
+  "all": {
+   "items": 26,
+   "words": 21229,
+   "marks": 470,
+   "per100": 2.21,
+   "agency_marks": 377,
+   "agency_per100": 1.78,
+   "agency_share": 0.8
+  }
+ },
+ "rules": [
+  {
+   "ruleId": "absolute.universal",
+   "level": "info",
+   "strata": {
+    "pastiche": {
+     "n": 5,
+     "TP": 5,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.566,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.566,
+      1
+     ],
+     "status": "measured"
+    },
+    "target-genre": {
+     "n": 5,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 1,
+     "FPB": 2,
+     "FPW": 1,
+     "unlabelled": 0,
+     "strict": 0.2,
+     "strict_ci": [
+      0.036,
+      0.624
+     ],
+     "lenient": 0.4,
+     "lenient_ci": [
+      0.118,
+      0.769
+     ],
+     "status": "measured"
+    },
+    "technical": {
+     "n": 15,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 12,
+     "FPW": 3,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.204
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.204
+     ],
+     "status": "measured"
+    },
+    "legacy": {
+     "n": 5,
+     "TP": 5,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.566,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.566,
+      1
+     ],
+     "status": "measured"
+    },
+    "wild": {
+     "n": 20,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 1,
+     "FPB": 14,
+     "FPW": 4,
+     "unlabelled": 0,
+     "strict": 0.05,
+     "strict_ci": [
+      0.009,
+      0.236
+     ],
+     "lenient": 0.1,
+     "lenient_ci": [
+      0.028,
+      0.301
+     ],
+     "status": "measured"
+    },
+    "all": {
+     "n": 25,
+     "TP": 6,
+     "MENTION": 0,
+     "DEBATABLE": 1,
+     "FPB": 14,
+     "FPW": 4,
+     "unlabelled": 0,
+     "strict": 0.24,
+     "strict_ci": [
+      0.115,
+      0.434
+     ],
+     "lenient": 0.28,
+     "lenient_ci": [
+      0.143,
+      0.476
+     ],
+     "status": "measured"
+    }
+   }
+  },
+  {
+   "ruleId": "agency-hiding.deleted-subject",
+   "level": "warning",
+   "strata": {
+    "pastiche": {
+     "n": 9,
+     "TP": 4,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 4,
+     "FPW": 1,
+     "unlabelled": 0,
+     "strict": 0.444,
+     "strict_ci": [
+      0.189,
+      0.733
+     ],
+     "lenient": 0.444,
+     "lenient_ci": [
+      0.189,
+      0.733
+     ],
+     "status": "measured"
+    },
+    "wild-pd": {
+     "n": 5,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 4,
+     "FPW": 1,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.434
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.434
+     ],
+     "status": "measured"
+    },
+    "target-genre": {
+     "n": 129,
+     "TP": 9,
+     "MENTION": 0,
+     "DEBATABLE": 30,
+     "FPB": 70,
+     "FPW": 20,
+     "unlabelled": 0,
+     "strict": 0.07,
+     "strict_ci": [
+      0.037,
+      0.127
+     ],
+     "lenient": 0.302,
+     "lenient_ci": [
+      0.23,
+      0.386
+     ],
+     "status": "measured"
+    },
+    "technical": {
+     "n": 234,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 225,
+     "FPW": 9,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.016
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.016
+     ],
+     "status": "measured"
+    },
+    "legacy": {
+     "n": 14,
+     "TP": 4,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 8,
+     "FPW": 2,
+     "unlabelled": 0,
+     "strict": 0.286,
+     "strict_ci": [
+      0.117,
+      0.546
+     ],
+     "lenient": 0.286,
+     "lenient_ci": [
+      0.117,
+      0.546
+     ],
+     "status": "measured"
+    },
+    "wild": {
+     "n": 368,
+     "TP": 9,
+     "MENTION": 0,
+     "DEBATABLE": 30,
+     "FPB": 299,
+     "FPW": 30,
+     "unlabelled": 0,
+     "strict": 0.024,
+     "strict_ci": [
+      0.013,
+      0.046
+     ],
+     "lenient": 0.106,
+     "lenient_ci": [
+      0.078,
+      0.142
+     ],
+     "status": "measured"
+    },
+    "all": {
+     "n": 377,
+     "TP": 13,
+     "MENTION": 0,
+     "DEBATABLE": 30,
+     "FPB": 303,
+     "FPW": 31,
+     "unlabelled": 0,
+     "strict": 0.034,
+     "strict_ci": [
+      0.02,
+      0.058
+     ],
+     "lenient": 0.114,
+     "lenient_ci": [
+      0.086,
+      0.15
+     ],
+     "status": "measured"
+    }
+   }
+  },
+  {
+   "ruleId": "attribution.doubt-verb",
+   "level": "note",
+   "strata": {}
+  },
+  {
+   "ruleId": "attribution.factive",
+   "level": "info",
+   "strata": {}
+  },
+  {
+   "ruleId": "combat.attack-verb",
+   "level": "info",
+   "strata": {}
+  },
+  {
+   "ruleId": "contrition.rehearsed",
+   "level": "warning",
+   "strata": {
+    "pastiche": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "target-genre": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "legacy": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "wild": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "all": {
+     "n": 2,
+     "TP": 2,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.342,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    }
+   }
+  },
+  {
+   "ruleId": "deflection.whataboutism",
+   "level": "note",
+   "strata": {
+    "pastiche": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "legacy": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "all": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    }
+   }
+  },
+  {
+   "ruleId": "distancing.doubt-marker",
+   "level": "info",
+   "strata": {}
+  },
+  {
+   "ruleId": "editorializing.stance",
+   "level": "info",
+   "strata": {
+    "pastiche": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "target-genre": {
+     "n": 1,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 1,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.793
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "legacy": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "wild": {
+     "n": 1,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 1,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.793
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "all": {
+     "n": 2,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 1,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 0.5,
+     "strict_ci": [
+      0.095,
+      0.905
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    }
+   }
+  },
+  {
+   "ruleId": "euphemism.institutional",
+   "level": "note",
+   "strata": {}
+  },
+  {
+   "ruleId": "exoneration.formula",
+   "level": "note",
+   "strata": {}
+  },
+  {
+   "ruleId": "hedge.deniable",
+   "level": "info",
+   "strata": {
+    "pastiche": {
+     "n": 4,
+     "TP": 3,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 1,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 0.75,
+     "strict_ci": [
+      0.301,
+      0.954
+     ],
+     "lenient": 0.75,
+     "lenient_ci": [
+      0.301,
+      0.954
+     ],
+     "status": "unmeasured"
+    },
+    "target-genre": {
+     "n": 27,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 13,
+     "FPB": 11,
+     "FPW": 3,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.125
+     ],
+     "lenient": 0.481,
+     "lenient_ci": [
+      0.307,
+      0.66
+     ],
+     "status": "measured"
+    },
+    "technical": {
+     "n": 11,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 7,
+     "FPW": 4,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.259
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.259
+     ],
+     "status": "measured"
+    },
+    "legacy": {
+     "n": 4,
+     "TP": 3,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 1,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 0.75,
+     "strict_ci": [
+      0.301,
+      0.954
+     ],
+     "lenient": 0.75,
+     "lenient_ci": [
+      0.301,
+      0.954
+     ],
+     "status": "unmeasured"
+    },
+    "wild": {
+     "n": 38,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 13,
+     "FPB": 18,
+     "FPW": 7,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.092
+     ],
+     "lenient": 0.342,
+     "lenient_ci": [
+      0.212,
+      0.501
+     ],
+     "status": "measured"
+    },
+    "all": {
+     "n": 42,
+     "TP": 3,
+     "MENTION": 0,
+     "DEBATABLE": 13,
+     "FPB": 19,
+     "FPW": 7,
+     "unlabelled": 0,
+     "strict": 0.071,
+     "strict_ci": [
+      0.025,
+      0.19
+     ],
+     "lenient": 0.381,
+     "lenient_ci": [
+      0.25,
+      0.532
+     ],
+     "status": "measured"
+    }
+   }
+  },
+  {
+   "ruleId": "hedge.softener",
+   "level": "info",
+   "strata": {
+    "target-genre": {
+     "n": 3,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 2,
+     "FPB": 1,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.561
+     ],
+     "lenient": 0.667,
+     "lenient_ci": [
+      0.208,
+      0.939
+     ],
+     "status": "unmeasured"
+    },
+    "technical": {
+     "n": 4,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 2,
+     "FPW": 2,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.49
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.49
+     ],
+     "status": "unmeasured"
+    },
+    "wild": {
+     "n": 7,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 2,
+     "FPB": 3,
+     "FPW": 2,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.354
+     ],
+     "lenient": 0.286,
+     "lenient_ci": [
+      0.082,
+      0.641
+     ],
+     "status": "measured"
+    },
+    "all": {
+     "n": 7,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 2,
+     "FPB": 3,
+     "FPW": 2,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.354
+     ],
+     "lenient": 0.286,
+     "lenient_ci": [
+      0.082,
+      0.641
+     ],
+     "status": "measured"
+    }
+   }
+  },
+  {
+   "ruleId": "implicative.shortfall",
+   "level": "info",
+   "strata": {}
+  },
+  {
+   "ruleId": "insinuation.raises-questions",
+   "level": "note",
+   "strata": {}
+  },
+  {
+   "ruleId": "intensifier.loaded",
+   "level": "info",
+   "strata": {
+    "pastiche": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "target-genre": {
+     "n": 8,
+     "TP": 8,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.676,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.676,
+      1
+     ],
+     "status": "measured"
+    },
+    "legacy": {
+     "n": 1,
+     "TP": 1,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.207,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.207,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "wild": {
+     "n": 8,
+     "TP": 8,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.676,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.676,
+      1
+     ],
+     "status": "measured"
+    },
+    "all": {
+     "n": 9,
+     "TP": 9,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.701,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.701,
+      1
+     ],
+     "status": "measured"
+    }
+   }
+  },
+  {
+   "ruleId": "lure.free-offer",
+   "level": "info",
+   "strata": {}
+  },
+  {
+   "ruleId": "puffery.peacock",
+   "level": "info",
+   "strata": {}
+  },
+  {
+   "ruleId": "shouting.caps",
+   "level": "info",
+   "strata": {
+    "pastiche": {
+     "n": 2,
+     "TP": 2,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.342,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "legacy": {
+     "n": 2,
+     "TP": 2,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.342,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "all": {
+     "n": 2,
+     "TP": 2,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.342,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    }
+   }
+  },
+  {
+   "ruleId": "sourcing.anonymous",
+   "level": "info",
+   "strata": {}
+  },
+  {
+   "ruleId": "urgency.appeal-to-time",
+   "level": "note",
+   "strata": {
+    "pastiche": {
+     "n": 2,
+     "TP": 2,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.342,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "legacy": {
+     "n": 2,
+     "TP": 2,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.342,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    },
+    "all": {
+     "n": 2,
+     "TP": 2,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 0,
+     "unlabelled": 0,
+     "strict": 1,
+     "strict_ci": [
+      0.342,
+      1
+     ],
+     "lenient": 1,
+     "lenient_ci": [
+      0.342,
+      1
+     ],
+     "status": "unmeasured"
+    }
+   }
+  },
+  {
+   "ruleId": "weasel.attribution",
+   "level": "note",
+   "strata": {
+    "target-genre": {
+     "n": 1,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 1,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.793
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.793
+     ],
+     "status": "unmeasured"
+    },
+    "wild": {
+     "n": 1,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 1,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.793
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.793
+     ],
+     "status": "unmeasured"
+    },
+    "all": {
+     "n": 1,
+     "TP": 0,
+     "MENTION": 0,
+     "DEBATABLE": 0,
+     "FPB": 0,
+     "FPW": 1,
+     "unlabelled": 0,
+     "strict": 0,
+     "strict_ci": [
+      0,
+      0.793
+     ],
+     "lenient": 0,
+     "lenient_ci": [
+      0,
+      0.793
+     ],
+     "status": "unmeasured"
+    }
+   }
+  }
+ ],
+ "totals": {
+  "pastiche": {
+   "n": 26,
+   "TP": 20,
+   "MENTION": 0,
+   "DEBATABLE": 0,
+   "FPB": 5,
+   "FPW": 1,
+   "unlabelled": 0,
+   "strict": 0.769,
+   "strict_ci": [
+    0.579,
+    0.89
+   ],
+   "lenient": 0.769,
+   "lenient_ci": [
+    0.579,
+    0.89
+   ],
+   "status": "measured"
+  },
+  "wild-pd": {
+   "n": 5,
+   "TP": 0,
+   "MENTION": 0,
+   "DEBATABLE": 0,
+   "FPB": 4,
+   "FPW": 1,
+   "unlabelled": 0,
+   "strict": 0,
+   "strict_ci": [
+    0,
+    0.434
+   ],
+   "lenient": 0,
+   "lenient_ci": [
+    0,
+    0.434
+   ],
+   "status": "measured"
+  },
+  "target-genre": {
+   "n": 175,
+   "TP": 19,
+   "MENTION": 0,
+   "DEBATABLE": 47,
+   "FPB": 84,
+   "FPW": 25,
+   "unlabelled": 0,
+   "strict": 0.109,
+   "strict_ci": [
+    0.071,
+    0.163
+   ],
+   "lenient": 0.377,
+   "lenient_ci": [
+    0.309,
+    0.451
+   ],
+   "status": "measured"
+  },
+  "technical": {
+   "n": 264,
+   "TP": 0,
+   "MENTION": 0,
+   "DEBATABLE": 0,
+   "FPB": 246,
+   "FPW": 18,
+   "unlabelled": 0,
+   "strict": 0,
+   "strict_ci": [
+    0,
+    0.014
+   ],
+   "lenient": 0,
+   "lenient_ci": [
+    0,
+    0.014
+   ],
+   "status": "measured"
+  },
+  "legacy": {
+   "n": 31,
+   "TP": 20,
+   "MENTION": 0,
+   "DEBATABLE": 0,
+   "FPB": 9,
+   "FPW": 2,
+   "unlabelled": 0,
+   "strict": 0.645,
+   "strict_ci": [
+    0.469,
+    0.789
+   ],
+   "lenient": 0.645,
+   "lenient_ci": [
+    0.469,
+    0.789
+   ],
+   "status": "measured"
+  },
+  "wild": {
+   "n": 444,
+   "TP": 19,
+   "MENTION": 0,
+   "DEBATABLE": 47,
+   "FPB": 334,
+   "FPW": 44,
+   "unlabelled": 0,
+   "strict": 0.043,
+   "strict_ci": [
+    0.028,
+    0.066
+   ],
+   "lenient": 0.149,
+   "lenient_ci": [
+    0.119,
+    0.185
+   ],
+   "status": "measured"
+  },
+  "all": {
+   "n": 470,
+   "TP": 39,
+   "MENTION": 0,
+   "DEBATABLE": 47,
+   "FPB": 339,
+   "FPW": 45,
+   "unlabelled": 0,
+   "strict": 0.083,
+   "strict_ci": [
+    0.061,
+    0.111
+   ],
+   "lenient": 0.183,
+   "lenient_ci": [
+    0.151,
+    0.22
+   ],
+   "status": "measured"
+  }
+ },
+ "gold": {
+  "any_rule": {
+   "hit": 57,
+   "n": 100,
+   "recall": 0.57
+  },
+  "by_set": {
+   "accountable-passive-v1": {
+    "hit": 39,
+    "n": 41,
+    "recall": 0.951
+   },
+   "legacy-semeval": {
+    "hit": 18,
+    "n": 59,
+    "recall": 0.305
+   }
+  },
+  "by_rule": {
+   "agency-hiding.deleted-subject": {
+    "hit": 39,
+    "n": 41,
+    "incidental": [],
+    "recall": 0.951
+   }
+  }
+ },
+ "density": {
+  "items": [
+   {
+    "id": "inv-breach-apology",
+    "stratum": "pastiche",
+    "register": "spin",
+    "words": 218,
+    "tells": 9,
+    "per100": 4.1
+   },
+   {
+    "id": "inv-crypto-launch",
+    "stratum": "pastiche",
+    "register": "spin",
+    "words": 161,
+    "tells": 2,
+    "per100": 1.2
+   },
+   {
+    "id": "inv-political-nondenial",
+    "stratum": "pastiche",
+    "register": "spin",
+    "words": 178,
+    "tells": 6,
+    "per100": 3.4
+   },
+   {
+    "id": "inv-scarcity-banner",
+    "stratum": "pastiche",
+    "register": "spin",
+    "words": 60,
+    "tells": 4,
+    "per100": 6.7
+   },
+   {
+    "id": "inv-recipe",
+    "stratum": "pastiche",
+    "register": "ham",
+    "words": 171,
+    "tells": 1,
+    "per100": 0.6
+   },
+   {
+    "id": "inv-science-abstract",
+    "stratum": "pastiche",
+    "register": "ham",
+    "words": 137,
+    "tells": 4,
+    "per100": 2.9
+   },
+   {
+    "id": "pd-declaration",
+    "stratum": "wild-pd",
+    "register": "mixed",
+    "words": 456,
+    "tells": 5,
+    "per100": 1.1
+   },
+   {
+    "id": "us-irs-get-transcript-2015-05",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 833,
+    "tells": 11,
+    "per100": 1.3
+   },
+   {
+    "id": "us-irs-get-transcript-2015-08",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 629,
+    "tells": 12,
+    "per100": 1.9
+   },
+   {
+    "id": "us-irs-get-transcript-2016-02",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 781,
+    "tells": 19,
+    "per100": 2.4
+   },
+   {
+    "id": "us-irs-form-990t-2022",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 235,
+    "tells": 7,
+    "per100": 3
+   },
+   {
+    "id": "us-irs-data-safeguards-2024",
+    "stratum": "target-genre",
+    "register": "spin",
+    "words": 442,
+    "tells": 4,
+    "per100": 0.9
+   },
+   {
+    "id": "us-cms-ffe-breach-2018",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 407,
+    "tells": 10,
+    "per100": 2.5
+   },
+   {
+    "id": "us-cms-agent-broker-2024-07",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 549,
+    "tells": 10,
+    "per100": 1.8
+   },
+   {
+    "id": "uk-laa-data-breach-2025",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 335,
+    "tells": 11,
+    "per100": 3.3
+   },
+   {
+    "id": "uk-laa-data-update-2026",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 443,
+    "tells": 11,
+    "per100": 2.5
+   },
+   {
+    "id": "uk-mod-payroll-incident-2024",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 825,
+    "tells": 14,
+    "per100": 1.7
+   },
+   {
+    "id": "uk-mod-afghan-statement-2025",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 1862,
+    "tells": 30,
+    "per100": 1.6
+   },
+   {
+    "id": "uk-mod-afghan-guidance-2025",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 1003,
+    "tells": 29,
+    "per100": 2.9
+   },
+   {
+    "id": "uk-nio-psni-breach-2023",
+    "stratum": "target-genre",
+    "register": "mixed",
+    "words": 552,
+    "tells": 7,
+    "per100": 1.3
+   },
+   {
+    "id": "py-tutorial-errors",
+    "stratum": "technical",
+    "register": "ham",
+    "words": 2060,
+    "tells": 57,
+    "per100": 2.8
+   },
+   {
+    "id": "py-tutorial-inputoutput",
+    "stratum": "technical",
+    "register": "ham",
+    "words": 2288,
+    "tells": 46,
+    "per100": 2
+   },
+   {
+    "id": "py-library-tempfile",
+    "stratum": "technical",
+    "register": "ham",
+    "words": 2327,
+    "tells": 66,
+    "per100": 2.8
+   },
+   {
+    "id": "py-library-venv",
+    "stratum": "technical",
+    "register": "ham",
+    "words": 1330,
+    "tells": 22,
+    "per100": 1.7
+   },
+   {
+    "id": "py-tutorial-modules",
+    "stratum": "technical",
+    "register": "ham",
+    "words": 1640,
+    "tells": 38,
+    "per100": 2.3
+   },
+   {
+    "id": "py-reference-import",
+    "stratum": "technical",
+    "register": "ham",
+    "words": 1307,
+    "tells": 35,
+    "per100": 2.7
+   }
+  ],
+  "spin_ham": {
+   "pairs": 8,
+   "correct": 7,
+   "violations": [
+    {
+     "spin": "inv-crypto-launch",
+     "spin_per100": 1.2,
+     "ham": "inv-science-abstract",
+     "ham_per100": 2.9
+    }
+   ]
+  }
+ },
+ "release_blockers": [
+  {
+   "ruleId": "absolute.universal",
+   "level": "info",
+   "n": 20,
+   "lenient": 0.1,
+   "FPW": 4,
+   "why": [
+    "FPW 4 > 0",
+    "lenient 0.1 < 0.5 (info)"
+   ]
+  },
+  {
+   "ruleId": "agency-hiding.deleted-subject",
+   "level": "warning",
+   "n": 368,
+   "lenient": 0.106,
+   "FPW": 30,
+   "why": [
+    "FPW 30 > 0",
+    "lenient 0.106 < 0.8 (warning)"
+   ]
+  },
+  {
+   "ruleId": "hedge.deniable",
+   "level": "info",
+   "n": 38,
+   "lenient": 0.342,
+   "FPW": 7,
+   "why": [
+    "FPW 7 > 0",
+    "lenient 0.342 < 0.5 (info)"
+   ]
+  },
+  {
+   "ruleId": "hedge.softener",
+   "level": "info",
+   "n": 7,
+   "lenient": 0.286,
+   "FPW": 2,
+   "why": [
+    "FPW 2 > 0",
+    "lenient 0.286 < 0.5 (info)"
+   ]
+  },
+  {
+   "ruleId": "weasel.attribution",
+   "level": "note",
+   "n": 1,
+   "lenient": 0,
+   "FPW": 1,
+   "why": [
+    "FPW 1 > 0"
+   ]
+  }
+ ],
+ "false_positives": {
+  "absolute.universal": {
+   "FPB": 14,
+   "FPW": 4
+  },
+  "agency-hiding.deleted-subject": {
+   "FPB": 303,
+   "FPW": 31
+  },
+  "hedge.deniable": {
+   "FPB": 19,
+   "FPW": 7
+  },
+  "hedge.softener": {
+   "FPB": 3,
+   "FPW": 2
+  },
+  "weasel.attribution": {
+   "FPB": 0,
+   "FPW": 1
+  }
+ },
+ "contrast": null
+}
