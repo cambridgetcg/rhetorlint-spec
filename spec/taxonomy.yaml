@@ -423,6 +423,10 @@ families:
           - text: "Never before have prices been this low."
             expect: marked
             actual: "Never"
+          - text: "Never at any time disclose your password."
+            expect: unmarked
+          - text: "Never have more than two drinks."
+            expect: unmarked
         lineage: "SemEval-2023 · Simplification › False Dilemma or No Choice"
 
   # ==========================================================================
@@ -562,7 +566,7 @@ families:
   - id: agency-hiding
     semeval_parent: "(RhetorLint extension — not in SemEval)"
     what: "Sentence structure that removes the actor: the harm is described, but who chose it is gone."
-    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive of an act someone answers for), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar: the same participle is a tell in 'mistakes were made' and procedure in 'samples were collected', so the family reads the auxiliary, the verb and the noun before it together, and earns its own place."
+    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive of an act someone answers for), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar: the same participle is a tell in 'concerns were raised' and procedure in 'an error was raised', so the family reads the auxiliary, the verb and the noun before it together, and earns its own place."
     seeded_tells: 1
     tells:
 
@@ -573,7 +577,7 @@ families:
         # SemEval corpus drops this tell rather than silently absorbing it.
         what: "An agentless past passive of an accountable act — 'mistakes were made', 'your data was shared' — a fault, a breach, a concealment or a decision whose doer the clause never names."
         why_it_works: "No actor, no accountability: the harm reads like weather that simply happened rather than a choice a specific someone made."
-        benign_reading: "Most passives hide nothing, so most are unmarked by design: present, modal and procedural passives ('the option is ignored', 'the soup can be frozen', 'samples were collected at dawn'); clauses that name the agent ('...by Forbes'), including a 'by' that names only when ('shelved by Friday', a known under-mark); and harm and news verbs whose doer the words alone cannot establish ('lives were lost in the earthquake', 'your account was closed at your request')."
+        benign_reading: "Most passives hide nothing. The rule marks a was, were or been passive only when its verb is on a closed list of fault, breach, concealment and decision verbs (spec/agency-lexicon.json), so these are unmarked by design: present and modal 'be' passives ('the option is ignored', 'the soup can be frozen'); routine data handling ('samples were collected at dawn'); negated passives, which deny the act ('your data was never sold'); clauses that name the agent ('...by Forbes'), including a 'by' that names only when ('shelved by Friday', a known under-mark); and harm and news verbs whose doer the words alone cannot establish ('lives were lost in the earthquake', 'your account was closed at your request'). A modal perfect ('may have been accessed') reads as past and is marked. The listed verbs keep innocent senses the words cannot tell apart, and those are still marked ('tax was withheld', 'unknown keys were ignored', 'repeated measures were taken'): open O2 rows in measurement/contrast.json."
         examples:
           - marked: "Mistakes were made and your account was closed"
             tell: "Mistakes were made"
