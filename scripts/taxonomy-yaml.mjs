@@ -28,8 +28,7 @@
 // Run directly, it prints the parsed document as JSON:
 //   node scripts/taxonomy-yaml.mjs [path]   (default: spec/taxonomy.yaml)
 
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export class TaxonomyYamlError extends Error {
@@ -224,7 +223,9 @@ export function readTaxonomyYaml(path) {
   return parseTaxonomyYaml(readFileSync(path, "utf8"));
 }
 
-const directPath = process.argv[1] ? resolve(process.argv[1]) : null;
+// Compare real paths: on macOS /tmp is a symlink to /private/tmp, and a script
+// run through it must still run, not exit 0 silently.
+const directPath = process.argv[1] ? realpathSync(process.argv[1]) : null;
 if (directPath === fileURLToPath(import.meta.url)) {
   const target = process.argv[2] ??
     fileURLToPath(new URL("../spec/taxonomy.yaml", import.meta.url));

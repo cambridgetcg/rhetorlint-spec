@@ -13,6 +13,7 @@ import {
   openSync,
   readSync,
   readdirSync,
+  realpathSync,
   renameSync,
   rmSync,
   writeFileSync,
@@ -660,7 +661,9 @@ export async function runCli(argv = process.argv.slice(2), runtime = {}) {
   return 0;
 }
 
-const directPath = process.argv[1] ? resolve(process.argv[1]) : null;
+// Compare real paths: on macOS /tmp is a symlink to /private/tmp, and a check
+// run through it must still check (and fail when it should), not exit 0 silently.
+const directPath = process.argv[1] ? realpathSync(process.argv[1]) : null;
 if (directPath === fileURLToPath(import.meta.url)) {
   try {
     process.exitCode = await runCli();
