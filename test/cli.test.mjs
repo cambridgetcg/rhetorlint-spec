@@ -72,9 +72,37 @@ test("the CLI's dependency ranges can receive engine and rule-pack patches", () 
   }
 });
 
-test("the coordinated packages require modality-preserving core 0.1.3", () => {
-  assert.equal(CLI_MANIFEST.dependencies["@rhetorlint/core"], "^0.1.3");
-  assert.equal(RULES_MANIFEST.peerDependencies["@rhetorlint/core"], ">=0.1.3");
+test("the coordinated packages require core 0.1.4, whose detector the agency note describes", () => {
+  // rules-en 0.2.1's agency note names the accountable-passive detector of core
+  // 0.1.4. On core 0.1.3 the same note would label the old detector's wider
+  // marks ("Shipments are often delayed."), so the floor rises with the note.
+  assert.equal(CLI_MANIFEST.dependencies["@rhetorlint/core"], "^0.1.4");
+  assert.equal(RULES_MANIFEST.peerDependencies["@rhetorlint/core"], ">=0.1.4");
+});
+
+test("rules-en still parses on core 0.1.3: no pack key or engine floor that core lacks", () => {
+  // The keys core 0.1.3 accepts (packages/core/index.mjs PACK_KEYS and
+  // RULE_KEYS at 0.1.3), declared here so a new key that would make it reject
+  // the whole pack fails. The floor above is about honest labels, not parsing.
+  const PACK = JSON.parse(readFileSync(new URL("../packages/rules-en/rules.json", import.meta.url)));
+  const base = ["ruleId", "family", "technique", "type", "level", "confidence", "note", "expected"];
+  const CORE_013 = {
+    pack: ["id", "version", "locale", "note", "rules"],
+    lexical: [...base, "terms"],
+    pattern: [...base, "pattern", "caseSensitive", "minEngine"],
+    structural: [...base, "detector"]
+  };
+  const extra = (keys, allowed) => keys.filter((key) => !allowed.includes(key));
+  assert.deepEqual(extra(Object.keys(PACK), CORE_013.pack), []);
+  for (const rule of PACK.rules) {
+    assert.deepEqual(extra(Object.keys(rule), CORE_013[rule.type]), [], rule.ruleId);
+    if (rule.minEngine !== undefined) {
+      const [a, b, c] = rule.minEngine.split(".").map(Number);
+      assert.ok(a === 0 && (b < 1 || (b === 1 && c <= 3)), `${rule.ruleId} needs core ${rule.minEngine}`);
+    }
+  }
+  assert.ok(PACK.rules.some((rule) => rule.type === "structural" && rule.detector === "agentless-passive"),
+    "the detector name core 0.1.3 knows is still the one the pack asks for");
 });
 
 test("the CLI's caret ranges actually reach the in-repo pack", () => {

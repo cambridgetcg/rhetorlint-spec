@@ -11,9 +11,10 @@
 // instead of a key. It holds no token and can capture no second factor.
 //
 // The publish order is load-bearing at the tail, not the head. rules-en's only
-// link to core is an OPTIONAL peerDependency (>=0.1.3), which npm neither
+// link to core is an OPTIONAL peerDependency (>=0.1.4), which npm neither
 // installs nor resolves — it documents the coordinated engine floor, including
-// modality-preserving strip semantics, and constrains nothing about order, so
+// modality-preserving strip semantics and the accountable-passive detector its
+// agency note describes, and constrains nothing about order, so
 // core and rules-en could go either way round. It is @rhetorlint/cli that carries
 // real carets on both; publishing it first leaves an `npm i @rhetorlint/cli`
 // that cannot resolve. cli goes last.

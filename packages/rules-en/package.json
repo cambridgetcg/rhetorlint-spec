@@ -13,7 +13,7 @@
     "README.md"
   ],
   "peerDependencies": {
-    "@rhetorlint/core": ">=0.1.3"
+    "@rhetorlint/core": ">=0.1.4"
   },
   "peerDependenciesMeta": {
     "@rhetorlint/core": {

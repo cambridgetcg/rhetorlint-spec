@@ -12,7 +12,7 @@ The three packages that publish (nothing else does):
 |------|---------|-----------|
 | 1 | `@rhetorlint/core` | — |
 | 2 | `@rhetorlint/rules-en` | — |
-| 3 | `@rhetorlint/cli` | `^0.1.3` core, `^0.2.0` rules-en (must be live first) |
+| 3 | `@rhetorlint/cli` | `^0.1.4` core, `^0.2.0` rules-en (must be live first) |
 
 > The CLI's ranges are carets on purpose, and it was not always so: `cli@0.1.0`
 > shipped with **exact** pins, so every `npm i @rhetorlint/cli` kept installing
@@ -21,9 +21,15 @@ The three packages that publish (nothing else does):
 > receive those improvements. Keep them carets, and re-release the CLI whenever
 > a floor rises (an engine feature the CLI's own output depends on).
 
-Core 0.1.3 is the current floor for the coordinated 0.2.0 CLI and rule pack:
-it preserves modality and attribution in strip output. Allowing core 0.1.2
-would install successfully while producing the superseded strip semantics.
+Core 0.1.4 is the current floor for the coordinated 0.2.0 CLI and rules-en
+0.2.1. Rules-en 0.2.1 adds no pack key, so core 0.1.3 still parses it, but its
+agency note ("a past-tense passive of a fault, breach, concealment or decision
+verb") describes the 0.1.4 accountable-passive detector. Core 0.1.3 would put
+that note on its old, wider marks ("Shipments are often delayed", "The soup
+can be frozen"), a label that is false for each of them. Core 0.1.3 was the
+floor before, because it preserves modality and attribution in strip output;
+allowing core 0.1.2 would install successfully while producing the superseded
+strip semantics.
 
 ### Core-only meaning-preservation candidate
 
