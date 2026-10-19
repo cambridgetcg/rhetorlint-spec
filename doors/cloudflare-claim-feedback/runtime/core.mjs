@@ -55,10 +55,14 @@ const RULE_KEYS = {
 const ZERO_LENGTH_PATTERN_PROBES = ["", "a", "A", "0", "_", " ", "\n", "word", "example"];
 
 // BEGIN GENERATED AGENCY LEXICON
-// spec/agency-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// spec/agency-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
+const AGENCY_WHITESPACE = " \t\n\r\f";
+const AGENCY_SPACE = "[ \\t\\n\\r\\f]+";
+const AGENCY_HEAD_STOPS = ".;:!?\n";
+const AGENCY_CLAUSE_BREAKS = ".;:!?";
 const AGENCY_AUXILIARIES = ["been", "was", "were"];
-const AGENCY_ADVERBS = ["already", "always", "never", "often", "still"];
+const AGENCY_ADVERBS = ["already", "always", "often", "still"];
 const AGENCY_ADVERB_SUFFIX = "ly";
 const AGENCY_SKIP = new Set([
   "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never",
@@ -67,6 +71,10 @@ const AGENCY_SKIP = new Set([
 const AGENCY_SKIP_SUFFIX = "ly";
 const AGENCY_SKIP_MAX = 4;
 const AGENCY_BY_WINDOW = 7;
+const AGENCY_NEGATORS = new Set([
+  "cannot", "neither", "never", "no", "none", "nor", "not", "nothing"
+]);
+const AGENCY_NEGATOR_WINDOW = 5;
 const AGENCY_HEADS = new Map([
   ["challenge", new Set([
     "allegations", "concerns", "questions"
@@ -84,6 +92,10 @@ const AGENCY_HEADS = new Map([
     "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps", "mistake", "mistakes",
     "omissions", "promises", "questions", "remarks", "safeguards", "statements", "steps", "things",
     "threats", "words"
+  ])],
+  ["held", new Set([
+    "account", "accounts", "address", "addresses", "credentials", "data", "details", "information",
+    "password", "passwords", "pii", "records"
   ])]
 ]);
 /** [class, head class or "" for none, participles]. */
@@ -96,8 +108,10 @@ const AGENCY_CLASSES = [
     "overlooked", "tampered", "underpaid"
   ]],
   ["breach", "", [
-    "accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked",
-    "impacted", "leaked", "stolen"
+    "accessed", "breached", "compromised", "exfiltrated", "exposed", "hacked", "leaked", "stolen"
+  ]],
+  ["affect", "held", [
+    "affected", "impacted"
   ]],
   ["conceal", "", [
     "axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
@@ -137,24 +151,28 @@ const AGENCY_UNLESS = new Map([["exposed", "to"]]);
  *      AGENCY_UNLESS word ("exposed to" names an exposure, not a breach);
  *   4. no "by" among the next AGENCY_BY_WINDOW words of the clause: the agent
  *      is named ("...by Forbes"), or the clause says when ("by Friday"), and
- *      either way the rule stays silent.
+ *      either way the rule stays silent;
+ *   5. no negator (AGENCY_NEGATORS, or an n't contraction) in the auxiliary
+ *      chain ("have not been", "hasn't been"), as the head word ("Nothing was
+ *      withheld") or among the AGENCY_NEGATOR_WINDOW words before the head
+ *      ("No customer data was", "None of the records were"): a negated
+ *      passive denies the act, it does not hide a doer.
  * The head word is the nearest word before the auxiliary, stepping back over
  * at most AGENCY_SKIP_MAX words of AGENCY_SKIP or ending in -ly, never past
- * . ; : ! ? or a line break. The "by" window ends at . ; : ! ? but reads on
- * across a line break, since hard-wrapped text breaks lines mid-clause: each
- * window stops where stopping marks less.
+ * AGENCY_HEAD_STOPS (. ; : ! ? or a line break); the negator walk reads the
+ * same words and stops at the same characters. The "by" window ends at
+ * AGENCY_CLAUSE_BREAKS (. ; : ! ?) but reads on across a line break, since
+ * hard-wrapped text breaks lines mid-clause: each window stops where stopping
+ * marks less.
  *
  * Portability: matching runs on an ASCII-lowercased copy (A-Z to a-z and
  * nothing else, so its length is the text's in every offset unit), with no
- * case-insensitive flag, explicit [ \t\n\r\f] whitespace and ASCII word
- * boundaries. A no-break space or a vertical tab does not join two words, and
- * a non-ASCII letter is never folded into one, so JavaScript, Python and Go
- * read the same words. The lists are generated from spec/agency-lexicon.json.
+ * case-insensitive flag, explicit AGENCY_WHITESPACE ([ \t\n\r\f]) and ASCII
+ * word boundaries. A no-break space or a vertical tab does not join two words,
+ * and a non-ASCII letter is never folded into one, so JavaScript, Python and
+ * Go read the same words. The word lists, the numbers and the three character
+ * sets are generated from spec/agency-lexicon.json.
  */
-const AGENCY_WHITESPACE = " \t\n\r\f";
-const AGENCY_SPACE = "[ \\t\\n\\r\\f]+";
-const AGENCY_HEAD_STOPS = ".;:!?\n";
-const AGENCY_CLAUSE_BREAKS = ".;:!?";
 
 /** Each participle and the head class it needs ("" for none). */
 const AGENCY_HEAD_OF = new Map(
@@ -170,6 +188,7 @@ const AGENCY_CANDIDATE = new RegExp(
     .join("|") + ")\\b",
   "g"
 );
+const AGENCY_SPACE_RUN = new RegExp(AGENCY_SPACE);
 
 /** An ASCII letter, digit or underscore: what \b counts as a word character. */
 function isAgencyWordCode(code) {
@@ -191,6 +210,37 @@ function agencyHeadWord(low, index) {
     if (!AGENCY_SKIP.has(word) && !word.endsWith(AGENCY_SKIP_SUFFIX)) return word;
   }
   return "";
+}
+
+/** True when the word "t" at `start` ends an n't contraction: "n", then an apostrophe (U+0027 or U+2019). */
+function agencyContraction(low, start) {
+  return start >= 2 && (low.slice(start - 2, start) === "n'" || low.slice(start - 2, start) === "n\u2019");
+}
+
+/**
+ * True when a negator stands in the auxiliary chain before `index`, is the
+ * head word, or is one of the AGENCY_NEGATOR_WINDOW words before the head. It
+ * walks the words agencyHeadWord walks, never past AGENCY_HEAD_STOPS; when
+ * agencyHeadWord finds no head, only the chain is read.
+ */
+function agencyNegated(low, index) {
+  let i = index;
+  let left = -1; // words still to read before the head; -1 until the head is read
+  for (let seen = 0; left !== 0; seen++) {
+    while (i > 0 && !isAgencyWordCode(low.charCodeAt(i - 1))) {
+      if (AGENCY_HEAD_STOPS.includes(low[i - 1])) return false;
+      i--;
+    }
+    const end = i;
+    while (i > 0 && isAgencyWordCode(low.charCodeAt(i - 1))) i--;
+    if (i === end) return false;
+    const word = low.slice(i, end);
+    if (AGENCY_NEGATORS.has(word) || (word === "t" && agencyContraction(low, i))) return true;
+    if (left > 0) left--;
+    else if (!AGENCY_SKIP.has(word) && !word.endsWith(AGENCY_SKIP_SUFFIX)) left = AGENCY_NEGATOR_WINDOW;
+    else if (seen === AGENCY_SKIP_MAX) return false;
+  }
+  return false;
 }
 
 /** True when "by" is one of the next AGENCY_BY_WINDOW words after `index`, before . ; : ! or ?. */
@@ -228,7 +278,7 @@ function agentlessPassives(text) {
   const out = [];
   for (const m of low.matchAll(AGENCY_CANDIDATE)) {
     const start = m.index, end = start + m[0].length;
-    const participle = m[2].split(/[ \t\n\r\f]+/).join(" ");
+    const participle = m[2].split(AGENCY_SPACE_RUN).join(" ");
     const unless = AGENCY_UNLESS.get(participle);
     if (unless !== undefined && agencyPhraseFollows(low, end, unless)) continue;
     const requires = AGENCY_REQUIRES.get(participle);
@@ -236,6 +286,7 @@ function agentlessPassives(text) {
     if (agencyByFollows(low, end)) continue;
     const head = AGENCY_HEAD_OF.get(participle);
     if (head !== "" && !AGENCY_HEADS.get(head).has(agencyHeadWord(low, start))) continue;
+    if (agencyNegated(low, start)) continue;
     out.push({ index: start, length: end - start, actual: text.slice(start, end) });
   }
   return out;
@@ -589,13 +640,18 @@ function negationScopedAt(text, start, end) {
   return negatedAt(text, start, true) || imperativeNeverAt(text, start, end);
 }
 
-/** Words that cannot be the verb of an imperative "Never <verb>": after a
- *  clause-initial "never" they make a fragment ("Never an issue.") or an
- *  inversion ("Never has a product been this good."), both claims. */
+/** Words that, after a clause-initial "never", open a fragment ("Never an
+ *  issue.") or an inversion ("Never has a product been this good."), both
+ *  claims, and do not begin advice. A word that can also begin advice is left
+ *  out, so the advice stays unmarked and the claim goes unmarked with it:
+ *  "Never have regrets." but "Never have I seen…"; "Never at any time
+ *  disclose your PIN." but "Never in history has…"; "Never so much as glance
+ *  at it."; "Never should you share it." (so, in, at, on, have and should are
+ *  not listed: recorded misses, the safe direction). */
 const NEVER_NON_VERBS = new Set([
-  "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
-  "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
-  "should", "can", "did", "does", "been", "being"
+  "a", "an", "the", "any", "before", "such",
+  "has", "had", "is", "are", "was", "were", "will", "would", "could",
+  "can", "did", "does", "been", "being"
 ]);
 
 /** Adverbs that may stand between "Never" and its verb: the word after them
