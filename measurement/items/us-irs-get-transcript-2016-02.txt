@@ -1,0 +1,41 @@
+Feb. 26, 2016
+
+Following an incident involving the IRS’s “Get Transcript” application discovered last May, the Treasury Inspector General for Tax Administration conducted a nine-month long investigation looking back to the launch of the application in January 2014 for additional suspicious activity. This expanded review has identified additional suspicious attempts to access taxpayer accounts using sensitive information already in the hands of criminals. The IRS is moving immediately to notify and help protect these taxpayers, including through free identity theft protection services as well as Identity Protection PINs.
+
+This further review found potential access of approximately 390,000 additional taxpayer accounts during the period from January 2014 through May 2015. In addition, 295,000 taxpayer transcripts were targeted but access was not successful. Mailings to these taxpayers will start February 29. The “Get Transcript” web application has been offline since this incident was discovered in May 2015.
+
+“The IRS is committed to protecting taxpayers on multiple fronts against tax-related identity theft, and these mailings are part of that effort,” IRS Commissioner John Koskinen said. “We appreciate the work of the Treasury Inspector General for Tax Administration to identify these additional taxpayers whose accounts may have been accessed. We are moving quickly to help these taxpayers.”
+
+Help For Taxpayers
+
+As it did last year, the IRS is moving aggressively to protect these additional taxpayers from tax-related identity theft. This includes:
+
+- Notifying by mail those taxpayers whose transcripts were accessed and those taxpayers whose transcripts were targeted but not accessed. These mailings will provide guidance and notify them that criminals may have their personally identifiable information.
+
+- Informing taxpayers whose transcripts were accessed that they can request an Identity Protect PIN by completing a Form 14039, Identity Theft Affidavit. An IP PIN provides an additional layer of protection for the taxpayer’s SSN on the federal tax return.
+
+- Offering taxpayers whose returns were accessed a free Equifax identity theft protection product for one year, and encouraging taxpayers to place a “fraud alert” on their credit accounts.
+
+- Placing extra scrutiny on tax returns with taxpayers SSNs.
+
+- Placing special markers on these taxpayer accounts to advise IRS assistors that the caller is part of this event.
+
+To further protect taxpayers, the IRS also is sharing information about this incident with the states as part of the Security Summit effort. This is part of a larger effort undertaken this tax season to protect against identity theft refund fraud through the Security Summit group, a partnership between the IRS, state revenue departments and the tax industry.
+
+The IRS takes the security of taxpayer data extremely seriously, and we are working aggressively to protect affected taxpayers and continue to strengthen our systems.
+
+Additional information
+
+On May 26, 2015, the IRS announced it had discovered that criminals, using taxpayer information stolen elsewhere, had been able to pass procedures to access the Get Transcript application on IRS.gov.
+
+At that time, the IRS identified approximately 114,000 taxpayers whose transcripts had been accessed and about another 111,000 taxpayers whose transcripts were targeted but not accessed. In August 2015, the IRS announced it had identified another 220,000 taxpayers whose transcripts may have been accessed and an approximately 170,000 taxpayers whose transcripts were targeted but not accessed.
+
+After the IRS made its announcement, TIGTA investigators began their own review, covering from 2014 through May 2015. TIGTA investigators identified suspicious email addresses that made multiple attempts to access accounts. The IRS notes it is possible that some of those identified may be family members, tax return preparers or financial institutions using a single email address to attempt to access more than one account. However, in an abundance of caution, IRS will notify all taxpayers impacted.
+
+Status of Get Transcript
+
+In January 2014, Get Transcript launched on the IRS website. This application allowed taxpayers to have the option of immediately viewing and downloading their tax transcript or having it mailed to their address. Taxpayers could view or order multiple years of transcript information. For the 2015 filing season, approximately 23 million transcripts were ordered. Since its launch in 2014, 47 million transcripts have been ordered through the Get Transcript tool.
+
+The online viewing and download feature of “Get Transcript” has been unavailable since May 2015, and the IRS is working to restore that part of the service in the near future with enhanced taxpayer-identity authentication protocols. Other transcript options remain available via IRS.gov, with online requests being taken for mailed copies of transcripts. The IRS reminds taxpayers to plan ahead if they need transcripts; it can typically take five to 10 days before the transcripts arrive in the mail.
+
+See IRS Internal Revenue Service Reminds Taxpayers to Plan Ahead If You Need a Tax Transcript.

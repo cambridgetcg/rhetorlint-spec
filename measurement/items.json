@@ -1,0 +1,460 @@
+{
+ "version": 1,
+ "items": [
+  {
+   "id": "inv-breach-apology",
+   "stratum": "pastiche",
+   "register": "spin",
+   "licence": "CC-BY-SA-4.0",
+   "source": "invented",
+   "retrieved": "2026-10-19",
+   "sha256": "04eb8706bb37f501739136c7fa4d5c11507623a5b085601b782491cd7d3c070f",
+   "words": 218,
+   "title": "a corporate breach-notice pastiche",
+   "publisher": "rhetorlint-spec measurement (agent-written)",
+   "provenance": "invented by an agent after reading rules.json on 2026-10-19 — rules-aware, reported, never gates",
+   "licence_evidence": {
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "quote": "Written for this repository; offered under CC-BY-SA-4.0, the licence spec/taxonomy.yaml uses for teachable corpus text."
+   }
+  },
+  {
+   "id": "inv-crypto-launch",
+   "stratum": "pastiche",
+   "register": "spin",
+   "licence": "CC-BY-SA-4.0",
+   "source": "invented",
+   "retrieved": "2026-10-19",
+   "sha256": "f054cf82d6fd19e06172033e1983d8396b688c3f88a5da5cb3e271a6aebf4ba1",
+   "words": 161,
+   "title": "a token-launch pitch pastiche",
+   "publisher": "rhetorlint-spec measurement (agent-written)",
+   "provenance": "invented by an agent after reading rules.json on 2026-10-19 — rules-aware, reported, never gates",
+   "licence_evidence": {
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "quote": "Written for this repository; offered under CC-BY-SA-4.0, the licence spec/taxonomy.yaml uses for teachable corpus text."
+   }
+  },
+  {
+   "id": "inv-political-nondenial",
+   "stratum": "pastiche",
+   "register": "spin",
+   "licence": "CC-BY-SA-4.0",
+   "source": "invented",
+   "retrieved": "2026-10-19",
+   "sha256": "aa619f0881ccfc75d60d442e257181431d589ebcf7a29d535d4672f4e037710f",
+   "words": 178,
+   "title": "a political non-denial pastiche",
+   "publisher": "rhetorlint-spec measurement (agent-written)",
+   "provenance": "invented by an agent after reading rules.json on 2026-10-19 — rules-aware, reported, never gates",
+   "licence_evidence": {
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "quote": "Written for this repository; offered under CC-BY-SA-4.0, the licence spec/taxonomy.yaml uses for teachable corpus text."
+   }
+  },
+  {
+   "id": "inv-scarcity-banner",
+   "stratum": "pastiche",
+   "register": "spin",
+   "licence": "CC-BY-SA-4.0",
+   "source": "invented",
+   "retrieved": "2026-10-19",
+   "sha256": "1eaf6061f2333cbd94d99f705a1e37ae50f1389ab8c15295e37a021adea79bf8",
+   "words": 60,
+   "title": "a retail scarcity-banner pastiche",
+   "publisher": "rhetorlint-spec measurement (agent-written)",
+   "provenance": "invented by an agent after reading rules.json on 2026-10-19 — rules-aware, reported, never gates",
+   "licence_evidence": {
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "quote": "Written for this repository; offered under CC-BY-SA-4.0, the licence spec/taxonomy.yaml uses for teachable corpus text."
+   }
+  },
+  {
+   "id": "inv-recipe",
+   "stratum": "pastiche",
+   "register": "ham",
+   "licence": "CC-BY-SA-4.0",
+   "source": "invented",
+   "retrieved": "2026-10-19",
+   "sha256": "96a7767207ec86b9458d3999b394b5d503ad75bf313b2200425b2b32717c54af",
+   "words": 171,
+   "title": "a recipe (negative control)",
+   "publisher": "rhetorlint-spec measurement (agent-written)",
+   "provenance": "invented by an agent after reading rules.json on 2026-10-19 — rules-aware, reported, never gates",
+   "licence_evidence": {
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "quote": "Written for this repository; offered under CC-BY-SA-4.0, the licence spec/taxonomy.yaml uses for teachable corpus text."
+   }
+  },
+  {
+   "id": "inv-science-abstract",
+   "stratum": "pastiche",
+   "register": "ham",
+   "licence": "CC-BY-SA-4.0",
+   "source": "invented",
+   "retrieved": "2026-10-19",
+   "sha256": "81e27133a74c2c082974f42aa324c713c5c789ed71039dc5e199a9a50132e27d",
+   "words": 137,
+   "title": "a science abstract (negative control)",
+   "publisher": "rhetorlint-spec measurement (agent-written)",
+   "provenance": "invented by an agent after reading rules.json on 2026-10-19 — rules-aware, reported, never gates",
+   "licence_evidence": {
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "quote": "Written for this repository; offered under CC-BY-SA-4.0, the licence spec/taxonomy.yaml uses for teachable corpus text."
+   }
+  },
+  {
+   "id": "pd-declaration",
+   "stratum": "wild-pd",
+   "register": "mixed",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.archives.gov/founding-docs/declaration-transcript",
+   "retrieved": "2026-10-19",
+   "sha256": "a4e18229ec0a10551ecf5f1692b6cae3d51b62514b71e016da0b4581a2ef875a",
+   "words": 456,
+   "title": "Declaration of Independence: A Transcription (excerpt)",
+   "publisher": "U.S. National Archives and Records Administration",
+   "provenance": "Eight paragraphs of the archives.gov transcript (lines 45, 46, 54 and 68-72 of the extracted page text), selected by the empirical reader on 2026-10-19; re-verified verbatim against the live page on 2026-10-19.",
+   "excerpt": "Eight paragraphs, not the whole transcript.",
+   "licence_evidence": {
+    "url": "https://www.archives.gov/global-pages/privacy.html",
+    "quote": "Works of the U.S. Government that have been produced by the National Archives and Records Administration are in the public domain and may be copied and distributed without permission."
+   }
+  },
+  {
+   "id": "us-irs-get-transcript-2015-05",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.irs.gov/newsroom/irs-statement-on-the-get-transcript-application",
+   "retrieved": "2026-10-19",
+   "sha256": "3979fee3f595fc53c2988c08309a3b3ea3244a1930e7decfb810009cffe6440e",
+   "words": 833,
+   "title": "IRS Statement on the \"Get Transcript\" Application (May 26, 2015)",
+   "publisher": "Internal Revenue Service (US Treasury)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.irs.gov/about-irs/use-of-content-from-irsgov",
+    "quote": "Content on this website that was created or maintained by federal employees in the course of their duties is not subject to copyright and may be freely copied. Credit is requested."
+   }
+  },
+  {
+   "id": "us-irs-get-transcript-2015-08",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.irs.gov/newsroom/additional-irs-statement-on-the-get-transcript-incident",
+   "retrieved": "2026-10-19",
+   "sha256": "e1ef58e610668b4d898a32cf4234ee6ac5658900b93f00c5e6d5e6bc6785c690",
+   "words": 629,
+   "title": "Additional IRS Statement on the \"Get Transcript\" Incident (Aug. 17, 2015)",
+   "publisher": "Internal Revenue Service (US Treasury)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.irs.gov/about-irs/use-of-content-from-irsgov",
+    "quote": "Content on this website that was created or maintained by federal employees in the course of their duties is not subject to copyright and may be freely copied. Credit is requested."
+   }
+  },
+  {
+   "id": "us-irs-get-transcript-2016-02",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.irs.gov/newsroom/irs-statement-on-get-transcript",
+   "retrieved": "2026-10-19",
+   "sha256": "f85fa42df805116e91f9ac3d1b72bc385a87c18fb89fb0baa6f0693bf52f5f3e",
+   "words": 781,
+   "title": "IRS Statement On \"Get Transcript\" (Feb. 26, 2016)",
+   "publisher": "Internal Revenue Service (US Treasury)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.irs.gov/about-irs/use-of-content-from-irsgov",
+    "quote": "Content on this website that was created or maintained by federal employees in the course of their duties is not subject to copyright and may be freely copied. Credit is requested."
+   },
+   "note": "Contains a quotation of the then IRS Commissioner (a federal official speaking in office); no non-federal quotation."
+  },
+  {
+   "id": "us-irs-form-990t-2022",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.irs.gov/newsroom/irs-statement-on-forms-990-t",
+   "retrieved": "2026-10-19",
+   "sha256": "236929837461dadc6b85f4295b26b417846dc757d21f4c6f560b798e5506a81b",
+   "words": 235,
+   "title": "IRS statement on Forms 990-T (September 2, 2022)",
+   "publisher": "Internal Revenue Service (US Treasury)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.irs.gov/about-irs/use-of-content-from-irsgov",
+    "quote": "Content on this website that was created or maintained by federal employees in the course of their duties is not subject to copyright and may be freely copied. Credit is requested."
+   }
+  },
+  {
+   "id": "us-irs-data-safeguards-2024",
+   "stratum": "target-genre",
+   "register": "spin",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.irs.gov/newsroom/irs-statement-10-key-areas-where-the-irs-has-stepped-up-protections-for-taxpayer-information-tax-systems",
+   "retrieved": "2026-10-19",
+   "sha256": "67cb4d330668bd92cd36c3dd894c2ac644e82fe4bd00ec85cdd91645a8dbc43f",
+   "words": 442,
+   "title": "IRS statement: 10 key areas where the IRS has stepped up protections for taxpayer information, tax systems (May 10, 2024)",
+   "publisher": "Internal Revenue Service (US Treasury)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.irs.gov/about-irs/use-of-content-from-irsgov",
+    "quote": "Content on this website that was created or maintained by federal employees in the course of their duties is not subject to copyright and may be freely copied. Credit is requested."
+   }
+  },
+  {
+   "id": "us-cms-ffe-breach-2018",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.cms.gov/newsroom/press-releases/cms-responding-suspicious-activity-agent-broker-exchanges-portal",
+   "retrieved": "2026-10-19",
+   "sha256": "617094fee83499a2e1f73d20fec409f11f520227431866ee52c420c53e55a7c2",
+   "words": 407,
+   "title": "CMS Responding to Suspicious Activity in Agent and Broker Exchanges Portal (Oct 19, 2018)",
+   "publisher": "Centers for Medicare & Medicaid Services (US HHS)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.cms.gov/about-cms/web-policies-important-links/about-website/link-to-us",
+    "quote": "CMS.gov is the official website of the Centers for Medicare & Medicaid Services (CMS), an operating division of the U.S. Department of Health & Human Services (HHS). It is a public domain web site."
+   },
+   "note": "Contains a quotation of the then CMS Administrator (a federal official speaking in office); no non-federal quotation. Page chrome (date line, topic tag, Share, related releases, media contact) omitted."
+  },
+  {
+   "id": "us-cms-agent-broker-2024-07",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "US-federal-public-domain",
+   "source": "https://www.cms.gov/newsroom/press-releases/cms-statement-system-changes-stop-unauthorized-agent-broker-marketplace-activity",
+   "retrieved": "2026-10-19",
+   "sha256": "426b7e9c94c6d169056b075d2eb7ce44decdfd0512bdd9baf508d72ccaa56e81",
+   "words": 549,
+   "title": "CMS Statement on System Changes to Stop Unauthorized Agent and Broker Marketplace Activity (Jul 19, 2024)",
+   "publisher": "Centers for Medicare & Medicaid Services (US HHS)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.cms.gov/about-cms/web-policies-important-links/about-website/link-to-us",
+    "quote": "CMS.gov is the official website of the Centers for Medicare & Medicaid Services (CMS), an operating division of the U.S. Department of Health & Human Services (HHS). It is a public domain web site."
+   },
+   "note": "Page chrome (date line, topic tag, Share, related releases, media contact) omitted."
+  },
+  {
+   "id": "uk-laa-data-breach-2025",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "OGL-UK-3.0",
+   "source": "https://www.gov.uk/government/news/legal-aid-agency-data-breach",
+   "retrieved": "2026-10-19",
+   "sha256": "6a9a2af48c89376f5d3b3c469ae38ebb208ccaffd873fa233664e61e87889acc",
+   "words": 335,
+   "title": "Legal Aid Agency data breach (news story, updated 31 July 2025)",
+   "publisher": "Legal Aid Agency and Ministry of Justice (UK)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "quote": "Page footer: © Crown copyright. All content is available under the Open Government Licence v3.0, except where otherwise stated. (No other statement appears on the page.)"
+   }
+  },
+  {
+   "id": "uk-laa-data-update-2026",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "OGL-UK-3.0",
+   "source": "https://www.gov.uk/government/news/legal-aid-agency-cyber-security-incident-data-update-october-2026",
+   "retrieved": "2026-10-19",
+   "sha256": "96a18d4e7c0a46ac175e5338d9f26d33a6c42bc1df4e3da5a3a1e9db7339fd3a",
+   "words": 443,
+   "title": "Legal Aid Agency cyber security incident data update October 2026 (news story)",
+   "publisher": "Legal Aid Agency (UK)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "quote": "Page footer: © Crown copyright. All content is available under the Open Government Licence v3.0, except where otherwise stated. (No other statement appears on the page.)"
+   },
+   "excerpt": "Narrative opening only, up to the first data table; the tables and later sections are omitted."
+  },
+  {
+   "id": "uk-mod-payroll-incident-2024",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "OGL-UK-3.0",
+   "source": "https://www.gov.uk/government/speeches/defence-secretary-oral-statement-to-provide-a-defence-personnel-update-07-may-2024",
+   "retrieved": "2026-10-19",
+   "sha256": "8ffa1f781d43412a2343c663ced19e7c22b634622ea0d9387db42b9b70539a87",
+   "words": 825,
+   "title": "Defence Secretary Oral Statement to provide a Defence Personnel Update - 07 May 2024",
+   "publisher": "Ministry of Defence (UK)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "quote": "Page footer: © Crown copyright. All content is available under the Open Government Licence v3.0, except where otherwise stated. (No other statement appears on the page.)"
+   }
+  },
+  {
+   "id": "uk-mod-afghan-statement-2025",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "OGL-UK-3.0",
+   "source": "https://www.gov.uk/government/speeches/oral-statement-on-afghan-data-breach",
+   "retrieved": "2026-10-19",
+   "sha256": "8382722e5dc88488fb2a35ee15fe84fa546fc5343bfe112f53affbd73b57c541",
+   "words": 1862,
+   "title": "Oral Statement on Afghan data breach (15 July 2025)",
+   "publisher": "Ministry of Defence (UK)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "quote": "Page footer: © Crown copyright. All content is available under the Open Government Licence v3.0, except where otherwise stated. (No other statement appears on the page.)"
+   },
+   "excerpt": "Whole statement except the translation link and the four paragraphs that quote the independent Rimmer Review (third-party-quoted passages excluded)."
+  },
+  {
+   "id": "uk-mod-afghan-guidance-2025",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "OGL-UK-3.0",
+   "source": "https://www.gov.uk/guidance/data-incident-affecting-applicants-to-the-afghan-relocations-and-assistance-policy-scheme-and-afghanistan-locally-employed-staff-ex-gratia-scheme",
+   "retrieved": "2026-10-19",
+   "sha256": "17ef79b036831d86aa67bc959e6b15c380c9535eda2f7bc3766b2c2ea12a2a72",
+   "words": 1003,
+   "title": "Data incident affecting applicants to the Afghan Relocations and Assistance Policy Scheme and Afghanistan Locally Employed Staff Ex-Gratia Scheme (guidance, updated 31 October 2025)",
+   "publisher": "Ministry of Defence (UK)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "quote": "Page footer: © Crown copyright. All content is available under the Open Government Licence v3.0, except where otherwise stated. (No other statement appears on the page.)"
+   },
+   "excerpt": "Everything before the Translations and Related information link lists."
+  },
+  {
+   "id": "uk-nio-psni-breach-2023",
+   "stratum": "target-genre",
+   "register": "mixed",
+   "licence": "OGL-UK-3.0",
+   "source": "https://www.gov.uk/government/speeches/secretary-of-states-speech-psni-data-breach",
+   "retrieved": "2026-10-19",
+   "sha256": "7f8dd88999ce044d1b0c9353f780b6106a2f4338be97756cf5252fd348627375",
+   "words": 552,
+   "title": "Secretary of State's speech - PSNI data breach (4 September 2023)",
+   "publisher": "Northern Ireland Office (UK)",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "quote": "Page footer: © Crown copyright. All content is available under the Open Government Licence v3.0, except where otherwise stated. (No other statement appears on the page.)"
+   }
+  },
+  {
+   "id": "py-tutorial-errors",
+   "stratum": "technical",
+   "register": "ham",
+   "licence": "PSF-2.0",
+   "source": "https://docs.python.org/3/tutorial/errors.html",
+   "retrieved": "2026-10-19",
+   "sha256": "dfc3e00b0404665d050ddbbe32cb7298c3d7af0b8cc6d78a253cae4f30816862",
+   "words": 2060,
+   "title": "The Python Tutorial, 8. Errors and Exceptions",
+   "publisher": "Python Software Foundation",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://docs.python.org/3/license.html",
+    "quote": "Python software and documentation are licensed under the Python Software Foundation License Version 2. (Page footer: Copyright © 2001 Python Software Foundation. This page is licensed under the Python Software Foundation License Version 2.)"
+   },
+   "excerpt": "Whole page prose; code listings (<pre> blocks) omitted."
+  },
+  {
+   "id": "py-tutorial-inputoutput",
+   "stratum": "technical",
+   "register": "ham",
+   "licence": "PSF-2.0",
+   "source": "https://docs.python.org/3/tutorial/inputoutput.html",
+   "retrieved": "2026-10-19",
+   "sha256": "15b2cca2bfca364353437cdc220cb7782f9c1d77469aa6c167150cbb4a9362ae",
+   "words": 2288,
+   "title": "The Python Tutorial, 7. Input and Output",
+   "publisher": "Python Software Foundation",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://docs.python.org/3/license.html",
+    "quote": "Python software and documentation are licensed under the Python Software Foundation License Version 2. (Page footer: Copyright © 2001 Python Software Foundation. This page is licensed under the Python Software Foundation License Version 2.)"
+   },
+   "excerpt": "Whole page prose; code listings (<pre> blocks) omitted."
+  },
+  {
+   "id": "py-library-tempfile",
+   "stratum": "technical",
+   "register": "ham",
+   "licence": "PSF-2.0",
+   "source": "https://docs.python.org/3/library/tempfile.html",
+   "retrieved": "2026-10-19",
+   "sha256": "337ecd07b7c9410b5c14ac52f887e9e05966f6ce75643a66f373715d073adebd",
+   "words": 2327,
+   "title": "The Python Standard Library, tempfile",
+   "publisher": "Python Software Foundation",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://docs.python.org/3/license.html",
+    "quote": "Python software and documentation are licensed under the Python Software Foundation License Version 2. (Page footer: Copyright © 2001 Python Software Foundation. This page is licensed under the Python Software Foundation License Version 2.)"
+   },
+   "excerpt": "From the top up to (not including) the Examples section; code listings (<pre> blocks) omitted."
+  },
+  {
+   "id": "py-library-venv",
+   "stratum": "technical",
+   "register": "ham",
+   "licence": "PSF-2.0",
+   "source": "https://docs.python.org/3/library/venv.html",
+   "retrieved": "2026-10-19",
+   "sha256": "53e39da01f6d96f7a038b1b4f4ad471ad4818c9f148023afa04aa41e3c5edaf3",
+   "words": 1330,
+   "title": "The Python Standard Library, venv",
+   "publisher": "Python Software Foundation",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://docs.python.org/3/license.html",
+    "quote": "Python software and documentation are licensed under the Python Software Foundation License Version 2. (Page footer: Copyright © 2001 Python Software Foundation. This page is licensed under the Python Software Foundation License Version 2.)"
+   },
+   "excerpt": "From the top up to (not including) the API section; code listings (<pre> blocks) omitted."
+  },
+  {
+   "id": "py-tutorial-modules",
+   "stratum": "technical",
+   "register": "ham",
+   "licence": "PSF-2.0",
+   "source": "https://docs.python.org/3/tutorial/modules.html",
+   "retrieved": "2026-10-19",
+   "sha256": "dc3e664f8eda340b280bba55fb38605f3fb161ad90bb75407622cdca9bc6fd0e",
+   "words": 1640,
+   "title": "The Python Tutorial, 6. Modules",
+   "publisher": "Python Software Foundation",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://docs.python.org/3/license.html",
+    "quote": "Python software and documentation are licensed under the Python Software Foundation License Version 2. (Page footer: Copyright © 2001 Python Software Foundation. This page is licensed under the Python Software Foundation License Version 2.)"
+   },
+   "excerpt": "Sections 6 to 6.3 (up to, not including, 6.4 Packages); code listings (<pre> blocks) omitted."
+  },
+  {
+   "id": "py-reference-import",
+   "stratum": "technical",
+   "register": "ham",
+   "licence": "PSF-2.0",
+   "source": "https://docs.python.org/3/reference/import.html",
+   "retrieved": "2026-10-19",
+   "sha256": "e1a25f427aacab831863e0ca609f43ccb850ec29a1a34847be336403677cfbdf",
+   "words": 1307,
+   "title": "The Python Language Reference, 5. The import system",
+   "publisher": "Python Software Foundation",
+   "provenance": "GET-fetched on 2026-10-19 and converted from HTML (gov.uk: the Content API body) to plain text: block elements become lines, whitespace collapsed as a browser renders it, list items prefixed '- ', page chrome omitted. Nothing reworded.",
+   "licence_evidence": {
+    "url": "https://docs.python.org/3/license.html",
+    "quote": "Python software and documentation are licensed under the Python Software Foundation License Version 2. (Page footer: Copyright © 2001 Python Software Foundation. This page is licensed under the Python Software Foundation License Version 2.)"
+   },
+   "excerpt": "Sections 5 to 5.3.1 (up to, not including, 5.3.2 Finders and loaders); code listings (<pre> blocks) omitted."
+  }
+ ]
+}

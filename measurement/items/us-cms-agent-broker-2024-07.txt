@@ -1,0 +1,29 @@
+The Centers for Medicare & Medicaid Services (CMS) is committed to protecting consumers from bad actors and ensuring the program integrity of the Federally-facilitated Marketplace (FFM). That’s why CMS is taking additional action to address increases in unauthorized changes in consumers’ enrollments by agents and brokers. Starting on July 19, 2024, CMS will block an agent or broker from making changes to a consumer’s FFM enrollment unless the agent is already associated with the consumer’s enrollment. Today’s new steps build on CMS’ previous work to protect consumers on the FFM by suspending and terminating agents and brokers who perform unauthorized Marketplace activity.
+
+An agent or broker who is not already associated with a consumer’s enrollment must now take additional steps to update a consumer’s Marketplace enrollment, even with their consent. Unassociated or “new” agents and brokers will be required to conduct a three-way call with the consumer and the Marketplace Call Center or to direct the consumer to submit the change themselves through HealthCare.gov or via an approved Classic Direct Enrollment or Enhanced Direct Enrollment partner website with a consumer pathway.
+
+CMS anticipates these updates will help block unauthorized changes by agents and brokers to FFM enrollments. CMS will continue to monitor any malicious activity by agents or brokers on the Marketplace and will take additional appropriate action against agents and brokers engaged in misconduct.
+
+Updates on data
+
+In the first six months of 2024, CMS received 73,884 complaints of situations in which a consumer alleges that their plan was changed without their consent (“unauthorized plan switches”) and has resolved 72,381, or 97.97%, of these complaints.
+
+CMS continues to work to resolve the 1,503 unresolved cases of unauthorized plan switches within approximately 18 calendar days for complaints that were received between January and June of 2024.
+
+CMS also received 134,368 complaints of situations in which a consumer alleges that they have been enrolled without their consent (“unauthorized enrollments”) in the first six months of 2024; 130,187 of these cases, or 96.89%, have been resolved.
+
+About 4,181 unauthorized enrollment cases are still pending resolution. The overall resolution time for an unauthorized enrollment case received between January and June was 53 calendar days.
+
+For more information about case resolution activities, see CMS’ May 6 statement.
+
+Agent suspensions
+
+Between June 21, 2024, and July 10, 2024, CMS issued 200 suspensions of agent or broker Marketplace Agreements for reasonable suspicion of fraud or abusive conduct related to unauthorized enrollments or unauthorized plan switching. When an agent or broker’s Marketplace Agreement is suspended, they are prohibited from participating in the Marketplace enrollment process and, as such, receiving commission payments for enrollments through the Marketplace. CMS will continue with robust oversight and monitoring of suspicious system activities by some agents and brokers and anticipates future suspensions of the Marketplace Agreements for additional agents and brokers who are suspected of unauthorized activity over the coming months.
+
+Consumer information
+
+Additionally, this month, CMS began social media outreach to warn Marketplace consumers about potentially fraudulent activity by agents and brokers and misleading marketing sites.
+
+Consumers who believe they may have been the victim of unauthorized agent or broker activity should call the Marketplace Call Center at 1-800-318-2596 (TTY: 1-855-889-4325) for prompt resolution of any coverage issues.
+
+For more information, see CMS’ May 6 statement and consumer assistance infographic.

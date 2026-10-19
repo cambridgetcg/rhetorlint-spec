@@ -1,0 +1,63 @@
+In February 2022 there was a data loss incident and some personal details of some applicants to the Afghan Relocations and Assistance Policy (ARAP) scheme and the Afghanistan Locally Employed Staff Ex-Gratia scheme (EGS) may have been compromised. This page provides information and guidance for those who may have been affected.
+
+Applications submitted after 7 January 2022 are not affected by this incident.
+
+Background
+
+The Secretary of State for Defence’s Oral Statement to Parliament about the incident.
+
+In February 2022, under the previous government, a spreadsheet with names of individual applicants for the ARAP scheme was emailed outside of official government systems. This was mistakenly thought to contain the names of a small number of applicants, but in fact the email contained personal information linked to around 18,700 applicants of ARAP and its predecessor, the EGS scheme. The data related to applications made on or before 7 January 2022. A small section of this spreadsheet briefly appeared online on 14 August 2023, which is when the previous Government first became aware of the incident.
+
+Concerns about the safety of those whose details were contained on the spreadsheet prompted the previous Government to request an injunction, which was granted as a super-injunction by the High Court. This order prevented widespread knowledge of the incident, allowing the UK Government to take any necessary protective action.
+
+The Afghanistan Response Route (ARR) was established in April 2024 by the previous Government for those who had not previously been found eligible for ARAP but were judged to be potentially at the highest risk of reprisals by the Taleban as a result of the data incident.
+
+Due to the restrictions of the court order, it was not possible to make any details of the incident or of ARR public and knowledge of this matter had been restricted to individuals with an essential need to know. This route has now closed.
+
+We sincerely apologise for this data incident and that regrettably on this occasion, personal data was not safeguarded to the UK Government standard. At present, there is no evidence to suggest that the spreadsheet has been seen or used by others who might seek to exploit the information, however, the UK Government cannot rule out that possibility. We understand that this news may be concerning for many individuals.
+
+Check if you may have been affected
+
+Anyone potentially affected by this incident and whose contact details were known by the Ministry of Defence would have been sent an email notification. However, if your contact details changed you may not have received it.
+
+- Anyone who first applied to ARAP or EGS after 7 January 2022 is not affected.
+
+- If you applied to ARAP or EGS on or before 7 January 2022, find out whether you (and any family or dependants cited in your application) are potentially affected.
+
+Please note, if you have submitted multiple applications under either scheme, you should check every reference you have been given.
+
+Being potentially affected by the data incident is unlikely to change your eligibility under ARAP, as the eligibility criteria for the ARAP scheme has not changed.
+
+If you are not a potentially affected person but want to know more about the incident: please read through the linked webpages but do not send an enquiry (unless you have formal deputy powers for someone who is affected), as we cannot give any information about other people and additional questions will make it harder for us to respond to those who are affected.
+
+The Information Service Centre’s automated telephone service for this incident has now closed. Please use the available guidance to address any questions you may have or get in touch with your assigned caseworker.
+
+Security advice
+
+If you believe that you or your family members have been affected, you should be vigilant (watchful). You should be especially careful if an unknown person contacts you.
+
+We advise those potentially affected to:
+
+- Exercise caution and not take phone calls or respond to messages or emails from unknown contacts.
+
+- Limit who can see your social media profiles and not accept friend/follow requests from individuals you do not know and trust. You may also consider shutting the social media account down if you suspect any suspicious activity.
+
+- Monitor your online accounts to check for any unauthorised access or change in settings. Where possible use a Virtual Private Network (VPN).
+
+- Be wary of telling others that your personal data may be vulnerable. Informing others who are unconnected to the loss may draw attention to the fact that your personal data may be exploitable.
+
+If you are considering changing your email address, you should maintain access to the email address linked to your application, in case we need to contact you with further information.
+
+If you are outside the UK, please do not try to travel to a third country without a valid passport and visa. If you do so, you will be putting yourself at risk on the journey, and you may face the risk of being deported back to Afghanistan. We also cannot support you in a third country such as Pakistan unless you have already received an invitation to resettle in the UK and it has been confirmed by the UK Government that you have access to support in the third country.
+
+Scam emails and texts
+
+We are aware of scam emails and texts about compensation that have been sent to some Afghans affected by the data incident. Please note:
+
+- Any contact from the UK Ministry of Defence will be sent from email addresses ending in ‘@MOD.GOV.UK’.
+
+- If you receive emails or texts claiming to be from the UK Ministry of Defence DO NOT reply or click on links or attachments.
+
+- There is no fee attached to your ARAP or EGS application, offers made under the ARR or relocation through the ARP. Emails or texts requesting money for these schemes are scams.
+
+- For further advice on spotting and reporting scams, read the National Cyber Security Centre’s phishing guidance.

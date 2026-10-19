@@ -1,0 +1,75 @@
+Mr Speaker, I’d like to update the House on a data incident involving activity by a malign actor.
+
+In recent days, the Ministry of Defence has identified indications that a malign actor gained access to part of the Armed Forces payment network.
+
+This is an external system, completely separate to MOD’s core network, and it is not connected to the main military HR system.
+
+The House will wish to note that it is operated by a contractor, and there is evidence of potential failings by them, which may have made it easier for the malign actor to gain entry.
+
+A specialist security review of the contractor’s operations is underway and appropriate steps will be taken.
+
+The contractor-operated system in question held the personal data of regular and reserve personnel and some recently retired veterans.
+
+This includes names and bank details, and, in a smaller number of cases, addresses.
+
+In response to this incident, Mr Speaker, we have undertaken significant and immediate action, enacting a multi-point response plan to support and protect our people.
+
+I’d like to provide detail to the House on what this eight-point plan will deliver.
+
+Firstly, we immediately took the system offline. This has secured it against further similar threats.
+
+Secondly, we have launched a full investigation, drawing on Cabinet Office support and specialist external expertise to examine potential failings by the contractor and to minimise the risk of similar incidents in the future.
+
+Three – whilst our initial investigations have found no evidence that any data has been removed, as a precaution, we have today alerted those service personnel affected through the chain of command.
+
+In addition, we are also sending out letters to a small number of veterans who have retired and who may have been affected, as a precaution.
+
+The House will wish to note that the vast majority of our UK veterans’ community are, however, unaffected.
+
+Four – specialist advice and guidance on data security has been shared and will be available on gov.uk.
+
+Fifth, we have additionally set up a helpline to support individuals. This helpline is available now and the number is 01249 596665.
+
+Next, we are providing a commercial personal data protection service for serving personnel.
+
+This facility will constantly monitor each individual’s personal data and notify them of any irregularities.
+
+Even though we do not believe their information has been stolen, this will help bring peace of mind.
+
+Seven – welfare and financial advice is available where needed through each individual’s chains of command.
+
+And eight, on becoming aware of this incident, MOD stopped the processing of all payments and isolated the system.
+
+And I want to provide further detail on this particular step: We are making changes to the system to ensure it is secure before recommencing payments.
+
+I can confirm in the meantime all April salaries have been paid.
+
+Some service personnel will have experienced a slight delay in receiving some expense payments, however, we expect this to be fully resolved today, with money in their accounts by Friday.
+
+Furthermore, I can confirm that we are ensuring all high-value payments are unaffected.
+
+For example, all outstanding Forces Help To Buy and Terminal Benefits payments have been facilitated by a secure transfer.
+
+As mentioned – salary payments and pensions for veterans have not been affected and we do not expect them to be in the future.
+
+Mr Speaker, for reasons of national security we cannot release further details of the suspected cyber activity behind this incident.
+
+However, I can confirm to the House that we do have indications that this was the suspected work of a malign actor and we cannot rule out state involvement.
+
+This incident is further proof that the UK is facing rising and evolving threats and, as I set out in my speech at Lancaster House in January, the world is, I’m afraid, becoming somewhat more dangerous.
+
+Last month, this Government therefore announced an increase in defence spending to meet these new threats, reaching 2.5% of GDP by the end of the decade.
+
+Following this incident, I can also announce today that although this incident is entirely unrelated to our own MOD networks, we are also reviewing all personnel data to ensure our people’s data is secure.
+
+This was the work of a malign actor who compromised a contractor-run network, entirely separate from the MOD core system.
+
+However, as I’ve said, we cannot at this stage rule out state involvement from elsewhere.
+
+This eight-point plan outlines the immediate and significant action we have taken to protect our most precious resource, our people.
+
+And, even though this has occurred on a contractor system, with a malign actor involved – and we can’t rule out that foreign state involvement – I want to apologise to the men and women affected by this.
+
+It should not have happened, and this eight-point plan seeks to ensure it is put right and that it cannot happen again.
+
+I commend this statement to the House.

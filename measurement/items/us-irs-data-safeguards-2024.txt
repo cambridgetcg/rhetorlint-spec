@@ -1,0 +1,23 @@
+May 10, 2024
+
+During the past year, the IRS has taken dramatic steps to strengthen our internal systems, protocols and procedures by putting in place numerous improvements to bolster protection of key systems and information. These recent steps have sharply reduced risks for taxpayers and the tax system.
+
+- Further restricting user access. The IRS restructured operations to reduce the number of people with access to the most sensitive taxpayer data sets.
+
+- More robust protective security controls. The IRS updated data protection mechanisms including anonymization to better protect taxpayer information.
+
+- More frequent data reviews. The IRS continues strengthening review protocols to ensure more IRS oversight of data users and implemented strong new procedures to ensure that all network access is timely removed for users who separate from the IRS. In addition, the IRS has intensified efforts to ensure that sensitive system access is timely removed for users who separate from the IRS.
+
+- Improved firewalls. The IRS has added additional firewalls between key taxpayer information and the rest of the IRS, providing additional monitoring capabilities.
+
+- Stronger 24/7 monitoring. The IRS has expanded advanced analytics to detect and prevent risky data usage, providing improved insight into suspicious activities around the clock.
+
+- New tools. Helped by Inflation Reduction Act funding, the IRS is adding new analytical tools and dashboards to monitor user activity involving sensitive data. These tools will help to improve the detection of potential data misuse.
+
+- Less removable media. The IRS has dramatically reduced users’ ability to connect removable media, such as thumb drives, to IRS computers. The new protocol requires executive approval of those users who have legitimate business needs and close monitoring of user activity to watch for risky behavior. This step has significantly curtailed opportunities to remove sensitive taxpayer information from the IRS computing environment.
+
+- Tighter email controls. The IRS has dramatically strengthened email controls involving taxpayer information, including new restrictions on the ability to email information outside the IRS, while preserving but closely monitoring this ability when necessary for collaborating with non-IRS employees.
+
+- Collection and retention of detailed access logs. Key data sources inside the IRS have improved monitoring and event logs. The IRS now maintains evidentiary copies of database queries and data outputs, which improves surveillance of internal data use and preserves records of who accessed which data and when. Additionally, the IRS enforces an approved destination for data exports and prevents users from copying those files to unapproved drives or folders.
+
+- New printer controls. We monitor the information that is printed from IRS computers; any printing of personal or sensitive tax information is logged for IRS cybersecurity use.
