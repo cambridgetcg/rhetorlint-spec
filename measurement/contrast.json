@@ -149,6 +149,78 @@
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
+      "id": "strip.intensifier-loaded.06",
+      "text": "Nothing extremely bad happened.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "Nothing extremely bad happened.",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O4",
+      "reason": "'Nothing' negates what follows: deleting 'extremely' leaves 'Nothing bad happened.', a stronger claim than the source made. The guards read the agency lexicon's negators since guard lexicon version 2.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.07",
+      "text": "Nobody was extremely hurt.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "Nobody was extremely hurt.",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O4",
+      "reason": "'Nobody' is two words before 'extremely': deleting it leaves 'Nobody was hurt.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.08",
+      "text": "None of it was extremely bad.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "None of it was extremely bad.",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "'None' is four words before 'extremely' and the guard reads two, so strip leaves 'None of it was bad.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.09",
+      "text": "The risk is not at all extremely high.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "The risk is not at all extremely high.",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "'not' is three words before 'extremely' and the guard reads two, so strip leaves 'The risk is not at all high.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.10",
+      "text": "It is rarely extremely hot here.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "It is rarely extremely hot here.",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "'rarely' limits what follows as 'hardly' does, but only 'hardly' is a negator to the guards ('rarely', 'seldom', 'barely' and 'scarcely' are not), so strip leaves 'It is rarely hot here.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.11",
+      "text": "He called it 'utterly devastating' on air.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "He called it 'utterly devastating' on air.",
+      "kind": "quotation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "Strip reads only double quotation marks (straight, or U+201C and U+201D) on the intensifier's line, so it edits this single-quoted quotation and leaves a stray space: 'He called it ' devastating' on air.'",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
       "id": "lesson.intensifier-loaded.tremendously",
       "text": "We are tremendously excited to announce our partnership.",
       "ruleId": "intensifier.loaded",
@@ -547,9 +619,9 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
-      "reason": "A disclaimer: 'nothing' is not one of the guard's negators.",
+      "reason": "A disclaimer: 'nothing' negates 'guaranteed'. The guards read the agency lexicon's negators, 'nothing' among them, since guard lexicon version 2.",
       "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
     },
     {
@@ -2066,10 +2138,22 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
-      "reason": "A denial: no one's data was accessed. 'nobody' is not among the lexicon's negators (cannot, neither, never, no, none, nor, not, nothing), so the breach passive is marked; 'No one's data was accessed.' is not.",
+      "reason": "A denial: no one's data was accessed. 'nobody' is a negator since agency lexicon version 5, as the 'no' of 'No one's data was accessed.' already was.",
       "source": "constructed probe (package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.without-is-local",
+      "text": "Without warning, customer data was exposed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "mark",
+      "actual": "was exposed",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "'Without' negates only the word after it ('without warning'), not the clause: the breach is asserted and who exposed the data is not said. The guards read 'without' within two words of a match; the agency detector's clause reading does not read it.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
     },
     {
       "id": "lesson.agency.accounts-affected",
