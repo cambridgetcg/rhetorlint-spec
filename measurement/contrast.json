@@ -311,7 +311,7 @@
       "kind": "innocent-twin",
       "status": "known-defect",
       "tag": "O6",
-      "reason": "'No one' reports a factual zero count with a named source; it does not claim more than anyone could know.",
+      "reason": "'No one' reports a zero count and names who gave it ('the fire service said'); the words make no claim beyond their source.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -487,7 +487,7 @@
       "kind": "innocent-twin",
       "status": "known-defect",
       "tag": "O7",
-      "reason": "Honest uncertainty about a physical outcome, with practical advice attached.",
+      "reason": "'might' states uncertainty about a physical outcome and comes with practical advice; nothing is floated for later denial.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -854,7 +854,7 @@
       "kind": "innocent-twin",
       "status": "known-defect",
       "tag": "O7",
-      "reason": "A true civic fact about price, with no offer attached.",
+      "reason": "'free of charge' describes how a public service is priced; no offer is made to the reader.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -910,7 +910,7 @@
       "kind": "innocent-twin",
       "status": "known-defect",
       "tag": "O7",
-      "reason": "Public-health instruction (the FAST stroke message); the urgency is real and medical.",
+      "reason": "Public-health instruction (the FAST stroke message): the words tie the urgency to a stated sign and a stated action.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -932,7 +932,7 @@
       "kind": "innocent-twin",
       "status": "known-defect",
       "tag": "O7",
-      "reason": "A true astronomical deadline with the date given.",
+      "reason": "A deadline set by the comet's return, with the date given; nothing is sold and no pressure is put on a choice.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -1157,7 +1157,7 @@
       "status": "known-defect",
       "tag": "O2",
       "reason": "'is required' states a precondition; there is no act whose doer is hidden.",
-      "source": "wild: three-word boilerplate from an estate site snapshot (zerone.ai; motifs survey, 2026-10-19)"
+      "source": "wild: the opening words of a boilerplate sentence ('JavaScript is required for the ...'), which marks the same span in full; estate site snapshot (zerone.ai; motifs survey, 2026-10-19)"
     },
     {
       "id": "wild.agency.helen",
@@ -1168,7 +1168,7 @@
       "status": "known-defect",
       "tag": "O2",
       "reason": "A proper name that ends in -en after 'is'; no passive at all.",
-      "source": "wild: four-word news headline (motifs survey supplementary news snapshot, 2026-10-19)"
+      "source": "wild: the opening words of a longer news headline that names a public figure, which marks the same span in full; front-page snapshot of theguardian.com/international (motifs survey supplementary news, 2026-10-19)"
     },
     {
       "id": "wild.agency.soil",
@@ -1179,7 +1179,7 @@
       "status": "known-defect",
       "tag": "O2",
       "reason": "A methods-section passive: the measuring is procedure, not a fault, breach or decision whose doer is hidden.",
-      "source": "pastiche: invented science abstract (motifs survey item inv-science-abstract, 2026-10-19)"
+      "source": "pastiche: shortened from a sentence of an invented science abstract (motifs survey item inv-science-abstract, 2026-10-19)"
     },
     {
       "id": "wild.agency.soup",
@@ -1607,7 +1607,7 @@
       "actual": "were accessed",
       "kind": "specimen",
       "status": "holds",
-      "reason": "'were accessed': the clause about the worst data loss ends in an agentless breach passive.",
+      "reason": "'were accessed': the clause about card numbers and identity documents ends in an agentless breach passive.",
       "source": "https://www.prnewswire.com/news-releases/equifax-announces-cybersecurity-incident-involving-consumer-information-300515960.html (2017-09-07), as quoted in the Open Lens lexicon OL.AGENTDEL (cambridgetcg/open-lens)"
     },
     {
