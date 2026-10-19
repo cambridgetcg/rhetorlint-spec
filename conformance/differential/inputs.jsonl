@@ -1,0 +1,104 @@
+{"id":"case:0","source":"conformance/cases.json","text":"We take your privacy extremely seriously, and regrettably, mistakes were made. We are reaching out to affected users."}
+{"id":"case:1","source":"conformance/cases.json","text":"Everyone knows the plan is working, but what about their failures? Studies show we are the best."}
+{"id":"case:2","source":"conformance/cases.json","text":"I made a mistake and I will fix it by Friday."}
+{"id":"case:3","source":"conformance/cases.json","text":"The report was written by the committee."}
+{"id":"case:4","source":"conformance/cases.json","text":"We were tired and we were committed to the plan."}
+{"id":"case:5","source":"conformance/cases.json","text":"The system might have possibly failed, allegedly."}
+{"id":"case:6","source":"conformance/cases.json","text":"Mistakes were made and concerns were raised."}
+{"id":"case:7","source":"conformance/cases.json","text":"It is widely believed that experts agree."}
+{"id":"case:8","source":"conformance/cases.json","text":"This is obviously the only choice; there is no question."}
+{"id":"case:9","source":"conformance/cases.json","text":"We sincerely apologize for any inconvenience caused."}
+{"id":"case:10","source":"conformance/cases.json","text":"ACT NOW: this offer is gone forever. Limited time, absolutely free, no strings attached."}
+{"id":"case:11","source":"conformance/cases.json","text":"The door is open and the fee is ten USD."}
+{"id":"case:12","source":"conformance/cases.json","text":"The issuing of coins is carried out collectively by the network."}
+{"id":"case:13","source":"conformance/cases.json","text":"Shipments are often delayed."}
+{"id":"case:14","source":"conformance/cases.json","text":"It works every time, without exception."}
+{"id":"case:15","source":"conformance/cases.json","text":"People familiar with the matter said the merger was dead."}
+{"id":"case:16","source":"conformance/cases.json","text":"The senator ripped into the ruling and sparked outrage online."}
+{"id":"case:17","source":"conformance/cases.json","text":"The strike caused collateral damage in two villages."}
+{"id":"case:18","source":"conformance/cases.json","text":"An officer-involved shooting occurred at dawn; an altercation ensued."}
+{"id":"case:19","source":"conformance/cases.json","text":"The filing raises serious questions about the timeline."}
+{"id":"case:20","source":"conformance/cases.json","text":"The minister failed to mention the audit."}
+{"id":"case:21","source":"conformance/cases.json","text":"Tellingly, the report was released on a Friday."}
+{"id":"case:22","source":"conformance/cases.json","text":"The memo revealed that the audit was shelved."}
+{"id":"case:23","source":"conformance/cases.json","text":"A world-class team of visionary engineers."}
+{"id":"case:24","source":"conformance/cases.json","text":"The minister claimed that the figures were audited."}
+{"id":"case:25","source":"conformance/cases.json","text":"We won't be lectured by these so-called experts."}
+{"id":"case:26","source":"conformance/cases.json","text":"Sources claim that the deal is dead."}
+{"id":"case:27","source":"conformance/cases.json","text":"Sources claimed that the deal is dead."}
+{"id":"case:28","source":"conformance/cases.json","text":"The plan has been widely described as a visionary gamble."}
+{"id":"case:29","source":"conformance/cases.json","text":"Experts noted that inflation slowed."}
+{"id":"case:30","source":"conformance/cases.json","text":"The startup has been described as the next big thing by Forbes."}
+{"id":"probe:nbsp-agency","source":"scripts/xengine-diff.mjs","text":"Mistakes were\u00a0made."}
+{"id":"probe:nbsp-agency-twice","source":"scripts/xengine-diff.mjs","text":"Mistakes\u00a0were\u00a0made."}
+{"id":"probe:nbsp-urgency","source":"scripts/xengine-diff.mjs","text":"Let us act\u00a0now."}
+{"id":"probe:nbsp-hedge","source":"scripts/xengine-diff.mjs","text":"The system may\u00a0have failed."}
+{"id":"probe:nbsp-weasel","source":"scripts/xengine-diff.mjs","text":"Experts\u00a0say the plan works."}
+{"id":"probe:nbsp-lure","source":"scripts/xengine-diff.mjs","text":"Join today: 100%\u00a0free, no strings attached."}
+{"id":"probe:nbsp-whataboutism","source":"scripts/xengine-diff.mjs","text":"What\u00a0about their record?"}
+{"id":"probe:nbsp-intensifier-seam","source":"scripts/xengine-diff.mjs","text":"We are extremely\u00a0sorry."}
+{"id":"probe:nbsp-lexical-phrase","source":"scripts/xengine-diff.mjs","text":"No\u00a0one was told."}
+{"id":"probe:nbsp-sourcing","source":"scripts/xengine-diff.mjs","text":"People familiar with the\u00a0matter said so."}
+{"id":"probe:nbsp-shouting","source":"scripts/xengine-diff.mjs","text":"THIS\u00a0IS\u00a0OUTRAGEOUS"}
+{"id":"probe:thin-agency","source":"scripts/xengine-diff.mjs","text":"Mistakes were\u2009made."}
+{"id":"probe:thin-urgency","source":"scripts/xengine-diff.mjs","text":"Act\u2009now \u2013 stocks are low."}
+{"id":"probe:thin-elsewhere","source":"scripts/xengine-diff.mjs","text":"Prices rose 5\u2009% and the plan was shelved."}
+{"id":"probe:narrow-nbsp-agency","source":"scripts/xengine-diff.mjs","text":"Mistakes were\u202fmade."}
+{"id":"probe:ideographic-space-agency","source":"scripts/xengine-diff.mjs","text":"Mistakes were\u3000made."}
+{"id":"probe:line-separator-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u2028shared."}
+{"id":"probe:nel-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u0085shared."}
+{"id":"probe:bom-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\ufeffshared."}
+{"id":"probe:zero-width-space-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u200bshared."}
+{"id":"probe:rsquo-urgency","source":"scripts/xengine-diff.mjs","text":"Don\u2019t miss out on this deal."}
+{"id":"probe:rsquo-editorializing","source":"scripts/xengine-diff.mjs","text":"It\u2019s worth noting that sales fell."}
+{"id":"probe:rsquo-whataboutism","source":"scripts/xengine-diff.mjs","text":"Let\u2019s not forget who started it."}
+{"id":"probe:rsquo-possessive-agency","source":"scripts/xengine-diff.mjs","text":"The company\u2019s data was accessed."}
+{"id":"probe:rsquo-plural-possessive","source":"scripts/xengine-diff.mjs","text":"Customers\u2019 accounts were suspended."}
+{"id":"probe:rsquo-contrition","source":"scripts/xengine-diff.mjs","text":"We\u2019re committed to your safety."}
+{"id":"probe:single-quotes-agency","source":"scripts/xengine-diff.mjs","text":"\u2018Mistakes were made,\u2019 she said."}
+{"id":"probe:double-quotes-agency","source":"scripts/xengine-diff.mjs","text":"\u201cShots were fired,\u201d the report said."}
+{"id":"probe:nb-hyphen-lure","source":"scripts/xengine-diff.mjs","text":"Start your risk\u2011free trial."}
+{"id":"probe:nb-hyphen-distancing","source":"scripts/xengine-diff.mjs","text":"These so\u2011called experts say otherwise."}
+{"id":"probe:nb-hyphen-exoneration","source":"scripts/xengine-diff.mjs","text":"An officer\u2011involved shooting was investigated."}
+{"id":"probe:nb-hyphen-puffery","source":"scripts/xengine-diff.mjs","text":"A world\u2011class team was hired."}
+{"id":"probe:en-dash-by-nobody","source":"scripts/xengine-diff.mjs","text":"Mistakes were made \u2013 by nobody."}
+{"id":"probe:en-dash-reportedly","source":"scripts/xengine-diff.mjs","text":"Shots were fired \u2013 reportedly by police."}
+{"id":"probe:en-dash-range","source":"scripts/xengine-diff.mjs","text":"Between 2019\u20132021 the records were destroyed."}
+{"id":"probe:em-dash-agency","source":"scripts/xengine-diff.mjs","text":"The files were deleted\u2014quietly."}
+{"id":"probe:accent-elsewhere","source":"scripts/xengine-diff.mjs","text":"Caf\u00e9 data was accessed."}
+{"id":"probe:accent-before-match","source":"scripts/xengine-diff.mjs","text":"Des d\u00e9cisions regrettables were made."}
+{"id":"probe:accent-hedge-word","source":"scripts/xengine-diff.mjs","text":"It may have \u00e9t\u00e9 confirmed."}
+{"id":"probe:accent-in-participle","source":"scripts/xengine-diff.mjs","text":"The files were d\u00e9l\u00e8ted overnight."}
+{"id":"probe:accent-caps-lead","source":"scripts/xengine-diff.mjs","text":"\u00c9RRORS WERE MADE AT THE TOP"}
+{"id":"probe:accent-caps-inside","source":"scripts/xengine-diff.mjs","text":"THE D\u00c9B\u00c2CLE WAS COVERED UP"}
+{"id":"probe:accent-decomposed","source":"scripts/xengine-diff.mjs","text":"Cafe\u0301 records were altered."}
+{"id":"probe:combining-after-match","source":"scripts/xengine-diff.mjs","text":"Mistakes were made\u0301."}
+{"id":"probe:accent-weasel","source":"scripts/xengine-diff.mjs","text":"\u00c9conomistes disagree; experts say it works."}
+{"id":"probe:emoji-inside","source":"scripts/xengine-diff.mjs","text":"Mistakes \ud83d\ude00 were made."}
+{"id":"probe:emoji-between","source":"scripts/xengine-diff.mjs","text":"Mistakes were \ud83d\ude2c made."}
+{"id":"probe:emoji-urgency","source":"scripts/xengine-diff.mjs","text":"Act now \ud83d\udd25 limited time only!"}
+{"id":"probe:emoji-lead","source":"scripts/xengine-diff.mjs","text":"\ud83d\ude00 Your data was shared."}
+{"id":"probe:emoji-strip-seam","source":"scripts/xengine-diff.mjs","text":"We take your privacy extremely seriously \ud83d\ude4f."}
+{"id":"probe:emoji-zwj-sequence","source":"scripts/xengine-diff.mjs","text":"The \ud83d\udc68\u200d\ud83d\udcbb team were fired."}
+{"id":"probe:long-s-irregular","source":"scripts/xengine-diff.mjs","text":"Lives were lo\u017ft."}
+{"id":"probe:long-s-participle","source":"scripts/xengine-diff.mjs","text":"Your data was \u017fhared."}
+{"id":"probe:long-s-lexical","source":"scripts/xengine-diff.mjs","text":"It \u017feems the plan worked."}
+{"id":"probe:kelvin-participle","source":"scripts/xengine-diff.mjs","text":"Civilians were \u212ailled."}
+{"id":"probe:kelvin-lexical","source":"scripts/xengine-diff.mjs","text":"This is \u212aind of a problem."}
+{"id":"probe:context-tired-glad-aware-open","source":"scripts/xengine-diff.mjs","text":"Zo\u00eb was tired, Zo\u00eb was glad, and Zo\u00eb was aware that the caf\u00e9 was open."}
+{"id":"probe:context-worried-excited-interested","source":"scripts/xengine-diff.mjs","text":"Ren\u00e9e was worried; later she was excited and was interested."}
+{"id":"probe:context-scared-bored-pleased","source":"scripts/xengine-diff.mjs","text":"The ni\u00f1os were scared, then were bored, and were pleased at noon."}
+{"id":"probe:context-married-gifted-talented","source":"scripts/xengine-diff.mjs","text":"Jos\u00e9 is married; Ana is gifted; L\u00fc is talented."}
+{"id":"probe:context-detailed-limited-dedicated","source":"scripts/xengine-diff.mjs","text":"The report is detailed and is limited to 2024 \u2013 it is dedicated to S\u00f8ren."}
+{"id":"probe:context-committed-supposed-used-based","source":"scripts/xengine-diff.mjs","text":"We are committed to this; we were supposed to finish; the tool is used daily \u2013 it is based in Malm\u00f6."}
+{"id":"probe:context-open-even-sudden","source":"scripts/xengine-diff.mjs","text":"The door is open, the score is even, the change was sudden \u2013 se\u00f1or."}
+{"id":"probe:context-seven-ten-eleven","source":"scripts/xengine-diff.mjs","text":"The total is seven, the floor is ten, and the team is eleven \u2013 ol\u00e9."}
+{"id":"probe:context-golden-wooden","source":"scripts/xengine-diff.mjs","text":"The crown is golden and the bench is wooden in the ch\u00e2teau."}
+{"id":"probe:context-often","source":"scripts/xengine-diff.mjs","text":"It is often said that the caf\u00e9 is often full."}
+{"id":"probe:context-irregular","source":"scripts/xengine-diff.mjs","text":"In Z\u00fcrich, mistakes were made, data was sent and kept, and lives were lost."}
+{"id":"probe:context-by-agent","source":"scripts/xengine-diff.mjs","text":"The report was written by the comit\u00e9."}
+{"id":"probe:context-by-particle","source":"scripts/xengine-diff.mjs","text":"The issuing is carried out collectively by the r\u00e9seau."}
+{"id":"probe:vertical-tab-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u000bshared."}
+{"id":"probe:vertical-tab-urgency","source":"scripts/xengine-diff.mjs","text":"Act\u000bnow."}
+{"id":"probe:form-feed-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\fshared."}
+{"id":"probe:unit-separator-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u001fshared."}
