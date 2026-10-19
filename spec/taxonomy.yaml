@@ -35,8 +35,6 @@
 #      so does a declaration the engine no longer needs.
 #
 #      Open defect tags used below:
-#        O2  agency-hiding.deleted-subject marks a passive without reading its
-#            context, even where the doer is named nearby or no doer is at issue.
 #        O6  absolute.universal matches bare absolutes word by word: it marks
 #            the 'never' of a plain statement of policy, and it misses the False
 #            Dilemma phrase its own lesson teaches ('the only option').
@@ -269,12 +267,6 @@ families:
           - marked: "An altercation ensued and a bystander was hurt."
             tell: "altercation ensued"
             plain: "The guard shoved the vendor, and a bystander was knocked down."
-            plain_also_marks:
-              - ruleId: agency-hiding.deleted-subject
-                actual: "was knocked"
-                status: known-defect
-                tag: "O2"
-                reason: "The clause before names the doer and the deed ('The guard shoved the vendor'); the detector reads each passive alone, so it asks 'who?' of a sentence that has already answered."
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (RhetorLint-authored pattern under a SemEval technique — the contrition.rehearsed precedent; structural kin: agency-hiding.deleted-subject. Seedable only where a deed-noun demands a doer; 'died in police custody' is deliberately NOT marked — intransitive 'died' states a death, not a deed, and marking it would presume an act the sentence never states)"
 
       - id: insinuation.raises-questions
@@ -285,12 +277,6 @@ families:
           - marked: "The filing raises serious questions about the timeline."
             tell: "raises serious questions about"
             plain: "The filing shows the contract was signed two weeks before the vote; the auditor asks whether the board knew."
-            plain_also_marks:
-              - ruleId: agency-hiding.deleted-subject
-                actual: "was signed"
-                status: known-defect
-                tag: "O2"
-                reason: "The rewrite's point is when the contract was signed, not who signed it; no doer is at issue, and the detector cannot tell a dated record from an accountable passive."
           - marked: "Questions swirled around the campaign's finances."
             tell: "Questions swirled around"
             plain: "Three donors asked the campaign to explain a $2m transfer; it has not yet done so."
@@ -489,12 +475,6 @@ families:
           - marked: "The minister claimed that the figures were audited."
             tell: "claimed that"
             plain: "The minister said the figures were audited; the auditor's office declined to confirm."
-            plain_also_marks:
-              - ruleId: agency-hiding.deleted-subject
-                actual: "were audited"
-                status: known-defect
-                tag: "O2"
-                reason: "'were audited' reports a routine procedure, not an accountable act, and the same sentence names the office that would have done it; the detector reads the passive alone and cannot tell a procedure from an evaded actor."
           - marked: "He insisted that nothing was wrong."
             tell: "insisted that"
             plain: "Asked three times, he said nothing was wrong."
@@ -582,7 +562,7 @@ families:
   - id: agency-hiding
     semeval_parent: "(RhetorLint extension — not in SemEval)"
     what: "Sentence structure that removes the actor: the harm is described, but who chose it is gone."
-    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar, so it earns its own family."
+    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive of an act someone answers for), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar: the same participle is a tell in 'mistakes were made' and procedure in 'samples were collected', so the family reads the auxiliary, the verb and the noun before it together, and earns its own place."
     seeded_tells: 1
     tells:
 
@@ -591,8 +571,9 @@ families:
         # NOT a SemEval technique. The parenthesis is load-bearing: it keeps the
         # label off SemEval's Obfuscation bucket, so a technique-level join to a
         # SemEval corpus drops this tell rather than silently absorbing it.
-        what: "An agentless passive — 'mistakes were made', 'your account was closed' — a sentence whose grammar has no subject, so who acted has been deleted."
+        what: "An agentless past passive of an accountable act — 'mistakes were made', 'your data was shared' — a fault, a breach, a concealment or a decision whose doer the clause never names."
         why_it_works: "No actor, no accountability: the harm reads like weather that simply happened rather than a choice a specific someone made."
+        benign_reading: "Most passives hide nothing, so most are unmarked by design: present, modal and procedural passives ('the option is ignored', 'the soup can be frozen', 'samples were collected at dawn'); clauses that name the agent ('...by Forbes'), including a 'by' that names only when ('shelved by Friday', a known under-mark); and harm and news verbs whose doer the words alone cannot establish ('lives were lost in the earthquake', 'your account was closed at your request')."
         examples:
           - marked: "Mistakes were made and your account was closed"
             tell: "Mistakes were made"
