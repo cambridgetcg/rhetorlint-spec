@@ -43,6 +43,15 @@ The same pattern string is compiled by the JavaScript, Python and Go engines, so
 
 So the pattern is built to match **nothing** under a case-insensitive compile. Each shouted word must open and close with `[A-Z]` around `[^\x00-\x40\x5b-\x7f]` — everything except the ASCII characters outside `A–Z`. Compiled case-insensitively that class rejects letters of either case, and the rule falls silent instead of firehosing. Under-marking is the doctrine: on an old engine the tell is lost, never invented. That class also admits accented capitals inside a word, so `CAFÉS ARE OPEN` is one run.
 
+### Typographic variants
+
+Published text often sets an apostrophe as U+2019 (the typographic apostrophe) and a hyphen as U+2010 (hyphen), U+2011 (non-breaking hyphen) or U+2013 (en dash). A tell spelt only in ASCII goes silent on that text, so since 0.2.1 the pack spells the variants itself, and no engine has to normalise anything:
+
+- a pattern writes an apostrophe as `['\u2019]` and a hyphen as `[-\u2010\u2011\u2013]`, keeping the space where the ASCII class had one (`risk[-\u2010\u2011\u2013 ]free`);
+- a lexical rule lists each term that holds an apostrophe or hyphen once per variant (`so-called`, `so\u2010called`, `so\u2011called`, `so\u2013called`), with every hyphen in a term set the same way.
+
+`rules.json` writes the variants as `\u` escapes, because U+2011 cannot be told from `-` in review. The variants add no field and no `minEngine`, so any engine that reads 0.2.0 reads 0.2.1. [`test/typography.test.mjs`](../../test/typography.test.mjs) fails when an ASCII term or pattern literal gains an apostrophe or hyphen without its variants, and the JavaScript, Python and Go engines are held to the same twelve typographic probes. Other look-alikes, such as U+02BC or an em dash, are not spelt: a tell written with them stays unmarked rather than guessed at.
+
 ## The seed families
 
 22 rules across 6 of the taxonomy's 7 families:
