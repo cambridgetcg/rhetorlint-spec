@@ -455,3 +455,29 @@ test("every reject fixture throws with its line number", () => {
     });
   }
 });
+
+test("the reader reads whitespace and line breaks as YAML does, or refuses", () => {
+  // Built with fromCharCode so the invisible characters stay visible in review.
+  const [NBSP, NEL, LS, NUL] = [0xa0, 0x85, 0x2028, 0x00].map((c) => String.fromCharCode(c));
+  // PyYAML 6.0.3 reads a no-break space as content, never as a blank line.
+  assert.deepEqual(parseTaxonomyYaml(`k: >\n  a\n  ${NBSP}\n`), { k: `a ${NBSP}\n` });
+  // Clip chomping keeps a final line break only if the text has one.
+  assert.deepEqual(parseTaxonomyYaml("k: >\n  a\n  b"), { k: "a b" });
+  assert.deepEqual(parseTaxonomyYaml("k: >\n  a\n  b\n"), { k: "a b\n" });
+  const refusals = [
+    [`k: a${NBSP}\n`, 1, "plain (unquoted) scalars"], // PyYAML reads the no-break space as content
+    [`k: 1\n${NBSP}\nj: 2\n`, 2, "expected 'key: value'"], // not a blank line
+    [`k: "a${NEL}b"\n`, 1, "U+0085"], // PyYAML folds NEL to a space
+    [`k: >\n  a${LS}b\n`, 2, "U+2028"],
+    [`k: "a${NUL}b"\n`, 1, "U+0000"],
+    ['k: "a"\t\n', 1, "double-quoted scalar"],
+  ];
+  for (const [text, line, fragment] of refusals) {
+    assert.throws(() => parseTaxonomyYaml(text), (error) => {
+      assert.ok(error instanceof TaxonomyYamlError, String(error));
+      assert.equal(error.line, line, error.message);
+      assert.ok(error.message.includes(fragment), error.message);
+      return true;
+    }, JSON.stringify(text));
+  }
+});

@@ -1,0 +1,7 @@
+# reject: line 6: a sequence item must be '- key: value'
+version: "0.1"
+families:
+  - id: call
+    tells:
+      - # an empty item is null in YAML, not a comment
+      - id: urgency.appeal-to-time

@@ -17,7 +17,11 @@
 // single quotes, literal '|' blocks, flow mappings, tabs in indentation,
 // duplicate keys and lone CR characters are all outside the subset, so the file
 // cannot drift into syntax this reader would misread. (CRLF line endings, as a
-// Windows checkout may produce, read as LF, exactly as YAML reads them.)
+// Windows checkout may produce, read as LF, exactly as YAML reads them.) So are
+// characters YAML refuses (C0/C1 controls, DEL, U+FFFE/U+FFFF) and the ones it
+// reads as line breaks (NEL, U+2028, U+2029). The only whitespace this reader
+// trims or skips is the ASCII space: YAML reads a no-break or ideographic space
+// as content, so a line holding one is never treated as blank.
 // scripts/check-taxonomy-yaml.py confirms the reader agrees with PyYAML's
 // safe_load.
 //
@@ -44,23 +48,27 @@ const IMPLICIT_WORD = /^(?:y|n|yes|no|true|false|on|off|null|~)$/i;
 const KEY_LINE = /^([A-Za-z_][A-Za-z0-9_]*):(?: +(.*))?$/;
 const SLUG = /^[a-z][a-z0-9.-]*$/;
 const INTEGER = /^-?(?:0|[1-9][0-9]*)$/;
+// Outside YAML's printable set (tab, LF and CR aside), or a non-LF line break.
+const REFUSED_CHAR = /[^\t\n\r\x20-\x7E\xA0-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]|[\u2028\u2029]/u;
+const BLANK = /^ *$/;
+const trimSpaces = (s) => s.replace(/^ +| +$/g, "");
 
-/** Drop a trailing comment ('#' after whitespace, outside double quotes). */
+/** Drop a trailing comment ('#' after a space, outside double quotes). */
 function stripTrailingComment(value, line) {
   let quoted = false;
   for (let i = 0; i < value.length; i++) {
     const ch = value[i];
     if (ch === '"') quoted = !quoted;
     else if (ch === "#" && !quoted && (i === 0 || value[i - 1] === " ")) {
-      return value.slice(0, i).trimEnd();
+      return trimSpaces(value.slice(0, i));
     }
   }
   if (quoted) fail(line, "unterminated double-quoted scalar");
-  return value.trimEnd();
+  return trimSpaces(value);
 }
 
 function flowSequence(value, line) {
-  const inner = value.slice(1, -1).trim();
+  const inner = trimSpaces(value.slice(1, -1));
   if (inner === "") return [];
   const items = [];
   let rest = inner;
@@ -110,11 +118,16 @@ export function parseTaxonomyYaml(text) {
   const lines = text.replace(/\r\n/g, "\n").split("\n");
   lines.forEach((s, i) => {
     if (s.includes("\r")) fail(i + 1, "a CR outside a CRLF line ending is outside the subset");
+    const refused = s.match(REFUSED_CHAR);
+    if (refused) {
+      const code = refused[0].codePointAt(0).toString(16).toUpperCase().padStart(4, "0");
+      fail(i + 1, `character U+${code} is a control character YAML refuses, or a line break other than LF; outside the subset`);
+    }
     if (/^ *\t/.test(s)) fail(i + 1, "tab indentation is outside the subset");
   });
 
   let i = 0; // index of the current line; its line number is i + 1
-  const skippable = (s) => s.trim() === "" || /^ *#/.test(s);
+  const skippable = (s) => BLANK.test(s) || /^ *#/.test(s);
   const indentOf = (s) => s.match(/^ */)[0].length;
   function peek() {
     while (i < lines.length && skippable(lines[i])) i++;
@@ -130,7 +143,8 @@ export function parseTaxonomyYaml(text) {
     for (let s = peek(); s !== null && indentOf(s) === indent; s = peek()) {
       const body = s.slice(indent);
       if (!body.startsWith("-")) fail(i + 1, "a mapping key cannot follow sequence items at the same indent");
-      if (!/^- [^ ]/.test(body)) fail(i + 1, "a sequence item must be '- key: value' (one space after the dash)");
+      // "- # note" is an empty (null) item in YAML, not a comment line.
+      if (!/^- [^ #]/.test(body)) fail(i + 1, "a sequence item must be '- key: value' (one space after the dash)");
       // Re-read "- key: v" as a mapping whose keys sit at indent + 2.
       lines[i] = " ".repeat(indent + 2) + body.slice(2);
       out.push(mapping(indent + 2));
@@ -145,9 +159,9 @@ export function parseTaxonomyYaml(text) {
     let contentIndent = null;
     while (i < lines.length) {
       const s = lines[i];
-      if (s.trim() === "") {
+      if (BLANK.test(s)) {
         let j = i;
-        while (j < lines.length && lines[j].trim() === "") j++;
+        while (j < lines.length && BLANK.test(lines[j])) j++;
         if (contentIndent !== null && j < lines.length && indentOf(lines[j]) >= contentIndent) {
           fail(i + 1, "a blank line inside a folded scalar is outside the subset");
         }
@@ -167,7 +181,9 @@ export function parseTaxonomyYaml(text) {
       i++;
     }
     if (parts.length === 0) fail(keyLine, "a '>' folded scalar has no content");
-    return parts.join(" ") + "\n"; // folded, clip chomping
+    // Folded, clip chomping: keep the final line break, if the text has one
+    // (a scalar that ends the file without a newline has none).
+    return parts.join(" ") + (i < lines.length ? "\n" : "");
   }
 
   function mapping(indent) {
