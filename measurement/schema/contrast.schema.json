@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/cambridgetcg/rhetorlint-spec/main/measurement/schema/contrast.schema.json",
   "title": "RhetorLint contrast set",
-  "description": "Minimal pairs for every rule: sentences that must be marked, innocent twins that must not, and strip probes whose output must keep every truth-bearing word. Each row records what the WORDS should get (expect) and whether the engine at this revision does (status). The data is engine-neutral: no offsets, so a JS, Python or Go runner reads it unchanged. test/contrast.test.mjs enforces this schema plus the rules it cannot express (the validator in test/helpers implements no conditionals): 'actual' goes with expect 'mark' and only with it; 'strip' goes with expect 'strip-preserves' and only with it; a known-defect row carries a tag; a priced-in row expects 'silent' and cites a file:line that resolves; text is ASCII unless kind is 'typography'; the file itself is ASCII, with smart punctuation written as \\u escapes.",
+  "description": "Minimal pairs for every rule: sentences that must be marked, innocent twins that must not, and strip probes whose output must keep every truth-bearing word. Each row records what the WORDS should get (expect) and whether the engine at this revision does (status). The data is engine-neutral: no offsets, so a JS, Python or Go runner reads it unchanged. test/contrast.test.mjs enforces this schema plus the rules it cannot express (the validator in test/helpers implements no conditionals): 'actual' goes with expect 'mark' and only with it; 'strip' goes with expect 'strip-preserves' and only with it; a known-defect row carries a tag; a priced-in row expects 'silent' and cites a file:line that names the span it accepts; text is ASCII unless kind is 'typography'; the file itself is ASCII, with smart punctuation written as \\u escapes.",
   "type": "object",
   "required": ["version", "note", "tags", "rows"],
   "additionalProperties": false,
@@ -100,7 +100,7 @@
         "cite": {
           "type": "string",
           "pattern": "^[A-Za-z0-9_][A-Za-z0-9._/-]*:[1-9][0-9]*$",
-          "description": "repo-relative path:line. Required on priced-in rows (the line that accepts the false positive); optional elsewhere."
+          "description": "repo-relative path:line. Required on priced-in rows (the line that accepts the false positive), and that line must contain the span the engine marks, so a cite that drifts when the file is edited fails the test; optional elsewhere, where it must resolve to a non-blank line."
         },
         "source": {
           "type": "string",

@@ -28,12 +28,12 @@ function judge(row) {
   const result = analyze(row.text, { rules: RULES });
   const spans = result.marks.filter((mark) => mark.ruleId === row.ruleId).map((mark) => mark.actual);
   if (row.expect === "mark") {
-    return { holds: spans.includes(row.actual), fires: spans.length > 0, got: `marks ${JSON.stringify(spans)}` };
+    return { holds: spans.includes(row.actual), fires: spans.length > 0, spans, got: `marks ${JSON.stringify(spans)}` };
   }
   if (row.expect === "silent") {
-    return { holds: spans.length === 0, fires: spans.length > 0, got: `marks ${JSON.stringify(spans)}` };
+    return { holds: spans.length === 0, fires: spans.length > 0, spans, got: `marks ${JSON.stringify(spans)}` };
   }
-  return { holds: result.strip === row.strip, fires: false, got: `strip ${JSON.stringify(result.strip)}` };
+  return { holds: result.strip === row.strip, fires: false, spans, got: `strip ${JSON.stringify(result.strip)}` };
 }
 
 function wanted(row) {
@@ -105,7 +105,17 @@ test("every row keeps the rules the schema cannot express", () => {
       if (row.expect !== "silent") say("priced-in means an accepted false positive, so expect must be 'silent'");
       if (row.cite === undefined) say("a priced-in row must cite the file:line that accepts its false positive");
     }
-    if (row.cite !== undefined && citedLine(row.cite) === null) say(`cite ${row.cite} does not resolve to a non-blank line in this repo`);
+    const line = row.cite === undefined ? undefined : citedLine(row.cite);
+    if (line === null) say(`cite ${row.cite} does not resolve to a non-blank line in this repo`);
+    // A line number survives edits above it only by luck. The line a priced-in
+    // row cites must name the very span it accepts, so a shifted cite fails here
+    // instead of silently pointing at another sentence. (A row that stopped
+    // marking is reported by the priced-in test below.)
+    const spans = VERDICTS.get(row.id).spans;
+    if (row.status === "priced-in" && line && spans.length > 0 &&
+        !spans.some((span) => line.toLowerCase().includes(span.toLowerCase()))) {
+      say(`cite ${row.cite} does not mention the false positive it prices in (${JSON.stringify(spans)}); has the line moved?`);
+    }
   }
   assert.deepEqual(problems, []);
 });
