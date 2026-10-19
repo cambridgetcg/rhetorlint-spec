@@ -396,9 +396,10 @@ test("the agency detector leaves procedure, named agents, harm verbs and idioms 
 });
 
 test("the agency detector leaves a negated passive, and 'affected' after an unheld noun, unmarked", () => {
-  // A negator in the auxiliary chain, as the head word or among the five words
-  // before it denies the act; it hides no doer. 'affected' and 'impacted' need
-  // a head held in trust for someone (data, an account).
+  // A negator anywhere in the clause before the auxiliary (in the chain, as the
+  // head word or before it, however long the subject) denies the act; it hides
+  // no doer. 'affected' and 'impacted' need a head held in trust for someone
+  // (data, an account).
   for (const text of [
     "Your data was never sold.",
     "Your information has never been sold.",
@@ -412,6 +413,11 @@ test("the agency detector leaves a negated passive, and 'affected' after an unhe
     "No mistakes have been made.",
     "No personal, financial or health information was accessed.",
     "We do not believe their information has been stolen.",
+    "No credit card numbers, bank account details or passwords were stolen.",
+    "No Social Security numbers or other sensitive personal information were exposed.",
+    "No a b c d e mistakes were made.",
+    // A comma starts no clause, so this act goes unmarked too: a recorded miss.
+    "No one called, but data were stolen.",
     "Twelve patients were affected.",
     "Roughly 2,000 flights were impacted after the storm."
   ]) {
@@ -420,9 +426,13 @@ test("the agency detector leaves a negated passive, and 'affected' after an unhe
   for (const [text, actual] of [
     ["Approximately 4,000 accounts may have been affected.", "been affected"],
     ["Your personal information may have been impacted.", "been impacted"],
-    // A negator outside the window, or behind a head stop, is not read.
+    // A negator behind a head stop, in an earlier clause, or after the passive
+    // it would deny, is not read.
     ["No: mistakes were made.", "were made"],
-    ["No a b c d e mistakes were made.", "were made"]
+    ["No one called; data were stolen.", "were stolen"],
+    ["No one called\ndata were stolen.", "were stolen"],
+    ["Data was accessed and no records were leaked.", "was accessed"],
+    ["No data was accessed. Records were leaked.", "were leaked"]
   ]) {
     const at = text.indexOf(actual);
     assert.deepEqual(agencySpans(text), [[actual, at, at + actual.length]], text);
