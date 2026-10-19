@@ -55,7 +55,7 @@ printable ASCII plus tab, LF and CR. Outside that, the three engines part in
 three independent ways. None is fixed. If you are writing a fourth engine, read
 all three before you start, because you cannot conform to something the
 reference engines themselves disagree on. The third reaches into ASCII itself:
-a vertical tab already parts Go from the other two.
+a vertical tab parts Go from the other two, and U+001F parts Python from them.
 
 ### 1. Offsets are counted in three different units
 
@@ -131,6 +131,17 @@ ASCII. Word counts, and so `density.per100Words`, also use each language's own
 whitespace: JS's `\S+`, Python's `\S+` and Go's `strings.Fields` already
 disagree on U+FEFF and U+0085.
 
+Under-marking is the doctrine, so in each of these splits the engine that marks
+less fails in the safe direction. No one engine is always that engine. JS and
+Go under-mark on accented letters. JS alone does on long s, and on a Kelvin
+sign inside a participle. Go alone does on the vertical tab and on the spaces
+JS and Python share, U+00A0 among them. On U+FEFF only JS marks, and on U+0085
+and U+001F only Python does. And
+failing safe is not agreeing: no locale pack with non-ASCII orthography can be
+conformance-tested until the spec pins matching semantics as well as offsets.
+Do not read the ASCII corpus as evidence that these engines agree on French,
+Turkish, or Greek. They do not.
+
 ## Beyond the cases: the three-engine differential
 
 The 31 cases pin values. The differential asks a wider question: do the three
@@ -193,10 +204,5 @@ that the others did not, and a reason. The record is a two-way ratchet:
 
 So the file always says exactly where the engines part today. After an engine
 change, run `--write-divergences`, read the diff, and write a reason for any new
-entry. Today it holds 27 entries, all from caveats 2 and 3.
-
-Under-marking is the doctrine, so JS and Go fail in the safe direction here. But
-failing safe is not agreeing, and it means no locale pack with non-ASCII
-orthography can be conformance-tested until the spec pins matching semantics as
-well as offsets. Do not read the ASCII corpus as evidence that these engines
-agree on French, Turkish, or Greek. They do not.
+entry. Every entry in it today comes from caveat 2 or 3; the check prints how
+many there are.
