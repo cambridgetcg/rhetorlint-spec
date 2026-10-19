@@ -199,7 +199,33 @@ const PROBES = [
   ["abs-emoji-before-never", "\ud83d\udd12 Never share your password."],
   ["abs-nbsp-after-never", "Never\u00a0share it."],
   ["abs-accented-word-before-never", "Caf\u00e9 never closes."],
-  ["abs-greek-word-before-never", "\u03a9 never fails."]
+  ["abs-greek-word-before-never", "\u03a9 never fails."],
+  // The guard's comma rule: a comma ends a negator's reach once a word stands
+  // between them, but not when it follows the negator directly; strip's
+  // negator still reads past a comma. And the imperative's closed lists: a word
+  // that cannot be the verb, the adverbs stepped over, and how a word is cut.
+  ["abs-comma-after-noun", "No fees, always free."],
+  ["abs-comma-after-verb", "Don't wait, everyone is buying."],
+  ["abs-comma-after-word-tab", "No risk,\tguaranteed."],
+  ["abs-comma-right-after-negator", "Past performance is not, however, always a guide."],
+  ["abs-comma-right-after-word-one", "No, never."],
+  ["abs-comma-strip-unchanged", "It isn't, frankly, extremely high."],
+  ["abs-never-fragment", "Battery life? Never an issue."],
+  ["abs-never-inversion-has", "Never has a product been this good."],
+  ["abs-never-inversion-before", "Never before have prices been this low."],
+  ["abs-never-ever-imperative", "Never ever share your password."],
+  ["abs-never-adverb-then-end", "Never ever again."],
+  ["abs-never-adverb-newline", "Never again\nshare it."],
+  ["abs-never-adverb-capital", "Never again Share it."],
+  ["abs-never-mixed-case-next", "Go; never hAS it."],
+  ["abs-never-prefix-word", "Never answer it."],
+  ["abs-never-contraction-next", "Never can't stop."],
+  ["abs-comma-curly-quoted-values", "Values are \u201cnever\u201d, \u201calways\u201d and \u201cauto\u201d."],
+  ["abs-comma-emoji-after-word", "No fees, \ud83d\ude00 always free."],
+  ["abs-fullwidth-comma", "No risk\uff0c guaranteed."],
+  ["abs-never-nbsp-after-adverb", "Never again\u00a0will prices fall."],
+  ["abs-never-accented-next", "Never \u00e9t\u00e9 again."],
+  ["abs-never-rsquo-in-next", "Never can\u2019t stop."]
 ];
 
 const isAscii = (text) => /^[\x00-\x7f]*$/.test(text);
