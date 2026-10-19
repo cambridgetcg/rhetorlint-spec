@@ -162,7 +162,9 @@ alone never runs it. The whole check takes about two seconds.
 **Inputs.** `differential/inputs.jsonl` holds one `{id, source, text}` per line.
 It is built from committed, licence-clean sources only:
 - the inputs of `cases.json`;
-- the paragraphs of `measurement/items/*.txt`, when present;
+- the paragraphs of `measurement/items/*.txt`, when present. These rows keep
+  their item's licence, not the repository's MIT licence: see
+  `measurement/items.json` and `measurement/NOTICE`;
 - the texts of `measurement/contrast.json`, when present;
 - the constructed probes in `scripts/xengine-diff.mjs`. These are non-ASCII
   text built around the characters above: U+00A0 and other spaces, U+2019,

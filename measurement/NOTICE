@@ -7,6 +7,10 @@ licence, source URL, retrieval date, licence evidence and the exact excerpt
 kept are recorded in measurement/items.json. The repository's MIT licence
 covers the repository's own code; it does not relicense the texts below.
 
+conformance/differential/inputs.jsonl also carries these items, split into
+paragraphs, one per row; each row names its item in `source`. The notices
+below apply to those rows as well.
+
 1. UK Crown copyright (OGL-UK-3.0)
 ----------------------------------
 Items: uk-laa-data-breach-2025, uk-laa-data-update-2026,
