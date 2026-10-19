@@ -107,6 +107,11 @@ AGENCY_REQUIRES = {"put": "in place"}
 AGENCY_UNLESS = {"exposed": "to"}
 # END GENERATED AGENCY LEXICON
 
+# ASCII-only lowercasing: A-Z to a-z and nothing else. The agency matcher and
+# the guards read words through it, so no engine folds a non-ASCII letter into
+# a word it looks for, and the lowercased copy keeps the text's length.
+_ASCII_LOWER = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
+
 # The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
 # clause leaves unstated, exactly as packages/core/index.mjs does (its comment
 # there is the full statement). A mark needs a past auxiliary (was, were,
@@ -119,9 +124,8 @@ AGENCY_UNLESS = {"exposed": "to"}
 # Matching runs on an ASCII-lowercased copy with no IGNORECASE, explicit
 # AGENCY_WHITESPACE ([ \t\n\r\f]) and re.ASCII word boundaries, so a
 # non-ASCII letter is never folded into a word and a no-break space never joins
-# two. The guards walk characters from the match, except the negator reader,
-# which searches with lookbehinds that read before its pos (JavaScript and Go
-# walk the same words). None applies an anchored pattern at an offset
+# two. The guards walk characters from the match, as the JavaScript and Go
+# engines do. None applies an anchored pattern at an offset
 # (re.match(text, pos) never matches '^' at pos > 0).
 
 # Each participle and the head class it needs ("" for none).
@@ -170,16 +174,10 @@ def _agency_head_word(low, index):
     return ""
 
 
-# A negator word, or the word "t" of an n't contraction ("n", then an
-# apostrophe, U+0027 or U+2019, then "t"), each whole: a word is a maximal run
-# of the characters _is_agency_word_char accepts, so neither side of a match
-# may touch one. The lookbehinds read before a search's pos, so a search from
-# pos finds the words a walk from the start of the text would.
-_AGENCY_NEGATOR_WORD = re.compile(
-    r"(?<![a-z0-9_])(?:"
-    + "|".join(sorted(AGENCY_NEGATORS, key=lambda w: (-len(w), w)))
-    + r")(?![a-z0-9_])|(?<=n['\u2019])t(?![a-z0-9_])"
-)
+def _agency_contraction(low, start):
+    """True when the word "t" at start ends an n't contraction: "n", then an
+    apostrophe (U+0027 or U+2019)."""
+    return start >= 2 and low[start - 2 : start] in ("n'", "n\u2019")
 
 
 def _agency_negation_reader(low):
@@ -187,22 +185,27 @@ def _agency_negation_reader(low):
     in increasing order, whether a negator (AGENCY_NEGATORS, or an n't
     contraction) stands anywhere between the start of that index's clause and
     the index: after the last AGENCY_HEAD_STOPS character before it, or from
-    the start of the text. It reads each stretch of text once, with str.rfind
-    and one regex search, so a clause with many passives costs one pass. Each
-    index is a candidate's start, just after a \\b, so no word runs across it
-    and the search's endpos cuts none."""
+    the start of the text. It reads forward and never twice, so a clause with
+    many passives costs one pass. The same character walk as JavaScript's and
+    Go's."""
     i = 0
     negated = False
+    n = len(low)
 
     def read(index):
         nonlocal i, negated
-        stop = max(low.rfind(c, i, index) for c in AGENCY_HEAD_STOPS)
-        if stop >= 0:
-            negated = False
-            i = stop + 1
-        if not negated and _AGENCY_NEGATOR_WORD.search(low, i, index):
-            negated = True
-        i = index
+        while i < index:
+            if not _is_agency_word_char(low[i]):
+                if low[i] in AGENCY_HEAD_STOPS:
+                    negated = False
+                i += 1
+                continue
+            start = i
+            while i < n and _is_agency_word_char(low[i]):
+                i += 1
+            word = low[start:i]
+            if word in AGENCY_NEGATORS or (word == "t" and _agency_contraction(low, start)):
+                negated = True
         return negated
 
     return read
@@ -296,8 +299,6 @@ _NEVER_PASS_THROUGH = frozenset({
     "again", "ever", "once"
 })
 # END GENERATED GUARD LEXICON
-# ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
-_ASCII_LOWER = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
 _REGEX_META = frozenset(r"\^$.*+?()[]{}|")
 
 

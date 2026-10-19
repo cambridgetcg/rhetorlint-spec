@@ -225,19 +225,20 @@ func agencyContraction(low string, start int) bool {
 	return strings.HasSuffix(low[:start], "n'") || strings.HasSuffix(low[:start], "n\u2019")
 }
 
-// agencyNegationReader reads the lowercased text forward, once. Its negatedAt
-// method reports, for each index it is given in increasing order, whether a
-// negator (agencyNegators, or an n't contraction) stands anywhere between the
-// start of that index's clause and the index: after the last agencyHeadStops
-// byte before it, or from the start of the text. Reading forward and never
-// twice, a clause with many passives costs one pass.
+// agencyNegationReader reads the lowercased text forward, once. Its
+// clauseNegated method reports, for each index it is given in increasing
+// order, whether a negator (agencyNegators, or an n't contraction) stands
+// anywhere between the start of that index's clause and the index: after the
+// last agencyHeadStops byte before it, or from the start of the text. Reading
+// forward and never twice, a clause with many passives costs one pass. (The
+// guards' negatedAt reads only the two words before a match.)
 type agencyNegationReader struct {
 	low     string
 	i       int
 	negated bool
 }
 
-func (r *agencyNegationReader) negatedAt(index int) bool {
+func (r *agencyNegationReader) clauseNegated(index int) bool {
 	low := r.low
 	for r.i < index {
 		if !isAgencyWordByte(low[r.i]) {
@@ -325,7 +326,7 @@ func agentlessPassives(text string) []hit {
 		if head := agencyHeadOf[participle]; head != "" && !agencyHeads[head][agencyHeadWord(low, start)] {
 			continue
 		}
-		if negation.negatedAt(start) {
+		if negation.clauseNegated(start) {
 			continue
 		}
 		out = append(out, hit{start, end - start, text[start:end]})
@@ -628,14 +629,7 @@ func isGuardWordRune(r rune) bool {
 }
 
 func isNegator(word string) bool {
-	// ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
-	lower := []byte(word)
-	for i, c := range lower {
-		if c >= 'A' && c <= 'Z' {
-			lower[i] = c + ('a' - 'A')
-		}
-	}
-	w := strings.Trim(string(lower), "'\u2019")
+	w := strings.Trim(asciiLower(word), "'\u2019")
 	return negators[w] || strings.HasSuffix(w, "n't") || strings.HasSuffix(w, "n\u2019t")
 }
 
