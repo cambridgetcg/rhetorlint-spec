@@ -32,6 +32,14 @@ function literal(name, open, close) {
 
 const FAMILIES = literal("FAMILIES", "[", "]");
 const WORKED = literal("WORKED", "{", "}");
+const LABEL_UNDER_REVIEW = literal("LABEL_UNDER_REVIEW", "{", "}");
+
+// The tells whose own lesson the taxonomy declares a known gap: an example's
+// tell that the rule does not mark (spec/taxonomy.yaml known_gaps). Their
+// technique label names a phrase the rule does not mark yet.
+const LESSON_GAPS = new Map(TAXONOMY.families.flatMap((f) => (f.tells || []).filter((t) =>
+  (t.known_gaps || []).some((gap) => (t.examples || []).some((ex) => ex.tell === gap.tell))
+).map((t) => [t.id, t.known_gaps.map((gap) => gap.tell)])));
 
 const SHIPPED = new Set(RULES.rules.map((r) => r.technique));
 const techniquesOf = (familyId) =>
@@ -202,7 +210,11 @@ test("the 'Marks today' line and the planned badge are read off the pack at rend
     const section = sections.get(f.id);
     const techniques = techniquesOf(f.id);
     if (techniques.length) {
-      assert.deepEqual(scopeLine(section, "Marks today"), techniques, `${f.id}: 'Marks today' disagrees with the pack`);
+      const labelled = techniques.map((technique) => {
+        const rule = RULES.rules.find((r) => r.family === f.id && r.technique === technique && LABEL_UNDER_REVIEW[r.ruleId]);
+        return rule ? `${technique} (label under review: ${LABEL_UNDER_REVIEW[rule.ruleId]})` : technique;
+      });
+      assert.deepEqual(scopeLine(section, "Marks today"), labelled, `${f.id}: 'Marks today' disagrees with the pack`);
       assert.doesNotMatch(section, /class="planned"/, `${f.id} has rules but shows 'planned'`);
     } else {
       assert.equal(scopeLine(section, "Marks today"), null, `${f.id} has no rules but claims to mark something`);
@@ -216,6 +228,33 @@ test("the 'Marks today' line and the planned badge are read off the pack at rend
   const attack = learnSections(renderPage(without).learn).get("attack-on-reputation");
   assert.equal(scopeLine(attack, "Marks today"), null, "'Marks today' must come from the inlined pack");
   assert.match(attack, /class="planned"/, "the planned badge must come from the inlined pack");
+});
+
+test("a technique whose own lesson is a known gap is shown as a label under review, and no other", () => {
+  assert.deepEqual(Object.keys(LABEL_UNDER_REVIEW).sort(), [...LESSON_GAPS.keys()].sort(),
+    "LABEL_UNDER_REVIEW must name exactly the tells whose lesson spec/taxonomy.yaml declares a known gap");
+  for (const [ruleId, gaps] of LESSON_GAPS) {
+    for (const gap of gaps) {
+      assert.ok(LABEL_UNDER_REVIEW[ruleId].includes(gap), `${ruleId}: the review note must name the unmarked '${gap}'`);
+      const marks = analyze(gap, { rules: RULES }).marks.filter((m) => m.ruleId === ruleId);
+      assert.deepEqual(marks, [], `${ruleId} now marks '${gap}': drop the review note and the known gap`);
+    }
+  }
+  const simplification = learnSections(renderPage().learn).get("simplification");
+  assert.match(simplification, /False Dilemma or No Choice \(label under review: /);
+});
+
+test("the agency-hiding description claims only the 'by' window the detector reads", () => {
+  const f = FAMILIES.find((x) => x.id === "agency-hiding");
+  const number = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][LEXICON.byWindow];
+  assert.match(f.what, new RegExp(`no \u201cby\u201d among the next ${number} words of its clause`),
+    "the description must state the 'by' window as spec/agency-lexicon.json sets it");
+  // packages/core/README.md: it still asks "who?" where a nearby clause has answered.
+  assert.ok(analyze("Mistakes were made, and I made them.", { rules: RULES }).marks.some((m) => m.family === "agency-hiding"));
+  assert.doesNotMatch(f.what, /no doer named nearby|names no doer|doer is not named/i,
+    "the detector reads a 'by' window, not whether a doer is named nearby");
+  // Procedural passives of listed verbs are marked, so 'Left unmarked' may not claim procedure as a class.
+  assert.doesNotMatch(f.unmarked, /procedural/i);
 });
 
 test("every worked example fires its own rule under the current pack", () => {
@@ -252,4 +291,9 @@ test("the strip legend claims no more than the strip flags", () => {
   const legend = HTML.match(/<p class="strip-legend">([\s\S]*?)<\/p>/)[1];
   assert.doesNotMatch(legend, /each agentless passive/i);
   assert.match(legend, /each passive the agency-hiding rule marks/);
+  // The intensifier guard reads two words back and double quotes on one line,
+  // no more: 'not at all extremely high' and a single-quoted quotation lose
+  // their intensifier (open O4 rows in measurement/contrast.json).
+  assert.match(legend, /negated within two words, or inside double quotes on its line, stays/);
+  assert.equal(analyze("The risk is not at all extremely high.", { rules: RULES }).strip, "The risk is not at all high.");
 });

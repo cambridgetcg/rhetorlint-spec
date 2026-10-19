@@ -512,7 +512,7 @@
       <div class="card col-strip">
         <p class="sect-label">Strip &mdash; the de-spun text</p>
         <div class="strip-out" id="strip"></div>
-        <p class="strip-legend">Deterministic counterfactual, no model: loaded intensifiers are subtracted (a negated or quoted one stays) and each passive the agency-hiding rule marks is flagged with <span class="who">[who?]</span>. Modality, attribution, and other tells stay intact. This is a reading aid, not a guarantee of grammatical or meaning-preserving revision.</p>
+        <p class="strip-legend">Deterministic counterfactual, no model: loaded intensifiers are subtracted (one negated within two words, or inside double quotes on its line, stays) and each passive the agency-hiding rule marks is flagged with <span class="who">[who?]</span>. Modality, attribution, and other tells stay intact. This is a reading aid, not a guarantee of grammatical or meaning-preserving revision.</p>
       </div>
 
     </div>
@@ -1896,14 +1896,28 @@
       what: "Pushes the audience to act right now, before they can weigh it — manufactured urgency.",
       notYet: ["Slogans", "Conversation Killer"] },
     { id: "agency-hiding", label: "Agency-hiding",
-      what: "Deletes who acted — a was, were or been passive whose verb is on a closed list of fault, breach, concealment, data-disclosure and decision verbs, with no doer named nearby ('mistakes were made', 'your data was shared'). RhetorLint's structural extension to the SemEval taxonomy.",
+      what: "Deletes who acted — a was, were or been passive whose verb is on a closed list of fault, breach, concealment, data-disclosure and decision verbs, with no “by” among the next seven words of its clause ('mistakes were made', 'your data was shared'). It reads no other clause, so a doer named in the next one does not silence it ('Mistakes were made, and I made them.'), and the listed verbs keep innocent senses that are still marked ('tax was withheld', 'unknown keys were ignored'). RhetorLint's structural extension to the SemEval taxonomy.",
       notYet: [],
-      unmarked: "present and modal 'be' passives ('is executed', 'can be frozen'), procedural ones ('samples were collected'), negated ones ('no customer data was accessed') and harm verbs whose doer the words cannot establish ('lives were lost'). Most passives hide nothing." }
+      unmarked: "present and modal 'be' passives ('is executed', 'can be frozen'), routine data handling ('samples were collected', 'records were retained'), negated ones ('no customer data was accessed') and harm verbs whose doer the words cannot establish ('lives were lost'). Most passives hide nothing." }
   ];
 
   // The techniques a family's rules carry, in pack order, without repeats.
   const techniquesInFamily = (id) =>
     [...new Set(RULES.rules.filter((r) => r.family === id).map((r) => r.technique || ""))].filter(Boolean);
+
+  // A rule whose taxonomy lesson declares its own tell a known gap
+  // (spec/taxonomy.yaml known_gaps) carries a technique label naming a phrase
+  // the rule does not mark yet. The label is the taxonomy's to change, so the
+  // "Marks today" line shows it as under review, with what the rule does
+  // mark. test/explorer-truth.test.mjs holds this map to known_gaps.
+  const LABEL_UNDER_REVIEW = {
+    "absolute.universal": "it marks absolutes; 'the only option' is not marked yet"
+  };
+  const techniqueLabel = (familyId, technique) => {
+    const rule = RULES.rules.find((r) =>
+      r.family === familyId && r.technique === technique && LABEL_UNDER_REVIEW[r.ruleId]);
+    return rule ? technique + " (label under review: " + LABEL_UNDER_REVIEW[rule.ruleId] + ")" : technique;
+  };
 
   const rulesInFamily = (id) => RULES.rules.filter((r) => r.family === id);
 
@@ -2055,7 +2069,8 @@
       html += '<p class="fam-desc">' + escapeHtml(fam.what) + '</p>';
       const shipped = techniquesInFamily(fam.id);
       if (shipped.length) {
-        html += '<p class="fam-scope"><b>Marks today:</b> ' + shipped.map(escapeHtml).join(" · ") + '</p>';
+        html += '<p class="fam-scope"><b>Marks today:</b> ' +
+          shipped.map((t) => escapeHtml(techniqueLabel(fam.id, t))).join(" · ") + '</p>';
       }
       if (fam.notYet.length) {
         html += '<p class="fam-scope"><b>Not yet marked:</b> ' + fam.notYet.map(escapeHtml).join(" · ") + '</p>';
