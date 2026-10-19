@@ -30,10 +30,10 @@ Every implementation, in any language, emits this one JSON shape. Analyzing the 
     "actual":   "were made",                         // the visible phrase
     "position": { "start": { "line": 1, "column": 69, "offset": 68 },
                   "end":   { "line": 1, "column": 78, "offset": 77 } },
-    "note":     "an agentless passive — who acted is deleted from the sentence",
+    "note":     "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
     "expected": ["(name who did it: 'I/we + verb')"],
-    "confidence": 0.7,                                // heuristic, NOT a lie probability
-    "level":    "warning"
+    "confidence": 0.6,                                // heuristic, NOT a lie probability
+    "level":    "note"
   }],
   "strip":   "We take your privacy seriously, and regrettably, mistakes [who?] were made. We are reaching out to affected users.",
   "rewrite": null,                                    // only non-null with a model adapter

@@ -44,7 +44,7 @@ node scripts/demo.mjs
   · [manipulative-wording]  "extremely"
       an intensifier — turns up the emotional volume without adding fact
   · [agency-hiding]  "were made"
-      an agentless passive — who acted is deleted from the sentence
+      a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause
   · [manipulative-wording]  "reaching out to"
       a hedge — lowers a promise you can later deny
 
@@ -112,7 +112,7 @@ The claim that "engines are just implementations of the spec" is not a promise h
 | [`impl/go/rhetorlint.go`](impl/go) | Go (stdlib only) | `go -C impl/go test ./...` |
 
 ```bash
-npm run test:conformance     # 39/39 cases — JS and Python only
+npm run test:conformance     # 58/58 cases — JS and Python only
 go -C impl/go test ./...     # the third engine; CI runs all three on every push
 ```
 
@@ -143,6 +143,6 @@ scripts/demo.mjs                                           a 20-line taste
 
 ## Status
 
-`0.2` — the seed, plus the media wave. The taxonomy carries seven families; six of them ship at least one rule, twenty-two rules in all. The 2026-07 media wave taught the pack the newsroom's own tells — anonymous-source formulas, combat framing, institutional euphemism, exoneration formulas, question-frame insinuation, implicative shortfalls, stance markers, factive and doubt-casting attribution, puffery, and distancing sneers — every rule adversarially reviewed before it shipped, and added zero marks on an uncommitted 105-item headline corpus during review (precision only); committed per-rule precision, and recall against a small gold set that is not blind, are in measurement/report.json. attack-on-reputation now carries its first two carefully-scoped seeds (the mark lands on the writer's own operator word, never on an inferred target); justification stays unseeded until it can be marked without guessing at intent. It still under-marks by design. The hard, unfinished work is the structural check-type (agency-hiding beyond simple passive needs real grammar awareness). Contributions of tell families and locales welcome once the contribution guide lands.
+`0.2` — the seed, plus the media wave. The taxonomy carries seven families; six of them ship at least one rule, twenty-two rules in all. The 2026-07 media wave taught the pack the newsroom's own tells — anonymous-source formulas, combat framing, institutional euphemism, exoneration formulas, question-frame insinuation, implicative shortfalls, stance markers, factive and doubt-casting attribution, puffery, and distancing sneers — every rule adversarially reviewed before it shipped, and added zero marks on an uncommitted 105-item headline corpus during review (precision only); committed per-rule precision, and recall against a small gold set that is not blind, are in measurement/report.json. attack-on-reputation now carries its first two carefully-scoped seeds (the mark lands on the writer's own operator word, never on an inferred target); justification stays unseeded until it can be marked without guessing at intent. It still under-marks by design. The hard, unfinished work is the structural check-type: agency-hiding now marks only accountable past passives (a fault, breach, concealment or decision verb with no named doer, from one lexicon every engine is generated from), and anything beyond that needs real grammar awareness. Contributions of tell families and locales welcome once the contribution guide lands.
 
 MIT (engine + rules) · CC-BY-SA-4.0 (taxonomy corpus).

@@ -11,9 +11,9 @@ The English **tell-pack** for RhetorLint: declarative rules for the families of 
   "technique": "Obfuscation (structural — RhetorLint extension)",
   "type": "structural",
   "detector": "agentless-passive",
-  "level": "warning",
-  "confidence": 0.7,
-  "note": "an agentless passive — who acted is deleted from the sentence",
+  "level": "note",
+  "confidence": 0.6,
+  "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
   "expected": ["(name who did it: 'I/we + verb')"]
 }
 ```
@@ -27,6 +27,10 @@ The English **tell-pack** for RhetorLint: declarative rules for the families of 
 | `structural` | a named built-in `detector` (currently `agentless-passive`) | agency-hiding |
 
 Simple regex and word-lists cover most families. The structural check-type is what RhetorLint's deleted-subject / agency-hiding tells need — and the part that wants real grammar awareness over time.
+
+### The accountable-passive detector behind `agency-hiding.deleted-subject`
+
+Since core 0.1.4 the `agentless-passive` detector marks only an accountable past passive whose doer the clause does not name: `was`, `were` or `been`, at most one adverb, then a participle of a fault, a breach or a concealment ("Records were withheld"), a light verb after an error or decision noun ("Mistakes were made"), `raised` after a challenge noun ("Concerns were raised"), `decided` after `it`, or `shared`, `sold` or `disclosed` after a data noun ("Your data was shared"). A `by` among the next seven words of the clause silences it, whether it names an agent ("…by Forbes") or only a time ("shelved by Friday", a known under-mark). Present, modal and procedural passives, harm and news verbs ("Lives were lost in the earthquake"), and routine data handling (`collected`, `retained`, `transferred`) are unmarked by design. The word lists are not in this pack: they live in [`spec/agency-lexicon.json`](../../spec/agency-lexicon.json), which a generator writes into every engine, because a new rule field would make core 0.1.3 reject the whole pack. The pack changed only the rule's note, level (`warning` → `note`) and confidence (0.7 → 0.6), so 0.2.1 still loads on core 0.1.3, which keeps the old, wider detector.
 
 Two optional fields qualify a `pattern` rule:
 
@@ -72,7 +76,7 @@ Every other absolute is marked as before. The guard is keyed by ruleId in the en
 | `distraction` | `deflection.whataboutism` |
 | `attack-on-reputation` | `attribution.doubt-verb` · `distancing.doubt-marker` |
 | `call` | `urgency.appeal-to-time` |
-| `agency-hiding` | `agency-hiding.deleted-subject` |
+| `agency-hiding` | `agency-hiding.deleted-subject` (accountable past passives; see above) |
 
 `justification` is named in the taxonomy and not yet seeded here.
 
