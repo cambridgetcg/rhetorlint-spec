@@ -4,8 +4,10 @@
 other, value for value. `measurement/` asks a different question: when the
 reference engine marks a phrase, would a careful reader agree that the phrase
 does the work the rule names? The two are kept apart on purpose. Changing a
-label here can never change an engine's ground truth, and nothing in
-`conformance/` depends on these files.
+label here can never change an engine's ground truth: `conformance/cases.json`
+does not depend on these files. The three-engine differential in
+`conformance/differential/` does reuse the item paragraphs and the contrast
+texts as inputs, but never their labels.
 
 What this measures is precision (are the marks right?) and, through the gold
 spans, a little recall (are the phrases a reader marked found at all?). It does
@@ -21,8 +23,9 @@ person who wrote the text.
 | `labels.json` | one reader's label for every mark, keyed by `(item, ruleId, start, end)` |
 | `gold.json` | spans a reader marked before looking at the engine's output, for recall |
 | `baseline.json` | per-rule FPB and FPW counts of the canonical engine; the ratchet |
+| `contrast.json` | must-mark rows, innocent twins and strip probes; `test/contrast.test.mjs` keeps each row's status (holds, known-defect, priced-in) equal to what the engine does, and `report.json` counts the open known defects per tag |
 | `report.json` | the generated report (`node scripts/measure.mjs --write`) |
-| `schema/*.schema.json` | the shapes of items, labels and gold |
+| `schema/*.schema.json` | the shapes of items, labels, gold and contrast |
 | `NOTICE` | licence notices for the third-party texts |
 | `local/` | gitignored: uncommittable evidence (see below) |
 
@@ -119,6 +122,7 @@ node --test test/measurement.test.mjs
 4. If the item is target-genre, annotate any gold spans **before** running a detector on it.
 5. Run `node --test test/measurement.test.mjs`. Hand-label every proposal row it prints and add the rows to `labels.json`. Do not copy the engine's view: label what the phrase does in context.
 6. Run `node scripts/measure.mjs --write`. If false positives were added, update `baseline.json` and say why in the commit message.
+7. Run `node scripts/xengine-diff.mjs --build-inputs`, then `node scripts/xengine-diff.mjs`: the differential takes the new item's paragraphs as inputs. A new non-ASCII divergence needs `--write-divergences` and a reason written by a person.
 
 ## measurement/local/
 
