@@ -27,7 +27,7 @@ NAME = "rhetorlint (python)"
 CORE_VERSION = "0.1.4"
 
 # BEGIN GENERATED AGENCY LEXICON
-# spec/agency-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
+# spec/agency-lexicon.json version 3, written by scripts/gen-agency-lexicon.mjs.
 # Edit the lexicon and rerun the generator; --check fails when this block drifts.
 AGENCY_WHITESPACE = " \t\n\r\f"
 AGENCY_SPACE = "[ \\t\\n\\r\\f]+"
@@ -46,7 +46,6 @@ AGENCY_BY_WINDOW = 7
 AGENCY_NEGATORS = frozenset({
     "cannot", "neither", "never", "no", "none", "nor", "not", "nothing"
 })
-AGENCY_NEGATOR_WINDOW = 5
 AGENCY_HEADS = {
     "challenge": frozenset({
         "allegations", "concerns", "questions"
@@ -114,14 +113,16 @@ AGENCY_UNLESS = {"exposed": "to"}
 # been), at most one adverb, a participle from a closed class, the head word
 # its class names, its AGENCY_REQUIRES phrase and not its AGENCY_UNLESS word,
 # no "by" among the next AGENCY_BY_WINDOW words of the clause, and no negator
-# in the auxiliary chain, as the head word or among the AGENCY_NEGATOR_WINDOW
-# words before the head.
+# anywhere in its clause before the auxiliary: after the last
+# AGENCY_HEAD_STOPS character, or from the start of the text.
 #
 # Matching runs on an ASCII-lowercased copy with no IGNORECASE, explicit
 # AGENCY_WHITESPACE ([ \t\n\r\f]) and re.ASCII word boundaries, so a
 # non-ASCII letter is never folded into a word and a no-break space never joins
-# two. The guards walk characters from the match; none applies an anchored
-# pattern at an offset (re.match(text, pos) never matches '^' at pos > 0).
+# two. The guards walk characters from the match, except the negator reader,
+# which searches with lookbehinds that read before its pos (JavaScript and Go
+# walk the same words). None applies an anchored pattern at an offset
+# (re.match(text, pos) never matches '^' at pos > 0).
 
 # Each participle and the head class it needs ("" for none).
 _AGENCY_HEAD_OF = {
@@ -169,41 +170,42 @@ def _agency_head_word(low, index):
     return ""
 
 
-def _agency_contraction(low, start):
-    """True when the word "t" at start ends an n't contraction: "n", then an
-    apostrophe (U+0027 or U+2019). It never slices from a negative index."""
-    return start >= 2 and low[start - 2:start] in ("n'", "n\u2019")
+# A negator word, or the word "t" of an n't contraction ("n", then an
+# apostrophe, U+0027 or U+2019, then "t"), each whole: a word is a maximal run
+# of the characters _is_agency_word_char accepts, so neither side of a match
+# may touch one. The lookbehinds read before a search's pos, so a search from
+# pos finds the words a walk from the start of the text would.
+_AGENCY_NEGATOR_WORD = re.compile(
+    r"(?<![a-z0-9_])(?:"
+    + "|".join(sorted(AGENCY_NEGATORS, key=lambda w: (-len(w), w)))
+    + r")(?![a-z0-9_])|(?<=n['\u2019])t(?![a-z0-9_])"
+)
 
 
-def _agency_negated(low, index):
-    """True when a negator stands in the auxiliary chain before index, is the
-    head word, or is one of the AGENCY_NEGATOR_WINDOW words before the head.
-    It walks the words _agency_head_word walks, never past AGENCY_HEAD_STOPS;
-    when _agency_head_word finds no head, only the chain is read."""
-    i = index
-    left = -1  # words still to read before the head; -1 until the head is read
-    seen = 0
-    while left != 0:
-        while i > 0 and not _is_agency_word_char(low[i - 1]):
-            if low[i - 1] in AGENCY_HEAD_STOPS:
-                return False
-            i -= 1
-        end = i
-        while i > 0 and _is_agency_word_char(low[i - 1]):
-            i -= 1
-        if i == end:
-            return False
-        word = low[i:end]
-        if word in AGENCY_NEGATORS or (word == "t" and _agency_contraction(low, i)):
-            return True
-        if left > 0:
-            left -= 1
-        elif word not in AGENCY_SKIP and not word.endswith(AGENCY_SKIP_SUFFIX):
-            left = AGENCY_NEGATOR_WINDOW
-        elif seen == AGENCY_SKIP_MAX:
-            return False
-        seen += 1
-    return False
+def _agency_negation_reader(low):
+    """A reader of the lowercased text that answers, for each index it is given
+    in increasing order, whether a negator (AGENCY_NEGATORS, or an n't
+    contraction) stands anywhere between the start of that index's clause and
+    the index: after the last AGENCY_HEAD_STOPS character before it, or from
+    the start of the text. It reads each stretch of text once, with str.rfind
+    and one regex search, so a clause with many passives costs one pass. Each
+    index is a candidate's start, just after a \\b, so no word runs across it
+    and the search's endpos cuts none."""
+    i = 0
+    negated = False
+
+    def read(index):
+        nonlocal i, negated
+        stop = max(low.rfind(c, i, index) for c in AGENCY_HEAD_STOPS)
+        if stop >= 0:
+            negated = False
+            i = stop + 1
+        if not negated and _AGENCY_NEGATOR_WORD.search(low, i, index):
+            negated = True
+        i = index
+        return negated
+
+    return read
 
 
 def _agency_by_follows(low, index):
@@ -245,6 +247,7 @@ def _agency_phrase_follows(low, index, phrase):
 def _agentless_passives(text):
     """Every accountable agentless passive, as (index, length, actual)."""
     low = text.translate(_ASCII_LOWER)
+    negated = _agency_negation_reader(low)
     out = []
     for m in AGENCY_CANDIDATE.finditer(low):
         start, end = m.start(), m.end()
@@ -260,7 +263,7 @@ def _agentless_passives(text):
         head = _AGENCY_HEAD_OF[participle]
         if head and _agency_head_word(low, start) not in AGENCY_HEADS[head]:
             continue
-        if _agency_negated(low, start):
+        if negated(start):
             continue
         out.append((start, end - start, text[start:end]))
     return out

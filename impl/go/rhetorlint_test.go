@@ -608,6 +608,13 @@ func TestAgencyDetector(t *testing.T) {
 			"No mistakes have been made.",
 			"No personal, financial or health information was accessed.",
 			"We do not believe their information has been stolen.",
+			// However long the subject: a negator anywhere in the clause before
+			// the auxiliary denies the act.
+			"No credit card numbers, bank account details or passwords were stolen.",
+			"No Social Security numbers or other sensitive personal information were exposed.",
+			"No a b c d e mistakes were made.",
+			// A comma starts no clause, so this act goes unmarked too: a recorded miss.
+			"No one called, but data were stolen.",
 			"Twelve patients were affected.",
 			"Roughly 2,000 flights were impacted after the storm.",
 		} {
@@ -618,8 +625,13 @@ func TestAgencyDetector(t *testing.T) {
 		for _, c := range [][2]string{
 			{"Approximately 4,000 accounts may have been affected.", "been affected"},
 			{"Your personal information may have been impacted.", "been impacted"},
+			// A negator behind a head stop, in an earlier clause, or after the
+			// passive it would deny, is not read.
 			{"No: mistakes were made.", "were made"},
-			{"No a b c d e mistakes were made.", "were made"},
+			{"No one called; data were stolen.", "were stolen"},
+			{"No one called\ndata were stolen.", "were stolen"},
+			{"Data was accessed and no records were leaked.", "was accessed"},
+			{"No data was accessed. Records were leaked.", "were leaked"},
 		} {
 			at := strings.Index(c[0], c[1])
 			want := []string{fmt.Sprintf("%s@%d-%d", c[1], at, at+len(c[1]))}
@@ -635,14 +647,13 @@ func TestAgencyDetector(t *testing.T) {
 			t.Fatalf("read spec/agency-lexicon.json: %v", err)
 		}
 		var lex struct {
-			Whitespace    string              `json:"whitespace"`
-			HeadStops     string              `json:"headStops"`
-			ClauseBreaks  string              `json:"clauseBreaks"`
-			Negators      []string            `json:"negators"`
-			NegatorWindow int                 `json:"negatorWindow"`
-			Auxiliaries   []string            `json:"auxiliaries"`
-			Heads         map[string][]string `json:"heads"`
-			Classes       []struct {
+			Whitespace   string              `json:"whitespace"`
+			HeadStops    string              `json:"headStops"`
+			ClauseBreaks string              `json:"clauseBreaks"`
+			Negators     []string            `json:"negators"`
+			Auxiliaries  []string            `json:"auxiliaries"`
+			Heads        map[string][]string `json:"heads"`
+			Classes      []struct {
 				ID          string   `json:"id"`
 				Head        *string  `json:"head"`
 				Participles []string `json:"participles"`
@@ -658,8 +669,8 @@ func TestAgencyDetector(t *testing.T) {
 			t.Errorf("character sets %q %q %q, spec %q %q %q", agencyWhitespace, agencyHeadStops, agencyClauseBreaks,
 				lex.Whitespace, lex.HeadStops, lex.ClauseBreaks)
 		}
-		if agencyNegatorWindow != lex.NegatorWindow || len(agencyNegators) != len(lex.Negators) {
-			t.Errorf("negators %v (window %d), spec %q (window %d)", agencyNegators, agencyNegatorWindow, lex.Negators, lex.NegatorWindow)
+		if len(agencyNegators) != len(lex.Negators) {
+			t.Errorf("negators %v, spec %q", agencyNegators, lex.Negators)
 		}
 		for _, w := range lex.Negators {
 			if !agencyNegators[w] {

@@ -42,7 +42,7 @@ type agencyClass struct {
 }
 
 // BEGIN GENERATED AGENCY LEXICON
-// spec/agency-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
+// spec/agency-lexicon.json version 3, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
 const (
 	agencyWhitespace   = " \t\n\r\f"
@@ -70,8 +70,6 @@ var agencyNegators = map[string]bool{
 	"cannot": true, "neither": true, "never": true, "no": true, "none": true, "nor": true, "not": true,
 	"nothing": true,
 }
-
-const agencyNegatorWindow = 5
 
 var agencyHeads = map[string]map[string]bool{
 	"challenge": map[string]bool{
@@ -144,9 +142,9 @@ var agencyUnless = map[string]string{"exposed": "to"}
 // there is the full statement). A mark needs a past auxiliary (was, were,
 // been), at most one adverb, a participle from a closed class, the head word
 // its class names, its agencyRequires phrase and not its agencyUnless word,
-// no "by" among the next agencyByWindow words of the clause, and no negator in
-// the auxiliary chain, as the head word or among the agencyNegatorWindow words
-// before the head.
+// no "by" among the next agencyByWindow words of the clause, and no negator
+// anywhere in its clause before the auxiliary: after the last agencyHeadStops
+// character, or from the start of the text.
 //
 // Matching runs on an ASCII-lowercased copy with no (?i), so RE2 cannot fold
 // U+212A KELVIN SIGN or U+017F LONG S into a participle, with explicit
@@ -227,40 +225,38 @@ func agencyContraction(low string, start int) bool {
 	return strings.HasSuffix(low[:start], "n'") || strings.HasSuffix(low[:start], "n\u2019")
 }
 
-// agencyNegated reports whether a negator stands in the auxiliary chain before
-// index, is the head word, or is one of the agencyNegatorWindow words before
-// the head. It walks the words agencyHeadWord walks, never past
-// agencyHeadStops; when agencyHeadWord finds no head, only the chain is read.
-func agencyNegated(low string, index int) bool {
-	i := index
-	left := -1 // words still to read before the head; -1 until the head is read
-	for seen := 0; left != 0; seen++ {
-		for i > 0 && !isAgencyWordByte(low[i-1]) {
-			if strings.IndexByte(agencyHeadStops, low[i-1]) >= 0 {
-				return false
+// agencyNegationReader reads the lowercased text forward, once. Its negatedAt
+// method reports, for each index it is given in increasing order, whether a
+// negator (agencyNegators, or an n't contraction) stands anywhere between the
+// start of that index's clause and the index: after the last agencyHeadStops
+// byte before it, or from the start of the text. Reading forward and never
+// twice, a clause with many passives costs one pass.
+type agencyNegationReader struct {
+	low     string
+	i       int
+	negated bool
+}
+
+func (r *agencyNegationReader) negatedAt(index int) bool {
+	low := r.low
+	for r.i < index {
+		if !isAgencyWordByte(low[r.i]) {
+			if strings.IndexByte(agencyHeadStops, low[r.i]) >= 0 {
+				r.negated = false
 			}
-			i--
+			r.i++
+			continue
 		}
-		end := i
-		for i > 0 && isAgencyWordByte(low[i-1]) {
-			i--
+		start := r.i
+		for r.i < len(low) && isAgencyWordByte(low[r.i]) {
+			r.i++
 		}
-		if i == end {
-			return false
-		}
-		word := low[i:end]
-		if agencyNegators[word] || word == "t" && agencyContraction(low, i) {
-			return true
-		}
-		if left > 0 {
-			left--
-		} else if !agencySkip[word] && !strings.HasSuffix(word, agencySkipSuffix) {
-			left = agencyNegatorWindow
-		} else if seen == agencySkipMax {
-			return false
+		word := low[start:r.i]
+		if agencyNegators[word] || word == "t" && agencyContraction(low, start) {
+			r.negated = true
 		}
 	}
-	return false
+	return r.negated
 }
 
 // agencyByFollows reports whether "by" is one of the next agencyByWindow
@@ -312,6 +308,7 @@ func agencyPhraseFollows(low string, index int, phrase string) bool {
 // spanning auxiliary through participle.
 func agentlessPassives(text string) []hit {
 	low := asciiLower(text)
+	negation := agencyNegationReader{low: low}
 	var out []hit
 	for _, m := range agencyCandidate.FindAllStringSubmatchIndex(low, -1) {
 		start, end := m[0], m[1]
@@ -328,7 +325,7 @@ func agentlessPassives(text string) []hit {
 		if head := agencyHeadOf[participle]; head != "" && !agencyHeads[head][agencyHeadWord(low, start)] {
 			continue
 		}
-		if agencyNegated(low, start) {
+		if negation.negatedAt(start) {
 			continue
 		}
 		out = append(out, hit{start, end - start, text[start:end]})

@@ -350,9 +350,10 @@ class AgencyDetectorTests(unittest.TestCase):
                 self.assertEqual(agency_spans(text, rules), [])
 
     def test_negated_passives_and_unheld_affected_stay_unmarked(self):
-        """A negator in the auxiliary chain, as the head word or among the five
-        words before it denies the act; 'affected' and 'impacted' need a head
-        held in trust for someone (data, an account)."""
+        """A negator anywhere in the clause before the auxiliary (in the chain,
+        as the head word or before it, however long the subject) denies the
+        act; 'affected' and 'impacted' need a head held in trust for someone
+        (data, an account)."""
         rules = rhetorlint.load_default_rules()
         for text in [
             "Your data was never sold.",
@@ -367,6 +368,11 @@ class AgencyDetectorTests(unittest.TestCase):
             "No mistakes have been made.",
             "No personal, financial or health information was accessed.",
             "We do not believe their information has been stolen.",
+            "No credit card numbers, bank account details or passwords were stolen.",
+            "No Social Security numbers or other sensitive personal information were exposed.",
+            "No a b c d e mistakes were made.",
+            # A comma starts no clause, so this act goes unmarked too: a recorded miss.
+            "No one called, but data were stolen.",
             "Twelve patients were affected.",
             "Roughly 2,000 flights were impacted after the storm.",
         ]:
@@ -375,18 +381,40 @@ class AgencyDetectorTests(unittest.TestCase):
         for text, actual in [
             ("Approximately 4,000 accounts may have been affected.", "been affected"),
             ("Your personal information may have been impacted.", "been impacted"),
+            # A negator behind a head stop, in an earlier clause, or after the
+            # passive it would deny, is not read.
             ("No: mistakes were made.", "were made"),
-            ("No a b c d e mistakes were made.", "were made"),
+            ("No one called; data were stolen.", "were stolen"),
+            ("No one called\ndata were stolen.", "were stolen"),
+            ("Data was accessed and no records were leaked.", "was accessed"),
+            ("No data was accessed. Records were leaked.", "were leaked"),
         ]:
             with self.subTest(text=text):
                 at = text.index(actual)
                 self.assertEqual(agency_spans(text, rules), [(actual, at, at + len(actual))])
-        # An n't contraction needs "n" and an apostrophe right before its "t";
-        # near the start of the text the check never reads before index 0.
-        self.assertTrue(rhetorlint._agency_contraction("hasn't", 5))
-        self.assertTrue(rhetorlint._agency_contraction("hasn\u2019t", 5))
-        self.assertFalse(rhetorlint._agency_contraction("has't", 4))
-        self.assertFalse(rhetorlint._agency_contraction("t been x n'", 0))
+        # The reader searches from where it stopped, so its lookbehinds must
+        # read before that point: an n't contraction needs "n" and an
+        # apostrophe right before its "t", a "t" that opens the text has
+        # neither, and a negator's letters inside a longer word are no negator.
+        for low, want in [
+            ("data hasn't been accessed", True),
+            ("data hasn\u2019t been accessed", True),
+            ("data has't been accessed", False),
+            ("t been accessed", False),
+            ("xno data was accessed", False),
+            ("no_data was accessed", False),
+            ("nothing was withheld", True),
+        ]:
+            with self.subTest(low=low):
+                index = low.index("been") if "been" in low else low.index("was")
+                read = rhetorlint._agency_negation_reader(low)
+                self.assertEqual(read(index), want)
+        # Read in steps, as the detector does: a head stop between two passives
+        # starts a new clause, and a negator before the first carries to the second.
+        low = "no data was accessed and records were leaked. records were leaked."
+        read = rhetorlint._agency_negation_reader(low)
+        self.assertEqual([read(low.index("was")), read(low.index("were")), read(low.rindex("were"))],
+                         [True, True, False])
 
     def test_guards_read_at_the_participle_not_at_the_start_of_the_text(self):
         """Regression pin for a Python-only bug in an earlier prototype: a
@@ -416,7 +444,6 @@ class AgencyDetectorTests(unittest.TestCase):
         lexicon = json.loads((ROOT / "spec" / "agency-lexicon.json").read_text(encoding="utf-8"))
         self.assertEqual(list(rhetorlint.AGENCY_AUXILIARIES), lexicon["auxiliaries"])
         self.assertEqual(sorted(rhetorlint.AGENCY_NEGATORS), lexicon["negators"])
-        self.assertEqual(rhetorlint.AGENCY_NEGATOR_WINDOW, lexicon["negatorWindow"])
         self.assertEqual(
             (rhetorlint.AGENCY_WHITESPACE, rhetorlint.AGENCY_HEAD_STOPS, rhetorlint.AGENCY_CLAUSE_BREAKS),
             (lexicon["whitespace"], lexicon["headStops"], lexicon["clauseBreaks"]),
