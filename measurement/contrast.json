@@ -376,9 +376,9 @@
       "expect": "mark",
       "actual": "Never",
       "kind": "lesson",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
-      "reason": "An inverted 'Never again will...' claims nothing will ever match this price: an overclaim, not advice. The engine's imperative guard reads any clause-initial 'Never' before a lowercase word as an imperative, so it leaves this one unmarked; the guard cannot tell an inversion from an imperative.",
+      "reason": "An inverted 'Never again will...' claims nothing will ever match this price: an overclaim, not advice. The imperative guard steps over the adverb 'again' and finds 'will', which cannot be the verb of an imperative 'Never <verb>', so the absolute stays marked.",
       "source": "constructed (motifs design plan, package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
     },
     {
@@ -402,7 +402,7 @@
       "kind": "lesson",
       "status": "known-defect",
       "tag": "O6",
-      "reason": "A headline claim with its subject before the colon: 'never sold' promises the data is sold on no occasion, the same absolute as 'We never sell your data.', which stays marked. The imperative guard sees 'never' open a clause after ':' before a lowercase word and leaves it unmarked; position and a lowercase letter cannot tell a claim from an imperative.",
+      "reason": "A headline claim with its subject before the colon: 'never sold' promises the data is sold on no occasion, the same absolute as 'We never sell your data.', which stays marked. The imperative guard sees 'never' open a clause after ':' before 'sold', which is not among the words it knows cannot be a verb, and leaves it unmarked; position and a closed word list cannot tell a past participle from an imperative verb. Not opening a clause at ':' would mark this, but also the advice after a label in 'Rule: never share your password.', so the miss is kept.",
       "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
     },
     {
@@ -412,9 +412,9 @@
       "expect": "mark",
       "actual": "guaranteed",
       "kind": "lesson",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
-      "reason": "'No' negates 'risk', not 'guaranteed': the sentence is an unqualified guarantee. A comma is not a clause break for the negation guard, so 'No' counts among the two words before 'guaranteed' and the overclaim goes unmarked.",
+      "reason": "'No' negates 'risk', not 'guaranteed': the sentence is an unqualified guarantee. The negation guard ends a negator's reach at a comma once a word ('risk') stands between them, so 'guaranteed' stays marked.",
       "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
     },
     {
@@ -424,10 +424,21 @@
       "expect": "mark",
       "actual": "no exceptions",
       "kind": "lesson",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "Three parallel negatives: 'no exceptions' is itself the absolute, and the 'no' before 'fees' does not negate it. The comma after 'fees' ends that negator's reach, so the absolute stays marked.",
+      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "negation.absolute-universal.aside-cannot-be",
+      "text": "Returns are not, and cannot be, guaranteed.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
       "status": "known-defect",
       "tag": "O6",
-      "reason": "Three parallel negatives: 'no exceptions' is itself the absolute, and the 'no' before 'fees' does not negate it. The negation guard counts that 'no' among the two words before the term and leaves the absolute unmarked.",
-      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+      "reason": "'not, and cannot be, guaranteed' denies the guarantee twice: a disclaimer, the opposite of an overclaim. The negation guard ends a negator's reach at a comma once a word stands between them; here 'be' stands between 'cannot' and the comma, so 'guaranteed' is marked. The guard reads punctuation, not where an aside closes.",
+      "source": "constructed (package E3b: the false positive its comma rule brings back, 2026-10-19)"
     },
     {
       "id": "probe.hedge-softener.01",

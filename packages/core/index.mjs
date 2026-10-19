@@ -381,23 +381,36 @@ function isNegator(word) {
   return NEGATORS.has(w) || w.endsWith("n't") || w.endsWith("n\u2019t");
 }
 
+/** The characters that end a clause, for the negator window and the imperative "Never". */
+const CLAUSE_BREAKS = ".;:!?";
+
 /**
  * True when a negator is one of the two words before `offset`, with no
  * . ; : ! or ? between them. It walks back over characters and words, never a
  * count of code units, so JS (UTF-16), Python (code points) and Go (bytes)
  * decide alike on any input.
+ *
+ * With `commaEndsScope` (the absolute.universal guard; strip leaves it off),
+ * a comma also ends the negator's reach once a word stands between them: the
+ * "No" of "No risk, guaranteed." negates "risk", not "guaranteed". A negator
+ * followed directly by a comma reaches past the aside, so "not, however,
+ * guaranteed" and "No, never" stay negated.
  */
-function negatedAt(text, offset) {
+function negatedAt(text, offset, commaEndsScope = false) {
   let i = offset;
+  let commaBefore = false; // a comma between the term and the word being read
   for (let words = 0; words < 2; words++) {
+    let comma = false;
     while (i > 0 && !isGuardWordChar(text.charCodeAt(i - 1))) {
-      if (".;:!?".includes(text[i - 1])) return false;
+      if (CLAUSE_BREAKS.includes(text[i - 1])) return false;
+      if (text[i - 1] === ",") comma = true;
       i--;
     }
     if (i === 0) return false;
     const end = i;
     while (i > 0 && isGuardWordChar(text.charCodeAt(i - 1))) i--;
-    if (isNegator(text.slice(i, end))) return true;
+    if (isNegator(text.slice(i, end))) return !commaEndsScope || !commaBefore || comma;
+    commaBefore = commaBefore || comma;
   }
   return false;
 }
@@ -406,7 +419,7 @@ function negatedAt(text, offset) {
  * The ruleIds whose matches are read in their clause before they are marked.
  * An absolute under a negator ("not guaranteed", "isn't always", "Not
  * everyone") is a disclaimer, the opposite of an overclaim; a clause-initial
- * "Never" before a lowercase word ("Never share your password.") is advice to
+ * "Never" before a lowercase verb ("Never share your password.") is advice to
  * the reader, not a claim about what never happens. Neither is marked. The
  * guard lives in the engine, beside REMOVABLE, because a new pack key would
  * make an older core reject the whole pack; spec/taxonomy.yaml declares it as
@@ -416,26 +429,51 @@ const NEGATION_SCOPED = new Set(["absolute.universal"]);
 
 /** True when a NEGATION_SCOPED match at [start, end) is negated or an imperative "Never". */
 function negationScopedAt(text, start, end) {
-  return negatedAt(text, start) || imperativeNeverAt(text, start, end);
+  return negatedAt(text, start, true) || imperativeNeverAt(text, start, end);
 }
+
+/** Words that cannot be the verb of an imperative "Never <verb>": after a
+ *  clause-initial "never" they make a fragment ("Never an issue.") or an
+ *  inversion ("Never has a product been this good."), both claims. */
+const NEVER_NON_VERBS = new Set([
+  "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
+  "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
+  "should", "can", "did", "does", "been", "being"
+]);
+
+/** Adverbs that may stand between "Never" and its verb: the word after them
+ *  decides. "Never ever share it." is advice; "Never again will prices be
+ *  this low." is an inversion; "Never again." is a fragment. */
+const NEVER_PASS_THROUGH = new Set(["again", "ever", "once"]);
+
+const asciiLower = (s) => s.replace(/[A-Z]/g, (c) => c.toLowerCase());
 
 /**
  * True when [start, end) is the word "never", in any letter case, that opens
- * its clause and is followed by spaces or tabs and an ASCII lowercase letter.
- * It opens its clause when only non-word characters stand between it and the
- * start of the text or one of . ; : ! ? ("Never share", "...; never
- * manufacture"). Like negatedAt it walks characters, never a count of units.
+ * its clause and is followed by a verb: spaces or tabs, then a word that
+ * starts with an ASCII lowercase letter and is not one of NEVER_NON_VERBS.
+ * NEVER_PASS_THROUGH words are stepped over the same way first. It opens its
+ * clause when only non-word characters stand between it and the start of the
+ * text or one of . ; : ! ? ("Never share", "...; never manufacture"). Like
+ * negatedAt it walks characters, never a count of units.
  */
 function imperativeNeverAt(text, start, end) {
-  if (text.slice(start, end).replace(/[A-Z]/g, (c) => c.toLowerCase()) !== "never") return false;
+  if (asciiLower(text.slice(start, end)) !== "never") return false;
   let i = start;
-  while (i > 0 && !isGuardWordChar(text.charCodeAt(i - 1)) && !".;:!?".includes(text[i - 1])) i--;
+  while (i > 0 && !isGuardWordChar(text.charCodeAt(i - 1)) && !CLAUSE_BREAKS.includes(text[i - 1])) i--;
   if (i > 0 && isGuardWordChar(text.charCodeAt(i - 1))) return false;
   let j = end;
-  while (j < text.length && (text[j] === " " || text[j] === "\t")) j++;
-  if (j === end || j === text.length) return false;
-  const next = text.charCodeAt(j);
-  return next >= 97 && next <= 122;
+  for (;;) {
+    const gap = j;
+    while (j < text.length && (text[j] === " " || text[j] === "\t")) j++;
+    if (j === gap || j === text.length) return false;
+    const next = text.charCodeAt(j);
+    if (next < 97 || next > 122) return false;
+    const word = j;
+    while (j < text.length && isGuardWordChar(text.charCodeAt(j))) j++;
+    const w = asciiLower(text.slice(word, j));
+    if (!NEVER_PASS_THROUGH.has(w)) return !NEVER_NON_VERBS.has(w);
+  }
 }
 
 /**

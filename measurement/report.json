@@ -1685,11 +1685,11 @@
   }
  },
  "contrast": {
-  "rows": 224,
+  "rows": 225,
   "known_defect_by_tag": {
    "O2": 14,
    "O2-twin": 22,
-   "O6": 9,
+   "O6": 7,
    "O7": 65
   }
  }

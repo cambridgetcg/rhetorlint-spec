@@ -44,8 +44,11 @@ certify the runtime complexity of an arbitrary regular expression.
 Since 0.1.4 one rule is read in its clause before it is marked:
 `absolute.universal` leaves a negated absolute ("not guaranteed", "isn't
 always", "Not everyone") and a clause-initial imperative "Never" before a
-lowercase word ("Never share your password.") unmarked. The guard is keyed by
-ruleId, so the rule pack is unchanged; the
+verb ("Never share your password.") unmarked. A comma ends a negator's reach
+once a word stands between them ("No risk, guaranteed." stays marked), and a
+"Never" that opens a fragment or an inversion ("Never an issue.", "Never again
+will...") stays marked. The guard is keyed by ruleId, so the rule pack is
+unchanged; the
 [rules-en README](../rules-en/README.md#the-engine-side-guard-on-absoluteuniversal)
 states exactly what it reads and what it misses.
 

@@ -143,7 +143,10 @@ test("strip keeps an intensifier under a negator or inside a quotation", () => {
     "The risk cannot be extremely high.",
     "NOT EXTREMELY HIGH",
     "\"It was utterly devastating,\" the flood survivor told reporters.",
-    "He said \u201cwe are deeply sorry\u201d and left."
+    "He said \u201cwe are deeply sorry\u201d and left.",
+    // A comma is not a break for strip's negator: only absolute.universal's guard ends a negator's reach there.
+    "It isn\u2019t, frankly, extremely high.",
+    "We said no, extremely few agreed."
   ]) {
     const r = analyze(text, { rules: RULES });
     const intensifiers = r.marks.filter((mark) => mark.ruleId === "intensifier.loaded");
@@ -196,7 +199,16 @@ test("absolute.universal leaves a negated absolute and an imperative 'Never' unm
     "Never\tshare it.",
     "\"Never share it,\" he said.",
     "Explain real constraints; never manufacture the shortage.",
-    ...[".", ";", ":", "!", "?"].map((brk) => `Check the link${brk} never click it.`)
+    ...[".", ";", ":", "!", "?"].map((brk) => `Check the link${brk} never click it.`),
+    // A negator followed directly by a comma reaches past the aside.
+    "Past performance is not, however, always a guide.",
+    "No, never.",
+    // An adverb between 'Never' and its verb hands the decision to the verb.
+    "Never ever share your password.",
+    "Never again leave it unlocked.",
+    "Never once doubt it.",
+    // A word is compared whole: 'answer' is not 'an'.
+    "Never answer it."
   ]) {
     assert.deepEqual(absolutes(text).map((mark) => mark.actual), [], text);
   }
@@ -219,7 +231,20 @@ test("absolute.universal still marks absolutes the negator and imperative guards
     ["Never, ever.", "Never"],
     ["Never\nshare it.", "Never"],
     // A line break is not a clause break.
-    ["We will\nnever share it.", "never"]
+    ["We will\nnever share it.", "never"],
+    // A comma ends a negator's reach once a word stands between them.
+    ["No risk, guaranteed.", "guaranteed"],
+    ["Don't wait, everyone is buying.", "everyone"],
+    ["No fees, always free.", "always"],
+    ["No contracts, no fees, no exceptions.", "no exceptions"],
+    // A clause-initial 'Never' before a word that cannot be its verb is a fragment or an inversion.
+    ["Battery life? Never an issue.", "Never"],
+    ["Never again will prices be this low.", "Never"],
+    ["Never has a product been this good.", "Never"],
+    ["Never before have prices been this low.", "Never"],
+    ["Never again.", "Never"],
+    ["Never ever again.", "Never"],
+    ["Never again\nshare it.", "Never"]
   ]) {
     const marks = absolutes(text);
     assert.deepEqual(marks.map((mark) => mark.actual), [actual], text);
@@ -228,6 +253,32 @@ test("absolute.universal still marks absolutes the negator and imperative guards
   // The guard reads absolute.universal only: other rules keep their marks under a negator.
   assert.ok(analyze("It is not world-class.", { rules: RULES }).marks
     .some((mark) => mark.ruleId === "puffery.peacock"));
+});
+
+// The imperative 'Never' guard's two closed lists, declared here so an engine
+// that drops or adds a word fails.
+const NEVER_NON_VERBS = [
+  "a", "an", "the", "any", "before", "so", "such", "in", "at", "on",
+  "has", "have", "had", "is", "are", "was", "were", "will", "would", "could",
+  "should", "can", "did", "does", "been", "being"
+];
+const NEVER_PASS_THROUGH = ["again", "ever", "once"];
+
+test("absolute.universal reads the word after a clause-initial 'Never' against two closed lists", () => {
+  const actuals = (text) => absolutes(text).map((mark) => mark.actual);
+  for (const word of NEVER_NON_VERBS) {
+    assert.deepEqual(actuals(`Never ${word} x.`), ["Never"], word);
+    // After its lowercase first letter, the word is compared in ASCII lower case: "hAS" is "has".
+    const mixed = word[0] + word.slice(1).toUpperCase();
+    assert.deepEqual(actuals(`Go; never ${mixed} x.`), ["never"], mixed);
+  }
+  for (const adverb of NEVER_PASS_THROUGH) {
+    assert.deepEqual(actuals(`Never ${adverb} share it.`), [], adverb);
+    assert.deepEqual(actuals(`Never ${adverb} ${NEVER_PASS_THROUGH[0]} share it.`), [], adverb);
+    for (const word of NEVER_NON_VERBS) assert.deepEqual(actuals(`Never ${adverb} ${word} x.`), ["Never"], `${adverb} ${word}`);
+    assert.deepEqual(actuals(`Never ${adverb}.`), ["Never"], adverb);
+    assert.deepEqual(actuals(`Never ${adverb} Share it.`), ["Never"], adverb);
+  }
 });
 
 test("strip is identity without an actionable mark and cleans only removal seams", () => {
