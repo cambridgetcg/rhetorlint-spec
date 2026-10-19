@@ -7,14 +7,15 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyze } from "../packages/core/index.mjs";
 import {
-  BEGIN, END, LEXICON, TARGETS, lexiconProbes, lexiconProblems, loadLexicon
+  BEGIN, END, LEXICON, TARGETS, boundaryProbes, lexiconProbes, lexiconProblems, loadLexicon
 } from "../scripts/gen-agency-lexicon.mjs";
 
 // spec/agency-lexicon.json is the one place the accountable-passive detector's
 // words live; scripts/gen-agency-lexicon.mjs writes them into the JavaScript,
 // Python and Go engines. Two declarations, one truth, now a test: --check fails
 // when any engine's generated block differs from the lexicon, and the probes
-// below hold the JavaScript engine to every word the lexicon lists or excludes.
+// below hold the JavaScript engine to every word the lexicon lists or excludes,
+// and to every edge of the walks that read them.
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const GEN = join(ROOT, "scripts", "gen-agency-lexicon.mjs");
@@ -54,6 +55,19 @@ test("the lexicon checker refuses a word in two classes, an unknown head class a
   assert.match(problems, /"withheld" is in both fault and conceal/);
   assert.match(problems, /head "nouns" is not a class in heads/);
   assert.match(problems, /"was" is excluded but also listed/);
+});
+
+test("the lexicon checker refuses a negator in the adverb slot and a character set it cannot render", () => {
+  const broken = structuredClone(LEX);
+  broken.adverbs = [...broken.adverbs, "never"].sort();
+  broken.whitespace += "\u00a0";
+  broken.headStops += "a";
+  broken.negatorWindow = 0;
+  const problems = lexiconProblems(broken).join("\n");
+  assert.match(problems, /adverbs: "never" is a negator/);
+  assert.match(problems, /whitespace: "\u00a0" is not one of space, tab, LF, CR, FF or VT/);
+  assert.match(problems, /headStops: "a" is not ASCII punctuation or a line break/);
+  assert.match(problems, /negatorWindow: must be a positive integer/);
 });
 
 test("every engine's generated block matches the lexicon (--check exits 0)", () => {
@@ -108,6 +122,23 @@ test("every participle marks its probe sentence and is silent with a 'by' agent"
   const participles = LEX.classes.reduce((n, c) => n + c.participles.length, 0);
   assert.equal(probes.length, 2 * participles);
   t.diagnostic(`${participles} participles, ${probes.length} probes`);
+});
+
+test("the detector's walks stop where the lexicon says, at every edge", (t) => {
+  // boundaryProbes() builds each sentence from the lexicon's numbers and
+  // character sets, so these spans are the lexicon's claim about the walks.
+  const probes = boundaryProbes(LEX);
+  const problems = [];
+  for (const [id, text, span] of probes) {
+    const got = agency(text);
+    const want = span === null ? [] : [span];
+    if (JSON.stringify(got) !== JSON.stringify(want)) {
+      problems.push(`${id}: ${JSON.stringify(text)} marks ${JSON.stringify(got)}, want ${JSON.stringify(want)}`);
+    }
+  }
+  assert.deepEqual(problems, []);
+  assert.equal(new Set(probes.map(([id]) => id)).size, probes.length, "probe ids are unique");
+  t.diagnostic(`${probes.length} boundary probes`);
 });
 
 test("a gated participle marks only after a head word of its class", () => {
