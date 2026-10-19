@@ -459,3 +459,53 @@ func TestOutputMatchesSchema(t *testing.T) {
 		})
 	}
 }
+
+// TestXEngineDump is the Go side of scripts/xengine-diff.mjs, the three-engine
+// differential. It is skipped unless the script sets both XENGINE_IN (a file
+// of JSON strings, one input per line) and XENGINE_OUT (where it writes one
+// JSON line per input: the marks as [ruleId, actual, start, end] and the
+// strip). Offsets stay in Go's native unit, bytes; the script converts units.
+func TestXEngineDump(t *testing.T) {
+	inPath, outPath := os.Getenv("XENGINE_IN"), os.Getenv("XENGINE_OUT")
+	if inPath == "" || outPath == "" {
+		t.Skip("set XENGINE_IN and XENGINE_OUT to dump analyses (node scripts/xengine-diff.mjs does)")
+	}
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	in, err := os.Open(inPath)
+	if err != nil {
+		t.Fatalf("open XENGINE_IN: %v", err)
+	}
+	defer in.Close()
+	out, err := os.Create(outPath)
+	if err != nil {
+		t.Fatalf("create XENGINE_OUT: %v", err)
+	}
+	defer out.Close()
+
+	dec := json.NewDecoder(in)
+	enc := json.NewEncoder(out)
+	enc.SetEscapeHTML(false)
+	n := 0
+	for dec.More() {
+		var text string
+		if err := dec.Decode(&text); err != nil {
+			t.Fatalf("input %d: %v", n, err)
+		}
+		r := Analyze(text, pack)
+		marks := make([][]any, 0, len(r.Marks))
+		for _, m := range r.Marks {
+			marks = append(marks, []any{m.RuleID, m.Actual, m.Position.Start.Offset, m.Position.End.Offset})
+		}
+		if err := enc.Encode(map[string]any{"marks": marks, "strip": r.Strip}); err != nil {
+			t.Fatalf("write analysis %d: %v", n, err)
+		}
+		n++
+	}
+	if err := out.Close(); err != nil {
+		t.Fatalf("close XENGINE_OUT: %v", err)
+	}
+	t.Logf("xengine: dumped %d analyses", n)
+}
