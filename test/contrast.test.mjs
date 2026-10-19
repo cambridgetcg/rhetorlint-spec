@@ -23,6 +23,21 @@ const ROWS = CONTRAST.rows;
 /** Rules held to at least five must-mark rows and five innocent twins. */
 const DEEP_RULES = ["agency-hiding.deleted-subject", "absolute.universal", "intensifier.loaded"];
 
+/**
+ * Which rows each opportunity tag may sit on, as contrast.json 'tags' describes
+ * them. Open counts per tag are the backlog the fixes report against, so a row
+ * filed under the wrong tag would move one fix's number with another's work.
+ */
+const TAG_SCOPE = {
+  "O2": (row) => row.ruleId === "agency-hiding.deleted-subject",
+  "O2-twin": (row) => row.ruleId === "agency-hiding.deleted-subject",
+  "O3": (row) => row.kind === "typography",
+  "O4": (row) => row.expect === "strip-preserves",
+  "O6": (row) => row.ruleId === "absolute.universal",
+  "O7": (row) => !["agency-hiding.deleted-subject", "absolute.universal"].includes(row.ruleId) &&
+    row.kind !== "typography" && row.expect !== "strip-preserves"
+};
+
 /** What the engine does with one row, judged against the row's expectation. */
 function judge(row) {
   const result = analyze(row.text, { rules: RULES });
@@ -70,6 +85,8 @@ test("contrast.json matches measurement/schema/contrast.schema.json", () => {
     [...SCHEMA.$defs.row.properties.tag.enum].sort(),
     "every tag a row may carry is described once in contrast.json 'tags'"
   );
+  assert.deepEqual(Object.keys(TAG_SCOPE).sort(), Object.keys(CONTRAST.tags).sort(),
+    "every tag has a scope in TAG_SCOPE");
 });
 
 test("contrast.json is ASCII, so smart punctuation stays visible in review", () => {
@@ -101,6 +118,7 @@ test("every row keeps the rules the schema cannot express", () => {
     if ((row.expect === "strip-preserves") !== (row.strip !== undefined)) say("'strip' goes with expect 'strip-preserves', and only with it");
 
     if (row.status === "known-defect" && row.tag === undefined) say("a known-defect row needs a tag naming the opportunity that fixes it");
+    if (row.tag !== undefined && TAG_SCOPE[row.tag] && !TAG_SCOPE[row.tag](row)) say(`tag ${row.tag} does not cover this row (see contrast.json 'tags')`);
     if (row.status === "priced-in") {
       if (row.expect !== "silent") say("priced-in means an accepted false positive, so expect must be 'silent'");
       if (row.cite === undefined) say("a priced-in row must cite the file:line that accepts its false positive");
