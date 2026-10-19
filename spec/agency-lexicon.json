@@ -1,0 +1,87 @@
+{
+  "lexicon": "agency-hiding.deleted-subject",
+  "detector": "agentless-passive",
+  "version": 1,
+  "about": "The single source of the accountable-passive detector's word lists. scripts/gen-agency-lexicon.mjs writes it into the JavaScript, Python and Go engines between BEGIN and END GENERATED AGENCY LEXICON markers, and its --check (run by test/agency-lexicon.test.mjs) fails when any engine's copy drifts. A mark needs all of: a past passive auxiliary; at most one adverb; a participle from one of the classes; the head word its class names, when it names one; no 'by' in the next byWindow words of the clause; and the participle's requires and unless conditions. The matcher reads an ASCII-lowercased copy of the text, so every word here is lowercase ASCII, and a phrasal participle is written with one space.",
+  "auxiliaries": ["been", "was", "were"],
+  "adverbs": ["already", "always", "never", "often", "still"],
+  "adverbSuffix": "ly",
+  "skip": ["all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never", "not", "now", "shall", "should", "since", "then", "will", "would"],
+  "skipSuffix": "ly",
+  "skipMax": 4,
+  "byWindow": 7,
+  "heads": {
+    "challenge": ["allegations", "concerns", "questions"],
+    "data": ["address", "addresses", "credentials", "data", "details", "information", "password", "passwords", "pii", "records"],
+    "dummy": ["it"],
+    "error": ["action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision", "decisions", "error", "errors", "measures", "miscalculation", "miscalculations", "misjudgement", "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps", "mistake", "mistakes", "omissions", "promises", "questions", "remarks", "safeguards", "statements", "steps", "things", "threats", "words"]
+  },
+  "classes": [
+    {
+      "id": "fault",
+      "head": null,
+      "why": "The participle itself names a fault: someone mishandled, misjudged, neglected or tampered.",
+      "participles": ["botched", "bungled", "doctored", "falsified", "ignored", "misappropriated", "miscalculated", "mischaracterised", "mischaracterized", "mishandled", "misinformed", "misinterpreted", "misjudged", "mislabeled", "mislabelled", "misled", "mismanaged", "misplaced", "misquoted", "misreported", "misrepresented", "misstated", "misused", "neglected", "overcharged", "overlooked", "tampered", "underpaid"]
+    },
+    {
+      "id": "breach",
+      "head": null,
+      "why": "The participle names a breach of something held in trust, mostly someone's data.",
+      "participles": ["accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked", "impacted", "leaked", "stolen"]
+    },
+    {
+      "id": "conceal",
+      "head": null,
+      "why": "The participle names a concealment or a withdrawal someone decided on.",
+      "participles": ["axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced", "withheld"]
+    },
+    {
+      "id": "light",
+      "head": "error",
+      "why": "A light verb says little alone; after an error, decision or statement noun it is the classic deletion ('mistakes were made', 'steps were taken').",
+      "participles": ["characterised", "characterized", "done", "given", "interpreted", "made", "perceived", "put", "said", "taken"]
+    },
+    {
+      "id": "raise",
+      "head": "challenge",
+      "why": "'Concerns were raised' deletes the accuser. After any other noun 'raised' is no deletion: software raises an error ('an error was raised'), and a threat level is raised.",
+      "participles": ["raised"]
+    },
+    {
+      "id": "impersonal",
+      "head": "dummy",
+      "why": "Only the impersonal 'it was decided' deletes who decided.",
+      "participles": ["agreed", "decided", "determined"]
+    },
+    {
+      "id": "data",
+      "head": "data",
+      "why": "After a data noun, these verbs say the data went to someone else: the act the taxonomy's lesson 'your data was shared' names.",
+      "participles": ["disclosed", "shared", "sold"]
+    }
+  ],
+  "requires": {
+    "put": "in place"
+  },
+  "unless": {
+    "exposed": "to"
+  },
+  "excluded": [
+    {
+      "words": ["are", "be", "being", "is"],
+      "why": "Present, modal and progressive passives ('is executed', 'can be frozen', 'were being withheld') describe procedure or ongoing state far more often than a deleted doer; every held-out false positive of the earlier detector was present or modal."
+    },
+    {
+      "words": ["got", "gotten"],
+      "why": "A get-passive is also an idiom ('got fired up', 'got lost'); the words alone cannot tell them apart."
+    },
+    {
+      "words": ["closed", "cut", "delayed", "deleted", "detained", "displaced", "fired", "killed", "lost", "shot"],
+      "why": "Harm and news verbs: 'Lives were lost in the earthquake', 'Your account was closed at your request'. The words alone cannot say a doer exists, so the rule marks nothing."
+    },
+    {
+      "words": ["collected", "retained", "transferred"],
+      "why": "Routine data handling: methods sections, retention notices and transfer logs use them as procedure ('Data were collected from 200 participants.', 'Records were retained for seven years.', 'Data were transferred to a secure server.'). The words alone say no harm, fault or concealment."
+    }
+  ]
+}
