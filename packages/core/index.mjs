@@ -55,7 +55,7 @@ const RULE_KEYS = {
 const ZERO_LENGTH_PATTERN_PROBES = ["", "a", "A", "0", "_", " ", "\n", "word", "example"];
 
 // BEGIN GENERATED AGENCY LEXICON
-// spec/agency-lexicon.json version 4, written by scripts/gen-agency-lexicon.mjs.
+// spec/agency-lexicon.json version 5, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
 const AGENCY_WHITESPACE = " \t\n\r\f";
 const AGENCY_SPACE = "[ \\t\\n\\r\\f]+";
@@ -72,7 +72,7 @@ const AGENCY_SKIP_SUFFIX = "ly";
 const AGENCY_SKIP_MAX = 4;
 const AGENCY_BY_WINDOW = 7;
 const AGENCY_NEGATORS = new Set([
-  "cannot", "neither", "never", "no", "none", "nor", "not", "nothing"
+  "cannot", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing"
 ]);
 const AGENCY_HEADS = new Map([
   ["challenge", new Set([
@@ -601,10 +601,12 @@ const REMOVABLE = new Set(["intensifier.loaded"]);
  *                       "Never again will prices be this low.").
  */
 // BEGIN GENERATED GUARD LEXICON
-// spec/guard-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// spec/guard-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
+// NEGATORS: spec/agency-lexicon.json version 5's negators, and localNegators.
 const NEGATORS = new Set([
-  "cannot", "hardly", "never", "no", "nor", "not", "without"
+  "cannot", "hardly", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing",
+  "without"
 ]);
 const CLAUSE_BREAKS = ".;:!?";
 const NEVER_NON_VERBS = new Set([

@@ -534,10 +534,12 @@ func TestAbsoluteGuard(t *testing.T) {
 	})
 }
 
-// guardLexicon is spec/guard-lexicon.json, the one source of the guards' lists.
+// guardLexicon is spec/guard-lexicon.json, the one source of the guards'
+// lists. Negators is derived: the agency lexicon's negators and LocalNegators.
 type guardLexicon struct {
 	ClauseBreaks       string   `json:"clauseBreaks"`
-	Negators           []string `json:"negators"`
+	LocalNegators      []string `json:"localNegators"`
+	Negators           []string `json:"-"`
 	NeverNonVerbs      []string `json:"neverNonVerbs"`
 	NeverPassThrough   []string `json:"neverPassThrough"`
 	NeverAdviceOpeners []string `json:"neverAdviceOpeners"`
@@ -553,6 +555,17 @@ func readGuardLexicon(t *testing.T) guardLexicon {
 	if err := json.Unmarshal(raw, &guard); err != nil {
 		t.Fatalf("parse spec/guard-lexicon.json: %v", err)
 	}
+	raw, err = os.ReadFile(filepath.Join(repoRoot(), "spec", "agency-lexicon.json"))
+	if err != nil {
+		t.Fatalf("read spec/agency-lexicon.json: %v", err)
+	}
+	var agency struct {
+		Negators []string `json:"negators"`
+	}
+	if err := json.Unmarshal(raw, &agency); err != nil {
+		t.Fatalf("parse spec/agency-lexicon.json: %v", err)
+	}
+	guard.Negators = append(append([]string{}, agency.Negators...), guard.LocalNegators...)
 	return guard
 }
 

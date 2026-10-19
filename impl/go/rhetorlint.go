@@ -42,7 +42,7 @@ type agencyClass struct {
 }
 
 // BEGIN GENERATED AGENCY LEXICON
-// spec/agency-lexicon.json version 4, written by scripts/gen-agency-lexicon.mjs.
+// spec/agency-lexicon.json version 5, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
 const (
 	agencyWhitespace   = " \t\n\r\f"
@@ -67,8 +67,8 @@ const agencySkipMax = 4
 const agencyByWindow = 7
 
 var agencyNegators = map[string]bool{
-	"cannot": true, "neither": true, "never": true, "no": true, "none": true, "nor": true, "not": true,
-	"nothing": true,
+	"cannot": true, "neither": true, "never": true, "no": true, "nobody": true, "none": true,
+	"nor": true, "not": true, "nothing": true,
 }
 
 var agencyHeads = map[string]map[string]bool{
@@ -355,13 +355,14 @@ var negationScoped = map[string]bool{"absolute.universal": true}
 // miss); neverPassThrough adverbs may stand between "Never" and its verb, so
 // the word after them decides.
 // BEGIN GENERATED GUARD LEXICON
-// spec/guard-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// spec/guard-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
 const clauseBreaks = ".;:!?"
 
+// NEGATORS: spec/agency-lexicon.json version 5's negators, and localNegators.
 var negators = map[string]bool{
-	"cannot": true, "hardly": true, "never": true, "no": true, "nor": true, "not": true,
-	"without": true,
+	"cannot": true, "hardly": true, "neither": true, "never": true, "no": true, "nobody": true,
+	"none": true, "nor": true, "not": true, "nothing": true, "without": true,
 }
 
 var neverNonVerbs = map[string]bool{

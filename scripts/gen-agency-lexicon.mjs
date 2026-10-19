@@ -144,17 +144,24 @@ export function lexiconProblems(lex) {
   return problems;
 }
 
-/** Every rule the guard lexicon must keep that JSON alone cannot express. */
-export function guardProblems(guard) {
+/**
+ * Every rule the guard lexicon must keep that JSON alone cannot express.
+ * `agencyNegators` are the agency lexicon's negators, which the guards share.
+ */
+export function guardProblems(guard, agencyNegators = []) {
   const problems = [];
   const say = (message) => problems.push(message);
   const { words, count, chars, why } = checkers(say);
   count(guard.version, "version");
   chars(guard.clauseBreaks, "clauseBreaks", (c) => STOP.test(c) && c !== "\n", "ASCII punctuation");
-  for (const key of ["negators", "neverNonVerbs", "neverPassThrough", "neverAdviceOpeners"]) {
+  for (const key of ["localNegators", "neverNonVerbs", "neverPassThrough", "neverAdviceOpeners"]) {
     words(guard[key], key);
     why(guard[`${key}Why`], `${key}Why`);
   }
+  for (const w of guard.localNegators || []) {
+    if (agencyNegators.includes(w)) say(`localNegators: ${JSON.stringify(w)} is already an agency negator`);
+  }
+  if (Object.hasOwn(guard, "negators")) say("negators: the guards' negators are derived (agency negators and localNegators), never listed");
   // Each word after "Never" is read once: stepped over, a fragment or an
   // inversion, or (named or not) the verb of advice.
   const seen = new Map();
@@ -178,8 +185,13 @@ export function loadLexicon(root = ROOT) {
   return load(root, LEXICON, lexiconProblems);
 }
 
-export function loadGuardLexicon(root = ROOT) {
-  return load(root, GUARD_LEXICON, guardProblems);
+/**
+ * The guard lexicon, with `negators` derived: the agency lexicon's negators
+ * and its own localNegators, sorted. One vocabulary, read two ways.
+ */
+export function loadGuardLexicon(root = ROOT, lex = loadLexicon(root)) {
+  const guard = load(root, GUARD_LEXICON, (g) => guardProblems(g, lex.negators));
+  return { ...guard, negators: [...new Set([...lex.negators, ...guard.localNegators])].sort(), agencyVersion: lex.version };
 }
 
 // ---- rendering ---------------------------------------------------------------
@@ -315,10 +327,14 @@ function renderGo(lex) {
   ].join("\n");
 }
 
+const negatorsComment = (c, guard) =>
+  `${c} NEGATORS: ${LEXICON} version ${guard.agencyVersion}'s negators, and localNegators.`;
+
 function renderGuardJs(guard) {
   const set = (items) => `new Set([\n${wrap(items.map(q), "  ")}\n])`;
   return [
     ...guardHeader("//", guard),
+    negatorsComment("//", guard),
     `const NEGATORS = ${set(guard.negators)};`,
     `const CLAUSE_BREAKS = ${q(guard.clauseBreaks)};`,
     `const NEVER_NON_VERBS = ${set(guard.neverNonVerbs)};`,
@@ -331,6 +347,7 @@ function renderGuardPython(guard) {
   const set = (items) => `frozenset({\n${wrap(items.map(q), "    ")}\n})`;
   return [
     ...guardHeader("#", guard),
+    negatorsComment("#", guard),
     `_NEGATORS = ${set(guard.negators)}`,
     `_CLAUSE_BREAKS = frozenset(${q(guard.clauseBreaks)})`,
     `_NEVER_NON_VERBS = ${set(guard.neverNonVerbs)}`,
@@ -345,6 +362,7 @@ function renderGuardGo(guard) {
     ...guardHeader("//", guard),
     `const clauseBreaks = ${q(guard.clauseBreaks)}`,
     "",
+    negatorsComment("//", guard),
     `var negators = ${set(guard.negators)}`,
     "",
     `var neverNonVerbs = ${set(guard.neverNonVerbs)}`,
@@ -595,7 +613,7 @@ function main(argv) {
   if (values.root === "" || tokens.filter((t) => t.kind === "option" && t.name === "root").length > 1) return usage();
   const root = values.root !== undefined ? resolve(values.root) : ROOT;
   const lex = loadLexicon(root);
-  const guard = loadGuardLexicon(root);
+  const guard = loadGuardLexicon(root, lex);
   if (values.check) {
     const problems = drift(root, lex, guard);
     if (problems.length) {

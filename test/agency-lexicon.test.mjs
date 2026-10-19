@@ -25,6 +25,7 @@ const GEN = join(ROOT, "scripts", "gen-agency-lexicon.mjs");
 const RULES = JSON.parse(readFileSync(join(ROOT, "packages", "rules-en", "rules.json"), "utf8"));
 const LEX = loadLexicon(ROOT);
 const GUARD = loadGuardLexicon(ROOT);
+const GUARD_JSON = JSON.parse(readFileSync(join(ROOT, GUARD_LEXICON), "utf8"));
 const AGENCY = "agency-hiding.deleted-subject";
 const agency = (text) => analyze(text, { rules: RULES }).marks.filter((m) => m.ruleId === AGENCY).map((m) => m.actual);
 
@@ -48,7 +49,12 @@ function withCopy(fn) {
 
 test("the lexicon keeps the rules its JSON shape cannot express", () => {
   assert.deepEqual(lexiconProblems(LEX), []);
-  assert.deepEqual(guardProblems(GUARD), []);
+  assert.deepEqual(guardProblems(GUARD_JSON, LEX.negators), []);
+});
+
+test("the guards read the agency lexicon's negators and their own local ones, as one vocabulary", () => {
+  assert.deepEqual(GUARD.negators, [...new Set([...LEX.negators, ...GUARD_JSON.localNegators])].sort());
+  for (const n of LEX.negators) assert.ok(GUARD.negators.includes(n), `${n} is an agency negator the guards do not read`);
 });
 
 test("the lexicon checker refuses a negator in the skip list and a head class without a why", () => {
@@ -60,17 +66,20 @@ test("the lexicon checker refuses a negator in the skip list and a head class wi
   assert.match(problems, /headWhy\.error: needs a why/);
 });
 
-test("the guard checker refuses a word read two ways after 'Never', an unsorted list and a line break", () => {
-  const broken = structuredClone(GUARD);
+test("the guard checker refuses a word read two ways after 'Never', an unsorted or shared negator and a line break", () => {
+  const broken = structuredClone(GUARD_JSON);
   broken.neverPassThrough = [...broken.neverPassThrough, "the"].sort();
-  broken.negators = [...broken.negators, "aaa"];
+  broken.localNegators = [...broken.localNegators, "aaa"];
   broken.clauseBreaks += "\n";
   delete broken.neverNonVerbsWhy;
-  const problems = guardProblems(broken).join("\n");
+  let problems = guardProblems(broken, LEX.negators).join("\n");
   assert.match(problems, /neverPassThrough: "the" is also in neverNonVerbs/);
-  assert.match(problems, /negators: must be sorted/);
+  assert.match(problems, /localNegators: must be sorted/);
   assert.match(problems, /clauseBreaks: "\\n" is not ASCII punctuation/);
   assert.match(problems, /neverNonVerbsWhy: needs a why/);
+  problems = guardProblems({ ...GUARD_JSON, localNegators: ["hardly", "not"], negators: ["no"] }, LEX.negators).join("\n");
+  assert.match(problems, /localNegators: "not" is already an agency negator/);
+  assert.match(problems, /negators: the guards' negators are derived/);
 });
 
 test("the lexicon checker refuses a word in two classes, an unknown head class and an excluded word that is listed", () => {

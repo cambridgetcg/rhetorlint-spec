@@ -250,15 +250,17 @@ class AbsoluteGuardTests(unittest.TestCase):
         # spec/guard-lexicon.json is the one source; scripts/gen-agency-lexicon.mjs
         # writes it here, and an added or dropped word fails this exactly.
         guard = json.loads((ROOT / "spec" / "guard-lexicon.json").read_text(encoding="utf-8"))
-        self.assertEqual(rhetorlint._NEGATORS, frozenset(guard["negators"]))
+        agency = json.loads((ROOT / "spec" / "agency-lexicon.json").read_text(encoding="utf-8"))
+        # One vocabulary: the agency lexicon's negators and the guards' local ones.
+        self.assertEqual(rhetorlint._NEGATORS, frozenset(agency["negators"] + guard["localNegators"]))
+        self.assertTrue(rhetorlint.AGENCY_NEGATORS <= rhetorlint._NEGATORS)
         self.assertEqual(rhetorlint._CLAUSE_BREAKS, frozenset(guard["clauseBreaks"]))
         self.assertEqual(rhetorlint._NEVER_NON_VERBS, frozenset(guard["neverNonVerbs"]))
         self.assertEqual(rhetorlint._NEVER_PASS_THROUGH, frozenset(guard["neverPassThrough"]))
 
     def test_each_guard_negator_keeps_an_intensifier_and_an_absolute(self):
-        guard = json.loads((ROOT / "spec" / "guard-lexicon.json").read_text(encoding="utf-8"))
         rules = rhetorlint.load_default_rules()
-        for negator in guard["negators"]:
+        for negator in sorted(rhetorlint._NEGATORS):
             with self.subTest(negator=negator):
                 text = "It was %s extremely bad." % negator
                 self.assertEqual(rhetorlint.analyze(text, rules)["strip"], text)

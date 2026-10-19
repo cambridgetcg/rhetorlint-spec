@@ -27,7 +27,7 @@ NAME = "rhetorlint (python)"
 CORE_VERSION = "0.1.4"
 
 # BEGIN GENERATED AGENCY LEXICON
-# spec/agency-lexicon.json version 4, written by scripts/gen-agency-lexicon.mjs.
+# spec/agency-lexicon.json version 5, written by scripts/gen-agency-lexicon.mjs.
 # Edit the lexicon and rerun the generator; --check fails when this block drifts.
 AGENCY_WHITESPACE = " \t\n\r\f"
 AGENCY_SPACE = "[ \\t\\n\\r\\f]+"
@@ -44,7 +44,7 @@ AGENCY_SKIP_SUFFIX = "ly"
 AGENCY_SKIP_MAX = 4
 AGENCY_BY_WINDOW = 7
 AGENCY_NEGATORS = frozenset({
-    "cannot", "neither", "never", "no", "none", "nor", "not", "nothing"
+    "cannot", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing"
 })
 AGENCY_HEADS = {
     "challenge": frozenset({
@@ -285,10 +285,12 @@ REMOVABLE = {"intensifier.loaded"}
 # _NEVER_PASS_THROUGH adverbs may stand between "Never" and its verb, so the
 # word after them decides.
 # BEGIN GENERATED GUARD LEXICON
-# spec/guard-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+# spec/guard-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
 # Edit the lexicon and rerun the generator; --check fails when this block drifts.
+# NEGATORS: spec/agency-lexicon.json version 5's negators, and localNegators.
 _NEGATORS = frozenset({
-    "cannot", "hardly", "never", "no", "nor", "not", "without"
+    "cannot", "hardly", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing",
+    "without"
 })
 _CLAUSE_BREAKS = frozenset(".;:!?")
 _NEVER_NON_VERBS = frozenset({
