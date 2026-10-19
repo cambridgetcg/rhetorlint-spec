@@ -1,0 +1,3 @@
+# inputs.jsonl is compared byte for byte with its rebuild, so keep LF on every
+# platform. (The root .gitattributes is a hashed source of the Cloudflare door.)
+* text eol=lf

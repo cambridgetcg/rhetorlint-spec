@@ -1,0 +1,4 @@
+# Byte-exact files: items are pinned by sha256, so keep LF on every platform.
+# (The root .gitattributes is a hashed source of the Cloudflare door, so this
+# rule lives here instead.)
+* text eol=lf
