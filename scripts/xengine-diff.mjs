@@ -141,7 +141,22 @@ const PROBES = [
   ["strip-rsquo-contraction", "The update isn\u2019t hugely different."],
   ["strip-emoji-between-negator", "Not \ud83d\ude00 extremely high."],
   ["strip-nbsp-after-negator", "Not\u00a0extremely high."],
-  ["strip-emoji-in-curly-quote", "He said \u201c\ud83d\ude00 we are deeply sorry\u201d and left."]
+  ["strip-emoji-in-curly-quote", "He said \u201c\ud83d\ude00 we are deeply sorry\u201d and left."],
+  // The guards' edges, where one engine could drift alone: the two-word
+  // window, each clause break, a comma (not a break), line-scoped quotes.
+  ["strip-negator-second-word", "The risk cannot be extremely high."],
+  ["strip-negator-third-word", "Not bad, and extremely cheap."],
+  ["strip-negator-behind-period", "We said no. extremely few agreed."],
+  ["strip-negator-behind-semicolon", "We said no; extremely few agreed."],
+  ["strip-negator-behind-colon", "We said no: extremely few agreed."],
+  ["strip-negator-behind-bang", "We said no! extremely few agreed."],
+  ["strip-negator-behind-question", "We said no? extremely few agreed."],
+  ["strip-negator-behind-comma", "We said no, extremely few agreed."],
+  ["strip-negator-uppercase", "NOT EXTREMELY HIGH"],
+  ["strip-quote-closed", "\"Fine,\" she said, extremely calmly."],
+  ["strip-quote-previous-line", "He said \"hello\nand it was extremely loud."],
+  ["strip-quote-crlf", "He said \"we are\r\nextremely sorry\" and left."],
+  ["strip-curly-quote-closed", "He said \u201chello\u201d and was extremely calm."]
 ];
 
 const isAscii = (text) => /^[\x00-\x7f]*$/.test(text);
