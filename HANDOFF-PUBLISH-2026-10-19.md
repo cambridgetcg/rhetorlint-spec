@@ -19,14 +19,18 @@ There are two stacked branches in the one repository behind
   - a contrast set;
   - taxonomy agreement tests;
   - a three-engine differential.
-- **PR B, `motifs/honest-marks`** (75 commits on PR A) fixes what PR A
+- **PR B, `motifs/honest-marks`** (stacked on PR A; `git rev-list --count
+  motifs/measure..motifs/honest-marks` gives its size) fixes what PR A
   measured:
   - typographic variants (rules-en 0.2.1);
-  - a strip that no longer strengthens a negated claim or edits a quotation;
+  - a strip that keeps an intensifier negated within two words or inside
+    double quotes on its line (its remaining misses are open O4 rows);
   - a negation and imperative guard for `absolute.universal`;
   - the accountable-passive detector behind `agency-hiding.deleted-subject`,
     which is now a note at confidence 0.6, not a warning;
-  - an honest people door;
+  - one negator vocabulary and the guards' word lists generated into all
+    three engines from `spec/agency-lexicon.json` and `spec/guard-lexicon.json`;
+  - a people door that says what the rules mark;
   - the dataset snapshot refreshed to the 76 conformance cases.
 
 `NPM_DEPLOY.md` § "Core 0.1.4 + rules-en 0.2.1" has the package-level detail:
@@ -36,8 +40,10 @@ post-publish check.
 The headline, from `node scripts/measure.mjs --compare origin/main`:
 
 - On the committed wild strata, the agency rule makes 368 marks at lenient
-  precision 0.11 on main. On this branch it makes 19, with no false positive.
-- On technical prose its 234 false marks go to 0.
+  precision 0.11 on main. On this branch it makes 19: 3 TP and 16 that one
+  reader judged debatable (strict 0.16, lenient 1.00), no false positive.
+- On technical prose its 234 false marks go to 0. That is in-sample: the
+  `raised` gate was chosen knowing these labels.
 - Accountable-passive gold recall falls from 39/41 to 19/41. That trade is
   deliberate. Under this project's doctrine a false positive blocks a release,
   and a miss is recorded instead.
@@ -49,11 +55,11 @@ cd ~/Desktop/rhetorlint-spec-motifs        # or any checkout that has both branc
 git fetch origin
 git log --oneline 1a16766..origin/main     # empty: main has not moved under the stack
 git switch --detach motifs/honest-marks    # the gates run on PR B's tree
-npm test                                   # 439 tests, fail 0
+npm test                                   # 447 tests, fail 0
 python3 impl/python/test_conformance.py    # 76/76
-python3 -m unittest discover -s impl/python -p 'test_rhetorlint.py'   # 21 OK
+python3 -m unittest discover -s impl/python -p 'test_rhetorlint.py'   # 23 OK
 go -C impl/go test -count=1 ./...          # ok
-node scripts/xengine-diff.mjs              # 1424 inputs, 0 plain-ASCII differences, 19 recorded divergences
+node scripts/xengine-diff.mjs              # 1489 inputs, 0 plain-ASCII differences, 19 recorded divergences
 node scripts/measure.mjs --check           # report current, every mark labelled
 node scripts/gen-agency-lexicon.mjs --check
 npm run check:cloudflare && npm run ml-dataset:check && node scripts/demo.mjs
@@ -64,11 +70,13 @@ If `origin/main` has moved, merge it into `motifs/measure` and then into
 `motifs/honest-marks`, and re-run the gates. A rebase would orphan the dataset's
 source revision.
 
-The PR bodies were written into the session scratchpad, not the repository:
+The PR bodies were written into the session scratchpad, not the repository.
+`/private/tmp` may not survive a reboot, so copy both somewhere durable, outside
+the repository, before relying on this path:
 
 ```bash
 SCRATCH=/private/tmp/claude-501/-Users-yournameisai/d24ce363-78c8-45fe-b7c4-98b46e277978/scratchpad
-ls "$SCRATCH/pr-a.md" "$SCRATCH/pr-b.md"   # /private/tmp may not survive a reboot
+ls "$SCRATCH/pr-a.md" "$SCRATCH/pr-b.md"
 ```
 
 ## 1 · Push and open the two PRs (private repo, paid Actions)
@@ -96,9 +104,9 @@ every push to `main`.
 | B merges | 1 | 1 |
 | each extra push to either branch | +1 | 0 |
 
-Retargeting B with `gh pr edit` is a `pull_request` "edited" event. `ci.yml`
-uses the default activity types (opened, synchronize, reopened), so the
-retarget should not start a run.
+Retargeting B is a `pull_request` "edited" event. `ci.yml` uses the default
+activity types (opened, synchronize, reopened), so the retarget should not
+start a run.
 
 A single combined PR would cost 2 runs, plus the Pages deploy, but makes a
 weaker review.
@@ -109,18 +117,31 @@ contrast, taxonomy and claims tests, because PR B moves those four files into
 
 ## 2 · Merge with merge commits only
 
+The repository deletes a head branch on merge, and allows squash and rebase
+merges (`gh repo view cambridgetcg/rhetorlint-spec --json
+deleteBranchOnMerge,squashMergeAllowed,rebaseMergeAllowed` on 2026-10-19:
+true, true, true). Branch protection is not available on this private
+repository's plan, so nothing enforces merge commits but the command you type.
+You may want to turn squash and rebase merging off while the stack lands.
+
 ```bash
-gh pr merge <A> -R cambridgetcg/rhetorlint-spec --merge      # no --delete-branch yet
+gh pr merge <A> -R cambridgetcg/rhetorlint-spec --merge
+# motifs/measure is deleted on merge, and GitHub retargets B to main by itself.
+gh pr view  <B> -R cambridgetcg/rhetorlint-spec --json baseRefName   # expect main
+# only if it still says motifs/measure:
 gh pr edit  <B> -R cambridgetcg/rhetorlint-spec --base main
 gh pr merge <B> -R cambridgetcg/rhetorlint-spec --merge
+# before any publish, deploy or upload: the dataset's source revision is on main
+git fetch origin && git merge-base --is-ancestor fcc205e42d9857e05b668c5ff7847f8ffba0930e origin/main && echo ok
 ```
 
 Why merge commits only:
 
-- The conformance dataset is locked to `SOURCE_REVISION` d488b81, a PR B
-  commit. Its card links `…/tree/d488b81…`.
-- A squash or rebase would leave that commit unreachable from `main`. The link
-  would then die and `git merge-base --is-ancestor` would fail.
+- The conformance dataset is locked to `SOURCE_REVISION` fcc205e, a PR B
+  commit. Its card links `…/tree/fcc205e…`.
+- A squash or rebase would leave that commit outside `main`'s history:
+  `git merge-base --is-ancestor` would fail, and the card's link would rest on
+  GitHub keeping the closed PR's refs.
 
 **Merging B fires `pages.yml`.** B changes `apps/explorer/index.html` and
 `apps/widget/bookmarklet.html`. That is a public redeploy of the people door at
@@ -131,8 +152,9 @@ https://cambridgetcg.github.io/rhetorlint-spec/ with core 0.1.4 and rules-en
 
 - **Accept the agency-hiding narrowing.**
   - What it marks changes. Before: "any agentless passive". After: "a
-    past-tense passive of a fault, breach, concealment or decision verb, whose
-    doer this clause does not name".
+    past-tense passive of a fault, breach, concealment or decision verb, with
+    no `by` among the next seven words of its clause". A doer named further
+    on, or in the next clause, does not silence it.
   - Level warning 0.7 → note 0.6.
   - The recall it gives up: `Your account was closed`, `Jobs were cut`,
     `Lives were lost`, `was inadvertently published`, `steps will be taken`,
@@ -144,14 +166,22 @@ https://cambridgetcg.github.io/rhetorlint-spec/ with core 0.1.4 and rules-en
 - **Placement of `concerns were raised`** (conformance case 6). It stays in
   agency-hiding, as now: `raised` after a challenge noun. Or it moves to an
   `insinuation.raises-questions` family that no rule seeds yet.
-- **`absolute.universal`'s technique label** (a ready follow-up, not in these
-  PRs):
+- **`absolute.universal`'s technique label** (a proposal, not in these PRs;
+  the people door shows it as "label under review" until you decide):
   - Change "False Dilemma or No Choice" to "Exaggeration or Minimisation" in
-    `packages/rules-en/rules.json`.
+    `packages/rules-en/rules.json`, and bump the pack's version (0.2.2 if 0.2.1
+    is already published), since its bytes change.
   - `cp packages/rules-en/rules.json impl/python/rules_en.json`.
-  - Set `semeval_technique` in `spec/taxonomy.yaml`.
+  - Set `semeval_technique` in `spec/taxonomy.yaml`, and drop the explorer's
+    `LABEL_UNDER_REVIEW` entry with the known gap it answers.
   - `node scripts/gen-conformance.mjs` regenerates the technique field of
-    cases 1, 8, 10 and 14.
+    every case with an `absolute.universal` mark: 9 today, cases 1, 8, 10, 14,
+    36, 37, 38, 57 and 64.
+  - `rules.json` and `cases.json` are locked by the dataset, so set a new
+    `SOURCE_REVISION` (the commit that changes them) and run
+    `npm run ml-dataset:build`; then `npm run build:widget`, `npm run
+    build:explorer` and `npm run build:cloudflare`, since all three embed the
+    pack; then the gates above.
   - Optionally move the family to manipulative-wording, which changes
     per-family `toSignal` counts.
   - Separately: drop bare `never`? On the 19 local reader samples it makes 10
@@ -175,16 +205,43 @@ https://cambridgetcg.github.io/rhetorlint-spec/ with core 0.1.4 and rules-en
     `measurement/report.json` lists release blockers. It lists four today, all
     `info` or `note` rules; the agency rule is no longer among them.
   - Optionally, adjudicate the DEBATABLE/FPB boundary rows as a second reader.
+- **Core's version number: 0.1.4 or 0.2.0.** Core 0.1.3 was never published,
+  so 0.1.4 is the first core on npm with closed rule-pack validation. A pack
+  core 0.1.2 reads now throws `TypeError: invalid rule pack at ...` when it
+  has a key the format does not list (even `$schema`, or `description`), a
+  family outside the seven, no `version`, or `level: "error"`. Every `^0.1.x`
+  consumer gets this on its next install with no pin change, and so does
+  `cli@0.1.1 --rules house.json`, which then exits 2 with a stack trace.
+  - As 0.1.4, caret consumers receive both the validator and the agency
+    narrowing.
+  - As 0.2.0, `^0.1.x` consumers receive neither. That needs cli `^0.2.0`
+    for core, a rules-en peer `>=0.2.0`, and a regenerated explorer, door and
+    dataset snapshot.
+- **Bump core and rules-en together.** With core 0.1.2 pinned, as fomoengine
+  and `@agenttool/browser` pin it, npm refuses a rules-en-only bump (ERESOLVE
+  on the optional peer `>=0.1.4`). Forced, or under an installer that only
+  warns on peer conflicts, core 0.1.2 puts the 0.2.1 note on every old passive mark
+  ("Shipments are often delayed.", "Your account was closed last week."). If
+  you want old engines silent instead, the 0.2.1 rule could name a new
+  detector that core 0.1.2 skips and core 0.1.4, Python and Go accept; the
+  cost is that the unpublished core 0.1.3 would reject the pack. Not done
+  here.
 - **CLI 0.2.0.**
   - Publish it, and a fresh `npm i @rhetorlint/cli` gets core 0.1.4 with
     rules-en 0.2.1 (22 rules).
   - Hold it, and `cli@0.1.1` (`^0.1.2` for both) gets core 0.1.4 with rules-en
-    0.1.2 (11 rules, old agency note at warning). That pairing runs, and the
-    old note stays true of the narrower marks.
+    0.1.2 (11 rules, old agency note at warning). With the default pack that
+    pairing runs, and the old note stays true of the narrower marks; with a
+    custom pack, see the validator above.
+- **Package READMEs on npm.** The core and rules-en READMEs link into the
+  repository (`../../spec/…`, `../../measurement/…`, 9 links in all). npmjs.com
+  resolves them against this private repository, so npm readers cannot follow
+  them. Make the repository public, point them at the Pages site, or accept
+  them as dead for now.
 - **CI steps.** Approve the two steps PR A added to `ci.yml`: `node
   scripts/xengine-diff.mjs`, and the Python unit tests.
-  - Locally they take 1.3 s with a warm Go build cache, 3 s cold, plus 0.1 s;
-    a hosted runner is slower.
+  - In one local run (no committed script times them) they took 1.3 s with a
+    warm Go build cache, 3 s cold, plus 0.1 s; a hosted runner is slower.
   - They make three-engine agreement and the Python unit tests gate CI for the
     first time.
 
@@ -201,17 +258,23 @@ Publish from a clean `main` that matches upstream. `~/Desktop/rhetorlint-spec`
 is shared with other sessions, and its local `main` was behind `origin/main`
 on 10-19. If its tree is dirty the helper refuses, so use a fresh clone.
 
+Before either route, check that `main`'s packages are the bytes PR B was
+reviewed at; anything that landed on `main` since would otherwise ship
+unreviewed. GitHub keeps each PR's head as `refs/pull/<n>/head`:
+
 ```bash
 cd ~/Desktop/rhetorlint-spec && git switch main && git pull --ff-only
 # or: git clone https://github.com/cambridgetcg/rhetorlint-spec.git "$(mktemp -d)/rl" && cd "$_"
+git fetch origin "pull/<B>/head" && git diff --exit-code FETCH_HEAD HEAD -- packages/
 zsh scripts/publish-npm-interactive.zsh
 ```
 
 The helper runs `npm test`, then publishes every workspace whose manifest
 version is new: core 0.1.4, rules-en 0.2.1 **and cli 0.2.0**. If the CLI should
-wait, publish the two by hand instead, in order:
+wait, publish the two by hand instead, in order, after the same check:
 
 ```bash
+npm test
 npm publish -w @rhetorlint/core
 npm view @rhetorlint/core@0.1.4 version      # wait until it answers
 npm publish -w @rhetorlint/rules-en
@@ -220,7 +283,10 @@ npm publish -w @rhetorlint/rules-en
 On ordering against the atlas's O1 item: core 0.1.4 already contains 0.1.3's
 hedge-preserving strip. A separate 0.1.3 release (`NPM_DEPLOY.md` §
 "Core-only meaning-preservation candidate") is needed only if the hedge fix
-should ship before the agency change.
+should ship before the agency change. Then publish it after A merges and
+before B merges, or from a pushed branch at 1a16766: once B merges, `main`'s
+core manifest says 0.1.4, and both the helper and `release.yml` publish what
+the manifest says.
 
 Then verify from a clean install:
 
@@ -229,18 +295,22 @@ Then verify from a clean install:
 - deprecate, but only once 0.1.4 installs.
 
 ```bash
-npm deprecate '@rhetorlint/core@<0.1.3' "strip output before 0.1.3 deletes hedges ('He allegedly stole it.' -> 'He stole it.') in strip() and in analyze().strip; marks are unaffected. Upgrade to >=0.1.4."
+npm deprecate '@rhetorlint/core@<0.1.3' "strip output before 0.1.3 deletes hedges ('He allegedly stole it.' -> 'He stole it.') in strip() and in analyze().strip; marks are not affected by this bug. Upgrade to >=0.1.4 (which also narrows agency-hiding marks and validates rule packs strictly; see the release notes)."
 npm deprecate @rhetorlint/rules-en@0.1.1 "Use 0.1.2. On an engine below core 0.1.2 this version's shouting.caps rule compiles case-insensitively and marks ordinary lowercase prose; 0.1.2 makes the pattern go silent."
 ```
 
 The planned core message said "analyze() is unaffected". That is not true:
 core 0.1.2's `analyze("He allegedly stole it.").strip` is `"He stole it."`. Only
-the marks are unaffected. The `rules-en@0.1.1` line is July's, still waiting.
+the marks are unaffected by that bug, and the upgrade it advises changes marks
+on purpose, so the message says both. The `rules-en@0.1.1` line is July's,
+still waiting.
 
-**The CI publish route is still closed.** No npm trusted-publisher record
-matches `release.yml`, so every OIDC attempt so far has failed with "package
-not found": 07-24, the two 07-27 tags, 08-24 and 09-07. Nothing in these PRs
-changes that.
+**The CI publish route is still closed.** Every OIDC attempt so far has failed
+with "package not found": 07-24, the two 07-27 tags, 08-24 and 09-07. The most
+likely cause is that no npm trusted-publisher record matches `release.yml`,
+but the error does not establish which field is wrong (`NPM_DEPLOY.md` says
+so); inspect each package's publisher settings. Nothing in these PRs changes
+that.
 
 Push a `v*` or `release-*` tag and it starts `release.yml`. That costs a run,
 and it fails at the same exchange until the publisher records exist. Mark a
@@ -250,11 +320,14 @@ hand release with a `hand-v…` tag, per `NPM_DEPLOY.md` step 6.
 
 - **Cloudflare claim-feedback door.** PR B regenerated
   `doors/cloudflare-claim-feedback/` (runtime core and rules, method, release
-  lock). After B merges, from a checkout whose HEAD is the fetched
-  `origin/main`, run `zsh scripts/deploy-cloudflare-claim-feedback.zsh active`.
-  The script refuses any other HEAD.
+  lock). After B merges, from a clean checkout whose HEAD is the fetched
+  `origin/main`, confirm the deploy for that exact commit yourself:
+  `RHETORLINT_CLOUDFLARE_DEPLOY="active:$(git rev-parse HEAD)" zsh
+  scripts/deploy-cloudflare-claim-feedback.zsh active`. The script refuses a
+  dirty tree, a missing or different confirmation, and any HEAD other than the
+  fetched `origin/main`.
 - **Hugging Face.** The conformance dataset has never been uploaded. The
-  committed snapshot now has 76 rows, locked to d488b81. A staging upload needs
+  committed snapshot now has 76 rows, locked to fcc205e. A staging upload needs
   its own review (namespace, visibility, token scope), as
   `datasets/rhetorlint-conformance/README.md` says.
 - **PyPI.** `impl/python` now says 0.1.4. PyPI still has no `rhetorlint`; see

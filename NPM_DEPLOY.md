@@ -22,11 +22,12 @@ The three packages that publish (nothing else does):
 > a floor rises (an engine feature the CLI's own output depends on).
 
 Core 0.1.4 is the current floor for the coordinated 0.2.0 CLI and rules-en
-0.2.1. Rules-en 0.2.1 adds no pack key, so core 0.1.3 still parses it, but its
-agency note ("a past-tense passive of a fault, breach, concealment or decision
-verb") describes the 0.1.4 accountable-passive detector. Core 0.1.3 would put
-that note on its old, wider marks ("Shipments are often delayed", "The soup
-can be frozen"), a label that is false for each of them. Core 0.1.3 was the
+0.2.1. Rules-en 0.2.1 adds no pack key, so core 0.1.3 and core 0.1.2 (the one
+npm has) still parse it, but its agency note ("a past-tense passive of a fault,
+breach, concealment or decision verb") describes the 0.1.4 accountable-passive
+detector. An older core would put that note on its old, wider marks
+("Shipments are often delayed", "The soup can be frozen"), a label that is
+false for each of them. Core 0.1.3 was the
 floor before, because it preserves modality and attribution in strip output;
 allowing core 0.1.2 would install successfully while producing the superseded
 strip semantics.
@@ -39,22 +40,42 @@ the person who publishes is `HANDOFF-PUBLISH-2026-10-19.md`. On 2026-10-19
 each `latest` the highest. Core 0.1.3, rules-en 0.2.0 and cli 0.2.0 were never
 published, so this release would carry all of them.
 
-**Core 0.1.4** contains everything in the 0.1.3 candidate below, plus:
+**Core 0.1.4** contains everything in the 0.1.3 candidate below, plus the
+changes listed after this paragraph. Because 0.1.3 was never published, 0.1.4
+is also the first core on npm with that candidate's closed rule-pack
+validation. A pack core 0.1.2 reads now throws `TypeError: invalid rule pack
+at ...` when it has a key the format does not list (`$schema`, `description`,
+`author`), a family outside the taxonomy's seven, no `version`, or `level:
+"error"`. Every `^0.1.x` consumer gets this on its next install with no pin
+change: `cli@0.1.1 --rules house.json` with a `description` key exits 2 with
+that TypeError and a stack trace, where core 0.1.2 gave a mark. The version is
+Yu's choice. Published as 0.1.4, caret consumers receive both the validator
+and the agency narrowing. Published as 0.2.0, `^0.1.x` consumers receive
+neither; that needs cli `^0.2.0` for core, a rules-en peer `>=0.2.0`, and a
+regenerated explorer, door and dataset snapshot.
 
 - **The accountable-passive detector** behind `agency-hiding.deleted-subject`.
   It marks a `was`, `were` or `been` passive only when its participle is on a
   closed list of fault, breach, concealment and decision verbs, and only when
-  the clause does not name the doer. Some classes also need a head noun:
+  no `by` stands among the next seven words of its clause. Some classes also
+  need a head noun:
   `raised` after a challenge noun such as `concerns`, `made` after an error or
   decision noun, `affected` after a held-in-trust noun. There must
-  be no `by` in the next seven words, and no negator anywhere in the clause
-  before the auxiliary. The lists live in `spec/agency-lexicon.json` and are
+  be no negator anywhere in the clause before the auxiliary. The lists live in `spec/agency-lexicon.json` and are
   generated into JS, Python and Go by `scripts/gen-agency-lexicon.mjs`. Before
   this, the detector marked a be-verb followed by an -ed or -en word, less a
   stoplist.
 - **Strip** keeps a loaded intensifier when a negator is one of the two words
-  before it in the clause, or when it sits inside a quotation on its line.
-  `The risk is not extremely high.` stays as it is.
+  before it in the clause, or when it sits inside double quotes on its line.
+  `The risk is not extremely high.` stays as it is. It still deletes one three
+  words from its negator (`not at all extremely high`), after `rarely`, or
+  inside single quotes: open O4 rows.
+- **One negator vocabulary**, generated into every engine from
+  `spec/agency-lexicon.json` and `spec/guard-lexicon.json`: the agency
+  detector reads `cannot neither never no nobody none nor not nothing`, and
+  the strip and `absolute.universal` guards read those plus `hardly` and
+  `without`. So `Nothing is guaranteed.` is unmarked and `Nothing extremely
+  bad happened.` keeps its `extremely`.
 - **An engine-side `absolute.universal` guard**, keyed by ruleId so the pack
   needs no new key. A negator among the two words before a match leaves it
   unmarked; a comma ends the negator's reach once a word stands between them.
@@ -68,7 +89,13 @@ published, so this release would carry all of them.
 - The agency rule's note now reads "a past-tense passive of a fault, breach,
   concealment or decision verb". Its level falls from `warning` to `note`, and
   its confidence from 0.7 to 0.6.
-- The optional peer rises to `@rhetorlint/core >=0.1.4`.
+- The optional peer rises to `@rhetorlint/core >=0.1.4`. Bump core and
+  rules-en together. With core 0.1.2 pinned (fomoengine and
+  `@agenttool/browser` pin it), `npm i @rhetorlint/rules-en` fails with
+  ERESOLVE on this peer's range. Forced (`--legacy-peer-deps`, `--force`), or
+  under an installer that only warns on peers, every old passive mark carries
+  the 0.2.1 note: on core 0.1.2, "Shipments are often delayed.", "The soup can
+  be frozen." and "Your account was closed last week." all draw it.
 
 **CLI 0.2.0** is unchanged since 07-27 apart from its ranges (`^0.1.4` core,
 `^0.2.0` rules-en). Publishing it is a separate decision.
@@ -96,15 +123,21 @@ No known consumer imports `strip()`. But `analyze()` returns a `strip` field,
 and Aletheia shows it as `lintText().strip` and `lintArticle().stripPreview`.
 
 When a pin moves to core 0.1.4 + rules-en 0.2.1, these are the measured
-changes. Reproduce them with `node scripts/measure.mjs --compare origin/main`,
-and with `node scripts/measure.mjs --local` on this branch and on
-`motifs/measure`, whose engine and pack equal `main`'s.
+changes. Before is `main` (core 0.1.3 + rules-en 0.2.0), from `node
+scripts/measure.mjs --consumer origin/main`; the local rows need the
+gitignored `measurement/local/`. Each agency mark is one `toSignal` rule count.
 
-| texts | marks per 100 words | agency marks (each one `toSignal` rule count and one `[who?]` in strip) |
-|---|---|---|
-| 26 committed items, 21,229 words | 2.21 → 0.53 | 377 → 22 |
-| 19 local reader samples, 10,738 words | 1.19 → 0.47 | 76 → 4 |
-| 70 local held-out files, 566,466 words | 1.78 → 0.45 | 7,500 → 33 |
+| texts | marks per 100 words | agency marks | `[who?]` in strip | SARIF warnings |
+|---|---|---|---|---|
+| 26 committed items, 21,229 words | 2.21 → 0.53 | 377 → 22 | 377 → 22 | 379 → 2 |
+| 19 local reader samples, 10,738 words | 1.19 → 0.47 | 76 → 4 | 76 → 4 | 78 → 2 |
+| 70 local held-out files, 566,466 words | 1.78 → 0.45 | 7,500 → 33 | 7,500 → 33 | 7,504 → 4 |
+
+The pair the known consumers pin today, core 0.1.2 + rules-en 0.1.2 (`node
+scripts/measure.mjs --consumer d190af1`), is close to `main` on the committed
+items: 2.20 marks per 100 words, 377 agency marks and 379 SARIF warnings. Its
+strip flags only 359 of its 377 agency marks with `[who?]`, so the "each agency
+mark is one `[who?]`" reading of the table holds from core 0.1.3 on.
 
 - **SARIF.** Every agency result moves from `warning` to `note`.
   `contrition.rehearsed` is now the pack's only `warning` rule. On the committed
@@ -134,8 +167,11 @@ marks:
 that core 0.1.2 leaves unmarked is now marked: `40 staff were laid off as we closed
 the Leeds office` (`twin.agency.26`).
 
-**After publishing**, run step 5 below; its two blocks still pass on this
-branch. Then add these checks from the clean install:
+**After publishing**, run step 5 below. Its first block installs cli 0.2.0, so
+it needs that version on the registry; if the CLI is held, run the second
+block and this section's check only. Both blocks and the check pass against
+this branch's workspace packages. Then add these checks from the clean
+install:
 
 ```bash
 node --input-type=module -e '
@@ -166,7 +202,7 @@ on core 0.1.2: `analyze("He allegedly stole it.").strip` is `"He stole it."`.
 So the message must not say `analyze()` is unaffected:
 
 ```bash
-npm deprecate '@rhetorlint/core@<0.1.3' "strip output before 0.1.3 deletes hedges ('He allegedly stole it.' -> 'He stole it.') in strip() and in analyze().strip; marks are unaffected. Upgrade to >=0.1.4."
+npm deprecate '@rhetorlint/core@<0.1.3' "strip output before 0.1.3 deletes hedges ('He allegedly stole it.' -> 'He stole it.') in strip() and in analyze().strip; marks are not affected by this bug. Upgrade to >=0.1.4 (which also narrows agency-hiding marks and validates rule packs strictly; see the release notes)."
 ```
 
 Every published core version is below 0.1.3, so the exact-pinned consumers
