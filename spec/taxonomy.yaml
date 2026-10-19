@@ -382,6 +382,30 @@ families:
           - tell: "the only option"
             tag: "O6"
             reason: "'the only option' is not among absolute.universal's terms, so the False Dilemma phrase this lesson teaches goes unmarked; the rule marks the same sentence's 'Everyone' instead."
+        # A negated absolute is a disclaimer, and a clause-initial 'Never' before
+        # a lowercase word is advice, so the engine leaves both unmarked. The
+        # guard lives in the engine, not the pack (packages/rules-en/README.md
+        # says why); these sentences hold every engine to it.
+        guard_examples:
+          - text: "Returns are not guaranteed; past performance is no indicator."
+            expect: unmarked
+          - text: "Results aren't always typical."
+            expect: unmarked
+          - text: "Not everyone qualifies."
+            expect: unmarked
+          - text: "Never share your password with anyone."
+            expect: unmarked
+          - text: "Explain real constraints; never manufacture the shortage."
+            expect: unmarked
+          - text: "This is guaranteed to double your savings."
+            expect: marked
+            actual: "guaranteed"
+          - text: "Everyone knows this policy works."
+            expect: marked
+            actual: "Everyone"
+          - text: "Our product will always be the best choice."
+            expect: marked
+            actual: "always"
         lineage: "SemEval-2023 · Simplification › False Dilemma or No Choice"
 
   # ==========================================================================
