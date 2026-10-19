@@ -162,6 +162,64 @@ class StripTests(unittest.TestCase):
                 self.assertEqual(rhetorlint.analyze(text, rules)["strip"], expected)
 
 
+def absolutes(text, rules):
+    marks = rhetorlint.analyze(text, rules)["marks"]
+    return [mark for mark in marks if mark["ruleId"] == "absolute.universal"]
+
+
+class AbsoluteGuardTests(unittest.TestCase):
+    def test_negated_absolute_and_imperative_never_are_unmarked(self):
+        rules = rhetorlint.load_default_rules()
+        cases = [
+            "Returns are not guaranteed; past performance is no indicator.",
+            "Results aren't always typical.",
+            "Results aren’t always typical.",
+            "Not everyone qualifies.",
+            "NOT EVERYONE QUALIFIES.",
+            "The risk cannot always be priced.",
+            "Never share your password with anyone.",
+            "NEVER share it.",
+            "Never\tshare it.",
+            "\"Never share it,\" he said.",
+            "Explain real constraints; never manufacture the shortage.",
+            *["Check the link%s never click it." % brk for brk in ".;:!?"],
+        ]
+        for text in cases:
+            with self.subTest(text=text):
+                self.assertEqual([mark["actual"] for mark in absolutes(text, rules)], [])
+
+    def test_absolutes_the_guards_do_not_reach_stay_marked(self):
+        rules = rhetorlint.load_default_rules()
+        cases = [
+            ("This is guaranteed to double your savings.", "guaranteed"),
+            ("Everyone knows this policy works.", "Everyone"),
+            ("Our product will always be the best choice.", "always"),
+            # The negator is the third word back: the window is two words.
+            ("Not bad, and always cheap.", "always"),
+            # The negator is the word before, but a clause break stands between them.
+            *[("We said no%s everyone agreed." % brk, "everyone") for brk in ".;:!?"],
+            # 'never' that does not open its clause, or that no lowercase word follows.
+            ("We never share data.", "never"),
+            ("Love begins with choice, never obligation.", "never"),
+            ("Never Again.", "Never"),
+            ("Never.", "Never"),
+            ("Never, ever.", "Never"),
+            ("Never\nshare it.", "Never"),
+            # A line break is not a clause break.
+            ("We will\nnever share it.", "never"),
+        ]
+        for text, actual in cases:
+            with self.subTest(text=text):
+                marks = absolutes(text, rules)
+                self.assertEqual([mark["actual"] for mark in marks], [actual])
+                start = marks[0]["position"]["start"]["offset"]
+                end = marks[0]["position"]["end"]["offset"]
+                self.assertEqual(text[start:end], actual)
+        # The guard reads absolute.universal only: other rules keep their marks under a negator.
+        marks = rhetorlint.analyze("It is not world-class.", rules)["marks"]
+        self.assertTrue(any(mark["ruleId"] == "puffery.peacock" for mark in marks))
+
+
 class EngineLabelTests(unittest.TestCase):
     def test_engine_version_names_the_core_revision_it_reproduces(self):
         core = json.loads((ROOT / "packages" / "core" / "package.json").read_text(encoding="utf-8"))

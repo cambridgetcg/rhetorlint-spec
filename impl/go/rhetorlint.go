@@ -58,8 +58,17 @@ var byFollows = regexp.MustCompile(`(?i)^\s+(?:(?:\w+ly|out|up|off|down|in|on|aw
 
 var removable = map[string]bool{"intensifier.loaded": true}
 
-// negators negate an intensifier after them ("not extremely high"). With any
-// "n't" contraction, they are what negatedAt looks for.
+// negationScoped names the rules whose matches are read in their clause before
+// they are marked: a negated absolute ("not guaranteed", "Not everyone") is a
+// disclaimer, and a clause-initial "Never" before a lowercase word ("Never
+// share your password.") is advice, not a claim. Engine-side, like removable,
+// so the pack stays readable by older engines; spec/taxonomy.yaml declares it
+// as guard_examples.
+var negationScoped = map[string]bool{"absolute.universal": true}
+
+// negators negate an intensifier or an absolute after them ("not extremely
+// high", "not always"). With any "n't" contraction, they are what negatedAt
+// looks for.
 var negators = map[string]bool{
 	"not": true, "never": true, "no": true, "nor": true,
 	"without": true, "hardly": true, "cannot": true,
@@ -249,7 +258,11 @@ func jsRound(x float64) float64 { return math.Floor(x + 0.5) }
 func Analyze(text string, pack RulePack) Result {
 	var marks []Mark
 	for _, rule := range pack.Rules {
+		scoped := negationScoped[rule.RuleID]
 		for _, h := range matchesFor(rule, text) {
+			if scoped && negationScopedAt(text, h.index, h.index+h.length) {
+				continue
+			}
 			var mk Mark
 			mk.RuleID = rule.RuleID
 			mk.Family = rule.Family
@@ -367,6 +380,44 @@ func negatedAt(text string, offset int) bool {
 		}
 	}
 	return false
+}
+
+// imperativeNeverAt reports whether text[start:end] is "never", in any letter
+// case, opening its clause (only non-word characters between it and the start
+// of the text or one of . ; : ! ?) and followed by spaces or tabs and an ASCII
+// lowercase letter. Like negatedAt it walks characters, never a count of bytes.
+func imperativeNeverAt(text string, start, end int) bool {
+	word := []byte(text[start:end])
+	for i, c := range word {
+		if c >= 'A' && c <= 'Z' {
+			word[i] = c + ('a' - 'A')
+		}
+	}
+	if string(word) != "never" {
+		return false
+	}
+	i := start
+	for i > 0 {
+		r, size := utf8.DecodeLastRuneInString(text[:i])
+		if isGuardWordRune(r) {
+			return false
+		}
+		if strings.ContainsRune(".;:!?", r) {
+			break
+		}
+		i -= size
+	}
+	j := end
+	for j < len(text) && (text[j] == ' ' || text[j] == '\t') {
+		j++
+	}
+	return j > end && j < len(text) && text[j] >= 'a' && text[j] <= 'z'
+}
+
+// negationScopedAt reports whether a negationScoped match is negated or an
+// imperative "Never".
+func negationScopedAt(text string, start, end int) bool {
+	return negatedAt(text, start) || imperativeNeverAt(text, start, end)
 }
 
 // quotedAt reports whether offset sits inside a quotation on its own line: an

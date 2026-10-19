@@ -363,6 +363,90 @@ func TestStripKeepsNegatedOrQuotedIntensifier(t *testing.T) {
 	})
 }
 
+func absoluteActuals(text string, pack RulePack) ([]string, []Mark) {
+	actuals := []string{}
+	var marks []Mark
+	for _, mark := range Analyze(text, pack).Marks {
+		if mark.RuleID == "absolute.universal" {
+			actuals = append(actuals, mark.Actual)
+			marks = append(marks, mark)
+		}
+	}
+	return actuals, marks
+}
+
+func TestAbsoluteGuard(t *testing.T) {
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	t.Run("negated absolute and imperative never are unmarked", func(t *testing.T) {
+		texts := []string{
+			"Returns are not guaranteed; past performance is no indicator.",
+			"Results aren't always typical.",
+			"Results aren’t always typical.",
+			"Not everyone qualifies.",
+			"NOT EVERYONE QUALIFIES.",
+			"The risk cannot always be priced.",
+			"Never share your password with anyone.",
+			"NEVER share it.",
+			"Never\tshare it.",
+			"\"Never share it,\" he said.",
+			"Explain real constraints; never manufacture the shortage.",
+		}
+		for _, brk := range []string{".", ";", ":", "!", "?"} {
+			texts = append(texts, "Check the link"+brk+" never click it.")
+		}
+		for _, text := range texts {
+			if actuals, _ := absoluteActuals(text, pack); len(actuals) != 0 {
+				t.Errorf("%q: absolute.universal marks %q, want none", text, actuals)
+			}
+		}
+	})
+
+	t.Run("absolutes the guards do not reach stay marked", func(t *testing.T) {
+		tests := []struct{ input, actual string }{
+			{"This is guaranteed to double your savings.", "guaranteed"},
+			{"Everyone knows this policy works.", "Everyone"},
+			{"Our product will always be the best choice.", "always"},
+			// The negator is the third word back: the window is two words.
+			{"Not bad, and always cheap.", "always"},
+			// 'never' that does not open its clause, or that no lowercase word follows.
+			{"We never share data.", "never"},
+			{"Love begins with choice, never obligation.", "never"},
+			{"Never Again.", "Never"},
+			{"Never.", "Never"},
+			{"Never, ever.", "Never"},
+			{"Never\nshare it.", "Never"},
+			// A line break is not a clause break.
+			{"We will\nnever share it.", "never"},
+		}
+		// The negator is the word before, but a clause break stands between them.
+		for _, brk := range []string{".", ";", ":", "!", "?"} {
+			tests = append(tests, struct{ input, actual string }{"We said no" + brk + " everyone agreed.", "everyone"})
+		}
+		for _, test := range tests {
+			actuals, marks := absoluteActuals(test.input, pack)
+			if len(actuals) != 1 || actuals[0] != test.actual {
+				t.Errorf("%q: absolute.universal marks %q, want [%q]", test.input, actuals, test.actual)
+				continue
+			}
+			start, end := marks[0].Position.Start.Offset, marks[0].Position.End.Offset
+			if test.input[start:end] != test.actual {
+				t.Errorf("%q: mark spans %q, want %q", test.input, test.input[start:end], test.actual)
+			}
+		}
+		// The guard reads absolute.universal only: other rules keep their marks under a negator.
+		peacock := false
+		for _, mark := range Analyze("It is not world-class.", pack).Marks {
+			peacock = peacock || mark.RuleID == "puffery.peacock"
+		}
+		if !peacock {
+			t.Errorf("puffery.peacock lost its mark under a negator")
+		}
+	})
+}
+
 func TestEngineVersionNamesTheCoreRevision(t *testing.T) {
 	raw, err := os.ReadFile(filepath.Join(repoRoot(), "packages", "core", "package.json"))
 	if err != nil {

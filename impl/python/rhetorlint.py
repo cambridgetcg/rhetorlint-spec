@@ -56,8 +56,9 @@ AGENTLESS_PASSIVE = re.compile(
 # The sole ruleId eligible under the conservative strip counterfactual.
 REMOVABLE = {"intensifier.loaded"}
 
-# Words that negate an intensifier after them ("not extremely high"). With any
-# "n't" contraction, they are what _negated_at looks for.
+# Words that negate an intensifier or an absolute after them ("not extremely
+# high", "not always"). With any "n't" contraction, they are what _negated_at
+# looks for.
 _NEGATORS = frozenset({"not", "never", "no", "nor", "without", "hardly", "cannot"})
 _CLAUSE_BREAKS = frozenset(".;:!?")
 # ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
@@ -162,6 +163,37 @@ def _negated_at(text, offset):
     return False
 
 
+# The ruleIds whose matches are read in their clause before they are marked:
+# a negated absolute ("not guaranteed", "Not everyone") is a disclaimer, and a
+# clause-initial "Never" before a lowercase word ("Never share your password.")
+# is advice, not a claim. Engine-side, like REMOVABLE, so the pack stays
+# readable by older engines; spec/taxonomy.yaml declares it as guard_examples.
+NEGATION_SCOPED = {"absolute.universal"}
+
+
+def _imperative_never_at(text, start, end):
+    """True when text[start:end] is "never", in any letter case, opening its
+    clause (only non-word characters between it and the start of the text or
+    one of . ; : ! ?) and followed by spaces or tabs and an ASCII lowercase
+    letter. Like _negated_at it walks characters, never a count of units."""
+    if text[start:end].translate(_ASCII_LOWER) != "never":
+        return False
+    i = start
+    while i > 0 and not _is_guard_word_char(text[i - 1]) and text[i - 1] not in _CLAUSE_BREAKS:
+        i -= 1
+    if i > 0 and _is_guard_word_char(text[i - 1]):
+        return False
+    j = end
+    while j < len(text) and text[j] in " \t":
+        j += 1
+    return end < j < len(text) and "a" <= text[j] <= "z"
+
+
+def _negation_scoped_at(text, start, end):
+    """True when a NEGATION_SCOPED match is negated or an imperative "Never"."""
+    return _negated_at(text, start) or _imperative_never_at(text, start, end)
+
+
 def _quoted_at(text, offset):
     """True when offset sits inside a quotation on its own line: an odd number
     of straight double quotes before it, or an unclosed U+201C."""
@@ -234,7 +266,10 @@ def analyze(text, rules=None, locale=None, rewrite=None):
     rules_provenance = rules["id"] + "@" + rules["version"]
     marks = []
     for rule in rules["rules"]:
+        scoped = rule.get("ruleId") in NEGATION_SCOPED
         for index, length, actual in _matches_for(rule, text):
+            if scoped and _negation_scoped_at(text, index, index + length):
+                continue
             marks.append({
                 "ruleId": rule["ruleId"],
                 "family": rule["family"],
