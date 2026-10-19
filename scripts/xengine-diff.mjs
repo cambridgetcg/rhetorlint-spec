@@ -224,8 +224,10 @@ const PROBES = [
   ["abs-greek-word-before-never", "\u03a9 never fails."],
   // The guard's comma rule: a comma ends a negator's reach once a word stands
   // between them, but not when it follows the negator directly; strip's
-  // negator still reads past a comma. And the imperative's closed lists: a word
-  // that cannot be the verb, the adverbs stepped over, and how a word is cut.
+  // negator still reads past a comma. And the imperative's closed lists: the
+  // words after "Never" that keep it marked because they open a fragment or an
+  // inversion (any other lowercase word is read as the verb of advice), the
+  // adverbs stepped over before that word, and how a word is cut.
   ["abs-comma-after-noun", "No fees, always free."],
   ["abs-comma-after-verb", "Don't wait, everyone is buying."],
   ["abs-comma-after-word-tab", "No risk,\tguaranteed."],
