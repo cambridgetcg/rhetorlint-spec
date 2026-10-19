@@ -394,6 +394,42 @@
       "source": "constructed (motifs design plan, package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
     },
     {
+      "id": "lesson.absolute-universal.colon-never-sold",
+      "text": "Your data: never sold.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "never",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "A headline claim with its subject before the colon: 'never sold' promises the data is sold on no occasion, the same absolute as 'We never sell your data.', which stays marked. The imperative guard sees 'never' open a clause after ':' before a lowercase word and leaves it unmarked; position and a lowercase letter cannot tell a claim from an imperative.",
+      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.no-risk-guaranteed",
+      "text": "No risk, guaranteed.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "guaranteed",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'No' negates 'risk', not 'guaranteed': the sentence is an unqualified guarantee. A comma is not a clause break for the negation guard, so 'No' counts among the two words before 'guaranteed' and the overclaim goes unmarked.",
+      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.no-exceptions-list",
+      "text": "No contracts, no fees, no exceptions.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "no exceptions",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "Three parallel negatives: 'no exceptions' is itself the absolute, and the 'no' before 'fees' does not negate it. The negation guard counts that 'no' among the two words before the term and leaves the absolute unmarked.",
+      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
       "id": "probe.hedge-softener.01",
       "text": "We believe this update will fix most issues.",
       "ruleId": "hedge.softener",
