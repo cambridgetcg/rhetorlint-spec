@@ -156,7 +156,7 @@
         },
         "source_revision": {
           "type": "string",
-          "enum": ["af3b87115d3d154f2ba8b4c955b5a6584be5cf60"]
+          "enum": ["d488b818408737e27554f5a3e42f25bb288724f0"]
         },
         "source_path": { "type": "string", "enum": ["conformance/cases.json"] },
         "source_case_index": { "type": "integer", "minimum": 0, "maximum": 1000000 },

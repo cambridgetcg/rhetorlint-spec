@@ -49,10 +49,10 @@ function parseJsonl(bytes) {
   return text.trimEnd().split("\n").map((line) => JSON.parse(line));
 }
 
-test("the snapshot is all 31 conformance cases and no invented training split", async () => {
+test("the snapshot is all 76 conformance cases and no invented training split", async () => {
   assert.doesNotThrow(() => assertSupported(SCHEMA));
   const snapshot = await buildSnapshot();
-  assert.equal(snapshot.rows.length, 31);
+  assert.equal(snapshot.rows.length, 76);
   assert.equal(snapshot.rows.length, CORPUS.cases.length);
   assert.equal(snapshot.manifest.train_rows, 0);
   assert.equal(snapshot.manifest.split, "test");
@@ -74,7 +74,7 @@ test("the snapshot is all 31 conformance cases and no invented training split", 
       marks: CORPUS.cases[index].marks,
     });
     assert.equal(row.provenance.source_repository, "https://github.com/cambridgetcg/rhetorlint-spec");
-    assert.equal(row.provenance.source_revision, "af3b87115d3d154f2ba8b4c955b5a6584be5cf60");
+    assert.equal(row.provenance.source_revision, "d488b818408737e27554f5a3e42f25bb288724f0");
     assert.equal(row.provenance.source_case_index, index);
     assert.equal(row.provenance.independent_human_labels, false);
     assert.equal(row.provenance.input_ascii, true);
@@ -85,16 +85,16 @@ test("the snapshot is all 31 conformance cases and no invented training split", 
     ids.add(row.row_id);
   });
   assert.deepEqual(snapshot.manifest.measured_frame, {
-    unique_inputs: 31,
-    minimum_input_characters: 28,
+    unique_inputs: 76,
+    minimum_input_characters: 16,
     maximum_input_characters: 117,
-    marks: 50,
-    marked_cases: 26,
-    zero_mark_cases: 5,
+    marks: 68,
+    marked_cases: 46,
+    zero_mark_cases: 30,
     rules_in_pack: 22,
     rules_observed: 22,
     families_observed: 6,
-    strip_outputs_changed: 9,
+    strip_outputs_changed: 18,
   });
   assert.equal(snapshot.sourceManifest.source_repository.source_lock_enforced, true);
   assert.equal(snapshot.sourceManifest.method.cross_engine_checks.run_by_builder, false);
@@ -146,7 +146,7 @@ test("Claim Feedback contributes a digest-only exclusion receipt and zero rows",
 test("the committed release is an exact deterministic snapshot", async () => {
   const receipt = await checkCommittedRelease();
   assert.equal(receipt.status, "match");
-  assert.equal(receipt.rows, 31);
+  assert.equal(receipt.rows, 76);
   assert.equal(receipt.claim_feedback_content_rows, 0);
   assert.equal(receipt.writes, 0);
 
@@ -184,7 +184,7 @@ test("build writes one private new directory and refuses replacement", async () 
     const output = join(parent, "release");
     const receipt = await writeSnapshot(output);
     assert.equal(receipt.files_written, 9);
-    assert.equal(receipt.rows, 31);
+    assert.equal(receipt.rows, 76);
     assert.equal(receipt.network_requests, 0);
     assert.equal(lstatSync(output).mode & 0o777, 0o700);
     assert.equal(lstatSync(join(output, "README.md")).mode & 0o777, 0o600);

@@ -82,7 +82,7 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
 - **Inquiry and formal-methods work** — the opt-in [claim graph](examples/claim-graph/README.md) binds exact source spans and external mathematical treatment cards (including KINGDOM's Math Passport), formal-verification, evidence, report, or evaluation-design artifacts without treating a digest, formula, proof method, or study plan as a verdict.
-- **ML evaluators** — the local-first [RhetorLint conformance dataset](datasets/rhetorlint-conformance/README.md) turns all 31 committed engine cases into one digest-bound Hugging Face-compatible `test` snapshot. It has no training split, upload, model call, person score, or truth label; the sole Claim Feedback fixture is explicitly excluded because its reuse lane denies mirroring.
+- **ML evaluators** — the local-first [RhetorLint conformance dataset](datasets/rhetorlint-conformance/README.md) turns all 76 committed engine cases into one digest-bound Hugging Face-compatible `test` snapshot. It has no training split, upload, model call, person score, or truth label; the sole Claim Feedback fixture is explicitly excluded because its reuse lane denies mirroring.
 
 ```bash
 echo "Mistakes were made." | npm run cli -- --json     # the CLI, on stdin
