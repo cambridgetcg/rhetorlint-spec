@@ -410,6 +410,8 @@
     border: 1px dashed var(--rule-strong); border-radius: 4px; padding: 2px 7px;
   }
   .fam-desc { font-size: 14px; color: var(--ink-soft); margin: 8px 0 4px; max-width: 70ch; }
+  .fam-scope { font-size: 13px; color: var(--ink-faint); margin: 2px 0; max-width: 70ch; }
+  .fam-scope b { color: var(--ink-soft); font-weight: 600; }
 
   .tell {
     border: 1px solid var(--rule); border-radius: 9px;
@@ -510,7 +512,7 @@
       <div class="card col-strip">
         <p class="sect-label">Strip &mdash; the de-spun text</p>
         <div class="strip-out" id="strip"></div>
-        <p class="strip-legend">Deterministic counterfactual, no model: loaded intensifiers are subtracted and each agentless passive is flagged with <span class="who">[who?]</span>. Modality, attribution, and other tells stay intact. This is a reading aid, not a guarantee of grammatical or meaning-preserving revision.</p>
+        <p class="strip-legend">Deterministic counterfactual, no model: loaded intensifiers are subtracted (a negated or quoted one stays) and each passive the agency-hiding rule marks is flagged with <span class="who">[who?]</span>. Modality, attribution, and other tells stay intact. This is a reading aid, not a guarantee of grammatical or meaning-preserving revision.</p>
       </div>
 
     </div>
@@ -1867,25 +1869,41 @@
   /* ============================================================
      3. PRESENTATION DATA (families, examples, worked cases)
      ============================================================ */
-  // The seven families of the taxonomy. Whether one counts as planned is read
-  // off the pack at render time, never hand-flagged here — a family cannot keep
-  // a "planned" badge after a rule lands in it.
+  // The seven families of the taxonomy. What a family marks today is read off
+  // the pack at render time, never hand-written here — the "planned" badge and
+  // the "Marks today" line both follow RULES, so neither can outlive a rule.
+  // `what` describes only what the pack marks; `notYet` holds the taxonomy's
+  // named but unseeded techniques (spec/taxonomy.yaml); `unmarked` says what is
+  // left unmarked by design. test/explorer-truth.test.mjs holds all three.
   const FAMILIES = [
     { id: "manipulative-wording", label: "Manipulative wording",
-      desc: "Word choices that steer feeling or lower a promise — loaded intensifiers, deniable modals, vague hedges, unnamed authorities, and rehearsed contrition." },
+      what: "Word choices that steer feeling or lower a promise — loaded intensifiers, deniable modals, vague hedges, unnamed authorities, and rehearsed contrition.",
+      notYet: ["Repetition"] },
     { id: "simplification", label: "Simplification",
-      desc: "Collapses a messy reality into a clean, unarguable shape — absolutes and false dilemmas that claim more than anyone could know." },
+      what: "Collapses a messy reality into a clean, unarguable shape — absolutes that claim more than anyone could know.",
+      notYet: ["Causal Oversimplification", "Consequential Oversimplification"] },
     { id: "distraction", label: "Distraction",
-      desc: "Moves attention off the question that was actually asked." },
+      what: "Moves attention off the question that was actually asked.",
+      notYet: ["Straw Man", "Red Herring"] },
     { id: "attack-on-reputation", label: "Attack on reputation",
-      desc: "Targets the person or group instead of the argument — name-calling, labeling, guilt by association." },
+      what: "Targets the person or group instead of the argument. Only the writer's own doubt-casting word is marked — a distancing marker ('so-called') or a doubt verb ('claimed that') — never the target.",
+      notYet: ["Name Calling or Labelling", "Guilt by Association", "Appeal to Hypocrisy", "Questioning the Reputation"],
+      unmarked: "bare-label Name Calling is refused by doctrine. A loaded label on its own ('regime', 'militants') stays unmarked: telling a slur from a description takes a reading of intent the words alone do not give." },
     { id: "justification", label: "Justification",
-      desc: "Frames a stance as already justified — appeal to fear, flag-waving, 'we had no choice'." },
+      what: "Frames a stance as already justified, leaning on an outside appeal in place of evidence.",
+      notYet: ["Flag Waving", "Appeal to Authority", "Appeal to Popularity", "Appeal to Values", "Appeal to Fear/Prejudice"] },
     { id: "call", label: "Call",
-      desc: "Pushes the audience to act or feel right now — manufactured urgency, slogans, us-vs-them appeals." },
+      what: "Pushes the audience to act right now, before they can weigh it — manufactured urgency.",
+      notYet: ["Slogans", "Conversation Killer"] },
     { id: "agency-hiding", label: "Agency-hiding",
-      desc: "Deletes who acted — agentless passives where the subject is missing. RhetorLint's structural extension to the SemEval taxonomy." }
+      what: "Deletes who acted — a was, were or been passive whose verb is on a closed list of fault, breach, concealment, data-disclosure and decision verbs, with no doer named nearby ('mistakes were made', 'your data was shared'). RhetorLint's structural extension to the SemEval taxonomy.",
+      notYet: [],
+      unmarked: "present and modal 'be' passives ('is executed', 'can be frozen'), procedural ones ('samples were collected'), negated ones ('no customer data was accessed') and harm verbs whose doer the words cannot establish ('lives were lost'). Most passives hide nothing." }
   ];
+
+  // The techniques a family's rules carry, in pack order, without repeats.
+  const techniquesInFamily = (id) =>
+    [...new Set(RULES.rules.filter((r) => r.family === id).map((r) => r.technique || ""))].filter(Boolean);
 
   const rulesInFamily = (id) => RULES.rules.filter((r) => r.family === id);
 
@@ -1993,7 +2011,7 @@
                     '<span class="conf">heuristic · ' + Number(m.confidence).toFixed(2) + '</span>' +
                   '</div>' +
                   '<div class="mark-note">' + escapeHtml(m.note || "") + '</div>' +
-                  (plain ? '<div class="mark-plain"><b>Plain:</b> ' + escapeHtml(plain) + '</div>' : '') +
+                  (plain ? '<div class="mark-plain"><b>Guidance:</b> ' + escapeHtml(plain) + '</div>' : '') +
                 '</div>';
       }
       html += '</div>';
@@ -2034,7 +2052,17 @@
                 '<span class="fid">' + escapeHtml(fam.id) + '</span>' +
                 (rules.length ? '' : '<span class="planned">planned</span>') +
               '</div>';
-      html += '<p class="fam-desc">' + escapeHtml(fam.desc) + '</p>';
+      html += '<p class="fam-desc">' + escapeHtml(fam.what) + '</p>';
+      const shipped = techniquesInFamily(fam.id);
+      if (shipped.length) {
+        html += '<p class="fam-scope"><b>Marks today:</b> ' + shipped.map(escapeHtml).join(" · ") + '</p>';
+      }
+      if (fam.notYet.length) {
+        html += '<p class="fam-scope"><b>Not yet marked:</b> ' + fam.notYet.map(escapeHtml).join(" · ") + '</p>';
+      }
+      if (fam.unmarked) {
+        html += '<p class="fam-scope"><b>Left unmarked by design:</b> ' + escapeHtml(fam.unmarked) + '</p>';
+      }
 
       if (!rules.length) {
         html += '<p class="planned-body">Defined in the taxonomy; no rules in ' +
@@ -2055,7 +2083,7 @@
                     '<p class="tell-def">' + escapeHtml(cap(r.note || "")) + '.</p>' +
                     '<p class="worked-label">Worked example</p>' +
                     '<div class="worked">' + renderMarked(ex, res.marks) + '</div>' +
-                    (plain ? '<p class="rewrite-label">Honest plain rewrite</p>' +
+                    (plain ? '<p class="rewrite-label">Guidance</p>' +
                              '<div class="rewrite">' + escapeHtml(plain) + '</div>' : '') +
                   '</div>';
         }
