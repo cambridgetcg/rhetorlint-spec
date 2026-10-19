@@ -42,7 +42,7 @@ type agencyClass struct {
 }
 
 // BEGIN GENERATED AGENCY LEXICON
-// spec/agency-lexicon.json version 3, written by scripts/gen-agency-lexicon.mjs.
+// spec/agency-lexicon.json version 4, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
 const (
 	agencyWhitespace   = " \t\n\r\f"
@@ -58,8 +58,8 @@ const agencyAdverbSuffix = "ly"
 
 var agencySkip = map[string]bool{
 	"all": true, "already": true, "also": true, "can": true, "could": true, "had": true, "has": true,
-	"have": true, "may": true, "might": true, "must": true, "never": true, "not": true, "now": true,
-	"shall": true, "should": true, "since": true, "then": true, "will": true, "would": true,
+	"have": true, "may": true, "might": true, "must": true, "now": true, "shall": true, "should": true,
+	"since": true, "then": true, "will": true, "would": true,
 }
 
 const agencySkipSuffix = "ly"
@@ -343,13 +343,37 @@ var removable = map[string]bool{"intensifier.loaded": true}
 // as guard_examples.
 var negationScoped = map[string]bool{"absolute.universal": true}
 
-// negators negate an intensifier or an absolute after them ("not extremely
-// high", "not always"). With any "n't" contraction, they are what negatedAt
-// looks for.
+// The guards' word lists, generated from spec/guard-lexicon.json, whose why
+// fields say why each word is there: negators negate the intensifier or
+// absolute after them ("not extremely high", "not always"), and with any "n't"
+// contraction are what negatedAt looks for; clauseBreaks end a clause, for the
+// negator window and the imperative "Never"; neverNonVerbs, after a
+// clause-initial "never", open a fragment ("Never an issue.") or an inversion
+// ("Never has a product been this good."), so "Never" stays marked (a word
+// that can also begin advice, "Never have regrets.", is left out: a recorded
+// miss); neverPassThrough adverbs may stand between "Never" and its verb, so
+// the word after them decides.
+// BEGIN GENERATED GUARD LEXICON
+// spec/guard-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// Edit the lexicon and rerun the generator; --check fails when this block drifts.
+const clauseBreaks = ".;:!?"
+
 var negators = map[string]bool{
-	"not": true, "never": true, "no": true, "nor": true,
-	"without": true, "hardly": true, "cannot": true,
+	"cannot": true, "hardly": true, "never": true, "no": true, "nor": true, "not": true,
+	"without": true,
 }
+
+var neverNonVerbs = map[string]bool{
+	"a": true, "an": true, "any": true, "are": true, "been": true, "before": true, "being": true,
+	"can": true, "could": true, "did": true, "does": true, "had": true, "has": true, "is": true,
+	"such": true, "the": true, "was": true, "were": true, "will": true, "would": true,
+}
+
+var neverPassThrough = map[string]bool{
+	"again": true, "ever": true, "once": true,
+}
+
+// END GENERATED GUARD LEXICON
 
 // Rule mirrors one entry of rules.json. Fields not relevant to a rule's type
 // are simply absent in the JSON and stay at their zero value.
@@ -615,9 +639,6 @@ func isNegator(word string) bool {
 	return negators[w] || strings.HasSuffix(w, "n't") || strings.HasSuffix(w, "n\u2019t")
 }
 
-// clauseBreaks end a clause, for the negator window and the imperative "Never".
-const clauseBreaks = ".;:!?"
-
 // negatedAt reports whether a negator is one of the two words before offset,
 // with no . ; : ! or ? between them. It walks back over characters and words,
 // never a count of bytes, so the JS, Python and Go engines decide alike.
@@ -663,24 +684,6 @@ func negatedAt(text string, offset int, commaEndsScope bool) bool {
 	}
 	return false
 }
-
-// neverNonVerbs, after a clause-initial "never", open a fragment ("Never an
-// issue.") or an inversion ("Never has a product been this good."), both
-// claims, and do not begin advice. A word that can also begin advice (so, in,
-// at, on, have, should: "Never have regrets.", "Never at any time disclose
-// your PIN.") is left out, so its inversions ("Never have I seen...") go
-// unmarked too: recorded misses, the safe direction.
-var neverNonVerbs = map[string]bool{
-	"a": true, "an": true, "the": true, "any": true, "before": true, "such": true,
-	"has": true, "had": true, "is": true, "are": true, "was": true, "were": true,
-	"will": true, "would": true, "could": true, "can": true, "did": true,
-	"does": true, "been": true, "being": true,
-}
-
-// neverPassThrough adverbs may stand between "Never" and its verb: the word
-// after them decides. "Never ever share it." is advice; "Never again will
-// prices be this low." is an inversion; "Never again." is a fragment.
-var neverPassThrough = map[string]bool{"again": true, "ever": true, "once": true}
 
 // asciiLower lowercases ASCII letters only, so no engine folds a non-ASCII
 // letter into a word it looks for.

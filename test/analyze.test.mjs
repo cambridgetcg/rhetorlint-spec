@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { analyze, strip } from "../packages/core/index.mjs";
 import { toSarif } from "../packages/core/sarif.mjs";
 import { validate } from "./helpers/schema-validator.mjs";
+import { guardProbes, loadGuardLexicon } from "../scripts/gen-agency-lexicon.mjs";
 
 const RULES = JSON.parse(
   readFileSync(new URL("../packages/rules-en/rules.json", import.meta.url))
@@ -255,16 +256,14 @@ test("absolute.universal still marks absolutes the negator and imperative guards
     .some((mark) => mark.ruleId === "puffery.peacock"));
 });
 
-// The imperative 'Never' guard's two closed lists, declared here so an engine
-// that drops or adds a word fails.
-const NEVER_NON_VERBS = [
-  "a", "an", "the", "any", "before", "such",
-  "has", "had", "is", "are", "was", "were", "will", "would", "could",
-  "can", "did", "does", "been", "being"
-];
-const NEVER_PASS_THROUGH = ["again", "ever", "once"];
+// The guards' closed lists come from spec/guard-lexicon.json. Each engine's
+// copy is generated from it, and scripts/gen-agency-lexicon.mjs --check fails
+// when one drops or adds a word; the probes below hold the code that reads them.
+const GUARD = loadGuardLexicon();
+const NEVER_NON_VERBS = GUARD.neverNonVerbs;
+const NEVER_PASS_THROUGH = GUARD.neverPassThrough;
 // Words that can begin advice after "Never", so they are not on the list.
-const NEVER_ADVICE_OPENERS = ["so", "in", "at", "on", "have", "should"];
+const NEVER_ADVICE_OPENERS = GUARD.neverAdviceOpeners;
 
 test("absolute.universal reads the word after a clause-initial 'Never' against two closed lists", () => {
   const actuals = (text) => absolutes(text).map((mark) => mark.actual);
@@ -287,6 +286,20 @@ test("absolute.universal reads the word after a clause-initial 'Never' against t
     assert.deepEqual(actuals(`Never ${adverb}.`), ["Never"], adverb);
     assert.deepEqual(actuals(`Never ${adverb} Share it.`), ["Never"], adverb);
   }
+});
+
+test("each guard negator keeps an intensifier in strip and leaves an absolute unmarked", () => {
+  for (const negator of GUARD.negators) {
+    const text = `It was ${negator} extremely bad.`;
+    assert.equal(analyze(text, { rules: RULES }).strip, text, negator);
+    assert.deepEqual(absolutes(`It is ${negator} always so.`).map((mark) => mark.actual).filter((a) => a === "always"), [], negator);
+    // Two words away it still reads; three words away it does not.
+    assert.equal(analyze(`It was ${negator} so extremely bad.`, { rules: RULES }).strip, `It was ${negator} so extremely bad.`, negator);
+    assert.equal(analyze(`It was ${negator} so very extremely bad.`, { rules: RULES }).strip, `It was ${negator} so very bad.`, negator);
+  }
+  // Every guard probe is one the differential feeds all three engines.
+  const ids = guardProbes(GUARD).map(([id]) => id);
+  assert.equal(new Set(ids).size, ids.length, "guard probe ids are unique");
 });
 
 test("strip is identity without an actionable mark and cleans only removal seams", () => {

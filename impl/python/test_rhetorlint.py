@@ -1,7 +1,6 @@
 """Focused behavioral regressions for the Python reference engine."""
 
 import json
-import re
 import sys
 import unittest
 from pathlib import Path
@@ -247,17 +246,33 @@ class AbsoluteGuardTests(unittest.TestCase):
         marks = rhetorlint.analyze("It is not world-class.", rules)["marks"]
         self.assertTrue(any(mark["ruleId"] == "puffery.peacock" for mark in marks))
 
+    def test_guard_lists_are_the_spec_words(self):
+        # spec/guard-lexicon.json is the one source; scripts/gen-agency-lexicon.mjs
+        # writes it here, and an added or dropped word fails this exactly.
+        guard = json.loads((ROOT / "spec" / "guard-lexicon.json").read_text(encoding="utf-8"))
+        self.assertEqual(rhetorlint._NEGATORS, frozenset(guard["negators"]))
+        self.assertEqual(rhetorlint._CLAUSE_BREAKS, frozenset(guard["clauseBreaks"]))
+        self.assertEqual(rhetorlint._NEVER_NON_VERBS, frozenset(guard["neverNonVerbs"]))
+        self.assertEqual(rhetorlint._NEVER_PASS_THROUGH, frozenset(guard["neverPassThrough"]))
+
+    def test_each_guard_negator_keeps_an_intensifier_and_an_absolute(self):
+        guard = json.loads((ROOT / "spec" / "guard-lexicon.json").read_text(encoding="utf-8"))
+        rules = rhetorlint.load_default_rules()
+        for negator in guard["negators"]:
+            with self.subTest(negator=negator):
+                text = "It was %s extremely bad." % negator
+                self.assertEqual(rhetorlint.analyze(text, rules)["strip"], text)
+                marks = absolutes("It is %s always so." % negator, rules)
+                self.assertEqual([m["actual"] for m in marks if m["actual"] == "always"], [])
+
     def test_word_after_never_is_read_against_two_closed_lists(self):
-        # The imperative 'Never' guard's two closed lists, declared here so an
-        # engine that drops or adds a word fails.
-        non_verbs = [
-            "a", "an", "the", "any", "before", "such",
-            "has", "had", "is", "are", "was", "were", "will", "would", "could",
-            "can", "did", "does", "been", "being",
-        ]
-        pass_through = ["again", "ever", "once"]
+        # The imperative 'Never' guard's two closed lists, and the advice openers
+        # left off them, from spec/guard-lexicon.json.
+        guard = json.loads((ROOT / "spec" / "guard-lexicon.json").read_text(encoding="utf-8"))
+        non_verbs = guard["neverNonVerbs"]
+        pass_through = guard["neverPassThrough"]
         # Words that can begin advice after "Never", so they are not on the list.
-        advice_openers = ["so", "in", "at", "on", "have", "should"]
+        advice_openers = guard["neverAdviceOpeners"]
         rules = rhetorlint.load_default_rules()
 
         def actuals(text):
@@ -421,7 +436,9 @@ class AgencyDetectorTests(unittest.TestCase):
         '^'-anchored pattern applied through pattern.match(text, pos) never
         matches at pos > 0, so the 'in place' requirement never held and the
         'exposed to' guard never fired. Every guard reads at the participle's
-        end, which is never 0, so each must be seen to work there."""
+        end, which is never 0, so each must be seen to work there. (That a
+        '^' pattern's match(text, pos) fails for any pos > 0 is the standard
+        library's documented behaviour, so it is said here, not tested.)"""
         rules = rhetorlint.load_default_rules()
         self.assertEqual(
             [span[0] for span in agency_spans("Additional safeguards have been put in place.", rules)],
@@ -437,8 +454,6 @@ class AgencyDetectorTests(unittest.TestCase):
         self.assertTrue(rhetorlint._agency_phrase_follows(low, low.index(" in"), "in place"))
         self.assertFalse(rhetorlint._agency_phrase_follows(low, low.index("in"), "in place"))
         self.assertTrue(rhetorlint._agency_by_follows("x were made by them", len("x were made")))
-        # An anchored pattern applied at an offset is the bug itself: show it.
-        self.assertIsNone(re.compile(r"^\s+in").match(low, low.index(" in")))
 
     def test_generated_lexicon_matches_the_spec(self):
         lexicon = json.loads((ROOT / "spec" / "agency-lexicon.json").read_text(encoding="utf-8"))

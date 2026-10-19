@@ -1,7 +1,7 @@
 {
   "lexicon": "agency-hiding.deleted-subject",
   "detector": "agentless-passive",
-  "version": 3,
+  "version": 4,
   "about": "The single source of the accountable-passive detector's word lists. scripts/gen-agency-lexicon.mjs writes it into the JavaScript, Python and Go engines between BEGIN and END GENERATED AGENCY LEXICON markers, and its --check (run by test/agency-lexicon.test.mjs) fails when any engine's copy drifts. A mark needs all of: a past passive auxiliary; at most one adverb; a participle from one of the classes; the head word its class names, when it names one; no 'by' in the next byWindow words of the clause; the participle's requires and unless conditions; and no negator anywhere in its clause before the auxiliary, that is after the last headStops character before it, or from the start of the text (an n't contraction counts as a negator wherever a negator does). The matcher reads an ASCII-lowercased copy of the text, so every word here is lowercase ASCII, and a phrasal participle is written with one space. The three character sets are written here too, so --check covers them: whitespace separates the words of a match and of a requires or unless phrase; the head walk never crosses a headStops character, and a headStops character starts the clause the negator reader reads; the 'by' window ends at a clauseBreaks character but reads on across a line break.",
   "whitespace": " \t\n\r\f",
   "headStops": ".;:!?\n",
@@ -9,7 +9,7 @@
   "auxiliaries": ["been", "was", "were"],
   "adverbs": ["already", "always", "often", "still"],
   "adverbSuffix": "ly",
-  "skip": ["all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never", "not", "now", "shall", "should", "since", "then", "will", "would"],
+  "skip": ["all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "now", "shall", "should", "since", "then", "will", "would"],
   "skipSuffix": "ly",
   "skipMax": 4,
   "byWindow": 7,
@@ -21,6 +21,13 @@
     "dummy": ["it"],
     "error": ["action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision", "decisions", "error", "errors", "measures", "miscalculation", "miscalculations", "misjudgement", "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps", "mistake", "mistakes", "omissions", "promises", "questions", "remarks", "safeguards", "statements", "steps", "things", "threats", "words"],
     "held": ["account", "accounts", "address", "addresses", "credentials", "data", "details", "information", "password", "passwords", "pii", "records"]
+  },
+  "headWhy": {
+    "challenge": "Nouns that name a challenge someone made: 'concerns were raised' deletes who raised them. Software raises an error and a threat level is raised, so 'raised' after any other noun is not marked.",
+    "data": "Nouns that name someone's data. After them, 'shared', 'sold' and 'disclosed' say the data went to someone else; after any other noun the same verbs are routine ('the slides were shared').",
+    "dummy": "Only the impersonal 'it': 'it was decided' deletes who decided, while 'the date was agreed' or 'the case was decided' names what, in an ordinary passive.",
+    "error": "Nouns that a light verb turns into a deletion: an error ('mistakes were made'), a decision or statement ('remarks were made', 'decisions were taken'), or a step, measure, safeguard, promise or threat an organisation takes or gives ('steps were taken', 'promises were given'). The class is named for its first members; it holds deeds as well as errors.",
+    "held": "Nouns that name something held in trust for someone: the 'data' class's nouns, plus 'account' and 'accounts', so that 'your account was affected' is marked while patients, flights and crops that were affected are not. The account nouns were added for 'affected' and 'impacted' alone (lexicon version 2); the data class was not widened with them, so 'your account was shared' stays unmarked. That is a choice no measurement has tested, in the safe direction."
   },
   "classes": [
     {

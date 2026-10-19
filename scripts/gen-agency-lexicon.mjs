@@ -1,36 +1,48 @@
 #!/usr/bin/env node
-// Write spec/agency-lexicon.json into the three engines. Zero dependencies.
+// Write spec/agency-lexicon.json and spec/guard-lexicon.json into the three
+// engines. Zero dependencies.
 //
 // The accountable-passive detector (agency-hiding.deleted-subject) reads closed
 // word lists: auxiliaries, adverbs, the head-word skip list, the negators, the
 // participle classes and their head nouns, and three character sets (the
 // whitespace between words, the characters that end the head walk and start
 // the clause the negator reader reads, and the clause breaks that end the 'by'
-// window). Copied by hand into JavaScript, Python and Go, three lists drift;
-// generated from one file, they cannot drift unseen. Each engine holds the
-// lists between two marker lines:
+// window). The engine-side guards read more: the negators of the two-word
+// window that strip and the absolute.universal guard share, its clause breaks,
+// and the imperative 'Never' guard's closed lists. Copied by hand into
+// JavaScript, Python and Go, three lists drift; generated from one file, they
+// cannot drift unseen. Each engine holds each lexicon between two marker lines:
 //
 //   // BEGIN GENERATED AGENCY LEXICON      (# in Python)
 //   ...
 //   // END GENERATED AGENCY LEXICON
+//   // BEGIN GENERATED GUARD LEXICON
+//   ...
+//   // END GENERATED GUARD LEXICON
 //
-//   node scripts/gen-agency-lexicon.mjs            rewrite the three blocks
-//   node scripts/gen-agency-lexicon.mjs --check    exit 1 if any block differs from the lexicon
+//   node scripts/gen-agency-lexicon.mjs            rewrite the six blocks
+//   node scripts/gen-agency-lexicon.mjs --check    exit 1 if any block differs from its lexicon
 //   ... --root <dir>                               read and write another checkout (tests use it)
 //
 // The module also exports lexiconProbes(): one sentence per participle that the
-// detector must mark, and one with a 'by' agent that it must not; and
+// detector must mark, and one with a 'by' agent that it must not;
 // boundaryProbes(): sentences at each edge of the hand-written walks, built from
-// the lexicon's numbers and character sets. The three-engine differential
-// (scripts/xengine-diff.mjs) takes both as inputs, and
-// test/agency-lexicon.test.mjs holds the JavaScript engine to their spans.
+// the lexicon's numbers and character sets; and guardProbes(): one sentence per
+// word of the guard lexicon and per clause break. The three-engine differential
+// (scripts/xengine-diff.mjs) takes all three as inputs, and
+// test/agency-lexicon.test.mjs and test/analyze.test.mjs hold the JavaScript
+// engine to them.
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
 
 export const LEXICON = "spec/agency-lexicon.json";
+export const GUARD_LEXICON = "spec/guard-lexicon.json";
 export const BEGIN = "BEGIN GENERATED AGENCY LEXICON";
 export const END = "END GENERATED AGENCY LEXICON";
+export const GUARD_BEGIN = "BEGIN GENERATED GUARD LEXICON";
+export const GUARD_END = "END GENERATED GUARD LEXICON";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const WIDTH = 100;
 
@@ -42,25 +54,35 @@ const SPACE_ESCAPES = { " ": " ", "\t": "\\t", "\n": "\\n", "\r": "\\r", "\f": "
 /** What a stop or a clause break may be: ASCII punctuation, or a line break. */
 const STOP = /^[!-/:-@[-`{-~\n]$/;
 
+/** The checks both lexicons share, reporting through `say`. */
+function checkers(say) {
+  return {
+    words(list, where, pattern = WORD) {
+      if (!Array.isArray(list) || list.length === 0) return say(`${where}: must be a non-empty array`);
+      for (const w of list) if (typeof w !== "string" || !pattern.test(w)) say(`${where}: ${JSON.stringify(w)} is not lowercase ASCII`);
+      const sorted = [...list].sort();
+      if (JSON.stringify(sorted) !== JSON.stringify(list)) say(`${where}: must be sorted`);
+      if (new Set(list).size !== list.length) say(`${where}: has duplicates`);
+    },
+    count(value, where) {
+      if (!Number.isInteger(value) || value < 1) say(`${where}: must be a positive integer`);
+    },
+    chars(value, where, allowed, what) {
+      if (typeof value !== "string" || value.length === 0) return say(`${where}: must be a non-empty string`);
+      for (const c of value) if (!allowed(c)) say(`${where}: ${JSON.stringify(c)} is not ${what}`);
+      if (new Set(value).size !== value.length) say(`${where}: has duplicates`);
+    },
+    why(value, where) {
+      if (typeof value !== "string" || !value.trim()) say(`${where}: needs a why`);
+    }
+  };
+}
+
 /** Every rule the lexicon must keep that JSON alone cannot express. */
 export function lexiconProblems(lex) {
   const problems = [];
   const say = (message) => problems.push(message);
-  const words = (list, where, pattern = WORD) => {
-    if (!Array.isArray(list) || list.length === 0) return say(`${where}: must be a non-empty array`);
-    for (const w of list) if (typeof w !== "string" || !pattern.test(w)) say(`${where}: ${JSON.stringify(w)} is not lowercase ASCII`);
-    const sorted = [...list].sort();
-    if (JSON.stringify(sorted) !== JSON.stringify(list)) say(`${where}: must be sorted`);
-    if (new Set(list).size !== list.length) say(`${where}: has duplicates`);
-  };
-  const count = (value, where) => {
-    if (!Number.isInteger(value) || value < 1) say(`${where}: must be a positive integer`);
-  };
-  const chars = (value, where, allowed, what) => {
-    if (typeof value !== "string" || value.length === 0) return say(`${where}: must be a non-empty string`);
-    for (const c of value) if (!allowed(c)) say(`${where}: ${JSON.stringify(c)} is not ${what}`);
-    if (new Set(value).size !== value.length) say(`${where}: has duplicates`);
-  };
+  const { words, count, chars, why } = checkers(say);
   count(lex.version, "version");
   chars(lex.whitespace, "whitespace", (c) => Object.hasOwn(SPACE_ESCAPES, c), "one of space, tab, LF, CR, FF or VT");
   chars(lex.headStops, "headStops", (c) => STOP.test(c), "ASCII punctuation or a line break");
@@ -72,7 +94,14 @@ export function lexiconProblems(lex) {
   for (const w of lex.adverbs || []) {
     if ((lex.negators || []).includes(w)) say(`adverbs: ${JSON.stringify(w)} is a negator, and a negated passive is not marked`);
   }
-  if (typeof lex.negatorWhy !== "string" || !lex.negatorWhy.trim()) say("negatorWhy: needs a why");
+  // The head walk and the negator reader both stop only at a head stop, so a
+  // word the walk steps over always lies in the clause the reader reads: a
+  // negator there silences the passive whatever the head, and listing it as a
+  // skip word could never change a mark.
+  for (const w of lex.skip || []) {
+    if ((lex.negators || []).includes(w)) say(`skip: ${JSON.stringify(w)} is a negator, which already silences the passive`);
+  }
+  why(lex.negatorWhy, "negatorWhy");
   for (const key of ["adverbSuffix", "skipSuffix"]) {
     if (typeof lex[key] !== "string" || !WORD.test(lex[key])) say(`${key}: must be lowercase ASCII`);
   }
@@ -82,13 +111,17 @@ export function lexiconProblems(lex) {
   for (const [name, list] of Object.entries(lex.heads || {})) {
     if (!WORD.test(name)) say(`heads: class name ${JSON.stringify(name)} is not lowercase ASCII`);
     words(list, `heads.${name}`);
+    why(lex.headWhy?.[name], `headWhy.${name}`);
+  }
+  for (const name of Object.keys(lex.headWhy || {})) {
+    if (!Object.hasOwn(lex.heads || {}, name)) say(`headWhy.${name}: is not a class in heads`);
   }
   const seen = new Map();
   for (const [i, c] of (lex.classes || []).entries()) {
     const where = `classes[${i}]`;
     if (typeof c.id !== "string" || !WORD.test(c.id)) say(`${where}: id must be lowercase ASCII`);
     if (c.head !== null && !Object.hasOwn(lex.heads || {}, c.head)) say(`${where}: head ${JSON.stringify(c.head)} is not a class in heads`);
-    if (typeof c.why !== "string" || !c.why.trim()) say(`${where}: needs a why`);
+    why(c.why, where);
     words(c.participles, `${where}.participles`, PHRASE);
     for (const p of c.participles || []) {
       if (seen.has(p)) say(`participle ${JSON.stringify(p)} is in both ${seen.get(p)} and ${c.id}`);
@@ -105,17 +138,48 @@ export function lexiconProblems(lex) {
   const used = new Set([...lex.auxiliaries || [], ...seen.keys()]);
   for (const [i, group] of (lex.excluded || []).entries()) {
     words(group.words, `excluded[${i}].words`);
-    if (typeof group.why !== "string" || !group.why.trim()) say(`excluded[${i}]: needs a why`);
+    why(group.why, `excluded[${i}]`);
     for (const w of group.words || []) if (used.has(w)) say(`excluded[${i}]: ${JSON.stringify(w)} is excluded but also listed`);
   }
   return problems;
 }
 
-export function loadLexicon(root = ROOT) {
-  const lex = JSON.parse(readFileSync(join(root, LEXICON), "utf8"));
-  const problems = lexiconProblems(lex);
-  if (problems.length) throw new Error(`${LEXICON} is invalid:\n  ${problems.join("\n  ")}`);
+/** Every rule the guard lexicon must keep that JSON alone cannot express. */
+export function guardProblems(guard) {
+  const problems = [];
+  const say = (message) => problems.push(message);
+  const { words, count, chars, why } = checkers(say);
+  count(guard.version, "version");
+  chars(guard.clauseBreaks, "clauseBreaks", (c) => STOP.test(c) && c !== "\n", "ASCII punctuation");
+  for (const key of ["negators", "neverNonVerbs", "neverPassThrough", "neverAdviceOpeners"]) {
+    words(guard[key], key);
+    why(guard[`${key}Why`], `${key}Why`);
+  }
+  // Each word after "Never" is read once: stepped over, a fragment or an
+  // inversion, or (named or not) the verb of advice.
+  const seen = new Map();
+  for (const key of ["neverNonVerbs", "neverPassThrough", "neverAdviceOpeners"]) {
+    for (const w of guard[key] || []) {
+      if (seen.has(w)) say(`${key}: ${JSON.stringify(w)} is also in ${seen.get(w)}`);
+      seen.set(w, key);
+    }
+  }
+  return problems;
+}
+
+function load(root, path, problemsOf) {
+  const lex = JSON.parse(readFileSync(join(root, path), "utf8"));
+  const problems = problemsOf(lex);
+  if (problems.length) throw new Error(`${path} is invalid:\n  ${problems.join("\n  ")}`);
   return lex;
+}
+
+export function loadLexicon(root = ROOT) {
+  return load(root, LEXICON, lexiconProblems);
+}
+
+export function loadGuardLexicon(root = ROOT) {
+  return load(root, GUARD_LEXICON, guardProblems);
 }
 
 // ---- rendering ---------------------------------------------------------------
@@ -140,11 +204,12 @@ function wrap(items, pad) {
   return lines.join("\n");
 }
 
-const header = (c, lex) => [
-  `${c} ${BEGIN}`,
-  `${c} ${LEXICON} version ${lex.version}, written by scripts/gen-agency-lexicon.mjs.`,
+const header = (c, lex, begin = BEGIN, path = LEXICON) => [
+  `${c} ${begin}`,
+  `${c} ${path} version ${lex.version}, written by scripts/gen-agency-lexicon.mjs.`,
   `${c} Edit the lexicon and rerun the generator; --check fails when this block drifts.`
 ];
+const guardHeader = (c, guard) => header(c, guard, GUARD_BEGIN, GUARD_LEXICON);
 
 function renderJs(lex) {
   const set = (items) => `new Set([\n${wrap(items.map(q), "  ")}\n])`;
@@ -250,36 +315,87 @@ function renderGo(lex) {
   ].join("\n");
 }
 
+function renderGuardJs(guard) {
+  const set = (items) => `new Set([\n${wrap(items.map(q), "  ")}\n])`;
+  return [
+    ...guardHeader("//", guard),
+    `const NEGATORS = ${set(guard.negators)};`,
+    `const CLAUSE_BREAKS = ${q(guard.clauseBreaks)};`,
+    `const NEVER_NON_VERBS = ${set(guard.neverNonVerbs)};`,
+    `const NEVER_PASS_THROUGH = ${set(guard.neverPassThrough)};`,
+    `// ${GUARD_END}`
+  ].join("\n");
+}
+
+function renderGuardPython(guard) {
+  const set = (items) => `frozenset({\n${wrap(items.map(q), "    ")}\n})`;
+  return [
+    ...guardHeader("#", guard),
+    `_NEGATORS = ${set(guard.negators)}`,
+    `_CLAUSE_BREAKS = frozenset(${q(guard.clauseBreaks)})`,
+    `_NEVER_NON_VERBS = ${set(guard.neverNonVerbs)}`,
+    `_NEVER_PASS_THROUGH = ${set(guard.neverPassThrough)}`,
+    `# ${GUARD_END}`
+  ].join("\n");
+}
+
+function renderGuardGo(guard) {
+  const set = (items) => `map[string]bool{\n${wrap(items.map((w) => `${q(w)}: true`), "\t")},\n}`;
+  return [
+    ...guardHeader("//", guard),
+    `const clauseBreaks = ${q(guard.clauseBreaks)}`,
+    "",
+    `var negators = ${set(guard.negators)}`,
+    "",
+    `var neverNonVerbs = ${set(guard.neverNonVerbs)}`,
+    "",
+    `var neverPassThrough = ${set(guard.neverPassThrough)}`,
+    "",
+    `// ${GUARD_END}`
+  ].join("\n");
+}
+
 export const TARGETS = [
-  { path: "packages/core/index.mjs", comment: "//", render: renderJs },
-  { path: "impl/python/rhetorlint.py", comment: "#", render: renderPython },
-  { path: "impl/go/rhetorlint.go", comment: "//", render: renderGo }
+  { path: "packages/core/index.mjs", comment: "//", render: renderJs, renderGuard: renderGuardJs },
+  { path: "impl/python/rhetorlint.py", comment: "#", render: renderPython, renderGuard: renderGuardPython },
+  { path: "impl/go/rhetorlint.go", comment: "//", render: renderGo, renderGuard: renderGuardGo }
 ];
 
-/** The source with its generated block replaced, or an error naming what is wrong. */
-export function spliceBlock(source, target, block) {
-  const begin = `${target.comment} ${BEGIN}`;
-  const end = `${target.comment} ${END}`;
+/** The source with one generated block replaced, or an error naming what is wrong. */
+export function spliceBlock(source, target, block, beginMarker = BEGIN, endMarker = END) {
+  const begin = `${target.comment} ${beginMarker}`;
+  const end = `${target.comment} ${endMarker}`;
   const at = source.indexOf(begin);
   const until = source.indexOf(end);
-  if (at < 0 || until < 0 || until < at) throw new Error(`${target.path}: the ${BEGIN} / ${END} markers are missing or out of order`);
+  if (at < 0 || until < 0 || until < at) throw new Error(`${target.path}: the ${beginMarker} / ${endMarker} markers are missing or out of order`);
   if (source.indexOf(begin, at + 1) >= 0 || source.indexOf(end, until + 1) >= 0) {
     throw new Error(`${target.path}: the generated-block markers appear more than once`);
   }
   return source.slice(0, at) + block + source.slice(until + end.length);
 }
 
-/** Each target whose block differs from the lexicon, as messages. */
-export function drift(root = ROOT, lex = loadLexicon(root)) {
+/** The source with both generated blocks rewritten from their lexicons. */
+function spliceBoth(source, target, lex, guard) {
+  const agency = spliceBlock(source, target, target.render(lex));
+  return spliceBlock(agency, target, target.renderGuard(guard), GUARD_BEGIN, GUARD_END);
+}
+
+/** Each target whose blocks differ from the lexicons, as messages. */
+export function drift(root = ROOT, lex = loadLexicon(root), guard = loadGuardLexicon(root)) {
   const out = [];
   for (const target of TARGETS) {
     const source = readFileSync(join(root, target.path), "utf8");
-    try {
-      if (spliceBlock(source, target, target.render(lex)) !== source) {
-        out.push(`${target.path}: its generated agency lexicon differs from ${LEXICON}; run node scripts/gen-agency-lexicon.mjs`);
+    for (const [name, path, begin, end, block] of [
+      ["agency", LEXICON, BEGIN, END, target.render(lex)],
+      ["guard", GUARD_LEXICON, GUARD_BEGIN, GUARD_END, target.renderGuard(guard)]
+    ]) {
+      try {
+        if (spliceBlock(source, target, block, begin, end) !== source) {
+          out.push(`${target.path}: its generated ${name} lexicon differs from ${path}; run node scripts/gen-agency-lexicon.mjs`);
+        }
+      } catch (error) {
+        out.push(error.message);
       }
-    } catch (error) {
-      out.push(error.message);
     }
   }
   return out;
@@ -335,9 +451,10 @@ export function boundaryProbes(lex = loadLexicon()) {
   const out = [];
   const add = (id, text, span) => out.push([`boundary:${id}`, text, span]);
   const filler = (n) => Array.from({ length: n }, (_, i) => String.fromCharCode(97 + (i % 26))).join(" ");
-  const negators = new Set(lex.negators);
-  const chain = lex.skip.filter((w) => !negators.has(w));
-  if (chain.length < lex.skipMax + 1) throw new Error("boundary probes need skipMax + 1 skip words that are not negators");
+  // No skip word is a negator (lexiconProblems refuses one), so any of them
+  // can stand in the auxiliary chain without silencing the passive.
+  const chain = lex.skip;
+  if (chain.length < lex.skipMax + 1) throw new Error("boundary probes need skipMax + 1 skip words");
   const name = (c) => c === "\n" ? "line-break" : `u${c.charCodeAt(0).toString(16).padStart(4, "0")}`;
   const edges = [...new Set([...lex.headStops, ...lex.clauseBreaks, ","])];
 
@@ -428,29 +545,71 @@ export function boundaryProbes(lex = loadLexicon()) {
   return out;
 }
 
+/**
+ * One sentence per word of the guard lexicon, and per clause break, as [id,
+ * text]: each negator before an intensifier (strip keeps it) and before an
+ * absolute (absolute.universal leaves it unmarked); each word after a
+ * clause-initial "Never", alone and after each adverb it steps over; and each
+ * clause break between a negator and what it would negate. The word lists are
+ * checked by --check; these give the differential the code that reads them, so
+ * a change to one engine's walk parts it from the other two.
+ */
+export function guardProbes(guard = loadGuardLexicon()) {
+  const out = [];
+  const add = (id, text) => out.push([`guard:${id}`, text]);
+  for (const n of guard.negators) {
+    add(`negator-${n}-strip`, `It was ${n} extremely bad.`);
+    add(`negator-${n}-absolute`, `It is ${n} always so.`);
+  }
+  for (const w of guard.neverNonVerbs) add(`never-non-verb-${w}`, `Never ${w} x.`);
+  for (const w of guard.neverAdviceOpeners) add(`never-advice-opener-${w}`, `Never ${w} x.`);
+  for (const a of guard.neverPassThrough) {
+    add(`never-pass-through-${a}`, `Never ${a} share it.`);
+    add(`never-pass-through-${a}-fragment`, `Never ${a} ${guard.neverNonVerbs[0]} x.`);
+  }
+  for (const c of guard.clauseBreaks) {
+    const id = `u${c.charCodeAt(0).toString(16).padStart(4, "0")}`;
+    add(`clause-break-${id}-strip`, `We said no${c} extremely few agreed.`);
+    add(`clause-break-${id}-absolute`, `We said no${c} everyone agreed.`);
+    add(`clause-break-${id}-never`, `Check the link${c} never click it.`);
+  }
+  return out;
+}
+
 // ---- command line ------------------------------------------------------------
 
 function main(argv) {
-  const rootAt = argv.indexOf("--root");
-  const root = rootAt >= 0 ? resolve(argv[rootAt + 1] ?? "") : ROOT;
-  const flags = argv.filter((a, i) => a.startsWith("--") && a !== "--root" && argv[i - 1] !== "--root");
-  if (rootAt >= 0 && !argv[rootAt + 1]) return usage();
-  if (flags.some((f) => f !== "--check") || argv.filter((a, i) => !a.startsWith("--") && argv[i - 1] !== "--root").length) return usage();
+  let values, tokens;
+  try {
+    ({ values, tokens } = parseArgs({
+      args: argv,
+      options: { check: { type: "boolean" }, root: { type: "string" } },
+      strict: true,
+      allowPositionals: false,
+      tokens: true
+    }));
+  } catch {
+    return usage();
+  }
+  // parseArgs keeps the last of a repeated option; refuse the repeat instead.
+  if (values.root === "" || tokens.filter((t) => t.kind === "option" && t.name === "root").length > 1) return usage();
+  const root = values.root !== undefined ? resolve(values.root) : ROOT;
   const lex = loadLexicon(root);
-  if (flags.includes("--check")) {
-    const problems = drift(root, lex);
+  const guard = loadGuardLexicon(root);
+  if (values.check) {
+    const problems = drift(root, lex, guard);
     if (problems.length) {
       console.error(`agency lexicon: DRIFT (${problems.length})\n` + problems.map((p) => `- ${p}`).join("\n"));
       return 1;
     }
-    console.log(`agency lexicon: ${TARGETS.length} engines match ${LEXICON} version ${lex.version}`);
+    console.log(`agency lexicon: ${TARGETS.length} engines match ${LEXICON} version ${lex.version} and ${GUARD_LEXICON} version ${guard.version}`);
     return 0;
   }
   // Splice every engine before writing any, so a missing marker changes nothing.
   const planned = TARGETS.map((target) => {
     const path = join(root, target.path);
     const source = readFileSync(path, "utf8");
-    return { target, path, source, next: spliceBlock(source, target, target.render(lex)) };
+    return { target, path, source, next: spliceBoth(source, target, lex, guard) };
   });
   for (const { target, path, source, next } of planned) {
     if (next !== source) writeFileSync(path, next);

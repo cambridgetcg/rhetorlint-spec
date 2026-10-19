@@ -7,20 +7,24 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyze } from "../packages/core/index.mjs";
 import {
-  BEGIN, END, LEXICON, TARGETS, boundaryProbes, lexiconProbes, lexiconProblems, loadLexicon
+  BEGIN, END, GUARD_BEGIN, GUARD_END, GUARD_LEXICON, LEXICON, TARGETS, boundaryProbes, guardProblems,
+  lexiconProbes, lexiconProblems, loadGuardLexicon, loadLexicon
 } from "../scripts/gen-agency-lexicon.mjs";
 
 // spec/agency-lexicon.json is the one place the accountable-passive detector's
-// words live; scripts/gen-agency-lexicon.mjs writes them into the JavaScript,
-// Python and Go engines. Two declarations, one truth, now a test: --check fails
-// when any engine's generated block differs from the lexicon, and the probes
-// below hold the JavaScript engine to every word the lexicon lists or excludes,
-// and to every edge of the walks that read them.
+// words live, and spec/guard-lexicon.json the one place the strip and
+// absolute.universal guards' words live; scripts/gen-agency-lexicon.mjs writes
+// both into the JavaScript, Python and Go engines. Two declarations, one truth,
+// now a test: --check fails when any engine's generated block differs from its
+// lexicon, and the probes below hold the JavaScript engine to every word the
+// agency lexicon lists or excludes, and to every edge of the walks that read
+// them (test/analyze.test.mjs probes the guard lexicon's words).
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const GEN = join(ROOT, "scripts", "gen-agency-lexicon.mjs");
 const RULES = JSON.parse(readFileSync(join(ROOT, "packages", "rules-en", "rules.json"), "utf8"));
 const LEX = loadLexicon(ROOT);
+const GUARD = loadGuardLexicon(ROOT);
 const AGENCY = "agency-hiding.deleted-subject";
 const agency = (text) => analyze(text, { rules: RULES }).marks.filter((m) => m.ruleId === AGENCY).map((m) => m.actual);
 
@@ -32,7 +36,7 @@ function check(root) {
 function withCopy(fn) {
   const dir = mkdtempSync(join(tmpdir(), "agency-lexicon-"));
   try {
-    for (const path of [LEXICON, ...TARGETS.map((t) => t.path)]) {
+    for (const path of [LEXICON, GUARD_LEXICON, ...TARGETS.map((t) => t.path)]) {
       mkdirSync(dirname(join(dir, path)), { recursive: true });
       cpSync(join(ROOT, path), join(dir, path));
     }
@@ -44,6 +48,29 @@ function withCopy(fn) {
 
 test("the lexicon keeps the rules its JSON shape cannot express", () => {
   assert.deepEqual(lexiconProblems(LEX), []);
+  assert.deepEqual(guardProblems(GUARD), []);
+});
+
+test("the lexicon checker refuses a negator in the skip list and a head class without a why", () => {
+  const broken = structuredClone(LEX);
+  broken.skip = [...broken.skip, "not"].sort();
+  delete broken.headWhy.error;
+  const problems = lexiconProblems(broken).join("\n");
+  assert.match(problems, /skip: "not" is a negator/);
+  assert.match(problems, /headWhy\.error: needs a why/);
+});
+
+test("the guard checker refuses a word read two ways after 'Never', an unsorted list and a line break", () => {
+  const broken = structuredClone(GUARD);
+  broken.neverPassThrough = [...broken.neverPassThrough, "the"].sort();
+  broken.negators = [...broken.negators, "aaa"];
+  broken.clauseBreaks += "\n";
+  delete broken.neverNonVerbsWhy;
+  const problems = guardProblems(broken).join("\n");
+  assert.match(problems, /neverPassThrough: "the" is also in neverNonVerbs/);
+  assert.match(problems, /negators: must be sorted/);
+  assert.match(problems, /clauseBreaks: "\\n" is not ASCII punctuation/);
+  assert.match(problems, /neverNonVerbsWhy: needs a why/);
 });
 
 test("the lexicon checker refuses a word in two classes, an unknown head class and an excluded word that is listed", () => {
@@ -91,19 +118,46 @@ test("a one-word edit inside any engine's generated block fails --check with exi
   }
 });
 
+test("a one-word edit inside any engine's generated guard block fails --check with exit 1", () => {
+  for (const target of TARGETS) {
+    withCopy((dir) => {
+      const file = join(dir, target.path);
+      const source = readFileSync(file, "utf8");
+      const at = source.indexOf(GUARD_BEGIN);
+      const until = source.indexOf(GUARD_END);
+      const block = source.slice(at, until);
+      assert.ok(block.includes('"hardly"'), `${target.path}: the guard block lists "hardly"`);
+      writeFileSync(file, source.slice(0, at) + block.replace('"hardly"', '"barely"') + source.slice(until));
+      const r = check(dir);
+      assert.equal(r.status, 1, `${target.path}: ${r.stderr}${r.stdout}`);
+      assert.match(r.stderr, new RegExp(`${target.path}: its generated guard lexicon differs`));
+    });
+  }
+});
+
 test("a missing marker fails --check and leaves every engine unwritten", () => {
-  withCopy((dir) => {
-    const go = join(dir, TARGETS[2].path);
-    writeFileSync(go, readFileSync(go, "utf8").replace(`// ${END}`, "// end of the lexicon"));
-    const r = check(dir);
-    assert.equal(r.status, 1, r.stderr + r.stdout);
-    assert.match(r.stderr, /markers are missing or out of order/);
-    const js = join(dir, TARGETS[0].path);
-    const before = readFileSync(js, "utf8");
-    const write = spawnSync(process.execPath, [GEN, "--root", dir], { encoding: "utf8" });
-    assert.notEqual(write.status, 0);
-    assert.equal(readFileSync(js, "utf8"), before, "a failed write changes no engine");
-  });
+  for (const end of [END, GUARD_END]) {
+    withCopy((dir) => {
+      const go = join(dir, TARGETS[2].path);
+      writeFileSync(go, readFileSync(go, "utf8").replace(`// ${end}`, "// end of the lexicon"));
+      const r = check(dir);
+      assert.equal(r.status, 1, r.stderr + r.stdout);
+      assert.match(r.stderr, /markers are missing or out of order/);
+      const js = join(dir, TARGETS[0].path);
+      const before = readFileSync(js, "utf8");
+      const write = spawnSync(process.execPath, [GEN, "--root", dir], { encoding: "utf8" });
+      assert.notEqual(write.status, 0);
+      assert.equal(readFileSync(js, "utf8"), before, "a failed write changes no engine");
+    });
+  }
+});
+
+test("the command line takes --check and one --root, and nothing else", () => {
+  for (const args of [["--chek"], ["extra"], ["--root"], ["--root", ""], ["--check=1"], ["--root", ".", "--root", "."]]) {
+    const r = spawnSync(process.execPath, [GEN, ...args], { encoding: "utf8" });
+    assert.equal(r.status, 2, `${args.join(" ")}: ${r.stderr}${r.stdout}`);
+    assert.match(r.stderr, /usage:/);
+  }
 });
 
 test("every participle marks its probe sentence and is silent with a 'by' agent", (t) => {

@@ -473,17 +473,29 @@ func TestAbsoluteGuard(t *testing.T) {
 		}
 	})
 
-	t.Run("the word after a clause-initial never is read against two closed lists", func(t *testing.T) {
-		// The imperative 'Never' guard's two closed lists, declared here so an
-		// engine that drops or adds a word fails.
-		nonVerbs := []string{
-			"a", "an", "the", "any", "before", "such",
-			"has", "had", "is", "are", "was", "were", "will", "would", "could",
-			"can", "did", "does", "been", "being",
+	t.Run("each guard negator keeps an intensifier and leaves an absolute unmarked", func(t *testing.T) {
+		for _, negator := range readGuardLexicon(t).Negators {
+			text := "It was " + negator + " extremely bad."
+			if got := Analyze(text, pack).Strip; got != text {
+				t.Errorf("%q: strip gives %q", text, got)
+			}
+			actuals, _ := absoluteActuals("It is "+negator+" always so.", pack)
+			for _, actual := range actuals {
+				if actual == "always" {
+					t.Errorf("%q: absolute.universal marks always", negator)
+				}
+			}
 		}
-		passThrough := []string{"again", "ever", "once"}
+	})
+
+	t.Run("the word after a clause-initial never is read against two closed lists", func(t *testing.T) {
+		// The imperative 'Never' guard's two closed lists, and the advice
+		// openers left off them, from spec/guard-lexicon.json.
+		guard := readGuardLexicon(t)
+		nonVerbs := guard.NeverNonVerbs
+		passThrough := guard.NeverPassThrough
 		// Words that can begin advice after "Never", so they are not on the list.
-		adviceOpeners := []string{"so", "in", "at", "on", "have", "should"}
+		adviceOpeners := guard.NeverAdviceOpeners
 		expect := func(text string, want ...string) {
 			t.Helper()
 			actuals, _ := absoluteActuals(text, pack)
@@ -520,6 +532,55 @@ func TestAbsoluteGuard(t *testing.T) {
 			expect("Never "+adverb+" Share it.", "Never")
 		}
 	})
+}
+
+// guardLexicon is spec/guard-lexicon.json, the one source of the guards' lists.
+type guardLexicon struct {
+	ClauseBreaks       string   `json:"clauseBreaks"`
+	Negators           []string `json:"negators"`
+	NeverNonVerbs      []string `json:"neverNonVerbs"`
+	NeverPassThrough   []string `json:"neverPassThrough"`
+	NeverAdviceOpeners []string `json:"neverAdviceOpeners"`
+}
+
+func readGuardLexicon(t *testing.T) guardLexicon {
+	t.Helper()
+	raw, err := os.ReadFile(filepath.Join(repoRoot(), "spec", "guard-lexicon.json"))
+	if err != nil {
+		t.Fatalf("read spec/guard-lexicon.json: %v", err)
+	}
+	var guard guardLexicon
+	if err := json.Unmarshal(raw, &guard); err != nil {
+		t.Fatalf("parse spec/guard-lexicon.json: %v", err)
+	}
+	return guard
+}
+
+// wordSet is a list as the engine's map[string]bool holds it.
+func wordSet(words []string) map[string]bool {
+	set := make(map[string]bool, len(words))
+	for _, w := range words {
+		set[w] = true
+	}
+	return set
+}
+
+func TestGuardListsAreTheSpecWords(t *testing.T) {
+	// The generator writes these from the spec; an added or dropped word in
+	// one engine's copy fails here exactly.
+	guard := readGuardLexicon(t)
+	if clauseBreaks != guard.ClauseBreaks {
+		t.Errorf("clauseBreaks %q, spec %q", clauseBreaks, guard.ClauseBreaks)
+	}
+	for name, pair := range map[string][2]map[string]bool{
+		"negators":         {negators, wordSet(guard.Negators)},
+		"neverNonVerbs":    {neverNonVerbs, wordSet(guard.NeverNonVerbs)},
+		"neverPassThrough": {neverPassThrough, wordSet(guard.NeverPassThrough)},
+	} {
+		if !reflect.DeepEqual(pair[0], pair[1]) {
+			t.Errorf("%s %v, spec %v", name, pair[0], pair[1])
+		}
+	}
 }
 
 func agencySpans(text string, pack RulePack) []string {

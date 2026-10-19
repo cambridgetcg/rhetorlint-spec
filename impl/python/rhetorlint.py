@@ -27,7 +27,7 @@ NAME = "rhetorlint (python)"
 CORE_VERSION = "0.1.4"
 
 # BEGIN GENERATED AGENCY LEXICON
-# spec/agency-lexicon.json version 3, written by scripts/gen-agency-lexicon.mjs.
+# spec/agency-lexicon.json version 4, written by scripts/gen-agency-lexicon.mjs.
 # Edit the lexicon and rerun the generator; --check fails when this block drifts.
 AGENCY_WHITESPACE = " \t\n\r\f"
 AGENCY_SPACE = "[ \\t\\n\\r\\f]+"
@@ -37,8 +37,8 @@ AGENCY_AUXILIARIES = ("been", "was", "were")
 AGENCY_ADVERBS = ("already", "always", "often", "still")
 AGENCY_ADVERB_SUFFIX = "ly"
 AGENCY_SKIP = frozenset({
-    "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never",
-    "not", "now", "shall", "should", "since", "then", "will", "would"
+    "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "now",
+    "shall", "should", "since", "then", "will", "would"
 })
 AGENCY_SKIP_SUFFIX = "ly"
 AGENCY_SKIP_MAX = 4
@@ -271,11 +271,31 @@ def _agentless_passives(text):
 # The sole ruleId eligible under the conservative strip counterfactual.
 REMOVABLE = {"intensifier.loaded"}
 
-# Words that negate an intensifier or an absolute after them ("not extremely
-# high", "not always"). With any "n't" contraction, they are what _negated_at
-# looks for.
-_NEGATORS = frozenset({"not", "never", "no", "nor", "without", "hardly", "cannot"})
+# The guards' word lists, generated from spec/guard-lexicon.json, whose why
+# fields say why each word is there: _NEGATORS negate the intensifier or
+# absolute after them ("not extremely high", "not always"), and with any "n't"
+# contraction are what _negated_at looks for; _CLAUSE_BREAKS end a clause, for
+# the negator window and the imperative "Never"; _NEVER_NON_VERBS, after a
+# clause-initial "never", open a fragment ("Never an issue.") or an inversion
+# ("Never has a product been this good."), so "Never" stays marked (a word that
+# can also begin advice, "Never have regrets.", is left out: a recorded miss);
+# _NEVER_PASS_THROUGH adverbs may stand between "Never" and its verb, so the
+# word after them decides.
+# BEGIN GENERATED GUARD LEXICON
+# spec/guard-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+# Edit the lexicon and rerun the generator; --check fails when this block drifts.
+_NEGATORS = frozenset({
+    "cannot", "hardly", "never", "no", "nor", "not", "without"
+})
 _CLAUSE_BREAKS = frozenset(".;:!?")
+_NEVER_NON_VERBS = frozenset({
+    "a", "an", "any", "are", "been", "before", "being", "can", "could", "did", "does", "had", "has",
+    "is", "such", "the", "was", "were", "will", "would"
+})
+_NEVER_PASS_THROUGH = frozenset({
+    "again", "ever", "once"
+})
+# END GENERATED GUARD LEXICON
 # ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
 _ASCII_LOWER = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
 _REGEX_META = frozenset(r"\^$.*+?()[]{}|")
@@ -392,22 +412,6 @@ def _negated_at(text, offset, comma_ends_scope=False):
 # readable by older engines; spec/taxonomy.yaml declares it as guard_examples.
 NEGATION_SCOPED = {"absolute.universal"}
 
-
-# Words that, after a clause-initial "never", open a fragment ("Never an
-# issue.") or an inversion ("Never has a product been this good."), both
-# claims, and do not begin advice. A word that can also begin advice (so, in,
-# at, on, have, should: "Never have regrets.", "Never at any time disclose your
-# PIN.") is left out, so its inversions ("Never have I seen...") go unmarked
-# too: recorded misses, the safe direction.
-_NEVER_NON_VERBS = frozenset({
-    "a", "an", "the", "any", "before", "such",
-    "has", "had", "is", "are", "was", "were", "will", "would", "could",
-    "can", "did", "does", "been", "being",
-})
-# Adverbs that may stand between "Never" and its verb: the word after them
-# decides. "Never ever share it." is advice; "Never again will prices be this
-# low." is an inversion; "Never again." is a fragment.
-_NEVER_PASS_THROUGH = frozenset({"again", "ever", "once"})
 
 
 def _imperative_never_at(text, start, end):
