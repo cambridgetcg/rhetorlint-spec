@@ -19,7 +19,7 @@
 
 export const SPEC_VERSION = "0.1";
 const NAME = "@rhetorlint/core";
-const CORE_VERSION = "0.1.3";
+const CORE_VERSION = "0.1.4";
 
 const RULE_FAMILIES = new Set([
   "manipulative-wording", "simplification", "distraction",
@@ -363,6 +363,55 @@ function countWords(text) {
  */
 const REMOVABLE = new Set(["intensifier.loaded"]);
 
+/** Words that negate an intensifier after them ("not extremely high"). With
+ *  any "n't" contraction, they are what `negatedAt` looks for. */
+const NEGATORS = new Set(["not", "never", "no", "nor", "without", "hardly", "cannot"]);
+
+/** A word character for the strip guards: an ASCII letter or digit, or an
+ *  apostrophe (U+0027 or U+2019). Every other character separates words. */
+function isGuardWordChar(code) {
+  return (code >= 97 && code <= 122) || (code >= 65 && code <= 90) ||
+    (code >= 48 && code <= 57) || code === 39 || code === 0x2019;
+}
+
+function isNegator(word) {
+  // ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
+  const w = word.replace(/[A-Z]/g, (c) => c.toLowerCase()).replace(/^['\u2019]+|['\u2019]+$/g, "");
+  return NEGATORS.has(w) || w.endsWith("n't") || w.endsWith("n\u2019t");
+}
+
+/**
+ * True when a negator is one of the two words before `offset`, with no
+ * . ; : ! or ? between them. It walks back over characters and words, never a
+ * count of code units, so JS (UTF-16), Python (code points) and Go (bytes)
+ * decide alike on any input.
+ */
+function negatedAt(text, offset) {
+  let i = offset;
+  for (let words = 0; words < 2; words++) {
+    while (i > 0 && !isGuardWordChar(text.charCodeAt(i - 1))) {
+      if (".;:!?".includes(text[i - 1])) return false;
+      i--;
+    }
+    if (i === 0) return false;
+    const end = i;
+    while (i > 0 && isGuardWordChar(text.charCodeAt(i - 1))) i--;
+    if (isNegator(text.slice(i, end))) return true;
+  }
+  return false;
+}
+
+/**
+ * True when `offset` sits inside a quotation on its own line: an odd number of
+ * straight double quotes before it, or a U+201C opening quote that no U+201D
+ * has closed. It counts characters, so it is unit-free like negatedAt.
+ */
+function quotedAt(text, offset) {
+  const line = text.slice(offset === 0 ? 0 : text.lastIndexOf("\n", offset - 1) + 1, offset);
+  return (line.split('"').length - 1) % 2 === 1 ||
+    line.lastIndexOf("\u201c") > line.lastIndexOf("\u201d");
+}
+
 function cloneMark(mark) {
   return {
     ...mark,
@@ -476,7 +525,9 @@ export function analyze(text, options = {}) {
  *
  * Removes loaded intensifiers and flags each agentless passive with a visible
  * [who?]. No model, no paraphrase — it only subtracts spin and points at what
- * was hidden, so a reader can see the difference.
+ * was hidden, so a reader can see the difference. An intensifier under a
+ * negator, or inside a quotation, stays: deleting it would strengthen the
+ * claim ("not extremely high" is not "not high") or edit someone's words.
  */
 export function strip(text, marks) {
   if (marks.length === 0) return text;
@@ -488,6 +539,8 @@ export function strip(text, marks) {
   for (const m of ordered) {
     const s = m.position.start.offset, e = m.position.end.offset;
     if (REMOVABLE.has(m.ruleId)) {
+      // Judged on the source text: edits so far all lie at or after s.
+      if (negatedAt(text, s) || quotedAt(text, s)) continue;
       out = joinRemovalSeam(out.slice(0, s), out.slice(e));
       changed = true;
     } else if (m.ruleId === "agency-hiding.deleted-subject") {

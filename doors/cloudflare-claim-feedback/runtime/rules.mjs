@@ -1,6 +1,6 @@
 export default {
   "id": "@rhetorlint/rules-en",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "locale": "en",
   "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.",
   "rules": [
@@ -118,7 +118,7 @@ export default {
       "level": "note",
       "confidence": 0.6,
       "note": "a deflection — points away from the question just asked",
-      "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let'?s\\s+not\\s+forget|whatabout)\\b",
+      "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let['’]?s\\s+not\\s+forget|whatabout)\\b",
       "expected": [
         "(answer the original question first)"
       ]
@@ -144,7 +144,7 @@ export default {
       "level": "info",
       "confidence": 0.55,
       "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
-      "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[- ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
+      "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[-‐‑– ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
       "expected": [
         "(state the price, the terms, and what is actually included)"
       ]
@@ -157,7 +157,7 @@ export default {
       "level": "note",
       "confidence": 0.6,
       "note": "manufactured urgency — pressure to act before you can weigh it",
-      "pattern": "\\b(?:act\\s+now|act\\s+fast|don'?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it'?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
+      "pattern": "\\b(?:act\\s+now|act\\s+fast|don['’]?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it['’]?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
       "expected": [
         "(state the real deadline and what actually happens after it, or drop the clock)"
       ]
@@ -222,8 +222,10 @@ export default {
         "it should be noted",
         "it is worth noting",
         "it's worth noting",
+        "it’s worth noting",
         "it is important to note",
         "it's important to note",
+        "it’s important to note",
         "needless to say",
         "tellingly",
         "unsurprisingly",
@@ -259,15 +261,33 @@ export default {
       "note": "a doubt marker — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute (technical 'so-called' = 'known as' is the known false positive; 'allegedly/purportedly' belong to hedge.deniable)",
       "terms": [
         "so-called",
+        "so‐called",
+        "so‑called",
+        "so–called",
         "self-styled",
+        "self‐styled",
+        "self‑styled",
+        "self–styled",
         "self-proclaimed",
+        "self‐proclaimed",
+        "self‑proclaimed",
+        "self–proclaimed",
         "self-appointed",
+        "self‐appointed",
+        "self‑appointed",
+        "self–appointed",
         "self-anointed",
+        "self‐anointed",
+        "self‑anointed",
+        "self–anointed",
         "styles himself as",
         "styles herself as",
         "styles itself as",
         "styles themselves as",
         "quote-unquote",
+        "quote‐unquote",
+        "quote‑unquote",
+        "quote–unquote",
         "quote unquote"
       ],
       "expected": [
@@ -295,7 +315,7 @@ export default {
       "level": "info",
       "confidence": 0.55,
       "note": "an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')",
-      "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n'?t)\\s+(?:even\\s+)?bother\\s+to\\b",
+      "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n['’]?t)\\s+(?:even\\s+)?bother\\s+to\\b",
       "expected": [
         "(report the event without the verdict: 'did not comment', 'declined to say')"
       ]
@@ -308,7 +328,7 @@ export default {
       "level": "info",
       "confidence": 0.6,
       "note": "an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check",
-      "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[- ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
+      "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[-‐‑– ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
       "expected": [
         "(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"
       ]
@@ -334,7 +354,7 @@ export default {
       "level": "note",
       "confidence": 0.7,
       "note": "an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)",
-      "pattern": "\\b(?:officer|police|deputy|trooper)[- ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[- ]of[- ]force\\s+incidents?\\b",
+      "pattern": "\\b(?:officer|police|deputy|trooper)[-‐‑– ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[-‐‑– ]of[-‐‑– ]force\\s+incidents?\\b",
       "expected": [
         "(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"
       ]
@@ -362,16 +382,34 @@ export default {
       "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
       "terms": [
         "world-class",
+        "world‐class",
+        "world‑class",
+        "world–class",
         "critically acclaimed",
         "award-winning",
+        "award‐winning",
+        "award‑winning",
+        "award–winning",
         "renowned",
         "famed",
         "storied",
         "visionary",
         "cutting-edge",
+        "cutting‐edge",
+        "cutting‑edge",
+        "cutting–edge",
         "game-changing",
+        "game‐changing",
+        "game‑changing",
+        "game–changing",
         "state-of-the-art",
+        "state‐of‐the‐art",
+        "state‑of‑the‑art",
+        "state–of–the–art",
         "best-in-class",
+        "best‐in‐class",
+        "best‑in‑class",
+        "best–in–class",
         "iconic"
       ],
       "expected": [

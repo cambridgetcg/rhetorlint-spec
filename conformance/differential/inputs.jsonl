@@ -29,6 +29,8 @@
 {"id":"case:28","source":"conformance/cases.json","text":"The plan has been widely described as a visionary gamble."}
 {"id":"case:29","source":"conformance/cases.json","text":"Experts noted that inflation slowed."}
 {"id":"case:30","source":"conformance/cases.json","text":"The startup has been described as the next big thing by Forbes."}
+{"id":"case:31","source":"conformance/cases.json","text":"The risk is not extremely high."}
+{"id":"case:32","source":"conformance/cases.json","text":"\"It was utterly devastating,\" she said."}
 {"id":"item:inv-breach-apology#1","source":"measurement/items/inv-breach-apology.txt","text":"Subject: An important update about your account"}
 {"id":"item:inv-breach-apology#2","source":"measurement/items/inv-breach-apology.txt","text":"Dear Valued Customer,"}
 {"id":"item:inv-breach-apology#3","source":"measurement/items/inv-breach-apology.txt","text":"At Brightwell, the trust you place in us is the foundation of everything we do. We are writing to let you know about a recent security incident that may have involved some of your information."}
@@ -738,7 +740,6 @@
 {"id":"contrast:probe.intensifier-loaded.05","source":"measurement/contrast.json","text":"Massively parallel processing splits the job across 512 cores."}
 {"id":"contrast:probe.intensifier-loaded.06","source":"measurement/contrast.json","text":"\"It was utterly devastating,\" the flood survivor told reporters."}
 {"id":"contrast:probe.intensifier-loaded.07","source":"measurement/contrast.json","text":"The risk is not extremely high, but it is not negligible."}
-{"id":"contrast:strip.intensifier-loaded.01","source":"measurement/contrast.json","text":"The risk is not extremely high."}
 {"id":"contrast:strip.intensifier-loaded.02","source":"measurement/contrast.json","text":"We are not deeply sorry."}
 {"id":"contrast:strip.intensifier-loaded.03","source":"measurement/contrast.json","text":"The update isn't hugely different."}
 {"id":"contrast:strip.intensifier-loaded.04","source":"measurement/contrast.json","text":"He said \"we are deeply sorry\" and left."}
@@ -1020,3 +1021,21 @@
 {"id":"probe:vertical-tab-urgency","source":"scripts/xengine-diff.mjs","text":"Act\u000bnow."}
 {"id":"probe:form-feed-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\fshared."}
 {"id":"probe:unit-separator-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u001fshared."}
+{"id":"probe:strip-curly-quoted","source":"scripts/xengine-diff.mjs","text":"He said \u201cwe are deeply sorry\u201d and left."}
+{"id":"probe:strip-rsquo-contraction","source":"scripts/xengine-diff.mjs","text":"The update isn\u2019t hugely different."}
+{"id":"probe:strip-emoji-between-negator","source":"scripts/xengine-diff.mjs","text":"Not \ud83d\ude00 extremely high."}
+{"id":"probe:strip-nbsp-after-negator","source":"scripts/xengine-diff.mjs","text":"Not\u00a0extremely high."}
+{"id":"probe:strip-emoji-in-curly-quote","source":"scripts/xengine-diff.mjs","text":"He said \u201c\ud83d\ude00 we are deeply sorry\u201d and left."}
+{"id":"probe:strip-negator-second-word","source":"scripts/xengine-diff.mjs","text":"The risk cannot be extremely high."}
+{"id":"probe:strip-negator-third-word","source":"scripts/xengine-diff.mjs","text":"Not bad, and extremely cheap."}
+{"id":"probe:strip-negator-behind-period","source":"scripts/xengine-diff.mjs","text":"We said no. extremely few agreed."}
+{"id":"probe:strip-negator-behind-semicolon","source":"scripts/xengine-diff.mjs","text":"We said no; extremely few agreed."}
+{"id":"probe:strip-negator-behind-colon","source":"scripts/xengine-diff.mjs","text":"We said no: extremely few agreed."}
+{"id":"probe:strip-negator-behind-bang","source":"scripts/xengine-diff.mjs","text":"We said no! extremely few agreed."}
+{"id":"probe:strip-negator-behind-question","source":"scripts/xengine-diff.mjs","text":"We said no? extremely few agreed."}
+{"id":"probe:strip-negator-behind-comma","source":"scripts/xengine-diff.mjs","text":"We said no, extremely few agreed."}
+{"id":"probe:strip-negator-uppercase","source":"scripts/xengine-diff.mjs","text":"NOT EXTREMELY HIGH"}
+{"id":"probe:strip-quote-closed","source":"scripts/xengine-diff.mjs","text":"\"Fine,\" she said, extremely calmly."}
+{"id":"probe:strip-quote-previous-line","source":"scripts/xengine-diff.mjs","text":"He said \"hello\nand it was extremely loud."}
+{"id":"probe:strip-quote-crlf","source":"scripts/xengine-diff.mjs","text":"He said \"we are\r\nextremely sorry\" and left."}
+{"id":"probe:strip-curly-quote-closed","source":"scripts/xengine-diff.mjs","text":"He said \u201chello\u201d and was extremely calm."}

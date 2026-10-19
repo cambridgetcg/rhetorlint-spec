@@ -556,7 +556,7 @@
   /* BEGIN GENERATED EXPLORER RULES */
   const RULES = {
     "id": "@rhetorlint/rules-en",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "locale": "en",
     "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.",
     "rules": [
@@ -674,7 +674,7 @@
         "level": "note",
         "confidence": 0.6,
         "note": "a deflection — points away from the question just asked",
-        "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let'?s\\s+not\\s+forget|whatabout)\\b",
+        "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let['’]?s\\s+not\\s+forget|whatabout)\\b",
         "expected": [
           "(answer the original question first)"
         ]
@@ -700,7 +700,7 @@
         "level": "info",
         "confidence": 0.55,
         "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
-        "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[- ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
+        "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[-‐‑– ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
         "expected": [
           "(state the price, the terms, and what is actually included)"
         ]
@@ -713,7 +713,7 @@
         "level": "note",
         "confidence": 0.6,
         "note": "manufactured urgency — pressure to act before you can weigh it",
-        "pattern": "\\b(?:act\\s+now|act\\s+fast|don'?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it'?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
+        "pattern": "\\b(?:act\\s+now|act\\s+fast|don['’]?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it['’]?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
         "expected": [
           "(state the real deadline and what actually happens after it, or drop the clock)"
         ]
@@ -778,8 +778,10 @@
           "it should be noted",
           "it is worth noting",
           "it's worth noting",
+          "it’s worth noting",
           "it is important to note",
           "it's important to note",
+          "it’s important to note",
           "needless to say",
           "tellingly",
           "unsurprisingly",
@@ -815,15 +817,33 @@
         "note": "a doubt marker — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute (technical 'so-called' = 'known as' is the known false positive; 'allegedly/purportedly' belong to hedge.deniable)",
         "terms": [
           "so-called",
+          "so‐called",
+          "so‑called",
+          "so–called",
           "self-styled",
+          "self‐styled",
+          "self‑styled",
+          "self–styled",
           "self-proclaimed",
+          "self‐proclaimed",
+          "self‑proclaimed",
+          "self–proclaimed",
           "self-appointed",
+          "self‐appointed",
+          "self‑appointed",
+          "self–appointed",
           "self-anointed",
+          "self‐anointed",
+          "self‑anointed",
+          "self–anointed",
           "styles himself as",
           "styles herself as",
           "styles itself as",
           "styles themselves as",
           "quote-unquote",
+          "quote‐unquote",
+          "quote‑unquote",
+          "quote–unquote",
           "quote unquote"
         ],
         "expected": [
@@ -851,7 +871,7 @@
         "level": "info",
         "confidence": 0.55,
         "note": "an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')",
-        "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n'?t)\\s+(?:even\\s+)?bother\\s+to\\b",
+        "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n['’]?t)\\s+(?:even\\s+)?bother\\s+to\\b",
         "expected": [
           "(report the event without the verdict: 'did not comment', 'declined to say')"
         ]
@@ -864,7 +884,7 @@
         "level": "info",
         "confidence": 0.6,
         "note": "an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check",
-        "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[- ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
+        "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[-‐‑– ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
         "expected": [
           "(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"
         ]
@@ -890,7 +910,7 @@
         "level": "note",
         "confidence": 0.7,
         "note": "an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)",
-        "pattern": "\\b(?:officer|police|deputy|trooper)[- ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[- ]of[- ]force\\s+incidents?\\b",
+        "pattern": "\\b(?:officer|police|deputy|trooper)[-‐‑– ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[-‐‑– ]of[-‐‑– ]force\\s+incidents?\\b",
         "expected": [
           "(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"
         ]
@@ -918,16 +938,34 @@
         "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
         "terms": [
           "world-class",
+          "world‐class",
+          "world‑class",
+          "world–class",
           "critically acclaimed",
           "award-winning",
+          "award‐winning",
+          "award‑winning",
+          "award–winning",
           "renowned",
           "famed",
           "storied",
           "visionary",
           "cutting-edge",
+          "cutting‐edge",
+          "cutting‑edge",
+          "cutting–edge",
           "game-changing",
+          "game‐changing",
+          "game‑changing",
+          "game–changing",
           "state-of-the-art",
+          "state‐of‐the‐art",
+          "state‑of‑the‑art",
+          "state–of–the–art",
           "best-in-class",
+          "best‐in‐class",
+          "best‑in‑class",
+          "best–in–class",
           "iconic"
         ],
         "expected": [
@@ -964,7 +1002,7 @@
 
   const SPEC_VERSION = "0.1";
   const NAME = "@rhetorlint/core";
-  const CORE_VERSION = "0.1.3";
+  const CORE_VERSION = "0.1.4";
 
   const RULE_FAMILIES = new Set([
     "manipulative-wording", "simplification", "distraction",
@@ -1308,6 +1346,55 @@
    */
   const REMOVABLE = new Set(["intensifier.loaded"]);
 
+  /** Words that negate an intensifier after them ("not extremely high"). With
+   *  any "n't" contraction, they are what `negatedAt` looks for. */
+  const NEGATORS = new Set(["not", "never", "no", "nor", "without", "hardly", "cannot"]);
+
+  /** A word character for the strip guards: an ASCII letter or digit, or an
+   *  apostrophe (U+0027 or U+2019). Every other character separates words. */
+  function isGuardWordChar(code) {
+    return (code >= 97 && code <= 122) || (code >= 65 && code <= 90) ||
+      (code >= 48 && code <= 57) || code === 39 || code === 0x2019;
+  }
+
+  function isNegator(word) {
+    // ASCII-only lowercasing, so no engine folds a non-ASCII letter into a negator.
+    const w = word.replace(/[A-Z]/g, (c) => c.toLowerCase()).replace(/^['\u2019]+|['\u2019]+$/g, "");
+    return NEGATORS.has(w) || w.endsWith("n't") || w.endsWith("n\u2019t");
+  }
+
+  /**
+   * True when a negator is one of the two words before `offset`, with no
+   * . ; : ! or ? between them. It walks back over characters and words, never a
+   * count of code units, so JS (UTF-16), Python (code points) and Go (bytes)
+   * decide alike on any input.
+   */
+  function negatedAt(text, offset) {
+    let i = offset;
+    for (let words = 0; words < 2; words++) {
+      while (i > 0 && !isGuardWordChar(text.charCodeAt(i - 1))) {
+        if (".;:!?".includes(text[i - 1])) return false;
+        i--;
+      }
+      if (i === 0) return false;
+      const end = i;
+      while (i > 0 && isGuardWordChar(text.charCodeAt(i - 1))) i--;
+      if (isNegator(text.slice(i, end))) return true;
+    }
+    return false;
+  }
+
+  /**
+   * True when `offset` sits inside a quotation on its own line: an odd number of
+   * straight double quotes before it, or a U+201C opening quote that no U+201D
+   * has closed. It counts characters, so it is unit-free like negatedAt.
+   */
+  function quotedAt(text, offset) {
+    const line = text.slice(offset === 0 ? 0 : text.lastIndexOf("\n", offset - 1) + 1, offset);
+    return (line.split('"').length - 1) % 2 === 1 ||
+      line.lastIndexOf("\u201c") > line.lastIndexOf("\u201d");
+  }
+
   function cloneMark(mark) {
     return {
       ...mark,
@@ -1421,7 +1508,9 @@
    *
    * Removes loaded intensifiers and flags each agentless passive with a visible
    * [who?]. No model, no paraphrase — it only subtracts spin and points at what
-   * was hidden, so a reader can see the difference.
+   * was hidden, so a reader can see the difference. An intensifier under a
+   * negator, or inside a quotation, stays: deleting it would strengthen the
+   * claim ("not extremely high" is not "not high") or edit someone's words.
    */
   function strip(text, marks) {
     if (marks.length === 0) return text;
@@ -1433,6 +1522,8 @@
     for (const m of ordered) {
       const s = m.position.start.offset, e = m.position.end.offset;
       if (REMOVABLE.has(m.ruleId)) {
+        // Judged on the source text: edits so far all lie at or after s.
+        if (negatedAt(text, s) || quotedAt(text, s)) continue;
         out = joinRemovalSeam(out.slice(0, s), out.slice(e));
         changed = true;
       } else if (m.ruleId === "agency-hiding.deleted-subject") {
