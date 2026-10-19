@@ -52,6 +52,15 @@ Published text often sets an apostrophe as U+2019 (the typographic apostrophe) a
 
 `rules.json` writes the variants as `\u` escapes, because U+2011 cannot be told from `-` in review. The variants add no field and no `minEngine`, so any engine that reads 0.2.0 reads 0.2.1. [`test/typography.test.mjs`](../../test/typography.test.mjs) fails when an ASCII term or pattern literal gains an apostrophe or hyphen without its variants, and the JavaScript, Python and Go engines are held to the same twelve typographic probes. Other look-alikes, such as U+02BC or an em dash, are not spelt: a tell written with them stays unmarked rather than guessed at.
 
+### The engine-side guard on `absolute.universal`
+
+An absolute under a negator is a disclaimer, the opposite of an overclaim: "Returns are not guaranteed", "Results aren't always typical", "Not everyone qualifies". A clause-initial "Never" before a lowercase word is advice to the reader, not a claim about what never happens: "Never share your password with anyone.", "Explain real constraints; never manufacture the shortage." Core 0.1.4, and the Python and Go engines that reproduce it, leave both unmarked:
+
+- **negated**: a negator (`not`, `never`, `no`, `nor`, `cannot`, `without`, `hardly`, or an `n't` contraction, with either apostrophe) is one of the two words before the term, with no `. ; : ! ?` between them. It is the same check `strip` uses to keep a negated intensifier.
+- **imperative**: the term is `never`, in any letter case; only non-word characters stand between it and the start of the text or one of `. ; : ! ?`; and spaces or tabs, then a lowercase ASCII letter, follow it.
+
+Every other absolute is marked as before. The guard is keyed by ruleId in the engine, not written into this pack: a new rule field would make core 0.1.3 reject the whole pack, so the pack is unchanged and an older engine still marks these sentences. It is declared where it can be checked instead: `guard_examples` on the tell in [`spec/taxonomy.yaml`](../../spec/taxonomy.yaml) (five sentences it must leave unmarked, three it must still mark), which [`test/taxonomy-agreement.test.mjs`](../../test/taxonomy-agreement.test.mjs) runs, and conformance cases that all three engines reproduce. Its known misses are open O6 rows in [`measurement/contrast.json`](../../measurement/contrast.json): an inversion ("Never again will prices be this low.") reads as an imperative, and a negator that governs another word ("There's no doubt everyone loves it.") still counts.
+
 ## The seed families
 
 22 rules across 6 of the taxonomy's 7 families:
