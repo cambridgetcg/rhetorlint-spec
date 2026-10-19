@@ -368,10 +368,10 @@ function formatDivergences(note, divergences) {
 
 function describe(id, d) {
   const lines = [`${id}: ${d.engine === "all" ? "all three engines differ" : `${d.engine} differs`} on ${d.fields.join(" + ")}`];
-  lines.push(`    text   ${asciiJson(d.text)}`);
+  lines.push(`    text    ${asciiJson(d.text)}`);
   for (const field of ["marks", "offsets", "strip"]) {
     if (!d[field]) continue;
-    for (const engine of ENGINES) lines.push(`    ${field.padEnd(7)}${engine.padEnd(7)}${asciiJson(d[field][engine])}`);
+    for (const engine of ENGINES) lines.push(`    ${field.padEnd(8)}${engine.padEnd(7)}${asciiJson(d[field][engine])}`);
   }
   return lines.join("\n");
 }
