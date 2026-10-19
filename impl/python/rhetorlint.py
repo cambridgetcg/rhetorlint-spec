@@ -27,10 +27,14 @@ NAME = "rhetorlint (python)"
 CORE_VERSION = "0.1.4"
 
 # BEGIN GENERATED AGENCY LEXICON
-# spec/agency-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+# spec/agency-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
 # Edit the lexicon and rerun the generator; --check fails when this block drifts.
+AGENCY_WHITESPACE = " \t\n\r\f"
+AGENCY_SPACE = "[ \\t\\n\\r\\f]+"
+AGENCY_HEAD_STOPS = ".;:!?\n"
+AGENCY_CLAUSE_BREAKS = ".;:!?"
 AGENCY_AUXILIARIES = ("been", "was", "were")
-AGENCY_ADVERBS = ("already", "always", "never", "often", "still")
+AGENCY_ADVERBS = ("already", "always", "often", "still")
 AGENCY_ADVERB_SUFFIX = "ly"
 AGENCY_SKIP = frozenset({
     "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "never",
@@ -39,6 +43,10 @@ AGENCY_SKIP = frozenset({
 AGENCY_SKIP_SUFFIX = "ly"
 AGENCY_SKIP_MAX = 4
 AGENCY_BY_WINDOW = 7
+AGENCY_NEGATORS = frozenset({
+    "cannot", "neither", "never", "no", "none", "nor", "not", "nothing"
+})
+AGENCY_NEGATOR_WINDOW = 5
 AGENCY_HEADS = {
     "challenge": frozenset({
         "allegations", "concerns", "questions"
@@ -57,6 +65,10 @@ AGENCY_HEADS = {
         "mistake", "mistakes", "omissions", "promises", "questions", "remarks", "safeguards",
         "statements", "steps", "things", "threats", "words"
     }),
+    "held": frozenset({
+        "account", "accounts", "address", "addresses", "credentials", "data", "details",
+        "information", "password", "passwords", "pii", "records"
+    }),
 }
 # (class, head class or "" for none, participles)
 AGENCY_CLASSES = (
@@ -68,8 +80,11 @@ AGENCY_CLASSES = (
         "neglected", "overcharged", "overlooked", "tampered", "underpaid",
     )),
     ("breach", "", (
-        "accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked",
-        "impacted", "leaked", "stolen",
+        "accessed", "breached", "compromised", "exfiltrated", "exposed", "hacked", "leaked",
+        "stolen",
+    )),
+    ("affect", "held", (
+        "affected", "impacted",
     )),
     ("conceal", "", (
         "axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
@@ -98,17 +113,15 @@ AGENCY_UNLESS = {"exposed": "to"}
 # there is the full statement). A mark needs a past auxiliary (was, were,
 # been), at most one adverb, a participle from a closed class, the head word
 # its class names, its AGENCY_REQUIRES phrase and not its AGENCY_UNLESS word,
-# and no "by" among the next AGENCY_BY_WINDOW words of the clause.
+# no "by" among the next AGENCY_BY_WINDOW words of the clause, and no negator
+# in the auxiliary chain, as the head word or among the AGENCY_NEGATOR_WINDOW
+# words before the head.
 #
 # Matching runs on an ASCII-lowercased copy with no IGNORECASE, explicit
-# [ \t\n\r\f] whitespace and re.ASCII word boundaries, so a non-ASCII letter
-# is never folded into a word and a no-break space never joins two. The guards
-# walk characters from the match; none applies an anchored pattern at an
-# offset (re.match(text, pos) never matches '^' at pos > 0).
-_AGENCY_WHITESPACE = " \t\n\r\f"
-_AGENCY_SPACE = r"[ \t\n\r\f]+"
-_AGENCY_HEAD_STOPS = ".;:!?\n"
-_AGENCY_CLAUSE_BREAKS = ".;:!?"
+# AGENCY_WHITESPACE ([ \t\n\r\f]) and re.ASCII word boundaries, so a
+# non-ASCII letter is never folded into a word and a no-break space never joins
+# two. The guards walk characters from the match; none applies an anchored
+# pattern at an offset (re.match(text, pos) never matches '^' at pos > 0).
 
 # Each participle and the head class it needs ("" for none).
 _AGENCY_HEAD_OF = {
@@ -118,16 +131,16 @@ _AGENCY_HEAD_OF = {
 }
 
 AGENCY_CANDIDATE = re.compile(
-    r"\b(" + "|".join(AGENCY_AUXILIARIES) + ")" + _AGENCY_SPACE
+    r"\b(" + "|".join(AGENCY_AUXILIARIES) + ")" + AGENCY_SPACE
     + "(?:(?:[a-z]+" + AGENCY_ADVERB_SUFFIX + "|" + "|".join(AGENCY_ADVERBS) + ")"
-    + _AGENCY_SPACE + ")?"
+    + AGENCY_SPACE + ")?"
     + "(" + "|".join(
-        _AGENCY_SPACE.join(p.split(" "))
+        AGENCY_SPACE.join(p.split(" "))
         for p in sorted(_AGENCY_HEAD_OF, key=lambda p: (-len(p), p))
     ) + r")\b",
     re.ASCII,
 )
-_AGENCY_SPACE_RUN = re.compile(_AGENCY_SPACE)
+_AGENCY_SPACE_RUN = re.compile(AGENCY_SPACE)
 
 
 def _is_agency_word_char(char):
@@ -142,7 +155,7 @@ def _agency_head_word(low, index):
     i = index
     for _ in range(AGENCY_SKIP_MAX + 1):
         while i > 0 and not _is_agency_word_char(low[i - 1]):
-            if low[i - 1] in _AGENCY_HEAD_STOPS:
+            if low[i - 1] in AGENCY_HEAD_STOPS:
                 return ""
             i -= 1
         end = i
@@ -156,13 +169,50 @@ def _agency_head_word(low, index):
     return ""
 
 
+def _agency_contraction(low, start):
+    """True when the word "t" at start ends an n't contraction: "n", then an
+    apostrophe (U+0027 or U+2019). It never slices from a negative index."""
+    return start >= 2 and low[start - 2:start] in ("n'", "n\u2019")
+
+
+def _agency_negated(low, index):
+    """True when a negator stands in the auxiliary chain before index, is the
+    head word, or is one of the AGENCY_NEGATOR_WINDOW words before the head.
+    It walks the words _agency_head_word walks, never past AGENCY_HEAD_STOPS;
+    when _agency_head_word finds no head, only the chain is read."""
+    i = index
+    left = -1  # words still to read before the head; -1 until the head is read
+    seen = 0
+    while left != 0:
+        while i > 0 and not _is_agency_word_char(low[i - 1]):
+            if low[i - 1] in AGENCY_HEAD_STOPS:
+                return False
+            i -= 1
+        end = i
+        while i > 0 and _is_agency_word_char(low[i - 1]):
+            i -= 1
+        if i == end:
+            return False
+        word = low[i:end]
+        if word in AGENCY_NEGATORS or (word == "t" and _agency_contraction(low, i)):
+            return True
+        if left > 0:
+            left -= 1
+        elif word not in AGENCY_SKIP and not word.endswith(AGENCY_SKIP_SUFFIX):
+            left = AGENCY_NEGATOR_WINDOW
+        elif seen == AGENCY_SKIP_MAX:
+            return False
+        seen += 1
+    return False
+
+
 def _agency_by_follows(low, index):
     """True when "by" is one of the next AGENCY_BY_WINDOW words after index,
     before . ; : ! or ?. A line break does not end the window."""
     i, n = index, len(low)
     for _ in range(AGENCY_BY_WINDOW):
         while i < n and not _is_agency_word_char(low[i]):
-            if low[i] in _AGENCY_CLAUSE_BREAKS:
+            if low[i] in AGENCY_CLAUSE_BREAKS:
                 return False
             i += 1
         if i == n:
@@ -182,7 +232,7 @@ def _agency_phrase_follows(low, index, phrase):
     i, n = index, len(low)
     for word in phrase.split(" "):
         gap = i
-        while i < n and low[i] in _AGENCY_WHITESPACE:
+        while i < n and low[i] in AGENCY_WHITESPACE:
             i += 1
         if i == gap or not low.startswith(word, i):
             return False
@@ -209,6 +259,8 @@ def _agentless_passives(text):
             continue
         head = _AGENCY_HEAD_OF[participle]
         if head and _agency_head_word(low, start) not in AGENCY_HEADS[head]:
+            continue
+        if _agency_negated(low, start):
             continue
         out.append((start, end - start, text[start:end]))
     return out

@@ -334,6 +334,45 @@ class AgencyDetectorTests(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(agency_spans(text, rules), [])
 
+    def test_negated_passives_and_unheld_affected_stay_unmarked(self):
+        """A negator in the auxiliary chain, as the head word or among the five
+        words before it denies the act; 'affected' and 'impacted' need a head
+        held in trust for someone (data, an account)."""
+        rules = rhetorlint.load_default_rules()
+        for text in [
+            "Your data was never sold.",
+            "Your information has never been sold.",
+            "Passwords have not been compromised.",
+            "Passwords haven't been compromised.",
+            "Passwords haven\u2019t been compromised.",
+            "No customer data was accessed.",
+            "Nothing was withheld from investigators.",
+            "None of the records were leaked.",
+            "Neither passwords nor card numbers were exposed.",
+            "No mistakes have been made.",
+            "No personal, financial or health information was accessed.",
+            "We do not believe their information has been stolen.",
+            "Twelve patients were affected.",
+            "Roughly 2,000 flights were impacted after the storm.",
+        ]:
+            with self.subTest(text=text):
+                self.assertEqual(agency_spans(text, rules), [])
+        for text, actual in [
+            ("Approximately 4,000 accounts may have been affected.", "been affected"),
+            ("Your personal information may have been impacted.", "been impacted"),
+            ("No: mistakes were made.", "were made"),
+            ("No a b c d e mistakes were made.", "were made"),
+        ]:
+            with self.subTest(text=text):
+                at = text.index(actual)
+                self.assertEqual(agency_spans(text, rules), [(actual, at, at + len(actual))])
+        # An n't contraction needs "n" and an apostrophe right before its "t";
+        # near the start of the text the check never reads before index 0.
+        self.assertTrue(rhetorlint._agency_contraction("hasn't", 5))
+        self.assertTrue(rhetorlint._agency_contraction("hasn\u2019t", 5))
+        self.assertFalse(rhetorlint._agency_contraction("has't", 4))
+        self.assertFalse(rhetorlint._agency_contraction("t been x n'", 0))
+
     def test_guards_read_at_the_participle_not_at_the_start_of_the_text(self):
         """Regression pin for a Python-only bug in an earlier prototype: a
         '^'-anchored pattern applied through pattern.match(text, pos) never
@@ -361,6 +400,12 @@ class AgencyDetectorTests(unittest.TestCase):
     def test_generated_lexicon_matches_the_spec(self):
         lexicon = json.loads((ROOT / "spec" / "agency-lexicon.json").read_text(encoding="utf-8"))
         self.assertEqual(list(rhetorlint.AGENCY_AUXILIARIES), lexicon["auxiliaries"])
+        self.assertEqual(sorted(rhetorlint.AGENCY_NEGATORS), lexicon["negators"])
+        self.assertEqual(rhetorlint.AGENCY_NEGATOR_WINDOW, lexicon["negatorWindow"])
+        self.assertEqual(
+            (rhetorlint.AGENCY_WHITESPACE, rhetorlint.AGENCY_HEAD_STOPS, rhetorlint.AGENCY_CLAUSE_BREAKS),
+            (lexicon["whitespace"], lexicon["headStops"], lexicon["clauseBreaks"]),
+        )
         self.assertEqual(sorted(rhetorlint.AGENCY_SKIP), lexicon["skip"])
         self.assertEqual(
             {name: sorted(words) for name, words in rhetorlint.AGENCY_HEADS.items()},

@@ -42,10 +42,17 @@ type agencyClass struct {
 }
 
 // BEGIN GENERATED AGENCY LEXICON
-// spec/agency-lexicon.json version 1, written by scripts/gen-agency-lexicon.mjs.
+// spec/agency-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
 // Edit the lexicon and rerun the generator; --check fails when this block drifts.
+const (
+	agencyWhitespace   = " \t\n\r\f"
+	agencySpace        = "[ \\t\\n\\r\\f]+"
+	agencyHeadStops    = ".;:!?\n"
+	agencyClauseBreaks = ".;:!?"
+)
+
 var agencyAuxiliaries = []string{"been", "was", "were"}
-var agencyAdverbs = []string{"already", "always", "never", "often", "still"}
+var agencyAdverbs = []string{"already", "always", "often", "still"}
 
 const agencyAdverbSuffix = "ly"
 
@@ -58,6 +65,13 @@ var agencySkip = map[string]bool{
 const agencySkipSuffix = "ly"
 const agencySkipMax = 4
 const agencyByWindow = 7
+
+var agencyNegators = map[string]bool{
+	"cannot": true, "neither": true, "never": true, "no": true, "none": true, "nor": true, "not": true,
+	"nothing": true,
+}
+
+const agencyNegatorWindow = 5
 
 var agencyHeads = map[string]map[string]bool{
 	"challenge": map[string]bool{
@@ -79,6 +93,11 @@ var agencyHeads = map[string]map[string]bool{
 		"promises": true, "questions": true, "remarks": true, "safeguards": true, "statements": true,
 		"steps": true, "things": true, "threats": true, "words": true,
 	},
+	"held": map[string]bool{
+		"account": true, "accounts": true, "address": true, "addresses": true, "credentials": true,
+		"data": true, "details": true, "information": true, "password": true, "passwords": true,
+		"pii": true, "records": true,
+	},
 }
 
 // agencyClasses holds {class, head class or "" for none, participles}.
@@ -91,8 +110,10 @@ var agencyClasses = []agencyClass{
 		"tampered", "underpaid",
 	}},
 	{"breach", "", []string{
-		"accessed", "affected", "breached", "compromised", "exfiltrated", "exposed", "hacked", "impacted",
-		"leaked", "stolen",
+		"accessed", "breached", "compromised", "exfiltrated", "exposed", "hacked", "leaked", "stolen",
+	}},
+	{"affect", "held", []string{
+		"affected", "impacted",
 	}},
 	{"conceal", "", []string{
 		"axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
@@ -123,19 +144,17 @@ var agencyUnless = map[string]string{"exposed": "to"}
 // there is the full statement). A mark needs a past auxiliary (was, were,
 // been), at most one adverb, a participle from a closed class, the head word
 // its class names, its agencyRequires phrase and not its agencyUnless word,
-// and no "by" among the next agencyByWindow words of the clause.
+// no "by" among the next agencyByWindow words of the clause, and no negator in
+// the auxiliary chain, as the head word or among the agencyNegatorWindow words
+// before the head.
 //
 // Matching runs on an ASCII-lowercased copy with no (?i), so RE2 cannot fold
 // U+212A KELVIN SIGN or U+017F LONG S into a participle, with explicit
-// [ \t\n\r\f] whitespace and RE2's ASCII \b. The guards walk bytes; every
-// character they look for is ASCII, so a multi-byte character reads as one
-// non-word run, as it does in JavaScript and Python.
-const (
-	agencyWhitespace   = " \t\n\r\f"
-	agencySpace        = `[ \t\n\r\f]+`
-	agencyHeadStops    = ".;:!?\n"
-	agencyClauseBreaks = ".;:!?"
-)
+// agencyWhitespace ([ \t\n\r\f]) and RE2's ASCII \b. The guards walk bytes;
+// every character they look for is ASCII, apart from the U+2019 of an n't
+// contraction, which agencyContraction compares as its three bytes; so a
+// multi-byte character reads as one non-word run, as it does in JavaScript and
+// Python.
 
 // agencyHeadOf maps each participle to the head class it needs ("" for none).
 var agencyHeadOf = func() map[string]string {
@@ -202,6 +221,48 @@ func agencyHeadWord(low string, index int) string {
 	return ""
 }
 
+// agencyContraction reports whether the word "t" at start ends an n't
+// contraction: "n", then an apostrophe (U+0027 or U+2019).
+func agencyContraction(low string, start int) bool {
+	return strings.HasSuffix(low[:start], "n'") || strings.HasSuffix(low[:start], "n\u2019")
+}
+
+// agencyNegated reports whether a negator stands in the auxiliary chain before
+// index, is the head word, or is one of the agencyNegatorWindow words before
+// the head. It walks the words agencyHeadWord walks, never past
+// agencyHeadStops; when agencyHeadWord finds no head, only the chain is read.
+func agencyNegated(low string, index int) bool {
+	i := index
+	left := -1 // words still to read before the head; -1 until the head is read
+	for seen := 0; left != 0; seen++ {
+		for i > 0 && !isAgencyWordByte(low[i-1]) {
+			if strings.IndexByte(agencyHeadStops, low[i-1]) >= 0 {
+				return false
+			}
+			i--
+		}
+		end := i
+		for i > 0 && isAgencyWordByte(low[i-1]) {
+			i--
+		}
+		if i == end {
+			return false
+		}
+		word := low[i:end]
+		if agencyNegators[word] || word == "t" && agencyContraction(low, i) {
+			return true
+		}
+		if left > 0 {
+			left--
+		} else if !agencySkip[word] && !strings.HasSuffix(word, agencySkipSuffix) {
+			left = agencyNegatorWindow
+		} else if seen == agencySkipMax {
+			return false
+		}
+	}
+	return false
+}
+
 // agencyByFollows reports whether "by" is one of the next agencyByWindow
 // words after index, before . ; : ! or ?. A line break does not end the window.
 func agencyByFollows(low string, index int) bool {
@@ -265,6 +326,9 @@ func agentlessPassives(text string) []hit {
 			continue
 		}
 		if head := agencyHeadOf[participle]; head != "" && !agencyHeads[head][agencyHeadWord(low, start)] {
+			continue
+		}
+		if agencyNegated(low, start) {
 			continue
 		}
 		out = append(out, hit{start, end - start, text[start:end]})

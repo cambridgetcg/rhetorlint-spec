@@ -579,15 +579,55 @@ func TestAgencyDetector(t *testing.T) {
 		}
 	})
 
+	t.Run("negated passives and 'affected' after an unheld noun stay unmarked", func(t *testing.T) {
+		for _, text := range []string{
+			"Your data was never sold.",
+			"Your information has never been sold.",
+			"Passwords have not been compromised.",
+			"Passwords haven't been compromised.",
+			"Passwords haven\u2019t been compromised.",
+			"No customer data was accessed.",
+			"Nothing was withheld from investigators.",
+			"None of the records were leaked.",
+			"Neither passwords nor card numbers were exposed.",
+			"No mistakes have been made.",
+			"No personal, financial or health information was accessed.",
+			"We do not believe their information has been stolen.",
+			"Twelve patients were affected.",
+			"Roughly 2,000 flights were impacted after the storm.",
+		} {
+			if got := agencySpans(text, pack); len(got) != 0 {
+				t.Errorf("%q: agency marks %q, want none", text, got)
+			}
+		}
+		for _, c := range [][2]string{
+			{"Approximately 4,000 accounts may have been affected.", "been affected"},
+			{"Your personal information may have been impacted.", "been impacted"},
+			{"No: mistakes were made.", "were made"},
+			{"No a b c d e mistakes were made.", "were made"},
+		} {
+			at := strings.Index(c[0], c[1])
+			want := []string{fmt.Sprintf("%s@%d-%d", c[1], at, at+len(c[1]))}
+			if got := agencySpans(c[0], pack); !reflect.DeepEqual(got, want) {
+				t.Errorf("%q: agency marks %q, want %q", c[0], got, want)
+			}
+		}
+	})
+
 	t.Run("the generated lexicon matches the spec", func(t *testing.T) {
 		raw, err := os.ReadFile(filepath.Join(repoRoot(), "spec", "agency-lexicon.json"))
 		if err != nil {
 			t.Fatalf("read spec/agency-lexicon.json: %v", err)
 		}
 		var lex struct {
-			Auxiliaries []string            `json:"auxiliaries"`
-			Heads       map[string][]string `json:"heads"`
-			Classes     []struct {
+			Whitespace    string              `json:"whitespace"`
+			HeadStops     string              `json:"headStops"`
+			ClauseBreaks  string              `json:"clauseBreaks"`
+			Negators      []string            `json:"negators"`
+			NegatorWindow int                 `json:"negatorWindow"`
+			Auxiliaries   []string            `json:"auxiliaries"`
+			Heads         map[string][]string `json:"heads"`
+			Classes       []struct {
 				ID          string   `json:"id"`
 				Head        *string  `json:"head"`
 				Participles []string `json:"participles"`
@@ -598,6 +638,18 @@ func TestAgencyDetector(t *testing.T) {
 		}
 		if !reflect.DeepEqual(agencyAuxiliaries, lex.Auxiliaries) {
 			t.Errorf("auxiliaries %q, spec %q", agencyAuxiliaries, lex.Auxiliaries)
+		}
+		if agencyWhitespace != lex.Whitespace || agencyHeadStops != lex.HeadStops || agencyClauseBreaks != lex.ClauseBreaks {
+			t.Errorf("character sets %q %q %q, spec %q %q %q", agencyWhitespace, agencyHeadStops, agencyClauseBreaks,
+				lex.Whitespace, lex.HeadStops, lex.ClauseBreaks)
+		}
+		if agencyNegatorWindow != lex.NegatorWindow || len(agencyNegators) != len(lex.Negators) {
+			t.Errorf("negators %v (window %d), spec %q (window %d)", agencyNegators, agencyNegatorWindow, lex.Negators, lex.NegatorWindow)
+		}
+		for _, w := range lex.Negators {
+			if !agencyNegators[w] {
+				t.Errorf("negators lack %q", w)
+			}
 		}
 		for name, words := range lex.Heads {
 			if len(agencyHeads[name]) != len(words) {
