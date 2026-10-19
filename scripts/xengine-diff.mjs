@@ -31,6 +31,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyze } from "../packages/core/index.mjs";
+import { lexiconProbes } from "./gen-agency-lexicon.mjs";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const at = (path) => join(ROOT, path);
@@ -107,8 +108,9 @@ const PROBES = [
   ["kelvin-participle", "Civilians were \u212ailled."],
   ["kelvin-lexical", "This is \u212aind of a problem."],
   // Non-ASCII away from any match: the engines must agree on every mark.
-  // Together these put every word of the passive detector's NOT_PASSIVE
-  // list after a be-verb, so a drifted list in any one engine shows up here.
+  // These put predicate adjectives, numerals and irregular participles after
+  // a be-verb; the agency lexicon's own words are probed one by one below
+  // (lexiconProbes, from scripts/gen-agency-lexicon.mjs).
   ["context-tired-glad-aware-open", "Zo\u00eb was tired, Zo\u00eb was glad, and Zo\u00eb was aware that the caf\u00e9 was open."],
   ["context-worried-excited-interested", "Ren\u00e9e was worried; later she was excited and was interested."],
   ["context-scared-bored-pleased", "The ni\u00f1os were scared, then were bored, and were pleased at noon."],
@@ -256,7 +258,7 @@ function contrastRows(data) {
 function collectInputs() {
   const rows = [];
   const seen = new Set();
-  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, duplicates: 0 };
+  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, lexicon: 0, duplicates: 0 };
   const add = (kind, id, source, text) => {
     if (typeof text !== "string" || text.trim() === "") return;
     if (loneSurrogate.test(text)) throw new Error(`${id}: lone surrogate; the engines cannot share it`);
@@ -285,6 +287,10 @@ function collectInputs() {
   }
 
   for (const [name, text] of PROBES) add("probes", `probe:${name}`, "scripts/xengine-diff.mjs", text);
+  // One sentence per participle of the agency lexicon that the detector marks,
+  // and the same with a 'by' agent, which it must not: a word dropped from, or
+  // added to, one engine's generated copy parts the engines here.
+  for (const [id, text] of lexiconProbes()) add("lexicon", id, "spec/agency-lexicon.json", text);
   return { rows, counts };
 }
 
@@ -479,6 +485,7 @@ async function differential(rows) {
   const results = rows.map((row, i) => ({
     ...row,
     jsMarked: analyses.js[i].marks.length > 0,
+    jsAgency: analyses.js[i].marks.some(([ruleId]) => ruleId === "agency-hiding.deleted-subject"),
     divergence: compare(row.text, ENGINES.map((e) => analyses[e][i]))
   }));
   return results;
@@ -489,6 +496,7 @@ function summarise(results) {
   return {
     inputs: results.length,
     jsMarked: results.filter((r) => r.jsMarked).length,
+    jsAgency: results.filter((r) => r.jsAgency).length,
     nonAscii: nonAscii.length,
     nonAsciiMarked: nonAscii.filter((r) => r.jsMarked).length,
     asciiControl: results.filter((r) => isAscii(r.text) && !isPlain(r.text)).length,
@@ -499,7 +507,7 @@ function summarise(results) {
 }
 
 function printCounts(label, s) {
-  console.log(`${label}: ${s.inputs} inputs; ${s.jsMarked} carry at least one JS mark`);
+  console.log(`${label}: ${s.inputs} inputs; ${s.jsMarked} carry at least one JS mark, ${s.jsAgency} an agency mark`);
   console.log(`  ${s.nonAscii} non-ASCII inputs (${s.nonAsciiMarked} marked); ${s.asciiControl} ASCII with control characters`);
   console.log(`  differences: ${s.plainDiffs} on ${s.plain} plain-ASCII inputs; ${s.divergences} on the other ${s.inputs - s.plain}`);
 }
@@ -519,7 +527,7 @@ async function check({ write }) {
   const results = await differential(rows);
   const s = summarise(results);
   printCounts("xengine", s);
-  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes (${counts.duplicates} duplicates dropped)`);
+  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes (${counts.duplicates} duplicates dropped)`);
 
   for (const r of results) {
     if (isPlain(r.text) && r.divergence) failures.push(`plain-ASCII difference (never recordable)\n  ${describe(r.id, r.divergence)}`);
@@ -590,7 +598,7 @@ async function main(argv) {
   if (argv[0] === "--build-inputs" && argv.length === 1) {
     const { rows, counts } = collectInputs();
     writeFileSync(at(INPUTS), serialiseInputs(rows));
-    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes; ${counts.duplicates} duplicates dropped)`);
+    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes; ${counts.duplicates} duplicates dropped)`);
     return 0;
   }
   let failures;
