@@ -74,7 +74,7 @@ test("the snapshot is all 76 conformance cases and no invented training split", 
       marks: CORPUS.cases[index].marks,
     });
     assert.equal(row.provenance.source_repository, "https://github.com/cambridgetcg/rhetorlint-spec");
-    assert.equal(row.provenance.source_revision, "d488b818408737e27554f5a3e42f25bb288724f0");
+    assert.equal(row.provenance.source_revision, "fcc205e42d9857e05b668c5ff7847f8ffba0930e");
     assert.equal(row.provenance.source_case_index, index);
     assert.equal(row.provenance.independent_human_labels, false);
     assert.equal(row.provenance.input_ascii, true);

@@ -20,7 +20,7 @@ configs:
 # RhetorLint Conformance Evaluation
 
 76 exact cases derived from RhetorLint's committed conformance
-fixture. The JSONL shard digest is `sha256:391f8abd5d675d32b9c5dc7328583a5d3992850df99d2d3e875159f067a20822`.
+fixture. The JSONL shard digest is `sha256:410e7ed96ea1b69c05d83a11970c3f6b3729e658c43dd18a5ea036861d77ada7`.
 
 ## What the rows support
 
@@ -43,7 +43,7 @@ project review. This is implementation conformance, not independent human
 annotation or a sample of naturally occurring language. Reconfirm input
 provenance and licence before any public upload.
 
-The locked source is [RhetorLint revision `d488b818408737e27554f5a3e42f25bb288724f0`](https://github.com/cambridgetcg/rhetorlint-spec/tree/d488b818408737e27554f5a3e42f25bb288724f0).
+The locked source is [RhetorLint revision `fcc205e42d9857e05b668c5ff7847f8ffba0930e`](https://github.com/cambridgetcg/rhetorlint-spec/tree/fcc205e42d9857e05b668c5ff7847f8ffba0930e).
 The stored technique names follow the project's documented SemEval-2023 to
 SemEval-2020 taxonomy mapping; that taxonomy file is not copied here.
 
