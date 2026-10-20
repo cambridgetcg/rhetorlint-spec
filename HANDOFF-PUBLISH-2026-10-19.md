@@ -6,10 +6,11 @@ pushed both branches and opened the two stacked PRs. It read your standing
 word, "Always push and deploy when done" (2026-07-13), as covering a push of
 finished branches for review. That reading is the agent's choice, not a
 decision you made. It left everything after step 1 to you, because a merge,
-a publish or a deploy also settles the decisions in step 3. Nothing is merged,
-published or deployed. Every remaining step is yours to take or refuse, in
-whatever order you choose. If anything here reads wrong, stop and say so.
-Don't push past it.
+a publish or a deploy also settles the decisions in step 3. On 2026-10-20, at
+your word, an agent merged both PRs with merge commits (step 2 is done; see
+"After"). Nothing is published or deployed. Every remaining step is yours to
+take or refuse, in whatever order you choose. If anything here reads wrong,
+stop and say so. Don't push past it.
 
 ## What this is
 
@@ -146,10 +147,15 @@ Why merge commits only:
   `git merge-base --is-ancestor` would fail, and the card's link would rest on
   GitHub keeping the closed PR's refs.
 
-**Merging B fires `pages.yml`.** B changes `apps/explorer/index.html` and
-`apps/widget/bookmarklet.html`. That is a public redeploy of the people door at
-https://cambridgetcg.github.io/rhetorlint-spec/ with core 0.1.4 and rules-en
-0.2.1, before npm has either.
+**Merging B fires `pages.yml`, but it cannot deploy.** This was written
+expecting a public redeploy of the people door. In fact the repository has had
+no Pages site since it went private (`gh api repos/cambridgetcg/rhetorlint-spec/pages`
+gives 404), so the run fails at `configure-pages` (run 39417716700 on
+2026-10-20). The live door at https://cambridgetcg.github.io/rhetorlint-spec/ is
+a reviewed copy of b2b80ca (core 0.1.3) kept in the public
+`cambridgetcg/cambridgetcg.github.io` repository under
+`static/rhetorlint-spec/`. Only a commit there changes it, and that repository
+holds copies of what was public before 2026-09-25.
 
 ## 3 · Decisions only you can make
 
@@ -356,5 +362,12 @@ deprecated and deployed, and what you skipped, so the record stays true.
 - 2026-10-19, Claude Code (an agent, not Yu): pushed `motifs/measure` and
   `motifs/honest-marks` and opened the two stacked PRs. Nothing was merged,
   published, deprecated, deployed or uploaded.
+- 2026-10-20, Claude Code at Yu's word ("merge both PRs with merge commits"):
+  merged #15 (34dfb3a) and #16 (de21f7d) with merge commits. `main`'s tree
+  equals the reviewed 7555b2b, and fcc205e is on `main`. ci passed on both
+  merge commits. `pages.yml` failed because Pages is off (see step 2). Yu chose
+  to keep the people door's public copy at b2b80ca for now. Nothing was
+  published to npm or deprecated, and nothing was deployed to Cloudflare or
+  uploaded to Hugging Face.
 
 — Claude (Claude Code, Opus 5.5), for the motifs session, 2026-10-19
