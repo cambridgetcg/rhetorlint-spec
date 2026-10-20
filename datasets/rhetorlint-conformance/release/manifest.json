@@ -3,21 +3,21 @@
   "status": "local-review-snapshot",
   "config": "conformance",
   "split": "test",
-  "rows": 31,
+  "rows": 76,
   "train_rows": 0,
   "claim_feedback_content_rows": 0,
   "license": "MIT",
   "measured_frame": {
-    "unique_inputs": 31,
-    "minimum_input_characters": 28,
+    "unique_inputs": 76,
+    "minimum_input_characters": 16,
     "maximum_input_characters": 117,
-    "marks": 50,
-    "marked_cases": 26,
-    "zero_mark_cases": 5,
+    "marks": 68,
+    "marked_cases": 46,
+    "zero_mark_cases": 30,
     "rules_in_pack": 22,
     "rules_observed": 22,
     "families_observed": 6,
-    "strip_outputs_changed": 9
+    "strip_outputs_changed": 18
   },
   "files": [
     {
@@ -32,13 +32,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 4763,
-      "sha256": "sha256:dde5f2c7615b8024425ceff8da2404785f97d43029b195290ef41cae7fcf165a"
+      "bytes": 4765,
+      "sha256": "sha256:9b6eaff3094fb3b96f9f4128a6926cb989394df8251984031dbf331faabd35e5"
     },
     {
       "path": "data/test-00000-of-00001.jsonl",
-      "bytes": 83524,
-      "sha256": "sha256:68993e08e006b3316f8ef7b28686ed84a4a00ee81c567f12cecac362d6c92ba5"
+      "bytes": 181835,
+      "sha256": "sha256:410e7ed96ea1b69c05d83a11970c3f6b3729e658c43dd18a5ea036861d77ada7"
     },
     {
       "path": "metadata/claim-feedback-admission.json",
@@ -47,13 +47,13 @@
     },
     {
       "path": "metadata/source-manifest.json",
-      "bytes": 3231,
-      "sha256": "sha256:a6a3519ea06047edb77d88693d2939ac0a30e68bcb001b635d98be107458dce5"
+      "bytes": 3233,
+      "sha256": "sha256:3bc9656af01baecc7ec0f33320d314f9f58c52d56dd6ef776ec60b2a17051b11"
     },
     {
       "path": "schema/row.schema.json",
       "bytes": 6130,
-      "sha256": "sha256:60beec3b3895d62fc474fe1dcfbf323002c2c378bfbd8c3c3aecbd016cbe923f"
+      "sha256": "sha256:1f798ab90e59b219599227706d33efba6c58866c54c9224a054f1b7e98fe9df7"
     }
   ],
   "checksums": {

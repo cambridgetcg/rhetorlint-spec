@@ -19,8 +19,8 @@ configs:
 
 # RhetorLint Conformance Evaluation
 
-31 exact cases derived from RhetorLint's committed conformance
-fixture. The JSONL shard digest is `sha256:68993e08e006b3316f8ef7b28686ed84a4a00ee81c567f12cecac362d6c92ba5`.
+76 exact cases derived from RhetorLint's committed conformance
+fixture. The JSONL shard digest is `sha256:410e7ed96ea1b69c05d83a11970c3f6b3729e658c43dd18a5ea036861d77ada7`.
 
 ## What the rows support
 
@@ -31,7 +31,7 @@ fixture. The JSONL shard digest is `sha256:68993e08e006b3316f8ef7b28686ed84a4a00
 - comparing RhetorLint implementations on the committed input frame.
 
 This release has only a `test` split. It has no `train` or `validation`
-split because 31 reference-generated cases are not a training corpus or a
+split because 76 reference-generated cases are not a training corpus or a
 generalisation benchmark.
 
 ## Provenance
@@ -43,7 +43,7 @@ project review. This is implementation conformance, not independent human
 annotation or a sample of naturally occurring language. Reconfirm input
 provenance and licence before any public upload.
 
-The locked source is [RhetorLint revision `af3b87115d3d154f2ba8b4c955b5a6584be5cf60`](https://github.com/cambridgetcg/rhetorlint-spec/tree/af3b87115d3d154f2ba8b4c955b5a6584be5cf60).
+The locked source is [RhetorLint revision `fcc205e42d9857e05b668c5ff7847f8ffba0930e`](https://github.com/cambridgetcg/rhetorlint-spec/tree/fcc205e42d9857e05b668c5ff7847f8ffba0930e).
 The stored technique names follow the project's documented SemEval-2023 to
 SemEval-2020 taxonomy mapping; that taxonomy file is not copied here.
 
@@ -59,10 +59,10 @@ or offsets for general non-ASCII input.
 
 ## Measured frame
 
-- 31 unique inputs, 28–117 characters each;
-- 50 marks across 26 marked cases and 5 zero-mark controls;
+- 76 unique inputs, 16–117 characters each;
+- 68 marks across 46 marked cases and 30 zero-mark controls;
 - 22/22 current English rules observed across 6 families; and
-- 9/31 strip outputs differ from their inputs.
+- 18/76 strip outputs differ from their inputs.
 
 The unseeded justification taxonomy family is absent.
 

@@ -35,8 +35,6 @@
 #      so does a declaration the engine no longer needs.
 #
 #      Open defect tags used below:
-#        O2  agency-hiding.deleted-subject marks a passive without reading its
-#            context, even where the doer is named nearby or no doer is at issue.
 #        O6  absolute.universal matches bare absolutes word by word: it marks
 #            the 'never' of a plain statement of policy, and it misses the False
 #            Dilemma phrase its own lesson teaches ('the only option').
@@ -269,12 +267,6 @@ families:
           - marked: "An altercation ensued and a bystander was hurt."
             tell: "altercation ensued"
             plain: "The guard shoved the vendor, and a bystander was knocked down."
-            plain_also_marks:
-              - ruleId: agency-hiding.deleted-subject
-                actual: "was knocked"
-                status: known-defect
-                tag: "O2"
-                reason: "The clause before names the doer and the deed ('The guard shoved the vendor'); the detector reads each passive alone, so it asks 'who?' of a sentence that has already answered."
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (RhetorLint-authored pattern under a SemEval technique — the contrition.rehearsed precedent; structural kin: agency-hiding.deleted-subject. Seedable only where a deed-noun demands a doer; 'died in police custody' is deliberately NOT marked — intransitive 'died' states a death, not a deed, and marking it would presume an act the sentence never states)"
 
       - id: insinuation.raises-questions
@@ -285,12 +277,6 @@ families:
           - marked: "The filing raises serious questions about the timeline."
             tell: "raises serious questions about"
             plain: "The filing shows the contract was signed two weeks before the vote; the auditor asks whether the board knew."
-            plain_also_marks:
-              - ruleId: agency-hiding.deleted-subject
-                actual: "was signed"
-                status: known-defect
-                tag: "O2"
-                reason: "The rewrite's point is when the contract was signed, not who signed it; no doer is at issue, and the detector cannot tell a dated record from an accountable passive."
           - marked: "Questions swirled around the campaign's finances."
             tell: "Questions swirled around"
             plain: "Three donors asked the campaign to explain a $2m transfer; it has not yet done so."
@@ -382,6 +368,65 @@ families:
           - tell: "the only option"
             tag: "O6"
             reason: "'the only option' is not among absolute.universal's terms, so the False Dilemma phrase this lesson teaches goes unmarked; the rule marks the same sentence's 'Everyone' instead."
+        # A negated absolute is a disclaimer, and a clause-initial 'Never' before
+        # a lowercase verb is advice, so the engine leaves both unmarked. A
+        # comma ends a negator's reach once a word stands between them, and a
+        # 'Never' before a word that cannot be its verb opens a fragment or an
+        # inversion, so those absolutes stay marked. The guard lives in the
+        # engine, not the pack (packages/rules-en/README.md says why); these
+        # sentences hold every engine to it.
+        guard_examples:
+          - text: "Returns are not guaranteed; past performance is no indicator."
+            expect: unmarked
+          - text: "Results aren't always typical."
+            expect: unmarked
+          - text: "Not everyone qualifies."
+            expect: unmarked
+          - text: "Never share your password with anyone."
+            expect: unmarked
+          - text: "Explain real constraints; never manufacture the shortage."
+            expect: unmarked
+          - text: "This is guaranteed to double your savings."
+            expect: marked
+            actual: "guaranteed"
+          - text: "Everyone knows this policy works."
+            expect: marked
+            actual: "Everyone"
+          - text: "Our product will always be the best choice."
+            expect: marked
+            actual: "always"
+          - text: "Past performance is not, however, always a guide."
+            expect: unmarked
+          - text: "Never ever share your password."
+            expect: unmarked
+          - text: "No risk, guaranteed."
+            expect: marked
+            actual: "guaranteed"
+          - text: "Don't wait, everyone is buying."
+            expect: marked
+            actual: "everyone"
+          - text: "No fees, always free."
+            expect: marked
+            actual: "always"
+          - text: "No contracts, no fees, no exceptions."
+            expect: marked
+            actual: "no exceptions"
+          - text: "Battery life? Never an issue."
+            expect: marked
+            actual: "Never"
+          - text: "Never again will prices be this low."
+            expect: marked
+            actual: "Never"
+          - text: "Never has a product been this good."
+            expect: marked
+            actual: "Never"
+          - text: "Never before have prices been this low."
+            expect: marked
+            actual: "Never"
+          - text: "Never at any time disclose your password."
+            expect: unmarked
+          - text: "Never have more than two drinks."
+            expect: unmarked
         lineage: "SemEval-2023 · Simplification › False Dilemma or No Choice"
 
   # ==========================================================================
@@ -434,12 +479,6 @@ families:
           - marked: "The minister claimed that the figures were audited."
             tell: "claimed that"
             plain: "The minister said the figures were audited; the auditor's office declined to confirm."
-            plain_also_marks:
-              - ruleId: agency-hiding.deleted-subject
-                actual: "were audited"
-                status: known-defect
-                tag: "O2"
-                reason: "'were audited' reports a routine procedure, not an accountable act, and the same sentence names the office that would have done it; the detector reads the passive alone and cannot tell a procedure from an evaded actor."
           - marked: "He insisted that nothing was wrong."
             tell: "insisted that"
             plain: "Asked three times, he said nothing was wrong."
@@ -527,7 +566,7 @@ families:
   - id: agency-hiding
     semeval_parent: "(RhetorLint extension — not in SemEval)"
     what: "Sentence structure that removes the actor: the harm is described, but who chose it is gone."
-    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar, so it earns its own family."
+    why_extension: "SemEval's taxonomy is lexical/rhetorical; RhetorLint adds one STRUCTURAL family because agency deletion is a grammatical move (an agentless passive of an act someone answers for), not a word on a list. Its nearest SemEval kin is Manipulative Wording › Obfuscation, but the tell lives in the grammar: the same participle is a tell in 'concerns were raised' and procedure in 'an error was raised', so the family reads the auxiliary, the verb and the noun before it together, and earns its own place."
     seeded_tells: 1
     tells:
 
@@ -536,8 +575,9 @@ families:
         # NOT a SemEval technique. The parenthesis is load-bearing: it keeps the
         # label off SemEval's Obfuscation bucket, so a technique-level join to a
         # SemEval corpus drops this tell rather than silently absorbing it.
-        what: "An agentless passive — 'mistakes were made', 'your account was closed' — a sentence whose grammar has no subject, so who acted has been deleted."
+        what: "An agentless past passive of an accountable act — 'mistakes were made', 'your data was shared' — a fault, a breach, a concealment or a decision whose doer the clause never names."
         why_it_works: "No actor, no accountability: the harm reads like weather that simply happened rather than a choice a specific someone made."
+        benign_reading: "Most passives hide nothing. The rule marks a was, were or been passive only when its verb is on a closed list of fault, breach, concealment and decision verbs (spec/agency-lexicon.json), so these are unmarked by design: present and modal 'be' passives ('the option is ignored', 'the soup can be frozen'); routine data handling ('samples were collected at dawn'); negated passives, which deny the act ('your data was never sold'); a passive with a 'by' among the next seven words of its clause, whether it names the agent ('...by Forbes') or only when ('shelved by Friday', a known under-mark), while a doer named further on or in the next clause does not silence it ('Mistakes were made, and I made them.' is marked); and harm and news verbs whose doer the words alone cannot establish ('lives were lost in the earthquake', 'your account was closed at your request'). A modal perfect ('may have been accessed') reads as past and is marked. The listed verbs keep innocent senses the words cannot tell apart, and those are still marked ('tax was withheld', 'unknown keys were ignored', 'repeated measures were taken'): open O2 rows in measurement/contrast.json."
         examples:
           - marked: "Mistakes were made and your account was closed"
             tell: "Mistakes were made"

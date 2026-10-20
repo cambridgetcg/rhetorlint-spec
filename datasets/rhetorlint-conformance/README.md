@@ -3,7 +3,7 @@
 This directory builds one small, Hugging Face-compatible **evaluation
 snapshot** from the repository's canonical `conformance/cases.json`.
 
-It does not create a training corpus. The 31 expected outputs were generated
+It does not create a training corpus. The 76 expected outputs were generated
 by the JavaScript reference engine. Separate JavaScript, Python, and Go
 conformance gates cover the scopes named in the release card; this data-only
 builder executes none of them. The rows are useful for exact implementation

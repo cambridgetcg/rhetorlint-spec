@@ -24,37 +24,283 @@ from pathlib import Path
 
 SPEC_VERSION = "0.1"
 NAME = "rhetorlint (python)"
-CORE_VERSION = "0.1.2"
+CORE_VERSION = "0.1.4"
 
-# Words the -ed/-en passive heuristic should treat as predicate adjectives.
-# Includes plain -en adjectives/numerals ("open", "seven") the \w+en pattern
-# would otherwise swallow, and "often" so bare "is often" never reads passive.
-NOT_PASSIVE = {
-    "tired", "glad", "aware", "worried", "excited", "interested", "scared",
-    "bored", "pleased", "married", "gifted", "talented", "detailed", "limited",
-    "dedicated", "committed", "supposed", "used", "based",
-    "open", "even", "sudden", "seven", "ten", "eleven", "golden", "wooden", "often",
+# BEGIN GENERATED AGENCY LEXICON
+# spec/agency-lexicon.json version 5, written by scripts/gen-agency-lexicon.mjs.
+# Edit the lexicon and rerun the generator; --check fails when this block drifts.
+AGENCY_WHITESPACE = " \t\n\r\f"
+AGENCY_SPACE = "[ \\t\\n\\r\\f]+"
+AGENCY_HEAD_STOPS = ".;:!?\n"
+AGENCY_CLAUSE_BREAKS = ".;:!?"
+AGENCY_AUXILIARIES = ("been", "was", "were")
+AGENCY_ADVERBS = ("already", "always", "often", "still")
+AGENCY_ADVERB_SUFFIX = "ly"
+AGENCY_SKIP = frozenset({
+    "all", "already", "also", "can", "could", "had", "has", "have", "may", "might", "must", "now",
+    "shall", "should", "since", "then", "will", "would"
+})
+AGENCY_SKIP_SUFFIX = "ly"
+AGENCY_SKIP_MAX = 4
+AGENCY_BY_WINDOW = 7
+AGENCY_NEGATORS = frozenset({
+    "cannot", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing"
+})
+AGENCY_HEADS = {
+    "challenge": frozenset({
+        "allegations", "concerns", "questions"
+    }),
+    "data": frozenset({
+        "address", "addresses", "credentials", "data", "details", "information", "password",
+        "passwords", "pii", "records"
+    }),
+    "dummy": frozenset({
+        "it"
+    }),
+    "error": frozenset({
+        "action", "actions", "allegations", "choices", "comments", "concerns", "cuts", "decision",
+        "decisions", "error", "errors", "measures", "miscalculation", "miscalculations",
+        "misjudgement", "misjudgements", "misjudgment", "misjudgments", "misstep", "missteps",
+        "mistake", "mistakes", "omissions", "promises", "questions", "remarks", "safeguards",
+        "statements", "steps", "things", "threats", "words"
+    }),
+    "held": frozenset({
+        "account", "accounts", "address", "addresses", "credentials", "data", "details",
+        "information", "password", "passwords", "pii", "records"
+    }),
+}
+# (class, head class or "" for none, participles)
+AGENCY_CLASSES = (
+    ("fault", "", (
+        "botched", "bungled", "doctored", "falsified", "ignored", "misappropriated",
+        "miscalculated", "mischaracterised", "mischaracterized", "mishandled", "misinformed",
+        "misinterpreted", "misjudged", "mislabeled", "mislabelled", "misled", "mismanaged",
+        "misplaced", "misquoted", "misreported", "misrepresented", "misstated", "misused",
+        "neglected", "overcharged", "overlooked", "tampered", "underpaid",
+    )),
+    ("breach", "", (
+        "accessed", "breached", "compromised", "exfiltrated", "exposed", "hacked", "leaked",
+        "stolen",
+    )),
+    ("affect", "held", (
+        "affected", "impacted",
+    )),
+    ("conceal", "", (
+        "axed", "censored", "concealed", "laid off", "let go", "scrapped", "shelved", "silenced",
+        "withheld",
+    )),
+    ("light", "error", (
+        "characterised", "characterized", "done", "given", "interpreted", "made", "perceived",
+        "put", "said", "taken",
+    )),
+    ("raise", "challenge", (
+        "raised",
+    )),
+    ("impersonal", "dummy", (
+        "agreed", "decided", "determined",
+    )),
+    ("data", "data", (
+        "disclosed", "shared", "sold",
+    )),
+)
+AGENCY_REQUIRES = {"put": "in place"}
+AGENCY_UNLESS = {"exposed": "to"}
+# END GENERATED AGENCY LEXICON
+
+# ASCII-only lowercasing: A-Z to a-z and nothing else. The agency matcher and
+# the guards read words through it, so no engine folds a non-ASCII letter into
+# a word it looks for, and the lowercased copy keeps the text's length.
+_ASCII_LOWER = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
+
+# The agentless-passive detector marks an ACCOUNTABLE passive whose doer the
+# clause leaves unstated, exactly as packages/core/index.mjs does (its comment
+# there is the full statement). A mark needs a past auxiliary (was, were,
+# been), at most one adverb, a participle from a closed class, the head word
+# its class names, its AGENCY_REQUIRES phrase and not its AGENCY_UNLESS word,
+# no "by" among the next AGENCY_BY_WINDOW words of the clause, and no negator
+# anywhere in its clause before the auxiliary: after the last
+# AGENCY_HEAD_STOPS character, or from the start of the text.
+#
+# Matching runs on an ASCII-lowercased copy with no IGNORECASE, explicit
+# AGENCY_WHITESPACE ([ \t\n\r\f]) and re.ASCII word boundaries, so a
+# non-ASCII letter is never folded into a word and a no-break space never joins
+# two. The guards walk characters from the match, as the JavaScript and Go
+# engines do. None applies an anchored pattern at an offset
+# (re.match(text, pos) never matches '^' at pos > 0).
+
+# Each participle and the head class it needs ("" for none).
+_AGENCY_HEAD_OF = {
+    participle: head
+    for _cls, head, participles in AGENCY_CLASSES
+    for participle in participles
 }
 
-# Irregular past participles the "\w+ed|\w+en" pattern would otherwise miss.
-_IRREGULAR_PP = (
-    "made|taken|done|given|seen|known|held|shown|drawn|chosen|written|broken|spoken|"
-    "built|sent|kept|left|lost|found|told|brought|dealt|put|set|paid|felt|met|led|read|"
-    "hit|cut|hurt|shut|split|spread|cast|cost|let"
+AGENCY_CANDIDATE = re.compile(
+    r"\b(" + "|".join(AGENCY_AUXILIARIES) + ")" + AGENCY_SPACE
+    + "(?:(?:[a-z]+" + AGENCY_ADVERB_SUFFIX + "|" + "|".join(AGENCY_ADVERBS) + ")"
+    + AGENCY_SPACE + ")?"
+    + "(" + "|".join(
+        AGENCY_SPACE.join(p.split(" "))
+        for p in sorted(_AGENCY_HEAD_OF, key=lambda p: (-len(p), p))
+    ) + r")\b",
+    re.ASCII,
 )
+_AGENCY_SPACE_RUN = re.compile(AGENCY_SPACE)
 
-# be-verb (+ optional adverb, -ly or a common frequency word) + participle,
-# NOT followed by "by <agent>" — the by-phrase may sit past a particle or
-# adverb ("carried out collectively by the network" still names the agent).
-AGENTLESS_PASSIVE = re.compile(
-    r"\b(is|are|was|were|been|being|be)\s+(?:(?:\w+ly|often|never|always|still|already)\s+)?"
-    r"(\w+(?:ed|en)|" + _IRREGULAR_PP + r")\b"
-    r"(?!\s+(?:(?:\w+ly|out|up|off|down|in|on|away|forward|together|aside|back)\s+)*by\b)",
-    re.IGNORECASE,
-)
+
+def _is_agency_word_char(char):
+    """An ASCII letter, digit or underscore: what \\b counts as a word character."""
+    return "a" <= char <= "z" or "0" <= char <= "9" or char == "_"
+
+
+def _agency_head_word(low, index):
+    """The nearest word before index, stepping back over at most
+    AGENCY_SKIP_MAX words of AGENCY_SKIP or ending in -ly, never past
+    . ; : ! ? or a line break; "" when there is none."""
+    i = index
+    for _ in range(AGENCY_SKIP_MAX + 1):
+        while i > 0 and not _is_agency_word_char(low[i - 1]):
+            if low[i - 1] in AGENCY_HEAD_STOPS:
+                return ""
+            i -= 1
+        end = i
+        while i > 0 and _is_agency_word_char(low[i - 1]):
+            i -= 1
+        if i == end:
+            return ""
+        word = low[i:end]
+        if word not in AGENCY_SKIP and not word.endswith(AGENCY_SKIP_SUFFIX):
+            return word
+    return ""
+
+
+def _agency_contraction(low, start):
+    """True when the word "t" at start ends an n't contraction: "n", then an
+    apostrophe (U+0027 or U+2019)."""
+    return start >= 2 and low[start - 2 : start] in ("n'", "n\u2019")
+
+
+def _agency_negation_reader(low):
+    """A reader of the lowercased text that answers, for each index it is given
+    in increasing order, whether a negator (AGENCY_NEGATORS, or an n't
+    contraction) stands anywhere between the start of that index's clause and
+    the index: after the last AGENCY_HEAD_STOPS character before it, or from
+    the start of the text. It reads forward and never twice, so a clause with
+    many passives costs one pass. The same character walk as JavaScript's and
+    Go's."""
+    i = 0
+    negated = False
+    n = len(low)
+
+    def read(index):
+        nonlocal i, negated
+        while i < index:
+            if not _is_agency_word_char(low[i]):
+                if low[i] in AGENCY_HEAD_STOPS:
+                    negated = False
+                i += 1
+                continue
+            start = i
+            while i < n and _is_agency_word_char(low[i]):
+                i += 1
+            word = low[start:i]
+            if word in AGENCY_NEGATORS or (word == "t" and _agency_contraction(low, start)):
+                negated = True
+        return negated
+
+    return read
+
+
+def _agency_by_follows(low, index):
+    """True when "by" is one of the next AGENCY_BY_WINDOW words after index,
+    before . ; : ! or ?. A line break does not end the window."""
+    i, n = index, len(low)
+    for _ in range(AGENCY_BY_WINDOW):
+        while i < n and not _is_agency_word_char(low[i]):
+            if low[i] in AGENCY_CLAUSE_BREAKS:
+                return False
+            i += 1
+        if i == n:
+            return False
+        start = i
+        while i < n and _is_agency_word_char(low[i]):
+            i += 1
+        if low[start:i] == "by":
+            return True
+    return False
+
+
+def _agency_phrase_follows(low, index, phrase):
+    """True when the words of phrase follow index, each after [ \\t\\n\\r\\f]+
+    and each whole. It compares with str.startswith at an offset, never an
+    anchored regex."""
+    i, n = index, len(low)
+    for word in phrase.split(" "):
+        gap = i
+        while i < n and low[i] in AGENCY_WHITESPACE:
+            i += 1
+        if i == gap or not low.startswith(word, i):
+            return False
+        i += len(word)
+        if i < n and _is_agency_word_char(low[i]):
+            return False
+    return True
+
+
+def _agentless_passives(text):
+    """Every accountable agentless passive, as (index, length, actual)."""
+    low = text.translate(_ASCII_LOWER)
+    negated = _agency_negation_reader(low)
+    out = []
+    for m in AGENCY_CANDIDATE.finditer(low):
+        start, end = m.start(), m.end()
+        participle = _AGENCY_SPACE_RUN.sub(" ", m.group(2))
+        unless = AGENCY_UNLESS.get(participle)
+        if unless is not None and _agency_phrase_follows(low, end, unless):
+            continue
+        requires = AGENCY_REQUIRES.get(participle)
+        if requires is not None and not _agency_phrase_follows(low, end, requires):
+            continue
+        if _agency_by_follows(low, end):
+            continue
+        head = _AGENCY_HEAD_OF[participle]
+        if head and _agency_head_word(low, start) not in AGENCY_HEADS[head]:
+            continue
+        if negated(start):
+            continue
+        out.append((start, end - start, text[start:end]))
+    return out
 
 # The sole ruleId eligible under the conservative strip counterfactual.
 REMOVABLE = {"intensifier.loaded"}
+
+# The guards' word lists, generated from spec/guard-lexicon.json, whose why
+# fields say why each word is there: _NEGATORS negate the intensifier or
+# absolute after them ("not extremely high", "not always"), and with any "n't"
+# contraction are what _negated_at looks for; _CLAUSE_BREAKS end a clause, for
+# the negator window and the imperative "Never"; _NEVER_NON_VERBS, after a
+# clause-initial "never", open a fragment ("Never an issue.") or an inversion
+# ("Never has a product been this good."), so "Never" stays marked (a word that
+# can also begin advice, "Never have regrets.", is left out: a recorded miss);
+# _NEVER_PASS_THROUGH adverbs may stand between "Never" and its verb, so the
+# word after them decides.
+# BEGIN GENERATED GUARD LEXICON
+# spec/guard-lexicon.json version 2, written by scripts/gen-agency-lexicon.mjs.
+# Edit the lexicon and rerun the generator; --check fails when this block drifts.
+# NEGATORS: spec/agency-lexicon.json version 5's negators, and localNegators.
+_NEGATORS = frozenset({
+    "cannot", "hardly", "neither", "never", "no", "nobody", "none", "nor", "not", "nothing",
+    "without"
+})
+_CLAUSE_BREAKS = frozenset(".;:!?")
+_NEVER_NON_VERBS = frozenset({
+    "a", "an", "any", "are", "been", "before", "being", "can", "could", "did", "does", "had", "has",
+    "is", "such", "the", "was", "were", "will", "would"
+})
+_NEVER_PASS_THROUGH = frozenset({
+    "again", "ever", "once"
+})
+# END GENERATED GUARD LEXICON
 _REGEX_META = frozenset(r"\^$.*+?()[]{}|")
 
 
@@ -96,11 +342,7 @@ def _matches_for(rule, text):
                 continue
             out.append((m.start(), len(m.group(0)), m.group(0)))
     elif kind == "structural" and rule.get("detector") == "agentless-passive":
-        for m in AGENTLESS_PASSIVE.finditer(text):
-            participle = (m.group(2) or "").lower()
-            if participle in NOT_PASSIVE:
-                continue
-            out.append((m.start(), len(m.group(0)), m.group(0)))
+        out.extend(_agentless_passives(text))
     return out
 
 
@@ -122,8 +364,105 @@ def _js_round(x):
     return math.floor(x + 0.5)
 
 
+def _is_guard_word_char(char):
+    """An ASCII letter or digit, or an apostrophe (U+0027 or U+2019)."""
+    return (
+        "a" <= char <= "z" or "A" <= char <= "Z" or "0" <= char <= "9"
+        or char == "'" or char == "\u2019"
+    )
+
+
+def _is_negator(word):
+    word = word.translate(_ASCII_LOWER).strip("'\u2019")
+    return word in _NEGATORS or word.endswith(("n't", "n\u2019t"))
+
+
+def _negated_at(text, offset, comma_ends_scope=False):
+    """True when a negator is one of the two words before offset, with no
+    . ; : ! or ? between them. It walks back over characters and words, never
+    a count of units, so the JS, Python and Go engines decide alike.
+
+    With comma_ends_scope (the absolute.universal guard; strip leaves it off),
+    a comma also ends the negator's reach once a word stands between them: the
+    "No" of "No risk, guaranteed." negates "risk", not "guaranteed". A negator
+    followed directly by a comma reaches past the aside, so "not, however,
+    guaranteed" and "No, never" stay negated."""
+    i = offset
+    comma_before = False  # a comma between the term and the word being read
+    for _ in range(2):
+        comma = False
+        while i > 0 and not _is_guard_word_char(text[i - 1]):
+            if text[i - 1] in _CLAUSE_BREAKS:
+                return False
+            if text[i - 1] == ",":
+                comma = True
+            i -= 1
+        if i == 0:
+            return False
+        end = i
+        while i > 0 and _is_guard_word_char(text[i - 1]):
+            i -= 1
+        if _is_negator(text[i:end]):
+            return not comma_ends_scope or not comma_before or comma
+        comma_before = comma_before or comma
+    return False
+
+
+# The ruleIds whose matches are read in their clause before they are marked:
+# a negated absolute ("not guaranteed", "Not everyone") is a disclaimer, and a
+# clause-initial "Never" before a lowercase verb ("Never share your password.")
+# is advice, not a claim. Engine-side, like REMOVABLE, so the pack stays
+# readable by older engines; spec/taxonomy.yaml declares it as guard_examples.
+NEGATION_SCOPED = {"absolute.universal"}
+
+
+
+def _imperative_never_at(text, start, end):
+    """True when text[start:end] is "never", in any letter case, opening its
+    clause (only non-word characters between it and the start of the text or
+    one of . ; : ! ?) and followed by a verb: spaces or tabs, then a word that
+    starts with an ASCII lowercase letter and is not one of _NEVER_NON_VERBS.
+    _NEVER_PASS_THROUGH words are stepped over the same way first. Like
+    _negated_at it walks characters, never a count of units."""
+    if text[start:end].translate(_ASCII_LOWER) != "never":
+        return False
+    i = start
+    while i > 0 and not _is_guard_word_char(text[i - 1]) and text[i - 1] not in _CLAUSE_BREAKS:
+        i -= 1
+    if i > 0 and _is_guard_word_char(text[i - 1]):
+        return False
+    j = end
+    while True:
+        gap = j
+        while j < len(text) and text[j] in " \t":
+            j += 1
+        if j == gap or j == len(text) or not "a" <= text[j] <= "z":
+            return False
+        word = j
+        while j < len(text) and _is_guard_word_char(text[j]):
+            j += 1
+        w = text[word:j].translate(_ASCII_LOWER)
+        if w not in _NEVER_PASS_THROUGH:
+            return w not in _NEVER_NON_VERBS
+
+
+def _negation_scoped_at(text, start, end):
+    """True when a NEGATION_SCOPED match is negated or an imperative "Never"."""
+    return _negated_at(text, start, True) or _imperative_never_at(text, start, end)
+
+
+def _quoted_at(text, offset):
+    """True when offset sits inside a quotation on its own line: an odd number
+    of straight double quotes before it, or an unclosed U+201C."""
+    line = text[text.rfind("\n", 0, offset) + 1 : offset]
+    return line.count('"') % 2 == 1 or line.rfind("\u201c") > line.rfind("\u201d")
+
+
 def strip(text, marks):
-    """Remove loaded intensifiers and flag hidden agents; preserve modality."""
+    """Remove loaded intensifiers and flag hidden agents; preserve modality.
+
+    An intensifier under a negator, or inside a quotation, stays: deleting it
+    would strengthen the claim or edit someone's words."""
     if not any(
         m["ruleId"] in REMOVABLE or m["ruleId"] == "agency-hiding.deleted-subject"
         for m in marks
@@ -136,6 +475,9 @@ def strip(text, marks):
         s = m["position"]["start"]["offset"]
         e = m["position"]["end"]["offset"]
         if m["ruleId"] in REMOVABLE:
+            # Judged on the source text: edits so far all lie at or after s.
+            if _negated_at(text, s) or _quoted_at(text, s):
+                continue
             out = _join_removal_seam(out[:s], out[e:])
         elif m["ruleId"] == "agency-hiding.deleted-subject":
             out = out[:s] + "[who?] " + out[s:]
@@ -181,7 +523,10 @@ def analyze(text, rules=None, locale=None, rewrite=None):
     rules_provenance = rules["id"] + "@" + rules["version"]
     marks = []
     for rule in rules["rules"]:
+        scoped = rule.get("ruleId") in NEGATION_SCOPED
         for index, length, actual in _matches_for(rule, text):
+            if scoped and _negation_scoped_at(text, index, index + length):
+                continue
             marks.append({
                 "ruleId": rule["ruleId"],
                 "family": rule["family"],

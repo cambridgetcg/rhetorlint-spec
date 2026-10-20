@@ -12,7 +12,7 @@ The three packages that publish (nothing else does):
 |------|---------|-----------|
 | 1 | `@rhetorlint/core` | — |
 | 2 | `@rhetorlint/rules-en` | — |
-| 3 | `@rhetorlint/cli` | `^0.1.3` core, `^0.2.0` rules-en (must be live first) |
+| 3 | `@rhetorlint/cli` | `^0.1.4` core, `^0.2.0` rules-en (must be live first) |
 
 > The CLI's ranges are carets on purpose, and it was not always so: `cli@0.1.0`
 > shipped with **exact** pins, so every `npm i @rhetorlint/cli` kept installing
@@ -21,9 +21,192 @@ The three packages that publish (nothing else does):
 > receive those improvements. Keep them carets, and re-release the CLI whenever
 > a floor rises (an engine feature the CLI's own output depends on).
 
-Core 0.1.3 is the current floor for the coordinated 0.2.0 CLI and rule pack:
-it preserves modality and attribution in strip output. Allowing core 0.1.2
-would install successfully while producing the superseded strip semantics.
+Core 0.1.4 is the current floor for the coordinated 0.2.0 CLI and rules-en
+0.2.1. Rules-en 0.2.1 adds no pack key, so core 0.1.3 and core 0.1.2 (the one
+npm has) still parse it, but its agency note ("a past-tense passive of a fault,
+breach, concealment or decision verb") describes the 0.1.4 accountable-passive
+detector. An older core would put that note on its old, wider marks
+("Shipments are often delayed", "The soup can be frozen"), a label that is
+false for each of them. Core 0.1.3 was the
+floor before, because it preserves modality and attribution in strip output;
+allowing core 0.1.2 would install successfully while producing the superseded
+strip semantics.
+
+### Core 0.1.4 + rules-en 0.2.1 — prepared 2026-10-19, not published
+
+Prepared on `motifs/honest-marks` (stacked on `motifs/measure`); the letter for
+the person who publishes is `HANDOFF-PUBLISH-2026-10-19.md`. On 2026-10-19
+`npm view` showed core 0.1.0–0.1.2, rules-en 0.1.0–0.1.2 and cli 0.1.0–0.1.1,
+each `latest` the highest. Core 0.1.3, rules-en 0.2.0 and cli 0.2.0 were never
+published, so this release would carry all of them.
+
+**Core 0.1.4** contains everything in the 0.1.3 candidate below, plus the
+changes listed after this paragraph. Because 0.1.3 was never published, 0.1.4
+is also the first core on npm with that candidate's closed rule-pack
+validation. A pack core 0.1.2 reads now throws `TypeError: invalid rule pack
+at ...` when it has a key the format does not list (`$schema`, `description`,
+`author`), a family outside the taxonomy's seven, no `version`, or `level:
+"error"`. Every `^0.1.x` consumer gets this on its next install with no pin
+change: `cli@0.1.1 --rules house.json` with a `description` key exits 2 with
+that TypeError and a stack trace, where core 0.1.2 gave a mark. The version is
+Yu's choice. Published as 0.1.4, caret consumers receive both the validator
+and the agency narrowing. Published as 0.2.0, `^0.1.x` consumers receive
+neither; that needs cli `^0.2.0` for core, a rules-en peer `>=0.2.0`, and a
+regenerated explorer, door and dataset snapshot.
+
+- **The accountable-passive detector** behind `agency-hiding.deleted-subject`.
+  It marks a `was`, `were` or `been` passive only when its participle is on a
+  closed list of fault, breach, concealment and decision verbs, and only when
+  no `by` stands among the next seven words of its clause. Some classes also
+  need a head noun:
+  `raised` after a challenge noun such as `concerns`, `made` after an error or
+  decision noun, `affected` after a held-in-trust noun. There must
+  be no negator anywhere in the clause before the auxiliary. The lists live in `spec/agency-lexicon.json` and are
+  generated into JS, Python and Go by `scripts/gen-agency-lexicon.mjs`. Before
+  this, the detector marked a be-verb followed by an -ed or -en word, less a
+  stoplist.
+- **Strip** keeps a loaded intensifier when a negator is one of the two words
+  before it in the clause, or when it sits inside double quotes on its line.
+  `The risk is not extremely high.` stays as it is. It still deletes one three
+  words from its negator (`not at all extremely high`), after `rarely`, or
+  inside single quotes: open O4 rows.
+- **One negator vocabulary**, generated into every engine from
+  `spec/agency-lexicon.json` and `spec/guard-lexicon.json`: the agency
+  detector reads `cannot neither never no nobody none nor not nothing`, and
+  the strip and `absolute.universal` guards read those plus `hardly` and
+  `without`. So `Nothing is guaranteed.` is unmarked and `Nothing extremely
+  bad happened.` keeps its `extremely`.
+- **An engine-side `absolute.universal` guard**, keyed by ruleId so the pack
+  needs no new key. A negator among the two words before a match leaves it
+  unmarked; a comma ends the negator's reach once a word stands between them.
+  An imperative clause-initial `Never` before a verb is also left unmarked
+  (`Never share your password.`).
+
+**Rules-en 0.2.1** is data only, with no new key.
+
+- Nine rules spell the smart apostrophe (U+2019) and the hyphens U+2010,
+  U+2011 and U+2013 beside the ASCII ones.
+- The agency rule's note now reads "a past-tense passive of a fault, breach,
+  concealment or decision verb". Its level falls from `warning` to `note`, and
+  its confidence from 0.7 to 0.6.
+- The optional peer rises to `@rhetorlint/core >=0.1.4`. Bump core and
+  rules-en together. With core 0.1.2 pinned (fomoengine and
+  `@agenttool/browser` pin it), `npm i @rhetorlint/rules-en` fails with
+  ERESOLVE on this peer's range. Forced (`--legacy-peer-deps`, `--force`), or
+  under an installer that only warns on peers, every old passive mark carries
+  the 0.2.1 note: on core 0.1.2, "Shipments are often delayed.", "The soup can
+  be frozen." and "Your account was closed last week." all draw it.
+
+**CLI 0.2.0** is unchanged since 07-27 apart from its ranges (`^0.1.4` core,
+`^0.2.0` rules-en). Publishing it is a separate decision.
+
+- With 0.2.0 published, a fresh `npm i @rhetorlint/cli` resolves core 0.1.4 with
+  rules-en 0.2.1: 22 rules.
+- Without it, `cli@0.1.1` stays `latest`. Its ranges are `^0.1.2` for both
+  packages, so once core 0.1.4 is live a fresh install resolves **core 0.1.4
+  with rules-en 0.1.2**: 11 rules.
+
+That pairing loads and runs. The agency marks narrow, but they keep 0.1.2's
+note ("an agentless passive — who acted is deleted from the sentence") at
+`warning` 0.7, which is still true of every narrower mark. So publishing core
+alone already changes what `cli@0.1.1` users see.
+
+**Consumers.** The estate's known dependents pin exact versions, so nothing
+reaches them until someone bumps the pin:
+
+- fomoengine `fly-api`: core 0.1.2 + rules-en 0.1.2; it calls `analyze()` only;
+- `@agenttool/browser@0.6.0`: the same pins; it calls `analyze()` and `toSignal()` only;
+- `@agenttool/aletheia`: not on npm; its lock held core 0.1.2 at the 09-07
+  check.
+
+No known consumer imports `strip()`. But `analyze()` returns a `strip` field,
+and Aletheia shows it as `lintText().strip` and `lintArticle().stripPreview`.
+
+When a pin moves to core 0.1.4 + rules-en 0.2.1, these are the measured
+changes. Before is `main` (core 0.1.3 + rules-en 0.2.0), from `node
+scripts/measure.mjs --consumer origin/main`; the local rows need the
+gitignored `measurement/local/`. Each agency mark is one `toSignal` rule count.
+
+| texts | marks per 100 words | agency marks | `[who?]` in strip | SARIF warnings |
+|---|---|---|---|---|
+| 26 committed items, 21,229 words | 2.21 → 0.53 | 377 → 22 | 377 → 22 | 379 → 2 |
+| 19 local reader samples, 10,738 words | 1.19 → 0.47 | 76 → 4 | 76 → 4 | 78 → 2 |
+| 70 local held-out files, 566,466 words | 1.78 → 0.45 | 7,500 → 33 | 7,500 → 33 | 7,504 → 4 |
+
+The pair the known consumers pin today, core 0.1.2 + rules-en 0.1.2 (`node
+scripts/measure.mjs --consumer d190af1`), is close to `main` on the committed
+items: 2.20 marks per 100 words, 377 agency marks and 379 SARIF warnings. Its
+strip flags only 359 of its 377 agency marks with `[who?]`, so the "each agency
+mark is one `[who?]`" reading of the table holds from core 0.1.3 on.
+
+- **SARIF.** Every agency result moves from `warning` to `note`.
+  `contrition.rehearsed` is now the pack's only `warning` rule. On the committed
+  items the SARIF warnings fall from 379 to 2.
+- **CLI output.** The human report prints the new agency note, and `--json`
+  carries `level: "note"` and `confidence: 0.6`.
+- **`--max` gates.** The density headline falls, so a gate set against core
+  0.1.2 output passes more files.
+
+**Recall given up, on purpose.** Accountable-passive gold recall falls from
+39/41 to 19/41 by the agency rule (20/41 by any rule). The detector no longer
+marks:
+
+- harm and news verbs (`Your account was closed`, `Jobs were cut`, `Lives were
+  lost`);
+- disclosure and publication (`was inadvertently published`, `was emailed`);
+- modal, present and progressive passives (`steps will be taken`, `is put
+  right`, `are being taken`);
+- verbs outside the lists (`were targeted`, `was changed`, `have been
+  enrolled`);
+- head-gated verbs whose head is a relative pronoun or an unlisted noun (`the
+  mistakes that were made`, `attempts were made`);
+- passives with a negator anywhere earlier in their clause (`we did not achieve
+  what we wished, and serious mistakes were made`).
+
+`measurement/contrast.json` keeps each of these as an open row. One honest twin
+that core 0.1.2 leaves unmarked is now marked: `40 staff were laid off as we closed
+the Leeds office` (`twin.agency.26`).
+
+**After publishing**, run step 5 below. Its first block installs cli 0.2.0, so
+it needs that version on the registry; if the CLI is held, run the second
+block and this section's check only. Both blocks and the check pass against
+this branch's workspace packages. Then add these checks from the clean
+install:
+
+```bash
+node --input-type=module -e '
+import { analyze } from "@rhetorlint/core"
+import rules from "@rhetorlint/rules-en" with { type: "json" }
+const a = (t) => analyze(t, { rules })
+const m = a("Mistakes were made.").marks
+if (m.length !== 1 || m[0].level !== "note" || m[0].confidence !== 0.6) process.exit(1)
+const allowed = {
+  "Shipments are often delayed.": [],
+  "Never share your password with anyone.": [],
+  "Your data was never sold.": ["absolute.universal"],
+}
+for (const [t, ok] of Object.entries(allowed))
+  if (a(t).marks.some((x) => !ok.includes(x.ruleId))) process.exit(2)
+if (a("The risk is not extremely high.").strip !== "The risk is not extremely high.") process.exit(3)
+if (!a("Let\u2019s not forget who started this.").marks.some((x) => x.ruleId === "deflection.whataboutism")) process.exit(4)
+console.log("core 0.1.4 + rules-en 0.2.1 verified")
+'
+```
+
+`Your data was never sold.` still draws `absolute.universal` on `never`. That
+is the existing absolute rule, not the agency rule, so this check allows it.
+
+**Deprecation**, only after 0.1.4 is installable. Strip output before 0.1.3
+deletes hedges, and that includes the `strip` field of `analyze()`. Verified
+on core 0.1.2: `analyze("He allegedly stole it.").strip` is `"He stole it."`.
+So the message must not say `analyze()` is unaffected:
+
+```bash
+npm deprecate '@rhetorlint/core@<0.1.3' "strip output before 0.1.3 deletes hedges ('He allegedly stole it.' -> 'He stole it.') in strip() and in analyze().strip; marks are not affected by this bug. Upgrade to >=0.1.4 (which also narrows agency-hiding marks and validates rule packs strictly; see the release notes)."
+```
+
+Every published core version is below 0.1.3, so the exact-pinned consumers
+above will print this warning on their next install.
 
 ### Core-only meaning-preservation candidate
 

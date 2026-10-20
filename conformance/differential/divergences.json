@@ -2,22 +2,6 @@
   "note": "Where the JS, Python and Go engines part today, on input outside plain ASCII (printable ASCII plus tab, LF and CR). Checked by `node scripts/xengine-diff.mjs`: a new divergence fails, and a resolved one fails until it is removed here. `--write-divergences` regenerates every field except reason, which it keeps. marks and offsets list only what not all three engines share; offsets are in code points; strip shows the differing window. See conformance/README.md.",
   "divergences": [
     {
-      "text": "Mistakes were\u00a0made.",
-      "engine": "go",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: were\u00a0made"], "python": ["agency-hiding.deleted-subject: were\u00a0made"], "go": []},
-      "strip": {"js": "[who?] ", "python": "[who?] ", "go": ""},
-      "reason": "\\s matches U+00A0 NO-BREAK SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
-    },
-    {
-      "text": "Mistakes\u00a0were\u00a0made.",
-      "engine": "go",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: were\u00a0made"], "python": ["agency-hiding.deleted-subject: were\u00a0made"], "go": []},
-      "strip": {"js": "[who?] ", "python": "[who?] ", "go": ""},
-      "reason": "\\s matches U+00A0 NO-BREAK SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
-    },
-    {
       "text": "Let us act\u00a0now.",
       "engine": "go",
       "fields": ["marks"],
@@ -67,14 +51,6 @@
       "reason": "\\s matches U+00A0 NO-BREAK SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
     },
     {
-      "text": "Mistakes were\u2009made.",
-      "engine": "go",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: were\u2009made"], "python": ["agency-hiding.deleted-subject: were\u2009made"], "go": []},
-      "strip": {"js": "[who?] ", "python": "[who?] ", "go": ""},
-      "reason": "\\s matches U+2009 THIN SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
-    },
-    {
       "text": "Act\u2009now \u2013 stocks are low.",
       "engine": "go",
       "fields": ["marks"],
@@ -82,44 +58,18 @@
       "reason": "\\s matches U+2009 THIN SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
     },
     {
-      "text": "Mistakes were\u202fmade.",
-      "engine": "go",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: were\u202fmade"], "python": ["agency-hiding.deleted-subject: were\u202fmade"], "go": []},
-      "strip": {"js": "[who?] ", "python": "[who?] ", "go": ""},
-      "reason": "\\s matches U+202F NARROW NO-BREAK SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
-    },
-    {
-      "text": "Mistakes were\u3000made.",
-      "engine": "go",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: were\u3000made"], "python": ["agency-hiding.deleted-subject: were\u3000made"], "go": []},
-      "strip": {"js": "[who?] ", "python": "[who?] ", "go": ""},
-      "reason": "\\s matches U+3000 IDEOGRAPHIC SPACE in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
-    },
-    {
-      "text": "Your data was\u2028shared.",
-      "engine": "go",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: was\u2028shared"], "python": ["agency-hiding.deleted-subject: was\u2028shared"], "go": []},
-      "strip": {"js": "[who?] ", "python": "[who?] ", "go": ""},
-      "reason": "\\s matches U+2028 LINE SEPARATOR in JS and Python (both Unicode-aware); Go's RE2 \\s is ASCII ([\\t\\n\\f\\r ]), so for Go the words around it are not separated by whitespace."
-    },
-    {
-      "text": "Your data was\u0085shared.",
-      "engine": "python",
-      "fields": ["marks", "strip"],
-      "marks": {"js": [], "python": ["agency-hiding.deleted-subject: was\u0085shared"], "go": []},
-      "strip": {"js": "", "python": "[who?] ", "go": ""},
-      "reason": "Only Python's \\s matches U+0085 NEXT LINE (str.isspace() is true for it); JS's \\s omits it and Go's \\s is ASCII."
-    },
-    {
-      "text": "Your data was\ufeffshared.",
+      "text": "Let us act\ufeffnow.",
       "engine": "js",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: was\ufeffshared"], "python": [], "go": []},
-      "strip": {"js": "[who?] ", "python": "", "go": ""},
-      "reason": "Only JS's \\s matches U+FEFF ZERO WIDTH NO-BREAK SPACE; Python's \\s omits it (str.isspace() is false) and Go's \\s is ASCII."
+      "fields": ["marks"],
+      "marks": {"js": ["urgency.appeal-to-time: act\ufeffnow"], "python": [], "go": []},
+      "reason": "JS's \\s includes U+FEFF ZERO WIDTH NO-BREAK SPACE; Python's (str.isspace) and Go's RE2 \\s ([\\t\\n\\f\\r ]) do not, so only JS reads 'act now'."
+    },
+    {
+      "text": "Let us act\u0085now.",
+      "engine": "python",
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["urgency.appeal-to-time: act\u0085now"], "go": []},
+      "reason": "Python's \\s includes U+0085 NEXT LINE (str.isspace); JS's \\s and Go's RE2 \\s do not, so only Python reads 'act now'."
     },
     {
       "text": "It may have \u00e9t\u00e9 confirmed.",
@@ -129,35 +79,11 @@
       "reason": "\\w is Unicode in Python and ASCII in JS (no u flag) and Go, so only Python's 'have \\w+' takes '\u00e9t\u00e9'."
     },
     {
-      "text": "The files were d\u00e9l\u00e8ted overnight.",
-      "engine": "python",
-      "fields": ["marks", "strip"],
-      "marks": {"js": [], "python": ["agency-hiding.deleted-subject: were d\u00e9l\u00e8ted"], "go": []},
-      "strip": {"js": "", "python": "[who?] ", "go": ""},
-      "reason": "\\w is Unicode in Python and ASCII in JS and Go, so only Python's '\\w+ed' reads 'd\u00e9l\u00e8ted' as a participle."
-    },
-    {
       "text": "\u00c9RRORS WERE MADE AT THE TOP",
       "engine": "python",
       "fields": ["marks"],
       "marks": {"js": ["shouting.caps: RRORS WERE MADE"], "python": ["shouting.caps: WERE MADE"], "go": ["shouting.caps: RRORS WERE MADE"]},
       "reason": "\\b is Unicode in Python: '\u00c9' is a word character there, so no boundary sits before 'RRORS' and the caps run starts at 'WERE'. JS and Go treat '\u00c9' as a non-word character."
-    },
-    {
-      "text": "Lives were lo\u017ft.",
-      "engine": "js",
-      "fields": ["marks", "strip"],
-      "marks": {"js": [], "python": ["agency-hiding.deleted-subject: were lo\u017ft"], "go": ["agency-hiding.deleted-subject: were lo\u017ft"]},
-      "strip": {"js": "", "python": "[who?] ", "go": "[who?] "},
-      "reason": "Case-insensitive matching folds U+017F LATIN SMALL LETTER LONG S to 's' in Python and Go, so 'lo\u017ft' matches the participle 'lost'; JS without the u flag folds only within ASCII."
-    },
-    {
-      "text": "Your data was \u017fhared.",
-      "engine": "js",
-      "fields": ["marks", "strip"],
-      "marks": {"js": [], "python": ["agency-hiding.deleted-subject: was \u017fhared"], "go": ["agency-hiding.deleted-subject: was \u017fhared"]},
-      "strip": {"js": "", "python": "[who?] ", "go": "[who?] "},
-      "reason": "U+017F LONG S is a word character for Python's Unicode \\w, and Go's (?i)\\w case-folds s to take it; JS's \\w is ASCII. So '\u017fhared' reads as an -ed participle in Python and Go only."
     },
     {
       "text": "It \u017feems the plan worked.",
@@ -167,14 +93,6 @@
       "reason": "Case-insensitive matching folds U+017F LONG S to 's' in Python and Go, so 'It \u017feems' matches the term 'it seems'; JS folds only within ASCII."
     },
     {
-      "text": "Civilians were \u212ailled.",
-      "engine": "js",
-      "fields": ["marks", "strip"],
-      "marks": {"js": [], "python": ["agency-hiding.deleted-subject: were \u212ailled"], "go": ["agency-hiding.deleted-subject: were \u212ailled"]},
-      "strip": {"js": "", "python": "[who?] ", "go": "[who?] "},
-      "reason": "U+212A KELVIN SIGN is a word character for Python's Unicode \\w, and Go's (?i)\\w case-folds k to take it; JS's \\w is ASCII. So '\u212ailled' reads as an -ed participle in Python and Go only."
-    },
-    {
       "text": "This is \u212aind of a problem.",
       "engine": "python",
       "fields": ["marks"],
@@ -182,12 +100,25 @@
       "reason": "Python folds U+212A KELVIN SIGN to 'k' and counts it as a word character, so 'kind of' matches. JS folds nothing outside ASCII; Go folds the letter, but its ASCII \\b refuses the boundary before it."
     },
     {
-      "text": "Your data was\u000bshared.",
-      "engine": "go",
-      "fields": ["marks", "strip"],
-      "marks": {"js": ["agency-hiding.deleted-subject: was\u000bshared"], "python": ["agency-hiding.deleted-subject: was\u000bshared"], "go": []},
-      "strip": {"js": "[who?] ", "python": "[who?] ", "go": ""},
-      "reason": "U+000B VERTICAL TAB is ASCII, yet the engines part on it: JS's and Python's \\s include it, Go's RE2 \\s ([\\t\\n\\f\\r ]) does not."
+      "text": "It may have \u017feen the file.",
+      "engine": "js",
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["hedge.deniable: may have \u017feen"], "go": ["hedge.deniable: may have \u017feen"]},
+      "reason": "Under (?i) Python and Go fold U+017F LONG S into \\w, so 'have \\w+' takes 'seen' spelt with a long s; JS folds only within ASCII and its \\w is ASCII. Go sides with Python here because no \\b stands in the way."
+    },
+    {
+      "text": "Caf\u00e9Never fails.",
+      "engine": "python",
+      "fields": ["marks"],
+      "marks": {"js": ["absolute.universal: Never"], "python": [], "go": ["absolute.universal: Never"]},
+      "reason": "Python's \\b is Unicode: the e-acute is a word character there, so no boundary sits before 'Never' and absolute.universal finds no term. JS's and Go's ASCII \\b see one and mark it."
+    },
+    {
+      "text": "No fees, alway\u017f free.",
+      "engine": "python",
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["absolute.universal: alway\u017f"], "go": []},
+      "reason": "Python folds U+017F LONG S to 's' and counts it as a word character, so 'always' matches with its closing \\b. JS folds nothing outside ASCII; Go folds the letter, but its ASCII \\b refuses the boundary after it. The comma rule leaves the term unguarded in Python."
     },
     {
       "text": "Act\u000bnow.",
@@ -197,12 +128,11 @@
       "reason": "U+000B VERTICAL TAB is ASCII, yet the engines part on it: JS's and Python's \\s include it, Go's RE2 \\s ([\\t\\n\\f\\r ]) does not."
     },
     {
-      "text": "Your data was\u001fshared.",
+      "text": "Let us act\u001fnow.",
       "engine": "python",
-      "fields": ["marks", "strip"],
-      "marks": {"js": [], "python": ["agency-hiding.deleted-subject: was\u001fshared"], "go": []},
-      "strip": {"js": "", "python": "[who?] ", "go": ""},
-      "reason": "Only Python's \\s matches U+001F UNIT SEPARATOR (str.isspace() is true for U+001C-U+001F); JS's and Go's \\s do not."
+      "fields": ["marks"],
+      "marks": {"js": [], "python": ["urgency.appeal-to-time: act\u001fnow"], "go": []},
+      "reason": "U+001F UNIT SEPARATOR is ASCII, yet the engines part on it: only Python's \\s (str.isspace) takes the U+001C to U+001F information separators."
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "id": "@rhetorlint/rules-en",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "locale": "en",
   "note": "Seed English tell-pack. Authored for honesty over coverage: each rule points at a visible phrase and errs toward under-marking. Confidence is heuristic — a language-pattern likelihood, NOT a probability that anyone is lying. Compiled from the human-readable taxonomy in spec/taxonomy.yaml. Pattern rules match case-insensitively unless the rule sets \"caseSensitive\": true; only engines at core>=0.1.2 honour that flag, and a rule that depends on it declares the floor as \"minEngine\". An older engine compiles such a pattern case-insensitively, which for a rule about letter case would match ordinary lowercase prose — so those patterns are written to match NOTHING under a case-insensitive compile. On an engine below the floor the tell goes silent instead of firing on every sentence.",
   "rules": [
@@ -67,7 +67,7 @@
       "level": "note",
       "confidence": 0.6,
       "note": "a deflection — points away from the question just asked",
-      "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let'?s\\s+not\\s+forget|whatabout)\\b",
+      "pattern": "\\b(?:what\\s+about|but\\s+what\\s+about|the\\s+real\\s+(?:question|issue)\\s+(?:is|here)|let['\u2019]?s\\s+not\\s+forget|whatabout)\\b",
       "expected": ["(answer the original question first)"]
     },
     {
@@ -89,7 +89,7 @@
       "level": "info",
       "confidence": 0.55,
       "note": "a free-offer lure — minimises the cost or inflates the bundle to rush the yes",
-      "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[- ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
+      "pattern": "\\b(?:absolutely\\s+free|completely\\s+free|totally\\s+free|100%\\s+free|free\\s+of\\s+charge|zero\\s+cost|at\\s+no\\s+cost|no\\s+hidden\\s+fees|risk[-\u2010\u2011\u2013 ]free|no\\s+strings\\s+attached|no\\s+obligation|everything\\s+you\\s+need|nothing\\s+to\\s+lose)\\b",
       "expected": ["(state the price, the terms, and what is actually included)"]
     },
     {
@@ -100,7 +100,7 @@
       "level": "note",
       "confidence": 0.6,
       "note": "manufactured urgency — pressure to act before you can weigh it",
-      "pattern": "\\b(?:act\\s+now|act\\s+fast|don'?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it'?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
+      "pattern": "\\b(?:act\\s+now|act\\s+fast|don['\u2019]?t\\s+miss\\s+(?:out|this)|limited\\s+time|while\\s+(?:supplies|stocks)\\s+last|last\\s+chance|final\\s+hours|today\\s+only|only\\s+today|before\\s+it['\u2019]?s\\s+too\\s+late|time\\s+is\\s+running\\s+out|the\\s+time\\s+is\\s+now|now\\s+or\\s+never)\\b",
       "expected": ["(state the real deadline and what actually happens after it, or drop the clock)"]
     },
     {
@@ -122,9 +122,9 @@
       "technique": "Obfuscation (structural — RhetorLint extension)",
       "type": "structural",
       "detector": "agentless-passive",
-      "level": "warning",
-      "confidence": 0.7,
-      "note": "an agentless passive — who acted is deleted from the sentence",
+      "level": "note",
+      "confidence": 0.6,
+      "note": "a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause",
       "expected": ["(name who did it: 'I/we + verb')"]
     },
     {
@@ -146,7 +146,7 @@
       "level": "info",
       "confidence": 0.6,
       "note": "an editorializing stance marker — instructs the reader how to judge the fact before the fact arrives",
-      "terms": ["it should be noted", "it is worth noting", "it's worth noting", "it is important to note", "it's important to note", "needless to say", "tellingly", "unsurprisingly", "in a stunning move", "in a bizarre twist", "in a shocking turn", "make no mistake"],
+      "terms": ["it should be noted", "it is worth noting", "it's worth noting", "it\u2019s worth noting", "it is important to note", "it's important to note", "it\u2019s important to note", "needless to say", "tellingly", "unsurprisingly", "in a stunning move", "in a bizarre twist", "in a shocking turn", "make no mistake"],
       "expected": ["(delete the stance word; state the fact and let the reader weigh it)"]
     },
     {
@@ -168,7 +168,7 @@
       "level": "info",
       "confidence": 0.55,
       "note": "a doubt marker — the writer's own distancing word delivers a verdict on a title or label; the word itself contains no argument for the dispute (technical 'so-called' = 'known as' is the known false positive; 'allegedly/purportedly' belong to hedge.deniable)",
-      "terms": ["so-called", "self-styled", "self-proclaimed", "self-appointed", "self-anointed", "styles himself as", "styles herself as", "styles itself as", "styles themselves as", "quote-unquote", "quote unquote"],
+      "terms": ["so-called", "so\u2010called", "so\u2011called", "so\u2013called", "self-styled", "self\u2010styled", "self\u2011styled", "self\u2013styled", "self-proclaimed", "self\u2010proclaimed", "self\u2011proclaimed", "self\u2013proclaimed", "self-appointed", "self\u2010appointed", "self\u2011appointed", "self\u2013appointed", "self-anointed", "self\u2010anointed", "self\u2011anointed", "self\u2013anointed", "styles himself as", "styles herself as", "styles itself as", "styles themselves as", "quote-unquote", "quote\u2010unquote", "quote\u2011unquote", "quote\u2013unquote", "quote unquote"],
       "expected": ["(argue the dispute: say who holds the title, who contests it, and why — or accept the label)"]
     },
     {
@@ -190,7 +190,7 @@
       "level": "info",
       "confidence": 0.55,
       "note": "an implicative shortfall — the verb presupposes a duty went unmet ('failed to comment' implies commenting was owed; the neutral report is 'did not comment')",
-      "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n'?t)\\s+(?:even\\s+)?bother\\s+to\\b",
+      "pattern": "\\b(?:fail|neglect)(?:s|ed)\\s+to\\s+(?:comment|mention)\\b|\\brefus(?:es|ed)\\s+to\\s+(?:say|comment|answer|confirm)\\b|\\b(?:did|does)(?:\\s+not|n['\u2019]?t)\\s+(?:even\\s+)?bother\\s+to\\b",
       "expected": ["(report the event without the verdict: 'did not comment', 'declined to say')"]
     },
     {
@@ -201,7 +201,7 @@
       "level": "info",
       "confidence": 0.6,
       "note": "an anonymous-source descriptor — the fact rides on someone the reader cannot identify, count, or check",
-      "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[- ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
+      "pattern": "\\b(?:person|people|those|officials?|sources?)\\s+familiar\\s+with\\s+the\\s+(?:matter|situation)\\b|\\bsources?\\s+with\\s+(?:direct\\s+|first[-\u2010\u2011\u2013 ]?hand\\s+)?knowledge\\s+of\\s+the\\s+matter\\b|\\ba\\s+source\\s+close\\s+to\\b|\\bsources\\s+close\\s+to\\s+the\\s+(?:matter|situation|talks|negotiations?|deal|campaign|investigation)\\b",
       "expected": ["(name the source — or state plainly why the reader is being asked to trust someone they cannot see)"]
     },
     {
@@ -223,7 +223,7 @@
       "level": "note",
       "confidence": 0.7,
       "note": "an exonerative formula — the deed is in the sentence but the doer is not ('an officer-involved shooting' names no one who shot)",
-      "pattern": "\\b(?:officer|police|deputy|trooper)[- ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[- ]of[- ]force\\s+incidents?\\b",
+      "pattern": "\\b(?:officer|police|deputy|trooper)[-\u2010\u2011\u2013 ]involved\\s+(?:shooting|incident)s?\\b|\\b(?:altercation|scuffle)s?\\s+ensued\\b|\\bscuffles?\\s+broke\\s+out\\b|\\bshots?\\s+rang\\s+out\\b|\\buse[-\u2010\u2011\u2013 ]of[-\u2010\u2011\u2013 ]force\\s+incidents?\\b",
       "expected": ["(name the actor and the act: 'an officer shot him', not 'an officer-involved shooting')"]
     },
     {
@@ -245,7 +245,7 @@
       "level": "info",
       "confidence": 0.5,
       "note": "a puffery epithet — the praise sits in the adjective, not in a checkable fact",
-      "terms": ["world-class", "critically acclaimed", "award-winning", "renowned", "famed", "storied", "visionary", "cutting-edge", "game-changing", "state-of-the-art", "best-in-class", "iconic"],
+      "terms": ["world-class", "world\u2010class", "world\u2011class", "world\u2013class", "critically acclaimed", "award-winning", "award\u2010winning", "award\u2011winning", "award\u2013winning", "renowned", "famed", "storied", "visionary", "cutting-edge", "cutting\u2010edge", "cutting\u2011edge", "cutting\u2013edge", "game-changing", "game\u2010changing", "game\u2011changing", "game\u2013changing", "state-of-the-art", "state\u2010of\u2010the\u2010art", "state\u2011of\u2011the\u2011art", "state\u2013of\u2013the\u2013art", "best-in-class", "best\u2010in\u2010class", "best\u2011in\u2011class", "best\u2013in\u2013class", "iconic"],
       "expected": ["(swap the epithet for the checkable specific: which award, acclaimed by whom, measured against what)"]
     }
   ]

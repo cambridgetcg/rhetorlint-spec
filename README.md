@@ -44,7 +44,7 @@ node scripts/demo.mjs
   · [manipulative-wording]  "extremely"
       an intensifier — turns up the emotional volume without adding fact
   · [agency-hiding]  "were made"
-      an agentless passive — who acted is deleted from the sentence
+      a past-tense passive of a fault, breach, concealment or decision verb — the doer is not named in this clause
   · [manipulative-wording]  "reaching out to"
       a hedge — lowers a promise you can later deny
 
@@ -82,7 +82,7 @@ const signal = toSignal(result); // redacted aggregate for explicit agent traces
 - **Educators & learners** — the [learning explorer](apps/explorer/index.html) turns each family into a lesson; the taxonomy is CC-BY-SA so you can copy it freely.
 - **Researchers** — tell labels reuse SemEval-2023 technique names, so output is interoperable with the largest annotated persuasion corpora.
 - **Inquiry and formal-methods work** — the opt-in [claim graph](examples/claim-graph/README.md) binds exact source spans and external mathematical treatment cards (including KINGDOM's Math Passport), formal-verification, evidence, report, or evaluation-design artifacts without treating a digest, formula, proof method, or study plan as a verdict.
-- **ML evaluators** — the local-first [RhetorLint conformance dataset](datasets/rhetorlint-conformance/README.md) turns all 31 committed engine cases into one digest-bound Hugging Face-compatible `test` snapshot. It has no training split, upload, model call, person score, or truth label; the sole Claim Feedback fixture is explicitly excluded because its reuse lane denies mirroring.
+- **ML evaluators** — the local-first [RhetorLint conformance dataset](datasets/rhetorlint-conformance/README.md) turns all 76 committed engine cases into one digest-bound Hugging Face-compatible `test` snapshot. It has no training split, upload, model call, person score, or truth label; the sole Claim Feedback fixture is explicitly excluded because its reuse lane denies mirroring.
 
 ```bash
 echo "Mistakes were made." | npm run cli -- --json     # the CLI, on stdin
@@ -112,13 +112,13 @@ The claim that "engines are just implementations of the spec" is not a promise h
 | [`impl/go/rhetorlint.go`](impl/go) | Go (stdlib only) | `go -C impl/go test ./...` |
 
 ```bash
-npm run test:conformance     # 31/31 cases — JS and Python only
+npm run test:conformance     # 76/76 cases — JS and Python only
 go -C impl/go test ./...     # the third engine; CI runs all three on every push
 ```
 
 Agreement is on **values**, not on serialised bytes: the same density that JS and Go write as `"per100Words": 25` Python writes as `25.0`, because that is what each language's JSON encoder does with a whole-numbered float. The suites compare parsed values, which is the only comparison a spec can fairly demand across languages. Offsets agree over the corpus because the corpus is ASCII; [`conformance/README.md`](conformance/README.md) sets out exactly where non-ASCII input parts the engines.
 
-`conformance/cases.json` is the ground truth. The Go engine is the sharpest proof: Go's RE2 regex has **no lookahead**, so it can't express the `(?!by)` agent-check the other two use — it reimplements that check in code and *still* produces identical output. That's precisely what a conformance suite is for: it pins the output, not the implementation. Point a fourth engine in any language at `cases.json` and you'll know instantly whether it conforms — which is what makes RhetorLint a spec, not just one library.
+`conformance/cases.json` is the ground truth. The Go engine is the sharpest proof: Go's RE2 regex has **no lookahead** and folds case differently from JavaScript, so the passive detector's agent check is a word walk in code in all three engines, over word lists generated from one file — and the output is identical. That's precisely what a conformance suite is for: it pins the output, not the implementation. Point a fourth engine in any language at `cases.json` and you'll know instantly whether it conforms — which is what makes RhetorLint a spec, not just one library.
 
 ## Layout
 
@@ -143,6 +143,6 @@ scripts/demo.mjs                                           a 20-line taste
 
 ## Status
 
-`0.2` — the seed, plus the media wave. The taxonomy carries seven families; six of them ship at least one rule, twenty-two rules in all. The 2026-07 media wave taught the pack the newsroom's own tells — anonymous-source formulas, combat framing, institutional euphemism, exoneration formulas, question-frame insinuation, implicative shortfalls, stance markers, factive and doubt-casting attribution, puffery, and distancing sneers — every rule adversarially reviewed before it shipped, and added zero marks on an uncommitted 105-item headline corpus during review (precision only); committed per-rule precision, and recall against a small gold set that is not blind, are in measurement/report.json. attack-on-reputation now carries its first two carefully-scoped seeds (the mark lands on the writer's own operator word, never on an inferred target); justification stays unseeded until it can be marked without guessing at intent. It still under-marks by design. The hard, unfinished work is the structural check-type (agency-hiding beyond simple passive needs real grammar awareness). Contributions of tell families and locales welcome once the contribution guide lands.
+`0.2` — the seed, plus the media wave. The taxonomy carries seven families; six of them ship at least one rule, twenty-two rules in all. The 2026-07 media wave taught the pack the newsroom's own tells — anonymous-source formulas, combat framing, institutional euphemism, exoneration formulas, question-frame insinuation, implicative shortfalls, stance markers, factive and doubt-casting attribution, puffery, and distancing sneers — every rule adversarially reviewed before it shipped, and added zero marks on an uncommitted 105-item headline corpus during review (precision only); committed per-rule precision, and recall against a small gold set that is not blind, are in measurement/report.json. attack-on-reputation now carries its first two carefully-scoped seeds (the mark lands on the writer's own operator word, never on an inferred target); justification stays unseeded until it can be marked without guessing at intent. It still under-marks by design. The hard, unfinished work is the structural check-type: agency-hiding now marks a was, were or been passive only when its verb is on a closed list of fault, breach, concealment and decision verbs, no "by" stands among the next seven words of its clause and no negator in the clause denies the act (from one lexicon every engine is generated from). Those verbs keep innocent senses it still marks ("tax was withheld", "unknown keys were ignored"), and anything beyond that needs real grammar awareness. Contributions of tell families and locales welcome once the contribution guide lands.
 
 MIT (engine + rules) · CC-BY-SA-4.0 (taxonomy corpus).

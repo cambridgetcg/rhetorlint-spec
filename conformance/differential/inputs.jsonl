@@ -29,6 +29,51 @@
 {"id":"case:28","source":"conformance/cases.json","text":"The plan has been widely described as a visionary gamble."}
 {"id":"case:29","source":"conformance/cases.json","text":"Experts noted that inflation slowed."}
 {"id":"case:30","source":"conformance/cases.json","text":"The startup has been described as the next big thing by Forbes."}
+{"id":"case:31","source":"conformance/cases.json","text":"The risk is not extremely high."}
+{"id":"case:32","source":"conformance/cases.json","text":"\"It was utterly devastating,\" she said."}
+{"id":"case:33","source":"conformance/cases.json","text":"Returns are not guaranteed; past performance is no indicator."}
+{"id":"case:34","source":"conformance/cases.json","text":"Results aren't always typical."}
+{"id":"case:35","source":"conformance/cases.json","text":"Never share your password with anyone."}
+{"id":"case:36","source":"conformance/cases.json","text":"Guaranteed to double your savings."}
+{"id":"case:37","source":"conformance/cases.json","text":"No risk, guaranteed."}
+{"id":"case:38","source":"conformance/cases.json","text":"Never again will prices be this low."}
+{"id":"case:39","source":"conformance/cases.json","text":"Mistakes, frankly, were made."}
+{"id":"case:40","source":"conformance/cases.json","text":"Customer data was quietly accessed."}
+{"id":"case:41","source":"conformance/cases.json","text":"Your data was shared with partners."}
+{"id":"case:42","source":"conformance/cases.json","text":"PII may have been compromised."}
+{"id":"case:43","source":"conformance/cases.json","text":"Records were withheld from investigators."}
+{"id":"case:44","source":"conformance/cases.json","text":"It was decided that the program would end."}
+{"id":"case:45","source":"conformance/cases.json","text":"Hundreds of workers were laid off."}
+{"id":"case:46","source":"conformance/cases.json","text":"Additional safeguards have been put in place."}
+{"id":"case:47","source":"conformance/cases.json","text":"My name is Fred."}
+{"id":"case:48","source":"conformance/cases.json","text":"JavaScript is required."}
+{"id":"case:49","source":"conformance/cases.json","text":"Soil water content was measured at 5 cm depth."}
+{"id":"case:50","source":"conformance/cases.json","text":"The soup can be frozen for up to 3 months."}
+{"id":"case:51","source":"conformance/cases.json","text":"This option is ignored when the flag is unset."}
+{"id":"case:52","source":"conformance/cases.json","text":"The report was shelved by Friday."}
+{"id":"case:53","source":"conformance/cases.json","text":"Lives were lost in the earthquake."}
+{"id":"case:54","source":"conformance/cases.json","text":"Your account was closed at your request."}
+{"id":"case:55","source":"conformance/cases.json","text":"He got fired up about the album."}
+{"id":"case:56","source":"conformance/cases.json","text":"Data were collected from 200 participants."}
+{"id":"case:57","source":"conformance/cases.json","text":"This is guaranteed to double your savings."}
+{"id":"case:58","source":"conformance/cases.json","text":"Mistakes were made a b c d e f by them."}
+{"id":"case:59","source":"conformance/cases.json","text":"Mistakes were made a b c d e f g by them."}
+{"id":"case:60","source":"conformance/cases.json","text":"Mistakes have also since then been made."}
+{"id":"case:61","source":"conformance/cases.json","text":"Mistakes may also since then have been made."}
+{"id":"case:62","source":"conformance/cases.json","text":"No customer data was accessed."}
+{"id":"case:63","source":"conformance/cases.json","text":"Passwords haven't been compromised."}
+{"id":"case:64","source":"conformance/cases.json","text":"Your data was never sold."}
+{"id":"case:65","source":"conformance/cases.json","text":"Approximately 4,000 accounts may have been affected."}
+{"id":"case:66","source":"conformance/cases.json","text":"Twelve patients were affected."}
+{"id":"case:67","source":"conformance/cases.json","text":"Never have more than two drinks."}
+{"id":"case:68","source":"conformance/cases.json","text":"No credit card numbers, bank account details or passwords were stolen."}
+{"id":"case:69","source":"conformance/cases.json","text":"No Social Security numbers or other sensitive personal information were exposed."}
+{"id":"case:70","source":"conformance/cases.json","text":"At this time, we do not believe that any of your personal information has been compromised."}
+{"id":"case:71","source":"conformance/cases.json","text":"We saw no alerts, but data were stolen."}
+{"id":"case:72","source":"conformance/cases.json","text":"We saw no alerts; data were stolen."}
+{"id":"case:73","source":"conformance/cases.json","text":"We saw no alerts\ndata were stolen."}
+{"id":"case:74","source":"conformance/cases.json","text":"Data was accessed and no records were leaked."}
+{"id":"case:75","source":"conformance/cases.json","text":"Customer data was exposed today."}
 {"id":"item:inv-breach-apology#1","source":"measurement/items/inv-breach-apology.txt","text":"Subject: An important update about your account"}
 {"id":"item:inv-breach-apology#2","source":"measurement/items/inv-breach-apology.txt","text":"Dear Valued Customer,"}
 {"id":"item:inv-breach-apology#3","source":"measurement/items/inv-breach-apology.txt","text":"At Brightwell, the trust you place in us is the foundation of everything we do. We are writing to let you know about a recent security incident that may have involved some of your information."}
@@ -738,10 +783,15 @@
 {"id":"contrast:probe.intensifier-loaded.05","source":"measurement/contrast.json","text":"Massively parallel processing splits the job across 512 cores."}
 {"id":"contrast:probe.intensifier-loaded.06","source":"measurement/contrast.json","text":"\"It was utterly devastating,\" the flood survivor told reporters."}
 {"id":"contrast:probe.intensifier-loaded.07","source":"measurement/contrast.json","text":"The risk is not extremely high, but it is not negligible."}
-{"id":"contrast:strip.intensifier-loaded.01","source":"measurement/contrast.json","text":"The risk is not extremely high."}
 {"id":"contrast:strip.intensifier-loaded.02","source":"measurement/contrast.json","text":"We are not deeply sorry."}
 {"id":"contrast:strip.intensifier-loaded.03","source":"measurement/contrast.json","text":"The update isn't hugely different."}
 {"id":"contrast:strip.intensifier-loaded.04","source":"measurement/contrast.json","text":"He said \"we are deeply sorry\" and left."}
+{"id":"contrast:strip.intensifier-loaded.06","source":"measurement/contrast.json","text":"Nothing extremely bad happened."}
+{"id":"contrast:strip.intensifier-loaded.07","source":"measurement/contrast.json","text":"Nobody was extremely hurt."}
+{"id":"contrast:strip.intensifier-loaded.08","source":"measurement/contrast.json","text":"None of it was extremely bad."}
+{"id":"contrast:strip.intensifier-loaded.09","source":"measurement/contrast.json","text":"The risk is not at all extremely high."}
+{"id":"contrast:strip.intensifier-loaded.10","source":"measurement/contrast.json","text":"It is rarely extremely hot here."}
+{"id":"contrast:strip.intensifier-loaded.11","source":"measurement/contrast.json","text":"He called it 'utterly devastating' on air."}
 {"id":"contrast:lesson.intensifier-loaded.tremendously","source":"measurement/contrast.json","text":"We are tremendously excited to announce our partnership."}
 {"id":"contrast:lesson.intensifier-loaded.profoundly","source":"measurement/contrast.json","text":"The response to our launch has been profoundly moving."}
 {"id":"contrast:twin.intensifier-loaded.profoundly-deaf","source":"measurement/contrast.json","text":"Profoundly deaf children may qualify for cochlear implants."}
@@ -750,18 +800,31 @@
 {"id":"contrast:twin.intensifier-loaded.plain","source":"measurement/contrast.json","text":"This is an important update for every customer."}
 {"id":"contrast:probe.absolute-universal.01","source":"measurement/contrast.json","text":"Everyone knows this policy works."}
 {"id":"contrast:probe.absolute-universal.02","source":"measurement/contrast.json","text":"Our product will always be the best choice."}
-{"id":"contrast:probe.absolute-universal.03","source":"measurement/contrast.json","text":"This is guaranteed to double your savings."}
 {"id":"contrast:probe.absolute-universal.04","source":"measurement/contrast.json","text":"This is the only option."}
 {"id":"contrast:probe.absolute-universal.05","source":"measurement/contrast.json","text":"No-one could have predicted this."}
-{"id":"contrast:probe.absolute-universal.06","source":"measurement/contrast.json","text":"Never share your password with anyone."}
 {"id":"contrast:probe.absolute-universal.07","source":"measurement/contrast.json","text":"Speak clearly into the microphone."}
-{"id":"contrast:probe.absolute-universal.08","source":"measurement/contrast.json","text":"Returns are not guaranteed; past performance is no indicator."}
 {"id":"contrast:probe.absolute-universal.09","source":"measurement/contrast.json","text":"No one was injured in the fire, the fire service said."}
-{"id":"contrast:negation.absolute-universal.arent-always","source":"measurement/contrast.json","text":"Results aren't always typical."}
 {"id":"contrast:negation.absolute-universal.not-everyone","source":"measurement/contrast.json","text":"Not everyone qualifies."}
 {"id":"contrast:negation.absolute-universal.never-manufacture","source":"measurement/contrast.json","text":"Explain real constraints; never manufacture the shortage."}
 {"id":"contrast:lesson.absolute-universal.nobody","source":"measurement/contrast.json","text":"Nobody beats our prices."}
 {"id":"contrast:lesson.absolute-universal.undeniable","source":"measurement/contrast.json","text":"Our results are undeniable."}
+{"id":"contrast:lesson.absolute-universal.no-doubt-everyone","source":"measurement/contrast.json","text":"There's no doubt everyone loves it."}
+{"id":"contrast:lesson.absolute-universal.colon-never-sold","source":"measurement/contrast.json","text":"Your data: never sold."}
+{"id":"contrast:lesson.absolute-universal.no-exceptions-list","source":"measurement/contrast.json","text":"No contracts, no fees, no exceptions."}
+{"id":"contrast:negation.absolute-universal.aside-cannot-be","source":"measurement/contrast.json","text":"Returns are not, and cannot be, guaranteed."}
+{"id":"contrast:imperative.absolute-universal.never-at-any-time","source":"measurement/contrast.json","text":"Never at any time disclose your password."}
+{"id":"contrast:imperative.absolute-universal.never-should-you","source":"measurement/contrast.json","text":"Never should you share your password."}
+{"id":"contrast:lesson.absolute-universal.never-have-i-seen","source":"measurement/contrast.json","text":"Never have I seen prices this low."}
+{"id":"contrast:lesson.absolute-universal.never-in-history","source":"measurement/contrast.json","text":"Never in history has a deal been better."}
+{"id":"contrast:negation.absolute-universal.aside-never-was","source":"measurement/contrast.json","text":"This isn't, and never was, guaranteed."}
+{"id":"contrast:imperative.absolute-universal.comma-always-ask","source":"measurement/contrast.json","text":"If you're not sure, always ask."}
+{"id":"contrast:imperative.absolute-universal.comma-never-fix","source":"measurement/contrast.json","text":"If it isn't broken, never fix it."}
+{"id":"contrast:imperative.absolute-universal.never-comma-ever","source":"measurement/contrast.json","text":"Never, ever share your PIN."}
+{"id":"contrast:negation.absolute-universal.nothing-guaranteed","source":"measurement/contrast.json","text":"Nothing is guaranteed."}
+{"id":"contrast:twin.absolute-universal.never-the-less","source":"measurement/contrast.json","text":"Never the less, we shipped on time."}
+{"id":"contrast:twin.absolute-universal.never-can-tell","source":"measurement/contrast.json","text":"Never can tell with these things."}
+{"id":"contrast:twin.absolute-universal.never-is-a-long-time","source":"measurement/contrast.json","text":"Never is a long time."}
+{"id":"contrast:twin.absolute-universal.never-being-late","source":"measurement/contrast.json","text":"Never being late is the secret to keeping a job."}
 {"id":"contrast:probe.hedge-softener.01","source":"measurement/contrast.json","text":"We believe this update will fix most issues."}
 {"id":"contrast:probe.hedge-softener.02","source":"measurement/contrast.json","text":"It seems the outage is sort of resolved."}
 {"id":"contrast:probe.hedge-softener.03","source":"measurement/contrast.json","text":"To some extent, the rollout went well."}
@@ -827,19 +890,12 @@
 {"id":"contrast:probe.agency-hiding-deleted-subject.02","source":"measurement/contrast.json","text":"Errors were made in the billing process."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.03","source":"measurement/contrast.json","text":"The data was shared with partners."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.04","source":"measurement/contrast.json","text":"The barn is red and the gate is green."}
-{"id":"contrast:probe.agency-hiding-deleted-subject.05","source":"measurement/contrast.json","text":"My name is Fred."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.06","source":"measurement/contrast.json","text":"Both of the twins were fifteen."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.07","source":"measurement/contrast.json","text":"The museum is located in Paris."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.08","source":"measurement/contrast.json","text":"Eggs are beaten until stiff, then folded into the batter."}
 {"id":"contrast:probe.agency-hiding-deleted-subject.09","source":"measurement/contrast.json","text":"The issue was raised again by the auditor."}
-{"id":"contrast:wild.agency.javascript","source":"measurement/contrast.json","text":"JavaScript is required."}
 {"id":"contrast:wild.agency.helen","source":"measurement/contrast.json","text":"Who is Helen Haines?"}
-{"id":"contrast:wild.agency.soil","source":"measurement/contrast.json","text":"Soil water content was measured at 5 cm depth."}
-{"id":"contrast:wild.agency.soup","source":"measurement/contrast.json","text":"The soup can be frozen for up to 3 months."}
-{"id":"contrast:wild.agency.option-ignored","source":"measurement/contrast.json","text":"This option is ignored when the flag is unset."}
-{"id":"contrast:unjudgeable.agency.account-request","source":"measurement/contrast.json","text":"Your account was closed at your request."}
 {"id":"contrast:twin.agency.01","source":"measurement/contrast.json","text":"Three people were killed when the bus overturned on the ice."}
-{"id":"contrast:twin.agency.02","source":"measurement/contrast.json","text":"Lives were lost in the earthquake."}
 {"id":"contrast:twin.agency.03","source":"measurement/contrast.json","text":"Two climbers were injured in a fall near the summit."}
 {"id":"contrast:twin.agency.04","source":"measurement/contrast.json","text":"The suspect was arrested on Tuesday, police said."}
 {"id":"contrast:twin.agency.05","source":"measurement/contrast.json","text":"Police said the suspect was arrested on Tuesday."}
@@ -870,9 +926,49 @@
 {"id":"contrast:twin.agency.30","source":"measurement/contrast.json","text":"The report was shelved by the committee chair."}
 {"id":"contrast:specimen.agency.reagan-1987","source":"measurement/contrast.json","text":"But we did not achieve what we wished, and serious mistakes were made in trying to do so."}
 {"id":"contrast:specimen.agency.clinton-1997","source":"measurement/contrast.json","text":"no one is blameless here; it costs so much money to pay for these campaigns, that mistakes were made here by people who either did it deliberately or inadvertently"}
+{"id":"contrast:procedure.agency.collected-information","source":"measurement/contrast.json","text":"Information was collected via a survey."}
+{"id":"contrast:procedure.agency.retained","source":"measurement/contrast.json","text":"Records were retained for seven years."}
+{"id":"contrast:procedure.agency.transferred","source":"measurement/contrast.json","text":"Data were transferred to a secure server."}
+{"id":"contrast:term-of-art.agency.error-raised","source":"measurement/contrast.json","text":"If no error was raised, the call succeeded."}
+{"id":"contrast:procedure.agency.shared-on-request","source":"measurement/contrast.json","text":"Data were shared on request."}
 {"id":"contrast:specimen.agency.target-2013","source":"measurement/contrast.json","text":"Approximately 40 million credit and debit card accounts may have been impacted between Nov. 27 and Dec. 15, 2013."}
 {"id":"contrast:specimen.agency.opm-2015","source":"measurement/contrast.json","text":"As a result of the incident, OPM will send notifications to approximately 4 million individuals whose PII may have been compromised."}
 {"id":"contrast:specimen.agency.equifax-2017","source":"measurement/contrast.json","text":"In addition, credit card numbers for approximately 209,000 U.S. consumers, and certain dispute documents with personal identifying information for approximately 182,000 U.S. consumers, were accessed."}
+{"id":"contrast:negation.agency.has-not-been","source":"measurement/contrast.json","text":"Passwords have not been compromised."}
+{"id":"contrast:negation.agency.none-of","source":"measurement/contrast.json","text":"None of the records were leaked."}
+{"id":"contrast:negation.agency.nothing","source":"measurement/contrast.json","text":"Nothing was withheld from investigators."}
+{"id":"contrast:negation.agency.neither-nor","source":"measurement/contrast.json","text":"Neither passwords nor card numbers were exposed."}
+{"id":"contrast:negation.agency.long-subject","source":"measurement/contrast.json","text":"No personal, financial or health information was accessed."}
+{"id":"contrast:negation.agency.do-not-believe","source":"measurement/contrast.json","text":"We do not believe their information has been stolen."}
+{"id":"contrast:negation.agency.after-participle","source":"measurement/contrast.json","text":"Your data was shared with no one."}
+{"id":"contrast:lesson.agency.negator-earlier-clause","source":"measurement/contrast.json","text":"No one called, but data were stolen."}
+{"id":"contrast:negation.agency.nobody-possessive","source":"measurement/contrast.json","text":"Nobody's data was accessed."}
+{"id":"contrast:negation.agency.without-is-local","source":"measurement/contrast.json","text":"Without warning, customer data was exposed."}
+{"id":"contrast:lesson.agency.information-impacted","source":"measurement/contrast.json","text":"Your personal information may have been impacted."}
+{"id":"contrast:innocent.agency.flights-impacted","source":"measurement/contrast.json","text":"Roughly 2,000 flights were impacted after the storm."}
+{"id":"contrast:innocent.agency.earnings-affected","source":"measurement/contrast.json","text":"Earnings were affected this quarter."}
+{"id":"contrast:lesson.agency.ssn-impacted","source":"measurement/contrast.json","text":"Your Social Security number was potentially impacted."}
+{"id":"contrast:procedure.agency.tax-withheld","source":"measurement/contrast.json","text":"Federal income tax was withheld from each paycheck."}
+{"id":"contrast:term-of-art.agency.keys-ignored","source":"measurement/contrast.json","text":"Unknown keys were ignored."}
+{"id":"contrast:procedure.agency.outliers-ignored","source":"measurement/contrast.json","text":"Outliers were ignored in the main analysis."}
+{"id":"contrast:procedure.agency.plate-exposed","source":"measurement/contrast.json","text":"Each plate was exposed for 10 minutes."}
+{"id":"contrast:term-of-art.agency.port-exposed","source":"measurement/contrast.json","text":"Port 8080 was exposed in the Dockerfile."}
+{"id":"contrast:procedure.agency.renal-compromised","source":"measurement/contrast.json","text":"Renal function was compromised in three patients."}
+{"id":"contrast:term-of-art.agency.cache-accessed","source":"measurement/contrast.json","text":"The cache was accessed 40,000 times."}
+{"id":"contrast:term-of-art.agency.memory-leaked","source":"measurement/contrast.json","text":"Memory was leaked each time the handler ran."}
+{"id":"contrast:procedure.agency.hinges-concealed","source":"measurement/contrast.json","text":"The hinges were concealed behind the panel for a seamless look."}
+{"id":"contrast:procedure.agency.arrivals-shelved","source":"measurement/contrast.json","text":"New arrivals were shelved on Monday."}
+{"id":"contrast:procedure.agency.bird-let-go","source":"measurement/contrast.json","text":"The bird was let go at the edge of the wood."}
+{"id":"contrast:term-of-art.agency.warning-silenced","source":"measurement/contrast.json","text":"The warning was silenced with a pragma."}
+{"id":"contrast:procedure.agency.measures-taken","source":"measurement/contrast.json","text":"Repeated measures were taken at baseline and at 12 weeks."}
+{"id":"contrast:procedure.agency.steps-given","source":"measurement/contrast.json","text":"Detailed steps were given in section 3."}
+{"id":"contrast:procedure.agency.steps-done","source":"measurement/contrast.json","text":"Once all the steps were done, the dough rested for an hour."}
+{"id":"contrast:procedure.agency.words-said","source":"measurement/contrast.json","text":"Kind words were said about the late mayor."}
+{"id":"contrast:procedure.agency.statements-taken","source":"measurement/contrast.json","text":"Statements were taken from all the witnesses."}
+{"id":"contrast:procedure.agency.errors-characterized","source":"measurement/contrast.json","text":"Errors were characterized using a Monte Carlo method."}
+{"id":"contrast:procedure.agency.it-determined","source":"measurement/contrast.json","text":"It was determined that the sample was pure."}
+{"id":"contrast:named-agent.agency.agreed-between","source":"measurement/contrast.json","text":"It was agreed between the parties that the fee would be waived."}
+{"id":"contrast:named-agent.agency.by-past-window","source":"measurement/contrast.json","text":"Mistakes were made in the preparation of the quarterly report by the finance team."}
 {"id":"contrast:probe.euphemism-institutional.01","source":"measurement/contrast.json","text":"The airstrike caused collateral damage."}
 {"id":"contrast:probe.euphemism-institutional.02","source":"measurement/contrast.json","text":"Workforce reductions will affect 400 roles."}
 {"id":"contrast:probe.euphemism-institutional.03","source":"measurement/contrast.json","text":"Officials described it as a surgical strike."}
@@ -967,6 +1063,8 @@
 {"id":"probe:line-separator-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u2028shared."}
 {"id":"probe:nel-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u0085shared."}
 {"id":"probe:bom-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\ufeffshared."}
+{"id":"probe:bom-urgency","source":"scripts/xengine-diff.mjs","text":"Let us act\ufeffnow."}
+{"id":"probe:nel-urgency","source":"scripts/xengine-diff.mjs","text":"Let us act\u0085now."}
 {"id":"probe:zero-width-space-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u200bshared."}
 {"id":"probe:rsquo-editorializing","source":"scripts/xengine-diff.mjs","text":"It\u2019s worth noting that sales fell."}
 {"id":"probe:rsquo-whataboutism","source":"scripts/xengine-diff.mjs","text":"Let\u2019s not forget who started it."}
@@ -1003,6 +1101,12 @@
 {"id":"probe:long-s-lexical","source":"scripts/xengine-diff.mjs","text":"It \u017feems the plan worked."}
 {"id":"probe:kelvin-participle","source":"scripts/xengine-diff.mjs","text":"Civilians were \u212ailled."}
 {"id":"probe:kelvin-lexical","source":"scripts/xengine-diff.mjs","text":"This is \u212aind of a problem."}
+{"id":"probe:long-s-lexicon-participle","source":"scripts/xengine-diff.mjs","text":"Data was acce\u017f\u017fed."}
+{"id":"probe:kelvin-lexicon-participle","source":"scripts/xengine-diff.mjs","text":"Accounts were hac\u212aed."}
+{"id":"probe:kelvin-lexicon-participle-leaked","source":"scripts/xengine-diff.mjs","text":"Customer data was lea\u212aed."}
+{"id":"probe:long-s-hedge-word","source":"scripts/xengine-diff.mjs","text":"It may have \u017feen the file."}
+{"id":"probe:accent-against-absolute","source":"scripts/xengine-diff.mjs","text":"Caf\u00e9Never fails."}
+{"id":"probe:long-s-absolute","source":"scripts/xengine-diff.mjs","text":"No fees, alway\u017f free."}
 {"id":"probe:context-tired-glad-aware-open","source":"scripts/xengine-diff.mjs","text":"Zo\u00eb was tired, Zo\u00eb was glad, and Zo\u00eb was aware that the caf\u00e9 was open."}
 {"id":"probe:context-worried-excited-interested","source":"scripts/xengine-diff.mjs","text":"Ren\u00e9e was worried; later she was excited and was interested."}
 {"id":"probe:context-scared-bored-pleased","source":"scripts/xengine-diff.mjs","text":"The ni\u00f1os were scared, then were bored, and were pleased at noon."}
@@ -1020,3 +1124,366 @@
 {"id":"probe:vertical-tab-urgency","source":"scripts/xengine-diff.mjs","text":"Act\u000bnow."}
 {"id":"probe:form-feed-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\fshared."}
 {"id":"probe:unit-separator-agency","source":"scripts/xengine-diff.mjs","text":"Your data was\u001fshared."}
+{"id":"probe:unit-separator-urgency","source":"scripts/xengine-diff.mjs","text":"Let us act\u001fnow."}
+{"id":"probe:strip-curly-quoted","source":"scripts/xengine-diff.mjs","text":"He said \u201cwe are deeply sorry\u201d and left."}
+{"id":"probe:strip-rsquo-contraction","source":"scripts/xengine-diff.mjs","text":"The update isn\u2019t hugely different."}
+{"id":"probe:strip-emoji-between-negator","source":"scripts/xengine-diff.mjs","text":"Not \ud83d\ude00 extremely high."}
+{"id":"probe:strip-nbsp-after-negator","source":"scripts/xengine-diff.mjs","text":"Not\u00a0extremely high."}
+{"id":"probe:strip-emoji-in-curly-quote","source":"scripts/xengine-diff.mjs","text":"He said \u201c\ud83d\ude00 we are deeply sorry\u201d and left."}
+{"id":"probe:strip-negator-second-word","source":"scripts/xengine-diff.mjs","text":"The risk cannot be extremely high."}
+{"id":"probe:strip-negator-third-word","source":"scripts/xengine-diff.mjs","text":"Not bad, and extremely cheap."}
+{"id":"probe:strip-negator-behind-period","source":"scripts/xengine-diff.mjs","text":"We said no. extremely few agreed."}
+{"id":"probe:strip-negator-behind-semicolon","source":"scripts/xengine-diff.mjs","text":"We said no; extremely few agreed."}
+{"id":"probe:strip-negator-behind-colon","source":"scripts/xengine-diff.mjs","text":"We said no: extremely few agreed."}
+{"id":"probe:strip-negator-behind-bang","source":"scripts/xengine-diff.mjs","text":"We said no! extremely few agreed."}
+{"id":"probe:strip-negator-behind-question","source":"scripts/xengine-diff.mjs","text":"We said no? extremely few agreed."}
+{"id":"probe:strip-negator-behind-comma","source":"scripts/xengine-diff.mjs","text":"We said no, extremely few agreed."}
+{"id":"probe:strip-negator-uppercase","source":"scripts/xengine-diff.mjs","text":"NOT EXTREMELY HIGH"}
+{"id":"probe:strip-quote-closed","source":"scripts/xengine-diff.mjs","text":"\"Fine,\" she said, extremely calmly."}
+{"id":"probe:strip-quote-previous-line","source":"scripts/xengine-diff.mjs","text":"He said \"hello\nand it was extremely loud."}
+{"id":"probe:strip-quote-crlf","source":"scripts/xengine-diff.mjs","text":"He said \"we are\r\nextremely sorry\" and left."}
+{"id":"probe:strip-curly-quote-closed","source":"scripts/xengine-diff.mjs","text":"He said \u201chello\u201d and was extremely calm."}
+{"id":"probe:abs-negator-uppercase","source":"scripts/xengine-diff.mjs","text":"NOT EVERYONE QUALIFIES."}
+{"id":"probe:abs-negator-second-word","source":"scripts/xengine-diff.mjs","text":"The risk cannot always be priced."}
+{"id":"probe:abs-negator-third-word","source":"scripts/xengine-diff.mjs","text":"Not bad, and always cheap."}
+{"id":"probe:abs-negator-behind-period","source":"scripts/xengine-diff.mjs","text":"We said no. everyone agreed."}
+{"id":"probe:abs-negator-behind-semicolon","source":"scripts/xengine-diff.mjs","text":"We said no; everyone agreed."}
+{"id":"probe:abs-negator-behind-colon","source":"scripts/xengine-diff.mjs","text":"We said no: everyone agreed."}
+{"id":"probe:abs-negator-behind-bang","source":"scripts/xengine-diff.mjs","text":"We said no! everyone agreed."}
+{"id":"probe:abs-negator-behind-question","source":"scripts/xengine-diff.mjs","text":"We said no? everyone agreed."}
+{"id":"probe:abs-negator-behind-comma","source":"scripts/xengine-diff.mjs","text":"We said no, everyone agreed."}
+{"id":"probe:abs-never-imperative-uppercase","source":"scripts/xengine-diff.mjs","text":"NEVER share it."}
+{"id":"probe:abs-never-after-period","source":"scripts/xengine-diff.mjs","text":"Check the link. never click it."}
+{"id":"probe:abs-never-after-colon","source":"scripts/xengine-diff.mjs","text":"Check the link: never click it."}
+{"id":"probe:abs-never-after-bang","source":"scripts/xengine-diff.mjs","text":"Check the link! never click it."}
+{"id":"probe:abs-never-after-question","source":"scripts/xengine-diff.mjs","text":"Check the link? never click it."}
+{"id":"probe:abs-never-after-comma","source":"scripts/xengine-diff.mjs","text":"Love begins with choice, never obligation."}
+{"id":"probe:abs-never-mid-clause","source":"scripts/xengine-diff.mjs","text":"We never share data."}
+{"id":"probe:abs-never-quoted-start","source":"scripts/xengine-diff.mjs","text":"\"Never share it,\" he said."}
+{"id":"probe:abs-never-tab-after","source":"scripts/xengine-diff.mjs","text":"Never\tshare it."}
+{"id":"probe:abs-never-newline-after","source":"scripts/xengine-diff.mjs","text":"Never\nshare it."}
+{"id":"probe:abs-never-newline-before","source":"scripts/xengine-diff.mjs","text":"We will\nnever share it."}
+{"id":"probe:abs-never-capital-next","source":"scripts/xengine-diff.mjs","text":"Never Again."}
+{"id":"probe:abs-never-digit-next","source":"scripts/xengine-diff.mjs","text":"Never 2 late."}
+{"id":"probe:abs-never-alone","source":"scripts/xengine-diff.mjs","text":"Never."}
+{"id":"probe:abs-never-text-end","source":"scripts/xengine-diff.mjs","text":"We said never"}
+{"id":"probe:abs-rsquo-contraction","source":"scripts/xengine-diff.mjs","text":"Results aren\u2019t always typical."}
+{"id":"probe:abs-nbsp-after-negator","source":"scripts/xengine-diff.mjs","text":"Not\u00a0everyone qualifies."}
+{"id":"probe:abs-emoji-between-negator","source":"scripts/xengine-diff.mjs","text":"Not \ud83d\ude00 always."}
+{"id":"probe:abs-curly-quote-never","source":"scripts/xengine-diff.mjs","text":"\u201cNever share it,\u201d he said."}
+{"id":"probe:abs-emoji-before-never","source":"scripts/xengine-diff.mjs","text":"\ud83d\udd12 Never share your password."}
+{"id":"probe:abs-nbsp-after-never","source":"scripts/xengine-diff.mjs","text":"Never\u00a0share it."}
+{"id":"probe:abs-accented-word-before-never","source":"scripts/xengine-diff.mjs","text":"Caf\u00e9 never closes."}
+{"id":"probe:abs-greek-word-before-never","source":"scripts/xengine-diff.mjs","text":"\u03a9 never fails."}
+{"id":"probe:abs-comma-after-noun","source":"scripts/xengine-diff.mjs","text":"No fees, always free."}
+{"id":"probe:abs-comma-after-verb","source":"scripts/xengine-diff.mjs","text":"Don't wait, everyone is buying."}
+{"id":"probe:abs-comma-after-word-tab","source":"scripts/xengine-diff.mjs","text":"No risk,\tguaranteed."}
+{"id":"probe:abs-comma-right-after-negator","source":"scripts/xengine-diff.mjs","text":"Past performance is not, however, always a guide."}
+{"id":"probe:abs-comma-right-after-word-one","source":"scripts/xengine-diff.mjs","text":"No, never."}
+{"id":"probe:abs-comma-strip-unchanged","source":"scripts/xengine-diff.mjs","text":"It isn't, frankly, extremely high."}
+{"id":"probe:abs-never-fragment","source":"scripts/xengine-diff.mjs","text":"Battery life? Never an issue."}
+{"id":"probe:abs-never-inversion-has","source":"scripts/xengine-diff.mjs","text":"Never has a product been this good."}
+{"id":"probe:abs-never-inversion-before","source":"scripts/xengine-diff.mjs","text":"Never before have prices been this low."}
+{"id":"probe:abs-never-ever-imperative","source":"scripts/xengine-diff.mjs","text":"Never ever share your password."}
+{"id":"probe:abs-never-adverb-then-end","source":"scripts/xengine-diff.mjs","text":"Never ever again."}
+{"id":"probe:abs-never-adverb-newline","source":"scripts/xengine-diff.mjs","text":"Never again\nshare it."}
+{"id":"probe:abs-never-adverb-capital","source":"scripts/xengine-diff.mjs","text":"Never again Share it."}
+{"id":"probe:abs-never-mixed-case-next","source":"scripts/xengine-diff.mjs","text":"Go; never hAS it."}
+{"id":"probe:abs-never-prefix-word","source":"scripts/xengine-diff.mjs","text":"Never answer it."}
+{"id":"probe:abs-never-contraction-next","source":"scripts/xengine-diff.mjs","text":"Never can't stop."}
+{"id":"probe:abs-comma-curly-quoted-values","source":"scripts/xengine-diff.mjs","text":"Values are \u201cnever\u201d, \u201calways\u201d and \u201cauto\u201d."}
+{"id":"probe:abs-comma-emoji-after-word","source":"scripts/xengine-diff.mjs","text":"No fees, \ud83d\ude00 always free."}
+{"id":"probe:abs-fullwidth-comma","source":"scripts/xengine-diff.mjs","text":"No risk\uff0c guaranteed."}
+{"id":"probe:abs-never-nbsp-after-adverb","source":"scripts/xengine-diff.mjs","text":"Never again\u00a0will prices fall."}
+{"id":"probe:abs-never-accented-next","source":"scripts/xengine-diff.mjs","text":"Never \u00e9t\u00e9 again."}
+{"id":"probe:abs-never-rsquo-in-next","source":"scripts/xengine-diff.mjs","text":"Never can\u2019t stop."}
+{"id":"probe:agency-put-into-place","source":"scripts/xengine-diff.mjs","text":"Safeguards were put into place."}
+{"id":"probe:agency-negator-crlf","source":"scripts/xengine-diff.mjs","text":"No one called\r\ndata were stolen."}
+{"id":"probe:agency-negator-nbsp","source":"scripts/xengine-diff.mjs","text":"No\u00a0card numbers were stolen."}
+{"id":"probe:agency-negator-ideographic-stop","source":"scripts/xengine-diff.mjs","text":"No\u3002data was accessed."}
+{"id":"probe:agency-negator-line-separator","source":"scripts/xengine-diff.mjs","text":"No\u2028data was accessed."}
+{"id":"probe:agency-negator-emoji","source":"scripts/xengine-diff.mjs","text":"No \ud83d\ude00 data was accessed."}
+{"id":"lexicon:botched","source":"spec/agency-lexicon.json","text":"The files were botched."}
+{"id":"lexicon:botched:by","source":"spec/agency-lexicon.json","text":"The files were botched by the board."}
+{"id":"lexicon:bungled","source":"spec/agency-lexicon.json","text":"The files were bungled."}
+{"id":"lexicon:bungled:by","source":"spec/agency-lexicon.json","text":"The files were bungled by the board."}
+{"id":"lexicon:doctored","source":"spec/agency-lexicon.json","text":"The files were doctored."}
+{"id":"lexicon:doctored:by","source":"spec/agency-lexicon.json","text":"The files were doctored by the board."}
+{"id":"lexicon:falsified","source":"spec/agency-lexicon.json","text":"The files were falsified."}
+{"id":"lexicon:falsified:by","source":"spec/agency-lexicon.json","text":"The files were falsified by the board."}
+{"id":"lexicon:ignored","source":"spec/agency-lexicon.json","text":"The files were ignored."}
+{"id":"lexicon:ignored:by","source":"spec/agency-lexicon.json","text":"The files were ignored by the board."}
+{"id":"lexicon:misappropriated","source":"spec/agency-lexicon.json","text":"The files were misappropriated."}
+{"id":"lexicon:misappropriated:by","source":"spec/agency-lexicon.json","text":"The files were misappropriated by the board."}
+{"id":"lexicon:miscalculated","source":"spec/agency-lexicon.json","text":"The files were miscalculated."}
+{"id":"lexicon:miscalculated:by","source":"spec/agency-lexicon.json","text":"The files were miscalculated by the board."}
+{"id":"lexicon:mischaracterised","source":"spec/agency-lexicon.json","text":"The files were mischaracterised."}
+{"id":"lexicon:mischaracterised:by","source":"spec/agency-lexicon.json","text":"The files were mischaracterised by the board."}
+{"id":"lexicon:mischaracterized","source":"spec/agency-lexicon.json","text":"The files were mischaracterized."}
+{"id":"lexicon:mischaracterized:by","source":"spec/agency-lexicon.json","text":"The files were mischaracterized by the board."}
+{"id":"lexicon:mishandled","source":"spec/agency-lexicon.json","text":"The files were mishandled."}
+{"id":"lexicon:mishandled:by","source":"spec/agency-lexicon.json","text":"The files were mishandled by the board."}
+{"id":"lexicon:misinformed","source":"spec/agency-lexicon.json","text":"The files were misinformed."}
+{"id":"lexicon:misinformed:by","source":"spec/agency-lexicon.json","text":"The files were misinformed by the board."}
+{"id":"lexicon:misinterpreted","source":"spec/agency-lexicon.json","text":"The files were misinterpreted."}
+{"id":"lexicon:misinterpreted:by","source":"spec/agency-lexicon.json","text":"The files were misinterpreted by the board."}
+{"id":"lexicon:misjudged","source":"spec/agency-lexicon.json","text":"The files were misjudged."}
+{"id":"lexicon:misjudged:by","source":"spec/agency-lexicon.json","text":"The files were misjudged by the board."}
+{"id":"lexicon:mislabeled","source":"spec/agency-lexicon.json","text":"The files were mislabeled."}
+{"id":"lexicon:mislabeled:by","source":"spec/agency-lexicon.json","text":"The files were mislabeled by the board."}
+{"id":"lexicon:mislabelled","source":"spec/agency-lexicon.json","text":"The files were mislabelled."}
+{"id":"lexicon:mislabelled:by","source":"spec/agency-lexicon.json","text":"The files were mislabelled by the board."}
+{"id":"lexicon:misled","source":"spec/agency-lexicon.json","text":"The files were misled."}
+{"id":"lexicon:misled:by","source":"spec/agency-lexicon.json","text":"The files were misled by the board."}
+{"id":"lexicon:mismanaged","source":"spec/agency-lexicon.json","text":"The files were mismanaged."}
+{"id":"lexicon:mismanaged:by","source":"spec/agency-lexicon.json","text":"The files were mismanaged by the board."}
+{"id":"lexicon:misplaced","source":"spec/agency-lexicon.json","text":"The files were misplaced."}
+{"id":"lexicon:misplaced:by","source":"spec/agency-lexicon.json","text":"The files were misplaced by the board."}
+{"id":"lexicon:misquoted","source":"spec/agency-lexicon.json","text":"The files were misquoted."}
+{"id":"lexicon:misquoted:by","source":"spec/agency-lexicon.json","text":"The files were misquoted by the board."}
+{"id":"lexicon:misreported","source":"spec/agency-lexicon.json","text":"The files were misreported."}
+{"id":"lexicon:misreported:by","source":"spec/agency-lexicon.json","text":"The files were misreported by the board."}
+{"id":"lexicon:misrepresented","source":"spec/agency-lexicon.json","text":"The files were misrepresented."}
+{"id":"lexicon:misrepresented:by","source":"spec/agency-lexicon.json","text":"The files were misrepresented by the board."}
+{"id":"lexicon:misstated","source":"spec/agency-lexicon.json","text":"The files were misstated."}
+{"id":"lexicon:misstated:by","source":"spec/agency-lexicon.json","text":"The files were misstated by the board."}
+{"id":"lexicon:misused","source":"spec/agency-lexicon.json","text":"The files were misused."}
+{"id":"lexicon:misused:by","source":"spec/agency-lexicon.json","text":"The files were misused by the board."}
+{"id":"lexicon:neglected","source":"spec/agency-lexicon.json","text":"The files were neglected."}
+{"id":"lexicon:neglected:by","source":"spec/agency-lexicon.json","text":"The files were neglected by the board."}
+{"id":"lexicon:overcharged","source":"spec/agency-lexicon.json","text":"The files were overcharged."}
+{"id":"lexicon:overcharged:by","source":"spec/agency-lexicon.json","text":"The files were overcharged by the board."}
+{"id":"lexicon:overlooked","source":"spec/agency-lexicon.json","text":"The files were overlooked."}
+{"id":"lexicon:overlooked:by","source":"spec/agency-lexicon.json","text":"The files were overlooked by the board."}
+{"id":"lexicon:tampered","source":"spec/agency-lexicon.json","text":"The files were tampered."}
+{"id":"lexicon:tampered:by","source":"spec/agency-lexicon.json","text":"The files were tampered by the board."}
+{"id":"lexicon:underpaid","source":"spec/agency-lexicon.json","text":"The files were underpaid."}
+{"id":"lexicon:underpaid:by","source":"spec/agency-lexicon.json","text":"The files were underpaid by the board."}
+{"id":"lexicon:accessed","source":"spec/agency-lexicon.json","text":"The files were accessed."}
+{"id":"lexicon:accessed:by","source":"spec/agency-lexicon.json","text":"The files were accessed by the board."}
+{"id":"lexicon:breached","source":"spec/agency-lexicon.json","text":"The files were breached."}
+{"id":"lexicon:breached:by","source":"spec/agency-lexicon.json","text":"The files were breached by the board."}
+{"id":"lexicon:compromised","source":"spec/agency-lexicon.json","text":"The files were compromised."}
+{"id":"lexicon:compromised:by","source":"spec/agency-lexicon.json","text":"The files were compromised by the board."}
+{"id":"lexicon:exfiltrated","source":"spec/agency-lexicon.json","text":"The files were exfiltrated."}
+{"id":"lexicon:exfiltrated:by","source":"spec/agency-lexicon.json","text":"The files were exfiltrated by the board."}
+{"id":"lexicon:exposed","source":"spec/agency-lexicon.json","text":"The files were exposed."}
+{"id":"lexicon:exposed:by","source":"spec/agency-lexicon.json","text":"The files were exposed by the board."}
+{"id":"lexicon:hacked","source":"spec/agency-lexicon.json","text":"The files were hacked."}
+{"id":"lexicon:hacked:by","source":"spec/agency-lexicon.json","text":"The files were hacked by the board."}
+{"id":"lexicon:leaked","source":"spec/agency-lexicon.json","text":"The files were leaked."}
+{"id":"lexicon:leaked:by","source":"spec/agency-lexicon.json","text":"The files were leaked by the board."}
+{"id":"lexicon:stolen","source":"spec/agency-lexicon.json","text":"The files were stolen."}
+{"id":"lexicon:stolen:by","source":"spec/agency-lexicon.json","text":"The files were stolen by the board."}
+{"id":"lexicon:affected","source":"spec/agency-lexicon.json","text":"Your account was affected."}
+{"id":"lexicon:affected:by","source":"spec/agency-lexicon.json","text":"Your account was affected by the board."}
+{"id":"lexicon:impacted","source":"spec/agency-lexicon.json","text":"Your account was impacted."}
+{"id":"lexicon:impacted:by","source":"spec/agency-lexicon.json","text":"Your account was impacted by the board."}
+{"id":"lexicon:axed","source":"spec/agency-lexicon.json","text":"The files were axed."}
+{"id":"lexicon:axed:by","source":"spec/agency-lexicon.json","text":"The files were axed by the board."}
+{"id":"lexicon:censored","source":"spec/agency-lexicon.json","text":"The files were censored."}
+{"id":"lexicon:censored:by","source":"spec/agency-lexicon.json","text":"The files were censored by the board."}
+{"id":"lexicon:concealed","source":"spec/agency-lexicon.json","text":"The files were concealed."}
+{"id":"lexicon:concealed:by","source":"spec/agency-lexicon.json","text":"The files were concealed by the board."}
+{"id":"lexicon:laid-off","source":"spec/agency-lexicon.json","text":"The files were laid off."}
+{"id":"lexicon:laid-off:by","source":"spec/agency-lexicon.json","text":"The files were laid off by the board."}
+{"id":"lexicon:let-go","source":"spec/agency-lexicon.json","text":"The files were let go."}
+{"id":"lexicon:let-go:by","source":"spec/agency-lexicon.json","text":"The files were let go by the board."}
+{"id":"lexicon:scrapped","source":"spec/agency-lexicon.json","text":"The files were scrapped."}
+{"id":"lexicon:scrapped:by","source":"spec/agency-lexicon.json","text":"The files were scrapped by the board."}
+{"id":"lexicon:shelved","source":"spec/agency-lexicon.json","text":"The files were shelved."}
+{"id":"lexicon:shelved:by","source":"spec/agency-lexicon.json","text":"The files were shelved by the board."}
+{"id":"lexicon:silenced","source":"spec/agency-lexicon.json","text":"The files were silenced."}
+{"id":"lexicon:silenced:by","source":"spec/agency-lexicon.json","text":"The files were silenced by the board."}
+{"id":"lexicon:withheld","source":"spec/agency-lexicon.json","text":"The files were withheld."}
+{"id":"lexicon:withheld:by","source":"spec/agency-lexicon.json","text":"The files were withheld by the board."}
+{"id":"lexicon:characterised","source":"spec/agency-lexicon.json","text":"Steps were characterised."}
+{"id":"lexicon:characterised:by","source":"spec/agency-lexicon.json","text":"Steps were characterised by the board."}
+{"id":"lexicon:characterized","source":"spec/agency-lexicon.json","text":"Steps were characterized."}
+{"id":"lexicon:characterized:by","source":"spec/agency-lexicon.json","text":"Steps were characterized by the board."}
+{"id":"lexicon:done","source":"spec/agency-lexicon.json","text":"Steps were done."}
+{"id":"lexicon:done:by","source":"spec/agency-lexicon.json","text":"Steps were done by the board."}
+{"id":"lexicon:given","source":"spec/agency-lexicon.json","text":"Steps were given."}
+{"id":"lexicon:given:by","source":"spec/agency-lexicon.json","text":"Steps were given by the board."}
+{"id":"lexicon:interpreted","source":"spec/agency-lexicon.json","text":"Steps were interpreted."}
+{"id":"lexicon:interpreted:by","source":"spec/agency-lexicon.json","text":"Steps were interpreted by the board."}
+{"id":"lexicon:made","source":"spec/agency-lexicon.json","text":"Steps were made."}
+{"id":"lexicon:made:by","source":"spec/agency-lexicon.json","text":"Steps were made by the board."}
+{"id":"lexicon:perceived","source":"spec/agency-lexicon.json","text":"Steps were perceived."}
+{"id":"lexicon:perceived:by","source":"spec/agency-lexicon.json","text":"Steps were perceived by the board."}
+{"id":"lexicon:put","source":"spec/agency-lexicon.json","text":"Steps were put in place."}
+{"id":"lexicon:put:by","source":"spec/agency-lexicon.json","text":"Steps were put in place by the board."}
+{"id":"lexicon:said","source":"spec/agency-lexicon.json","text":"Steps were said."}
+{"id":"lexicon:said:by","source":"spec/agency-lexicon.json","text":"Steps were said by the board."}
+{"id":"lexicon:taken","source":"spec/agency-lexicon.json","text":"Steps were taken."}
+{"id":"lexicon:taken:by","source":"spec/agency-lexicon.json","text":"Steps were taken by the board."}
+{"id":"lexicon:raised","source":"spec/agency-lexicon.json","text":"Concerns were raised."}
+{"id":"lexicon:raised:by","source":"spec/agency-lexicon.json","text":"Concerns were raised by the board."}
+{"id":"lexicon:agreed","source":"spec/agency-lexicon.json","text":"It was agreed that the plan would end."}
+{"id":"lexicon:agreed:by","source":"spec/agency-lexicon.json","text":"It was agreed by the board that the plan would end."}
+{"id":"lexicon:decided","source":"spec/agency-lexicon.json","text":"It was decided that the plan would end."}
+{"id":"lexicon:decided:by","source":"spec/agency-lexicon.json","text":"It was decided by the board that the plan would end."}
+{"id":"lexicon:determined","source":"spec/agency-lexicon.json","text":"It was determined that the plan would end."}
+{"id":"lexicon:determined:by","source":"spec/agency-lexicon.json","text":"It was determined by the board that the plan would end."}
+{"id":"lexicon:disclosed","source":"spec/agency-lexicon.json","text":"Your data was disclosed."}
+{"id":"lexicon:disclosed:by","source":"spec/agency-lexicon.json","text":"Your data was disclosed by the board."}
+{"id":"lexicon:shared","source":"spec/agency-lexicon.json","text":"Your data was shared."}
+{"id":"lexicon:shared:by","source":"spec/agency-lexicon.json","text":"Your data was shared by the board."}
+{"id":"lexicon:sold","source":"spec/agency-lexicon.json","text":"Your data was sold."}
+{"id":"lexicon:sold:by","source":"spec/agency-lexicon.json","text":"Your data was sold by the board."}
+{"id":"boundary:by-window-after-u002e","source":"spec/agency-lexicon.json","text":"Mistakes were made.by them."}
+{"id":"boundary:by-window-after-u003b","source":"spec/agency-lexicon.json","text":"Mistakes were made;by them."}
+{"id":"boundary:by-window-after-u003a","source":"spec/agency-lexicon.json","text":"Mistakes were made:by them."}
+{"id":"boundary:by-window-after-u0021","source":"spec/agency-lexicon.json","text":"Mistakes were made!by them."}
+{"id":"boundary:by-window-after-u003f","source":"spec/agency-lexicon.json","text":"Mistakes were made?by them."}
+{"id":"boundary:by-window-after-line-break","source":"spec/agency-lexicon.json","text":"Mistakes were made\nby them."}
+{"id":"boundary:by-window-after-u002c","source":"spec/agency-lexicon.json","text":"Mistakes were made,by them."}
+{"id":"boundary:head-after-u002e","source":"spec/agency-lexicon.json","text":"Mistakes.were made."}
+{"id":"boundary:head-after-u003b","source":"spec/agency-lexicon.json","text":"Mistakes;were made."}
+{"id":"boundary:head-after-u003a","source":"spec/agency-lexicon.json","text":"Mistakes:were made."}
+{"id":"boundary:head-after-u0021","source":"spec/agency-lexicon.json","text":"Mistakes!were made."}
+{"id":"boundary:head-after-u003f","source":"spec/agency-lexicon.json","text":"Mistakes?were made."}
+{"id":"boundary:head-after-line-break","source":"spec/agency-lexicon.json","text":"Mistakes\nwere made."}
+{"id":"boundary:head-after-u002c","source":"spec/agency-lexicon.json","text":"Mistakes,were made."}
+{"id":"boundary:skip-max","source":"spec/agency-lexicon.json","text":"Mistakes all already also can been made."}
+{"id":"boundary:skip-max-past","source":"spec/agency-lexicon.json","text":"Mistakes all already also can could been made."}
+{"id":"boundary:skip-suffix","source":"spec/agency-lexicon.json","text":"Mistakes all already also sadly been made."}
+{"id":"boundary:negator-chain-cannot","source":"spec/agency-lexicon.json","text":"Data has cannot been accessed."}
+{"id":"boundary:negator-head-cannot","source":"spec/agency-lexicon.json","text":"Cannot data was accessed."}
+{"id":"boundary:negator-chain-neither","source":"spec/agency-lexicon.json","text":"Data has neither been accessed."}
+{"id":"boundary:negator-head-neither","source":"spec/agency-lexicon.json","text":"Neither data was accessed."}
+{"id":"boundary:negator-chain-never","source":"spec/agency-lexicon.json","text":"Data has never been accessed."}
+{"id":"boundary:negator-head-never","source":"spec/agency-lexicon.json","text":"Never data was accessed."}
+{"id":"boundary:negator-chain-no","source":"spec/agency-lexicon.json","text":"Data has no been accessed."}
+{"id":"boundary:negator-head-no","source":"spec/agency-lexicon.json","text":"No data was accessed."}
+{"id":"boundary:negator-chain-nobody","source":"spec/agency-lexicon.json","text":"Data has nobody been accessed."}
+{"id":"boundary:negator-head-nobody","source":"spec/agency-lexicon.json","text":"Nobody data was accessed."}
+{"id":"boundary:negator-chain-none","source":"spec/agency-lexicon.json","text":"Data has none been accessed."}
+{"id":"boundary:negator-head-none","source":"spec/agency-lexicon.json","text":"None data was accessed."}
+{"id":"boundary:negator-chain-nor","source":"spec/agency-lexicon.json","text":"Data has nor been accessed."}
+{"id":"boundary:negator-head-nor","source":"spec/agency-lexicon.json","text":"Nor data was accessed."}
+{"id":"boundary:negator-chain-not","source":"spec/agency-lexicon.json","text":"Data has not been accessed."}
+{"id":"boundary:negator-head-not","source":"spec/agency-lexicon.json","text":"Not data was accessed."}
+{"id":"boundary:negator-chain-nothing","source":"spec/agency-lexicon.json","text":"Data has nothing been accessed."}
+{"id":"boundary:negator-head-nothing","source":"spec/agency-lexicon.json","text":"Nothing data was accessed."}
+{"id":"boundary:negator-skip-max","source":"spec/agency-lexicon.json","text":"No data all already also can been accessed."}
+{"id":"boundary:negator-skip-max-past","source":"spec/agency-lexicon.json","text":"No data all already also can could been accessed."}
+{"id":"boundary:negator-clause-far","source":"spec/agency-lexicon.json","text":"No a b c d e f g h i j k l m n o p q r s t u v w x y z data was accessed."}
+{"id":"boundary:negator-subject-list","source":"spec/agency-lexicon.json","text":"No card numbers, bank details or passwords were stolen."}
+{"id":"boundary:negator-after-u002e","source":"spec/agency-lexicon.json","text":"No.data was accessed."}
+{"id":"boundary:negator-earlier-clause-u002e","source":"spec/agency-lexicon.json","text":"No one called. but data were stolen."}
+{"id":"boundary:negator-after-u003b","source":"spec/agency-lexicon.json","text":"No;data was accessed."}
+{"id":"boundary:negator-earlier-clause-u003b","source":"spec/agency-lexicon.json","text":"No one called; but data were stolen."}
+{"id":"boundary:negator-after-u003a","source":"spec/agency-lexicon.json","text":"No:data was accessed."}
+{"id":"boundary:negator-earlier-clause-u003a","source":"spec/agency-lexicon.json","text":"No one called: but data were stolen."}
+{"id":"boundary:negator-after-u0021","source":"spec/agency-lexicon.json","text":"No!data was accessed."}
+{"id":"boundary:negator-earlier-clause-u0021","source":"spec/agency-lexicon.json","text":"No one called! but data were stolen."}
+{"id":"boundary:negator-after-u003f","source":"spec/agency-lexicon.json","text":"No?data was accessed."}
+{"id":"boundary:negator-earlier-clause-u003f","source":"spec/agency-lexicon.json","text":"No one called? but data were stolen."}
+{"id":"boundary:negator-after-line-break","source":"spec/agency-lexicon.json","text":"No\ndata was accessed."}
+{"id":"boundary:negator-earlier-clause-line-break","source":"spec/agency-lexicon.json","text":"No one called\n but data were stolen."}
+{"id":"boundary:negator-after-u002c","source":"spec/agency-lexicon.json","text":"No,data was accessed."}
+{"id":"boundary:negator-first-passive","source":"spec/agency-lexicon.json","text":"No data was accessed and records were leaked."}
+{"id":"boundary:negator-clause-reset","source":"spec/agency-lexicon.json","text":"No data was accessed. Records were leaked."}
+{"id":"boundary:contraction-ascii","source":"spec/agency-lexicon.json","text":"Data hasn't been accessed."}
+{"id":"boundary:contraction-rsquo","source":"spec/agency-lexicon.json","text":"Data hasn\u2019t been accessed."}
+{"id":"boundary:contraction-not-n","source":"spec/agency-lexicon.json","text":"Data has't been accessed."}
+{"id":"boundary:contraction-spaced","source":"spec/agency-lexicon.json","text":"Data hasn' t been accessed."}
+{"id":"boundary:contraction-no-apostrophe","source":"spec/agency-lexicon.json","text":"Data hasn t been accessed."}
+{"id":"boundary:adverb-already","source":"spec/agency-lexicon.json","text":"Customer data was already accessed."}
+{"id":"boundary:adverb-always","source":"spec/agency-lexicon.json","text":"Customer data was always accessed."}
+{"id":"boundary:adverb-often","source":"spec/agency-lexicon.json","text":"Customer data was often accessed."}
+{"id":"boundary:adverb-still","source":"spec/agency-lexicon.json","text":"Customer data was still accessed."}
+{"id":"boundary:adverb-suffix-alone","source":"spec/agency-lexicon.json","text":"Customer data was ly accessed."}
+{"id":"boundary:adverb-suffix-digit","source":"spec/agency-lexicon.json","text":"Customer data was 2ly accessed."}
+{"id":"boundary:adverb-two","source":"spec/agency-lexicon.json","text":"Customer data was quietly already accessed."}
+{"id":"boundary:adverb-unlisted","source":"spec/agency-lexicon.json","text":"Customer data was soon accessed."}
+{"id":"boundary:adverb-negator-cannot","source":"spec/agency-lexicon.json","text":"Customer data was cannot accessed."}
+{"id":"boundary:adverb-negator-neither","source":"spec/agency-lexicon.json","text":"Customer data was neither accessed."}
+{"id":"boundary:adverb-negator-never","source":"spec/agency-lexicon.json","text":"Customer data was never accessed."}
+{"id":"boundary:adverb-negator-no","source":"spec/agency-lexicon.json","text":"Customer data was no accessed."}
+{"id":"boundary:adverb-negator-nobody","source":"spec/agency-lexicon.json","text":"Customer data was nobody accessed."}
+{"id":"boundary:adverb-negator-none","source":"spec/agency-lexicon.json","text":"Customer data was none accessed."}
+{"id":"boundary:adverb-negator-nor","source":"spec/agency-lexicon.json","text":"Customer data was nor accessed."}
+{"id":"boundary:adverb-negator-not","source":"spec/agency-lexicon.json","text":"Customer data was not accessed."}
+{"id":"boundary:adverb-negator-nothing","source":"spec/agency-lexicon.json","text":"Customer data was nothing accessed."}
+{"id":"boundary:requires-partial-put","source":"spec/agency-lexicon.json","text":"Steps were put in places."}
+{"id":"boundary:unless-exposed","source":"spec/agency-lexicon.json","text":"The files were exposed to it."}
+{"id":"boundary:unless-partial-exposed","source":"spec/agency-lexicon.json","text":"The files were exposed tos."}
+{"id":"boundary:word-underscore-head","source":"spec/agency-lexicon.json","text":"Your user_data was shared."}
+{"id":"boundary:word-digit-head","source":"spec/agency-lexicon.json","text":"Your data2 was shared."}
+{"id":"boundary:word-underscore-negator","source":"spec/agency-lexicon.json","text":"No_data was accessed."}
+{"id":"boundary:word-digit-negator","source":"spec/agency-lexicon.json","text":"No2 data was accessed."}
+{"id":"boundary:word-underscore-before-negator","source":"spec/agency-lexicon.json","text":"Data_no was accessed."}
+{"id":"boundary:word-digit-before-negator","source":"spec/agency-lexicon.json","text":"Data2no was accessed."}
+{"id":"boundary:word-underscore-by","source":"spec/agency-lexicon.json","text":"Mistakes were made by_them."}
+{"id":"boundary:word-digit-by","source":"spec/agency-lexicon.json","text":"Mistakes were made by2."}
+{"id":"boundary:word-underscore-requires","source":"spec/agency-lexicon.json","text":"Safeguards were put in place_now."}
+{"id":"boundary:word-underscore-unless","source":"spec/agency-lexicon.json","text":"Customer data was exposed to_all."}
+{"id":"boundary:space-u0020","source":"spec/agency-lexicon.json","text":"Mistakes were made."}
+{"id":"boundary:space-requires-u0020","source":"spec/agency-lexicon.json","text":"Safeguards were put in place."}
+{"id":"boundary:space-u0009","source":"spec/agency-lexicon.json","text":"Mistakes were\tmade."}
+{"id":"boundary:space-requires-u0009","source":"spec/agency-lexicon.json","text":"Safeguards were put\tin place."}
+{"id":"boundary:space-line-break","source":"spec/agency-lexicon.json","text":"Mistakes were\nmade."}
+{"id":"boundary:space-requires-line-break","source":"spec/agency-lexicon.json","text":"Safeguards were put\nin place."}
+{"id":"boundary:space-u000d","source":"spec/agency-lexicon.json","text":"Mistakes were\rmade."}
+{"id":"boundary:space-requires-u000d","source":"spec/agency-lexicon.json","text":"Safeguards were put\rin place."}
+{"id":"boundary:space-u000c","source":"spec/agency-lexicon.json","text":"Mistakes were\fmade."}
+{"id":"boundary:space-requires-u000c","source":"spec/agency-lexicon.json","text":"Safeguards were put\fin place."}
+{"id":"boundary:space-u000b","source":"spec/agency-lexicon.json","text":"Mistakes were\u000bmade."}
+{"id":"boundary:space-requires-u000b","source":"spec/agency-lexicon.json","text":"Safeguards were put\u000bin place."}
+{"id":"guard:negator-cannot-strip","source":"spec/guard-lexicon.json","text":"It was cannot extremely bad."}
+{"id":"guard:negator-cannot-absolute","source":"spec/guard-lexicon.json","text":"It is cannot always so."}
+{"id":"guard:negator-hardly-strip","source":"spec/guard-lexicon.json","text":"It was hardly extremely bad."}
+{"id":"guard:negator-hardly-absolute","source":"spec/guard-lexicon.json","text":"It is hardly always so."}
+{"id":"guard:negator-neither-strip","source":"spec/guard-lexicon.json","text":"It was neither extremely bad."}
+{"id":"guard:negator-neither-absolute","source":"spec/guard-lexicon.json","text":"It is neither always so."}
+{"id":"guard:negator-never-strip","source":"spec/guard-lexicon.json","text":"It was never extremely bad."}
+{"id":"guard:negator-never-absolute","source":"spec/guard-lexicon.json","text":"It is never always so."}
+{"id":"guard:negator-no-strip","source":"spec/guard-lexicon.json","text":"It was no extremely bad."}
+{"id":"guard:negator-no-absolute","source":"spec/guard-lexicon.json","text":"It is no always so."}
+{"id":"guard:negator-nobody-strip","source":"spec/guard-lexicon.json","text":"It was nobody extremely bad."}
+{"id":"guard:negator-nobody-absolute","source":"spec/guard-lexicon.json","text":"It is nobody always so."}
+{"id":"guard:negator-none-strip","source":"spec/guard-lexicon.json","text":"It was none extremely bad."}
+{"id":"guard:negator-none-absolute","source":"spec/guard-lexicon.json","text":"It is none always so."}
+{"id":"guard:negator-nor-strip","source":"spec/guard-lexicon.json","text":"It was nor extremely bad."}
+{"id":"guard:negator-nor-absolute","source":"spec/guard-lexicon.json","text":"It is nor always so."}
+{"id":"guard:negator-not-strip","source":"spec/guard-lexicon.json","text":"It was not extremely bad."}
+{"id":"guard:negator-not-absolute","source":"spec/guard-lexicon.json","text":"It is not always so."}
+{"id":"guard:negator-nothing-strip","source":"spec/guard-lexicon.json","text":"It was nothing extremely bad."}
+{"id":"guard:negator-nothing-absolute","source":"spec/guard-lexicon.json","text":"It is nothing always so."}
+{"id":"guard:negator-without-strip","source":"spec/guard-lexicon.json","text":"It was without extremely bad."}
+{"id":"guard:negator-without-absolute","source":"spec/guard-lexicon.json","text":"It is without always so."}
+{"id":"guard:never-non-verb-a","source":"spec/guard-lexicon.json","text":"Never a x."}
+{"id":"guard:never-non-verb-an","source":"spec/guard-lexicon.json","text":"Never an x."}
+{"id":"guard:never-non-verb-any","source":"spec/guard-lexicon.json","text":"Never any x."}
+{"id":"guard:never-non-verb-are","source":"spec/guard-lexicon.json","text":"Never are x."}
+{"id":"guard:never-non-verb-been","source":"spec/guard-lexicon.json","text":"Never been x."}
+{"id":"guard:never-non-verb-before","source":"spec/guard-lexicon.json","text":"Never before x."}
+{"id":"guard:never-non-verb-being","source":"spec/guard-lexicon.json","text":"Never being x."}
+{"id":"guard:never-non-verb-can","source":"spec/guard-lexicon.json","text":"Never can x."}
+{"id":"guard:never-non-verb-could","source":"spec/guard-lexicon.json","text":"Never could x."}
+{"id":"guard:never-non-verb-did","source":"spec/guard-lexicon.json","text":"Never did x."}
+{"id":"guard:never-non-verb-does","source":"spec/guard-lexicon.json","text":"Never does x."}
+{"id":"guard:never-non-verb-had","source":"spec/guard-lexicon.json","text":"Never had x."}
+{"id":"guard:never-non-verb-has","source":"spec/guard-lexicon.json","text":"Never has x."}
+{"id":"guard:never-non-verb-is","source":"spec/guard-lexicon.json","text":"Never is x."}
+{"id":"guard:never-non-verb-such","source":"spec/guard-lexicon.json","text":"Never such x."}
+{"id":"guard:never-non-verb-the","source":"spec/guard-lexicon.json","text":"Never the x."}
+{"id":"guard:never-non-verb-was","source":"spec/guard-lexicon.json","text":"Never was x."}
+{"id":"guard:never-non-verb-were","source":"spec/guard-lexicon.json","text":"Never were x."}
+{"id":"guard:never-non-verb-will","source":"spec/guard-lexicon.json","text":"Never will x."}
+{"id":"guard:never-non-verb-would","source":"spec/guard-lexicon.json","text":"Never would x."}
+{"id":"guard:never-advice-opener-at","source":"spec/guard-lexicon.json","text":"Never at x."}
+{"id":"guard:never-advice-opener-have","source":"spec/guard-lexicon.json","text":"Never have x."}
+{"id":"guard:never-advice-opener-in","source":"spec/guard-lexicon.json","text":"Never in x."}
+{"id":"guard:never-advice-opener-on","source":"spec/guard-lexicon.json","text":"Never on x."}
+{"id":"guard:never-advice-opener-should","source":"spec/guard-lexicon.json","text":"Never should x."}
+{"id":"guard:never-advice-opener-so","source":"spec/guard-lexicon.json","text":"Never so x."}
+{"id":"guard:never-pass-through-again","source":"spec/guard-lexicon.json","text":"Never again share it."}
+{"id":"guard:never-pass-through-again-fragment","source":"spec/guard-lexicon.json","text":"Never again a x."}
+{"id":"guard:never-pass-through-ever","source":"spec/guard-lexicon.json","text":"Never ever share it."}
+{"id":"guard:never-pass-through-ever-fragment","source":"spec/guard-lexicon.json","text":"Never ever a x."}
+{"id":"guard:never-pass-through-once","source":"spec/guard-lexicon.json","text":"Never once share it."}
+{"id":"guard:never-pass-through-once-fragment","source":"spec/guard-lexicon.json","text":"Never once a x."}
+{"id":"guard:clause-break-u003b-never","source":"spec/guard-lexicon.json","text":"Check the link; never click it."}

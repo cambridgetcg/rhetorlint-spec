@@ -13,6 +13,7 @@ import {
   openSync,
   readSync,
   readdirSync,
+  realpathSync,
   renameSync,
   rmSync,
   writeFileSync,
@@ -30,7 +31,7 @@ const HERE = fileURLToPath(new URL(".", import.meta.url));
 const REPO = resolve(HERE, "..", "..");
 const COMMITTED_RELEASE = join(HERE, "release");
 const SOURCE_REPOSITORY = "https://github.com/cambridgetcg/rhetorlint-spec";
-const SOURCE_REVISION = "af3b87115d3d154f2ba8b4c955b5a6584be5cf60";
+const SOURCE_REVISION = "fcc205e42d9857e05b668c5ff7847f8ffba0930e";
 const PATHS = Object.freeze({
   cases: join(REPO, "conformance", "cases.json"),
   core: join(REPO, "packages", "core", "index.mjs"),
@@ -42,9 +43,9 @@ const PATHS = Object.freeze({
   notice: join(REPO, "NOTICE"),
 });
 const SOURCE_LOCK = Object.freeze({
-  cases: "sha256:9bd1952367858af2bda8c3dbff1b2ed8ddbf5ff592800faf41086a1e1e2ce7fa",
-  core: "sha256:2e8803be6345bfb5ba52d5fda9dffa177ffb9435a160487b31e18b244b19098e",
-  rules: "sha256:85a84ed51334a353ca162b2c7224a49df1b3f6a0160d4ef6577d65545f729b77",
+  cases: "sha256:c90aaaa4cc471fa6653e4bba1646d3dafb76a42cf3104a86d1d26aac5fd5e472",
+  core: "sha256:7dd2d7f9d8437e9883962591e34285229f5df8f4ccfdc31478a3bf8642037472",
+  rules: "sha256:b2201836c8d0050600066215fa73bb93fb1560f7bec54c35a7d4a87dd28f000a",
   fixture: "sha256:cc8cbca3750d4bf7917c2161c95db3abc2787ee0995463470f79143f924a9e5c",
   license: "sha256:a1613ba5d78294b212dfdb6691181c104c4620a848ebc17a5307d769418b0d29",
   notice: "sha256:5b8345db04a6820b9e96a31dccb4e940a0196232dff39fe9ab2ff0ef5d724c72",
@@ -58,7 +59,7 @@ const ROW_LIMITS = Object.freeze([
   "Expected outputs come from the JavaScript reference engine, not independent human annotation.",
   "These rows test exact RhetorLint behavior; they do not establish factual truth, deception, intent, ego, or trustworthiness.",
   "All source inputs are ASCII; cross-engine matching and offsets are not claimed for non-ASCII text.",
-  "Thirty-one conformance cases are too small for model training, generalisation, fairness, or calibration claims.",
+  "Seventy-six conformance cases are too small for model training, generalisation, fairness, or calibration claims.",
   "Strip text, expected suggestions, and confidence values are rule-pack outputs, not human corrections, preferred answers, or calibrated probabilities.",
   "Only six rule-pack families appear; the unseeded justification taxonomy family is absent.",
 ]);
@@ -141,8 +142,8 @@ function assertConformanceSource(corpus, rules) {
   if (corpus.spec !== "0.1" || corpus.rules !== `${rules.id}@${rules.version}`) {
     throw new TypeError("conformance metadata does not match the current rule pack");
   }
-  if (!Array.isArray(corpus.cases) || corpus.cases.length !== 31) {
-    throw new TypeError("conformance source must contain the reviewed 31-case frame");
+  if (!Array.isArray(corpus.cases) || corpus.cases.length !== 76) {
+    throw new TypeError("conformance source must contain the reviewed 76-case frame");
   }
   corpus.cases.forEach((item, caseIndex) => {
     const path = `$corpus.cases[${caseIndex}]`;
@@ -299,7 +300,7 @@ fixture. The JSONL shard digest is \`${dataSha256}\`.
 - comparing RhetorLint implementations on the committed input frame.
 
 This release has only a \`test\` split. It has no \`train\` or \`validation\`
-split because 31 reference-generated cases are not a training corpus or a
+split because 76 reference-generated cases are not a training corpus or a
 generalisation benchmark.
 
 ## Provenance
@@ -660,7 +661,9 @@ export async function runCli(argv = process.argv.slice(2), runtime = {}) {
   return 0;
 }
 
-const directPath = process.argv[1] ? resolve(process.argv[1]) : null;
+// Compare real paths: on macOS /tmp is a symlink to /private/tmp, and a check
+// run through it must still check (and fail when it should), not exit 0 silently.
+const directPath = process.argv[1] ? realpathSync(process.argv[1]) : null;
 if (directPath === fileURLToPath(import.meta.url)) {
   try {
     process.exitCode = await runCli();

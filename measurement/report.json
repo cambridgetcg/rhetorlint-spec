@@ -2,8 +2,8 @@
  "measurement": 1,
  "about": "Does the engine agree with one reader? Precision per rule x stratum on the committed items. Labels are one reader's judgement, not proof; floors are reported and never gate.",
  "engine": {
-  "core": "@rhetorlint/core@0.1.3",
-  "rules": "@rhetorlint/rules-en@0.2.0"
+  "core": "@rhetorlint/core@0.1.4",
+  "rules": "@rhetorlint/rules-en@0.2.1"
  },
  "floors": {
   "lenient": {
@@ -23,71 +23,71 @@
  "labels": {
   "rows": 471,
   "unlabelled_marks": 0,
-  "not_produced_by_engine": 1
+  "not_produced_by_engine": 359
  },
  "strata": {
   "pastiche": {
    "items": 6,
    "words": 925,
-   "marks": 26,
-   "per100": 2.81,
-   "agency_marks": 9,
-   "agency_per100": 0.97,
-   "agency_share": 0.35
+   "marks": 20,
+   "per100": 2.16,
+   "agency_marks": 3,
+   "agency_per100": 0.32,
+   "agency_share": 0.15
   },
   "wild-pd": {
    "items": 1,
    "words": 456,
-   "marks": 5,
-   "per100": 1.1,
-   "agency_marks": 5,
-   "agency_per100": 1.1,
-   "agency_share": 1
+   "marks": 0,
+   "per100": 0,
+   "agency_marks": 0,
+   "agency_per100": 0,
+   "agency_share": null
   },
   "target-genre": {
    "items": 13,
    "words": 8896,
-   "marks": 175,
-   "per100": 1.97,
-   "agency_marks": 129,
-   "agency_per100": 1.45,
-   "agency_share": 0.74
+   "marks": 65,
+   "per100": 0.73,
+   "agency_marks": 19,
+   "agency_per100": 0.21,
+   "agency_share": 0.29
   },
   "technical": {
    "items": 6,
    "words": 10952,
-   "marks": 264,
-   "per100": 2.41,
-   "agency_marks": 234,
-   "agency_per100": 2.14,
-   "agency_share": 0.89
+   "marks": 27,
+   "per100": 0.25,
+   "agency_marks": 0,
+   "agency_per100": 0,
+   "agency_share": 0
   },
   "legacy": {
    "items": 7,
    "words": 1381,
-   "marks": 31,
-   "per100": 2.24,
-   "agency_marks": 14,
-   "agency_per100": 1.01,
-   "agency_share": 0.45
+   "marks": 20,
+   "per100": 1.45,
+   "agency_marks": 3,
+   "agency_per100": 0.22,
+   "agency_share": 0.15
   },
   "wild": {
    "items": 20,
    "words": 20304,
-   "marks": 444,
-   "per100": 2.19,
-   "agency_marks": 368,
-   "agency_per100": 1.81,
-   "agency_share": 0.83
+   "marks": 92,
+   "per100": 0.45,
+   "agency_marks": 19,
+   "agency_per100": 0.09,
+   "agency_share": 0.21
   },
   "all": {
    "items": 26,
    "words": 21229,
-   "marks": 470,
-   "per100": 2.21,
-   "agency_marks": 377,
-   "agency_per100": 1.78,
-   "agency_share": 0.8
+   "marks": 112,
+   "per100": 0.53,
+   "agency_marks": 22,
+   "agency_per100": 0.1,
+   "agency_share": 0.2
   }
  },
  "rules": [
@@ -136,22 +136,22 @@
      "status": "measured"
     },
     "technical": {
-     "n": 15,
+     "n": 12,
      "TP": 0,
      "MENTION": 0,
      "DEBATABLE": 0,
      "FPB": 12,
-     "FPW": 3,
+     "FPW": 0,
      "unlabelled": 0,
      "strict": 0,
      "strict_ci": [
       0,
-      0.204
+      0.242
      ],
      "lenient": 0,
      "lenient_ci": [
       0,
-      0.204
+      0.242
      ],
      "status": "measured"
     },
@@ -176,42 +176,42 @@
      "status": "measured"
     },
     "wild": {
-     "n": 20,
+     "n": 17,
      "TP": 1,
      "MENTION": 0,
      "DEBATABLE": 1,
      "FPB": 14,
-     "FPW": 4,
+     "FPW": 1,
      "unlabelled": 0,
-     "strict": 0.05,
+     "strict": 0.059,
      "strict_ci": [
-      0.009,
-      0.236
+      0.01,
+      0.27
      ],
-     "lenient": 0.1,
+     "lenient": 0.118,
      "lenient_ci": [
-      0.028,
-      0.301
+      0.033,
+      0.343
      ],
      "status": "measured"
     },
     "all": {
-     "n": 25,
+     "n": 22,
      "TP": 6,
      "MENTION": 0,
      "DEBATABLE": 1,
      "FPB": 14,
-     "FPW": 4,
+     "FPW": 1,
      "unlabelled": 0,
-     "strict": 0.24,
+     "strict": 0.273,
      "strict_ci": [
-      0.115,
-      0.434
+      0.132,
+      0.482
      ],
-     "lenient": 0.28,
+     "lenient": 0.318,
      "lenient_ci": [
-      0.143,
-      0.476
+      0.164,
+      0.527
      ],
      "status": "measured"
     }
@@ -219,145 +219,105 @@
   },
   {
    "ruleId": "agency-hiding.deleted-subject",
-   "level": "warning",
+   "level": "note",
    "strata": {
     "pastiche": {
-     "n": 9,
-     "TP": 4,
+     "n": 3,
+     "TP": 3,
      "MENTION": 0,
      "DEBATABLE": 0,
-     "FPB": 4,
-     "FPW": 1,
+     "FPB": 0,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.444,
+     "strict": 1,
      "strict_ci": [
-      0.189,
-      0.733
+      0.439,
+      1
      ],
-     "lenient": 0.444,
+     "lenient": 1,
      "lenient_ci": [
-      0.189,
-      0.733
+      0.439,
+      1
      ],
-     "status": "measured"
-    },
-    "wild-pd": {
-     "n": 5,
-     "TP": 0,
-     "MENTION": 0,
-     "DEBATABLE": 0,
-     "FPB": 4,
-     "FPW": 1,
-     "unlabelled": 0,
-     "strict": 0,
-     "strict_ci": [
-      0,
-      0.434
-     ],
-     "lenient": 0,
-     "lenient_ci": [
-      0,
-      0.434
-     ],
-     "status": "measured"
+     "status": "unmeasured"
     },
     "target-genre": {
-     "n": 129,
-     "TP": 9,
+     "n": 19,
+     "TP": 3,
      "MENTION": 0,
-     "DEBATABLE": 30,
-     "FPB": 70,
-     "FPW": 20,
+     "DEBATABLE": 16,
+     "FPB": 0,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.07,
+     "strict": 0.158,
      "strict_ci": [
-      0.037,
-      0.127
+      0.055,
+      0.376
      ],
-     "lenient": 0.302,
+     "lenient": 1,
      "lenient_ci": [
-      0.23,
-      0.386
-     ],
-     "status": "measured"
-    },
-    "technical": {
-     "n": 234,
-     "TP": 0,
-     "MENTION": 0,
-     "DEBATABLE": 0,
-     "FPB": 225,
-     "FPW": 9,
-     "unlabelled": 0,
-     "strict": 0,
-     "strict_ci": [
-      0,
-      0.016
-     ],
-     "lenient": 0,
-     "lenient_ci": [
-      0,
-      0.016
+      0.832,
+      1
      ],
      "status": "measured"
     },
     "legacy": {
-     "n": 14,
-     "TP": 4,
+     "n": 3,
+     "TP": 3,
      "MENTION": 0,
      "DEBATABLE": 0,
-     "FPB": 8,
-     "FPW": 2,
+     "FPB": 0,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.286,
+     "strict": 1,
      "strict_ci": [
-      0.117,
-      0.546
+      0.439,
+      1
      ],
-     "lenient": 0.286,
+     "lenient": 1,
      "lenient_ci": [
-      0.117,
-      0.546
+      0.439,
+      1
      ],
-     "status": "measured"
+     "status": "unmeasured"
     },
     "wild": {
-     "n": 368,
-     "TP": 9,
+     "n": 19,
+     "TP": 3,
      "MENTION": 0,
-     "DEBATABLE": 30,
-     "FPB": 299,
-     "FPW": 30,
+     "DEBATABLE": 16,
+     "FPB": 0,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.024,
+     "strict": 0.158,
      "strict_ci": [
-      0.013,
-      0.046
+      0.055,
+      0.376
      ],
-     "lenient": 0.106,
+     "lenient": 1,
      "lenient_ci": [
-      0.078,
-      0.142
+      0.832,
+      1
      ],
      "status": "measured"
     },
     "all": {
-     "n": 377,
-     "TP": 13,
+     "n": 22,
+     "TP": 6,
      "MENTION": 0,
-     "DEBATABLE": 30,
-     "FPB": 303,
-     "FPW": 31,
+     "DEBATABLE": 16,
+     "FPB": 0,
+     "FPW": 0,
      "unlabelled": 0,
-     "strict": 0.034,
+     "strict": 0.273,
      "strict_ci": [
-      0.02,
-      0.058
+      0.132,
+      0.482
      ],
-     "lenient": 0.114,
+     "lenient": 1,
      "lenient_ci": [
-      0.086,
-      0.15
+      0.851,
+      1
      ],
      "status": "measured"
     }
@@ -1215,170 +1175,172 @@
  ],
  "totals": {
   "pastiche": {
-   "n": 26,
-   "TP": 20,
+   "n": 20,
+   "TP": 19,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 5,
-   "FPW": 1,
+   "FPB": 1,
+   "FPW": 0,
    "unlabelled": 0,
-   "strict": 0.769,
+   "strict": 0.95,
    "strict_ci": [
-    0.579,
-    0.89
+    0.764,
+    0.991
    ],
-   "lenient": 0.769,
+   "lenient": 0.95,
    "lenient_ci": [
-    0.579,
-    0.89
+    0.764,
+    0.991
    ],
    "status": "measured"
   },
   "wild-pd": {
-   "n": 5,
+   "n": 0,
    "TP": 0,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 4,
-   "FPW": 1,
+   "FPB": 0,
+   "FPW": 0,
    "unlabelled": 0,
-   "strict": 0,
-   "strict_ci": [
-    0,
-    0.434
-   ],
-   "lenient": 0,
-   "lenient_ci": [
-    0,
-    0.434
-   ],
-   "status": "measured"
+   "strict": null,
+   "strict_ci": null,
+   "lenient": null,
+   "lenient_ci": null,
+   "status": "unmeasured"
   },
   "target-genre": {
-   "n": 175,
-   "TP": 19,
+   "n": 65,
+   "TP": 13,
    "MENTION": 0,
-   "DEBATABLE": 47,
-   "FPB": 84,
-   "FPW": 25,
+   "DEBATABLE": 33,
+   "FPB": 14,
+   "FPW": 5,
    "unlabelled": 0,
-   "strict": 0.109,
+   "strict": 0.2,
    "strict_ci": [
-    0.071,
-    0.163
+    0.121,
+    0.313
    ],
-   "lenient": 0.377,
+   "lenient": 0.708,
    "lenient_ci": [
-    0.309,
-    0.451
+    0.588,
+    0.804
    ],
    "status": "measured"
   },
   "technical": {
-   "n": 264,
+   "n": 27,
    "TP": 0,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 246,
-   "FPW": 18,
+   "FPB": 21,
+   "FPW": 6,
    "unlabelled": 0,
    "strict": 0,
    "strict_ci": [
     0,
-    0.014
+    0.125
    ],
    "lenient": 0,
    "lenient_ci": [
     0,
-    0.014
+    0.125
    ],
    "status": "measured"
   },
   "legacy": {
-   "n": 31,
-   "TP": 20,
+   "n": 20,
+   "TP": 19,
    "MENTION": 0,
    "DEBATABLE": 0,
-   "FPB": 9,
-   "FPW": 2,
+   "FPB": 1,
+   "FPW": 0,
    "unlabelled": 0,
-   "strict": 0.645,
+   "strict": 0.95,
    "strict_ci": [
-    0.469,
-    0.789
+    0.764,
+    0.991
    ],
-   "lenient": 0.645,
+   "lenient": 0.95,
    "lenient_ci": [
-    0.469,
-    0.789
+    0.764,
+    0.991
    ],
    "status": "measured"
   },
   "wild": {
-   "n": 444,
-   "TP": 19,
+   "n": 92,
+   "TP": 13,
    "MENTION": 0,
-   "DEBATABLE": 47,
-   "FPB": 334,
-   "FPW": 44,
+   "DEBATABLE": 33,
+   "FPB": 35,
+   "FPW": 11,
    "unlabelled": 0,
-   "strict": 0.043,
+   "strict": 0.141,
    "strict_ci": [
-    0.028,
-    0.066
+    0.084,
+    0.227
    ],
-   "lenient": 0.149,
+   "lenient": 0.5,
    "lenient_ci": [
-    0.119,
-    0.185
+    0.4,
+    0.6
    ],
    "status": "measured"
   },
   "all": {
-   "n": 470,
-   "TP": 39,
+   "n": 112,
+   "TP": 32,
    "MENTION": 0,
-   "DEBATABLE": 47,
-   "FPB": 339,
-   "FPW": 45,
+   "DEBATABLE": 33,
+   "FPB": 36,
+   "FPW": 11,
    "unlabelled": 0,
-   "strict": 0.083,
+   "strict": 0.286,
    "strict_ci": [
-    0.061,
-    0.111
+    0.21,
+    0.375
    ],
-   "lenient": 0.183,
+   "lenient": 0.58,
    "lenient_ci": [
-    0.151,
-    0.22
+    0.488,
+    0.668
    ],
    "status": "measured"
   }
  },
  "gold": {
   "any_rule": {
-   "hit": 57,
+   "hit": 37,
    "n": 100,
-   "recall": 0.57
+   "recall": 0.37
   },
   "by_set": {
    "accountable-passive-v1": {
-    "hit": 39,
+    "hit": 20,
     "n": 41,
-    "recall": 0.951
+    "recall": 0.488
    },
    "legacy-semeval": {
-    "hit": 18,
+    "hit": 17,
     "n": 59,
-    "recall": 0.305
+    "recall": 0.288
    }
   },
   "by_rule": {
    "agency-hiding.deleted-subject": {
-    "hit": 39,
+    "hit": 19,
     "n": 41,
-    "incidental": [],
-    "recall": 0.951
+    "incidental": [
+     {
+      "item": "us-irs-get-transcript-2015-08",
+      "text": "may have been gathered",
+      "rules": [
+       "hedge.deniable"
+      ]
+     }
+    ],
+    "recall": 0.463
    }
   }
  },
@@ -1389,8 +1351,8 @@
     "stratum": "pastiche",
     "register": "spin",
     "words": 218,
-    "tells": 9,
-    "per100": 4.1
+    "tells": 8,
+    "per100": 3.7
    },
    {
     "id": "inv-crypto-launch",
@@ -1405,8 +1367,8 @@
     "stratum": "pastiche",
     "register": "spin",
     "words": 178,
-    "tells": 6,
-    "per100": 3.4
+    "tells": 5,
+    "per100": 2.8
    },
    {
     "id": "inv-scarcity-banner",
@@ -1421,212 +1383,194 @@
     "stratum": "pastiche",
     "register": "ham",
     "words": 171,
-    "tells": 1,
-    "per100": 0.6
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "inv-science-abstract",
     "stratum": "pastiche",
     "register": "ham",
     "words": 137,
-    "tells": 4,
-    "per100": 2.9
+    "tells": 1,
+    "per100": 0.7
    },
    {
     "id": "pd-declaration",
     "stratum": "wild-pd",
     "register": "mixed",
     "words": 456,
-    "tells": 5,
-    "per100": 1.1
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "us-irs-get-transcript-2015-05",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 833,
-    "tells": 11,
-    "per100": 1.3
+    "tells": 5,
+    "per100": 0.6
    },
    {
     "id": "us-irs-get-transcript-2015-08",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 629,
-    "tells": 12,
-    "per100": 1.9
+    "tells": 8,
+    "per100": 1.3
    },
    {
     "id": "us-irs-get-transcript-2016-02",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 781,
-    "tells": 19,
-    "per100": 2.4
+    "tells": 11,
+    "per100": 1.4
    },
    {
     "id": "us-irs-form-990t-2022",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 235,
-    "tells": 7,
-    "per100": 3
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "us-irs-data-safeguards-2024",
     "stratum": "target-genre",
     "register": "spin",
     "words": 442,
-    "tells": 4,
-    "per100": 0.9
+    "tells": 0,
+    "per100": 0
    },
    {
     "id": "us-cms-ffe-breach-2018",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 407,
-    "tells": 10,
-    "per100": 2.5
+    "tells": 4,
+    "per100": 1
    },
    {
     "id": "us-cms-agent-broker-2024-07",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 549,
-    "tells": 10,
-    "per100": 1.8
+    "tells": 1,
+    "per100": 0.2
    },
    {
     "id": "uk-laa-data-breach-2025",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 335,
-    "tells": 11,
-    "per100": 3.3
+    "tells": 6,
+    "per100": 1.8
    },
    {
     "id": "uk-laa-data-update-2026",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 443,
-    "tells": 11,
-    "per100": 2.5
+    "tells": 6,
+    "per100": 1.4
    },
    {
     "id": "uk-mod-payroll-incident-2024",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 825,
-    "tells": 14,
-    "per100": 1.7
+    "tells": 3,
+    "per100": 0.4
    },
    {
     "id": "uk-mod-afghan-statement-2025",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 1862,
-    "tells": 30,
-    "per100": 1.6
+    "tells": 12,
+    "per100": 0.6
    },
    {
     "id": "uk-mod-afghan-guidance-2025",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 1003,
-    "tells": 29,
-    "per100": 2.9
+    "tells": 8,
+    "per100": 0.8
    },
    {
     "id": "uk-nio-psni-breach-2023",
     "stratum": "target-genre",
     "register": "mixed",
     "words": 552,
-    "tells": 7,
-    "per100": 1.3
+    "tells": 1,
+    "per100": 0.2
    },
    {
     "id": "py-tutorial-errors",
     "stratum": "technical",
     "register": "ham",
     "words": 2060,
-    "tells": 57,
-    "per100": 2.8
+    "tells": 7,
+    "per100": 0.3
    },
    {
     "id": "py-tutorial-inputoutput",
     "stratum": "technical",
     "register": "ham",
     "words": 2288,
-    "tells": 46,
-    "per100": 2
+    "tells": 3,
+    "per100": 0.1
    },
    {
     "id": "py-library-tempfile",
     "stratum": "technical",
     "register": "ham",
     "words": 2327,
-    "tells": 66,
-    "per100": 2.8
+    "tells": 8,
+    "per100": 0.3
    },
    {
     "id": "py-library-venv",
     "stratum": "technical",
     "register": "ham",
     "words": 1330,
-    "tells": 22,
-    "per100": 1.7
+    "tells": 2,
+    "per100": 0.2
    },
    {
     "id": "py-tutorial-modules",
     "stratum": "technical",
     "register": "ham",
     "words": 1640,
-    "tells": 38,
-    "per100": 2.3
+    "tells": 2,
+    "per100": 0.1
    },
    {
     "id": "py-reference-import",
     "stratum": "technical",
     "register": "ham",
     "words": 1307,
-    "tells": 35,
-    "per100": 2.7
+    "tells": 5,
+    "per100": 0.4
    }
   ],
   "spin_ham": {
    "pairs": 8,
-   "correct": 7,
-   "violations": [
-    {
-     "spin": "inv-crypto-launch",
-     "spin_per100": 1.2,
-     "ham": "inv-science-abstract",
-     "ham_per100": 2.9
-    }
-   ]
+   "correct": 8,
+   "violations": []
   }
  },
  "release_blockers": [
   {
    "ruleId": "absolute.universal",
    "level": "info",
-   "n": 20,
-   "lenient": 0.1,
-   "FPW": 4,
+   "n": 17,
+   "lenient": 0.118,
+   "FPW": 1,
    "why": [
-    "FPW 4 > 0",
-    "lenient 0.1 < 0.5 (info)"
-   ]
-  },
-  {
-   "ruleId": "agency-hiding.deleted-subject",
-   "level": "warning",
-   "n": 368,
-   "lenient": 0.106,
-   "FPW": 30,
-   "why": [
-    "FPW 30 > 0",
-    "lenient 0.106 < 0.8 (warning)"
+    "FPW 1 > 0",
+    "lenient 0.118 < 0.5 (info)"
    ]
   },
   {
@@ -1665,11 +1609,7 @@
  "false_positives": {
   "absolute.universal": {
    "FPB": 14,
-   "FPW": 4
-  },
-  "agency-hiding.deleted-subject": {
-   "FPB": 303,
-   "FPW": 31
+   "FPW": 1
   },
   "hedge.deniable": {
    "FPB": 19,
@@ -1685,13 +1625,12 @@
   }
  },
  "contrast": {
-  "rows": 219,
+  "rows": 294,
   "known_defect_by_tag": {
-   "O2": 14,
-   "O2-twin": 22,
-   "O3": 12,
-   "O4": 6,
-   "O6": 9,
+   "O2": 27,
+   "O2-twin": 8,
+   "O4": 4,
+   "O6": 17,
    "O7": 65
   }
  }

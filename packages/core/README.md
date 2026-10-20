@@ -41,14 +41,46 @@ future `minEngine` requirements, and patterns that are known or observed to
 match zero characters. These checks constrain shape and size; they do not
 certify the runtime complexity of an arbitrary regular expression.
 
+Since 0.1.4 one rule is read in its clause before it is marked:
+`absolute.universal` leaves a negated absolute ("not guaranteed", "isn't
+always", "Not everyone") and a clause-initial imperative "Never" before a
+verb ("Never share your password.") unmarked. A comma ends a negator's reach
+once a word stands between them ("No risk, guaranteed." stays marked), and a
+"Never" that opens a fragment or an inversion ("Never an issue.", "Never again
+will...") stays marked. The guard is keyed by ruleId, so the rule pack is
+unchanged; the
+[rules-en README](../rules-en/README.md#the-engine-side-guard-on-absoluteuniversal)
+states exactly what it reads and what it misses.
+
 ### `strip(text, marks) → string`
 
 The deterministic, on-device de-spin removes only loaded intensifiers and flags
-each agentless passive with `[who?]`. Modality and attribution—including
+each passive the agency-hiding rule marks with `[who?]`. Modality and attribution—including
 deniable modals and `allegedly`—remain intact because deleting them can
 strengthen or otherwise change a claim. `strip` is a conservative reading aid,
 not a guarantee of grammatical or meaning-preserving revision; all other tells
 remain *marked* for the reader to judge.
+
+Since 0.1.4 an intensifier also stays, still marked, when deleting it would
+strengthen a negated claim or edit someone's words:
+
+- a negator is one of the two words before it, with no `. ; : ! ?` between
+  them: "The risk is not extremely high." strips to itself, not to "The risk
+  is not high." The negators are the agency detector's (`cannot`, `neither`,
+  `never`, `no`, `nobody`, `none`, `nor`, `not`, `nothing`), `hardly` and
+  `without`, and any `n't` contraction, all generated from
+  `spec/agency-lexicon.json` and `spec/guard-lexicon.json`;
+- it sits inside a quotation on its line, after an odd number of `"` or an
+  unclosed `“`: `"It was utterly devastating," she said.` strips to itself.
+
+It reads no further, so it still deletes an intensifier three words from its
+negator (`The risk is not at all extremely high.` strips to `The risk is not
+at all high.`), after `rarely`, which it does not list, inside single quotes,
+and inside a quotation that opened on an earlier line. The first three are
+open O4 rows in `measurement/contrast.json`; the last is a stated limit.
+
+Both checks read words and quote marks, not offsets, so the Python and Go
+engines reach the same decision for the same mark on any input.
 
 ### `toSarif(result) → sarifLog` (`@rhetorlint/core/sarif`)
 
@@ -131,6 +163,8 @@ path signs and submits once to an in-memory transport.
 
 ## The one hard part
 
-Structural tells (`agency-hiding`) use a heuristic agentless-passive detector: a be-verb + participle not followed by `by <agent>`, minus a small stop-list of predicate adjectives. It is deliberately conservative and honestly imperfect — genuine coverage of agency-hiding needs real part-of-speech awareness. This is where the framework wants investment, not a claim of solved.
+Structural tells (`agency-hiding`) use the accountable-passive detector. Most passives hide nothing — methods sections, documentation and news are full of honest ones — so a bare be-verb plus participle is not the tell. A mark needs a past auxiliary (`was`, `were`, `been`), at most one adverb, and a participle from a closed class: a fault (`mishandled`, `overlooked`), a breach (`accessed`, `compromised`), a concealment (`withheld`, `shelved`, `laid off`), a light verb after an error or decision noun (`mistakes were made`, `steps were taken`), `raised` after `concerns`, `questions` or `allegations`, `agreed`, `decided` or `determined` after `it`, `shared`, `sold` or `disclosed` after a data noun, or `affected` or `impacted` after a data or account noun. A `by` among the next seven words of the clause silences it, and so does a negator anywhere in its clause before the auxiliary, counted from the last `.`, `;`, `:`, `!`, `?` or line break (`Your data was never sold`, `No customer data was accessed`, `No credit card numbers, bank account details or passwords were stolen`): a negated passive denies the act. The clause reading cannot tell which verb a negator negates, so it also leaves `No one called, but data were stolen.` and the Reagan specimen `But we did not achieve what we wished, and serious mistakes were made…` unmarked: recorded misses, in the safe direction. The words, those numbers and the characters the walks stop at live once, in [`spec/agency-lexicon.json`](../../spec/agency-lexicon.json); `scripts/gen-agency-lexicon.mjs` writes them into this engine and the Python and Go ones, a test fails when a copy drifts, and probes built from the same file hold each engine's hand-written walks to their edges.
+
+It matches an ASCII-lowercased copy of the text with explicit `[ \t\n\r\f]` whitespace and ASCII word boundaries, so all three engines read the same words. It is deliberately narrow and honestly imperfect. It gives up recall it cannot judge from the words: harm and news verbs (`Lives were lost`, `Your account was closed`), present and modal `be` passives, relative clauses (`the mistakes that have been made`), `were being withheld`, and a `by` that names only when (`shelved by Friday`). On the committed gold annotations ([`measurement/report.json`](../../measurement/report.json)), accountable-passive recall by any rule falls from 39 of 41 spans before this detector to 20 of 41; the losses include disclosure and publication true positives in the target genre (`was inadvertently published`, `was emailed` outside official systems, `should not have been made public`) and the vague remedy `appropriate steps will be taken`, which wait for a fresh bench. It still asks "who?" where a nearby clause has answered (`Mistakes were made, and I made them.`), and the listed verbs keep innocent senses it marks (`Federal income tax was withheld.`, `Unknown keys were ignored.`, `Repeated measures were taken.`): open O2 rows in `measurement/contrast.json`. Genuine coverage of agency-hiding needs real part-of-speech awareness. This is where the framework wants investment, not a claim of solved.
 
 MIT.

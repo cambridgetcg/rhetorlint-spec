@@ -1,7 +1,7 @@
 // The three-engine differential: JavaScript, Python and Go must agree beyond
 // the conformance cases.
 //
-// conformance/cases.json pins 31 inputs value for value. This script feeds a
+// conformance/cases.json pins 76 inputs value for value. This script feeds a
 // wider, committed input set (conformance/differential/inputs.jsonl) to all
 // three engines and compares, per input:
 //   - the multiset of marks as (ruleId, actual), on every input;
@@ -31,6 +31,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyze } from "../packages/core/index.mjs";
+import { boundaryProbes, guardProbes, lexiconProbes } from "./gen-agency-lexicon.mjs";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const at = (path) => join(ROOT, path);
@@ -64,6 +65,11 @@ const PROBES = [
   ["line-separator-agency", "Your data was\u2028shared."],
   ["nel-agency", "Your data was\u0085shared."],
   ["bom-agency", "Your data was\ufeffshared."],
+  // The same three characters in a rule spelt with \s: here the engines part
+  // (conformance/README.md caveat 3), where the agency detector's own
+  // whitespace class keeps them together above.
+  ["bom-urgency", "Let us act\ufeffnow."],
+  ["nel-urgency", "Let us act\u0085now."],
   ["zero-width-space-agency", "Your data was\u200bshared."],
   // Quotation marks and apostrophes.
   ["rsquo-urgency", "Don\u2019t miss out on this deal."],
@@ -106,9 +112,24 @@ const PROBES = [
   ["long-s-lexical", "It \u017feems the plan worked."],
   ["kelvin-participle", "Civilians were \u212ailled."],
   ["kelvin-lexical", "This is \u212aind of a problem."],
+  // A look-alike letter inside a lexicon participle: the agency detector folds
+  // only A-Z, so no engine marks these (killed and lost, above, are excluded
+  // verbs and would be silent anyway). A long s inside a \w+ that no \b
+  // guards parts JS from Python and Go (caveat 2).
+  ["long-s-lexicon-participle", "Data was acce\u017f\u017fed."],
+  ["kelvin-lexicon-participle", "Accounts were hac\u212aed."],
+  ["kelvin-lexicon-participle-leaked", "Customer data was lea\u212aed."],
+  ["long-s-hedge-word", "It may have \u017feen the file."],
+  // absolute.universal finds its terms with \b: Python's is Unicode, so a
+  // letter like e-acute against the term hides it from Python alone, and a
+  // long s folds into the term in Python alone.
+  ["accent-against-absolute", "Caf\u00e9Never fails."],
+  ["long-s-absolute", "No fees, alway\u017f free."],
   // Non-ASCII away from any match: the engines must agree on every mark.
-  // Together these put every word of the passive detector's NOT_PASSIVE
-  // list after a be-verb, so a drifted list in any one engine shows up here.
+  // These put predicate adjectives, numerals and irregular participles after
+  // a be-verb; the agency lexicon's own words are probed one by one below
+  // (lexiconProbes, from scripts/gen-agency-lexicon.mjs), and the edges of the
+  // detector's walks by boundaryProbes, from the same file.
   ["context-tired-glad-aware-open", "Zo\u00eb was tired, Zo\u00eb was glad, and Zo\u00eb was aware that the caf\u00e9 was open."],
   ["context-worried-excited-interested", "Ren\u00e9e was worried; later she was excited and was interested."],
   ["context-scared-bored-pleased", "The ni\u00f1os were scared, then were bored, and were pleased at noon."],
@@ -127,7 +148,125 @@ const PROBES = [
   ["vertical-tab-agency", "Your data was\u000bshared."],
   ["vertical-tab-urgency", "Act\u000bnow."],
   ["form-feed-agency", "Your data was\u000cshared."],
-  ["unit-separator-agency", "Your data was\u001fshared."]
+  ["unit-separator-agency", "Your data was\u001fshared."],
+  ["unit-separator-urgency", "Let us act\u001fnow."],
+  // Strip guards: an intensifier under a negator, or inside a quotation, is
+  // kept. The guards read words and quote marks, never a count of units, so
+  // the engines must agree even where their offsets part. (Probes that repeat
+  // a contrast row are dropped as duplicates; they stay here as the set.)
+  ["strip-negated", "The risk is not extremely high, but it is not negligible."],
+  ["strip-negated-contraction", "The update isn't hugely different."],
+  ["strip-negated-sorry", "We are not deeply sorry."],
+  ["strip-quoted", "\"It was utterly devastating,\" the flood survivor told reporters."],
+  ["strip-curly-quoted", "He said \u201cwe are deeply sorry\u201d and left."],
+  ["strip-unguarded", "This is an incredibly important update for every customer."],
+  ["strip-rsquo-contraction", "The update isn\u2019t hugely different."],
+  ["strip-emoji-between-negator", "Not \ud83d\ude00 extremely high."],
+  ["strip-nbsp-after-negator", "Not\u00a0extremely high."],
+  ["strip-emoji-in-curly-quote", "He said \u201c\ud83d\ude00 we are deeply sorry\u201d and left."],
+  // The guards' edges, where one engine could drift alone: the two-word
+  // window, each clause break, a comma (not a break), line-scoped quotes.
+  ["strip-negator-second-word", "The risk cannot be extremely high."],
+  ["strip-negator-third-word", "Not bad, and extremely cheap."],
+  ["strip-negator-behind-period", "We said no. extremely few agreed."],
+  ["strip-negator-behind-semicolon", "We said no; extremely few agreed."],
+  ["strip-negator-behind-colon", "We said no: extremely few agreed."],
+  ["strip-negator-behind-bang", "We said no! extremely few agreed."],
+  ["strip-negator-behind-question", "We said no? extremely few agreed."],
+  ["strip-negator-behind-comma", "We said no, extremely few agreed."],
+  ["strip-negator-uppercase", "NOT EXTREMELY HIGH"],
+  ["strip-quote-closed", "\"Fine,\" she said, extremely calmly."],
+  ["strip-quote-previous-line", "He said \"hello\nand it was extremely loud."],
+  ["strip-quote-crlf", "He said \"we are\r\nextremely sorry\" and left."],
+  ["strip-curly-quote-closed", "He said \u201chello\u201d and was extremely calm."],
+  // The absolute.universal guard: an absolute under a negator, or a
+  // clause-initial "Never" before a lowercase word, is not marked. It reuses
+  // the strip guards' word walk, so the same edges apply, plus the imperative's:
+  // what may stand before "Never" and what must follow it.
+  ["abs-negated", "Returns are not guaranteed; past performance is no indicator."],
+  ["abs-negated-contraction", "Results aren't always typical."],
+  ["abs-negated-capital", "Not everyone qualifies."],
+  ["abs-negator-uppercase", "NOT EVERYONE QUALIFIES."],
+  ["abs-negator-second-word", "The risk cannot always be priced."],
+  ["abs-negator-third-word", "Not bad, and always cheap."],
+  ["abs-negator-behind-period", "We said no. everyone agreed."],
+  ["abs-negator-behind-semicolon", "We said no; everyone agreed."],
+  ["abs-negator-behind-colon", "We said no: everyone agreed."],
+  ["abs-negator-behind-bang", "We said no! everyone agreed."],
+  ["abs-negator-behind-question", "We said no? everyone agreed."],
+  ["abs-negator-behind-comma", "We said no, everyone agreed."],
+  ["abs-never-imperative", "Never share your password with anyone."],
+  ["abs-never-imperative-uppercase", "NEVER share it."],
+  ["abs-never-after-period", "Check the link. never click it."],
+  ["abs-never-after-semicolon", "Explain real constraints; never manufacture the shortage."],
+  ["abs-never-after-colon", "Check the link: never click it."],
+  ["abs-never-after-bang", "Check the link! never click it."],
+  ["abs-never-after-question", "Check the link? never click it."],
+  ["abs-never-after-comma", "Love begins with choice, never obligation."],
+  ["abs-never-mid-clause", "We never share data."],
+  ["abs-never-quoted-start", "\"Never share it,\" he said."],
+  ["abs-never-tab-after", "Never\tshare it."],
+  ["abs-never-newline-after", "Never\nshare it."],
+  ["abs-never-newline-before", "We will\nnever share it."],
+  ["abs-never-capital-next", "Never Again."],
+  ["abs-never-digit-next", "Never 2 late."],
+  ["abs-never-alone", "Never."],
+  ["abs-never-text-end", "We said never"],
+  ["abs-never-inversion", "Never again will prices be this low."],
+  ["abs-unguarded", "This is guaranteed to double your savings."],
+  ["abs-rsquo-contraction", "Results aren\u2019t always typical."],
+  ["abs-nbsp-after-negator", "Not\u00a0everyone qualifies."],
+  ["abs-emoji-between-negator", "Not \ud83d\ude00 always."],
+  ["abs-curly-quote-never", "\u201cNever share it,\u201d he said."],
+  ["abs-emoji-before-never", "\ud83d\udd12 Never share your password."],
+  ["abs-nbsp-after-never", "Never\u00a0share it."],
+  ["abs-accented-word-before-never", "Caf\u00e9 never closes."],
+  ["abs-greek-word-before-never", "\u03a9 never fails."],
+  // The guard's comma rule: a comma ends a negator's reach once a word stands
+  // between them, but not when it follows the negator directly; strip's
+  // negator still reads past a comma. And the imperative's closed lists: the
+  // words after "Never" that keep it marked because they open a fragment or an
+  // inversion (any other lowercase word is read as the verb of advice), the
+  // adverbs stepped over before that word, and how a word is cut.
+  ["abs-comma-after-noun", "No fees, always free."],
+  ["abs-comma-after-verb", "Don't wait, everyone is buying."],
+  ["abs-comma-after-word-tab", "No risk,\tguaranteed."],
+  ["abs-comma-right-after-negator", "Past performance is not, however, always a guide."],
+  ["abs-comma-right-after-word-one", "No, never."],
+  ["abs-comma-strip-unchanged", "It isn't, frankly, extremely high."],
+  ["abs-never-fragment", "Battery life? Never an issue."],
+  ["abs-never-inversion-has", "Never has a product been this good."],
+  ["abs-never-inversion-before", "Never before have prices been this low."],
+  ["abs-never-ever-imperative", "Never ever share your password."],
+  ["abs-never-adverb-then-end", "Never ever again."],
+  ["abs-never-adverb-newline", "Never again\nshare it."],
+  ["abs-never-adverb-capital", "Never again Share it."],
+  ["abs-never-mixed-case-next", "Go; never hAS it."],
+  ["abs-never-prefix-word", "Never answer it."],
+  ["abs-never-contraction-next", "Never can't stop."],
+  ["abs-comma-curly-quoted-values", "Values are \u201cnever\u201d, \u201calways\u201d and \u201cauto\u201d."],
+  ["abs-comma-emoji-after-word", "No fees, \ud83d\ude00 always free."],
+  ["abs-fullwidth-comma", "No risk\uff0c guaranteed."],
+  ["abs-never-nbsp-after-adverb", "Never again\u00a0will prices fall."],
+  ["abs-never-accented-next", "Never \u00e9t\u00e9 again."],
+  ["abs-never-rsquo-in-next", "Never can\u2019t stop."],
+  // The agency detector's clause negator, and the tests a one-engine change
+  // once slipped past, in natural sentences (boundaryProbes builds the same
+  // edges from the lexicon): breach notices that deny the act however long the
+  // subject; the whole-word test after 'exposed' ('to' is not 'today') and
+  // after 'put' ('in place' is not 'into place'); a line break that starts the
+  // clause after a carriage return; and non-ASCII characters that start no
+  // clause.
+  ["agency-denial-card-numbers", "No credit card numbers, bank account details or passwords were stolen."],
+  ["agency-denial-ssn", "No Social Security numbers or other sensitive personal information were exposed."],
+  ["agency-denial-earlier-clause", "No one called, but data were stolen."],
+  ["agency-exposed-today", "Customer data was exposed today."],
+  ["agency-put-into-place", "Safeguards were put into place."],
+  ["agency-negator-crlf", "No one called\r\ndata were stolen."],
+  ["agency-negator-nbsp", "No\u00a0card numbers were stolen."],
+  ["agency-negator-ideographic-stop", "No\u3002data was accessed."],
+  ["agency-negator-line-separator", "No\u2028data was accessed."],
+  ["agency-negator-emoji", "No \ud83d\ude00 data was accessed."]
 ];
 
 const isAscii = (text) => /^[\x00-\x7f]*$/.test(text);
@@ -158,7 +297,7 @@ function contrastRows(data) {
 function collectInputs() {
   const rows = [];
   const seen = new Set();
-  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, duplicates: 0 };
+  const counts = { cases: 0, items: 0, contrast: 0, probes: 0, lexicon: 0, boundary: 0, guard: 0, duplicates: 0 };
   const add = (kind, id, source, text) => {
     if (typeof text !== "string" || text.trim() === "") return;
     if (loneSurrogate.test(text)) throw new Error(`${id}: lone surrogate; the engines cannot share it`);
@@ -187,6 +326,22 @@ function collectInputs() {
   }
 
   for (const [name, text] of PROBES) add("probes", `probe:${name}`, "scripts/xengine-diff.mjs", text);
+  // One sentence per participle of the agency lexicon that the detector marks,
+  // and the same with a 'by' agent, which it must not: a word dropped from, or
+  // added to, one engine's generated copy parts the engines here.
+  for (const [id, text] of lexiconProbes()) add("lexicon", id, "spec/agency-lexicon.json", text);
+  // The edges of the detector's hand-written walks, built from the lexicon's
+  // words, numbers and character sets: the 'by' window, the head walk and the
+  // chain's length, the clause the negator reader reads, the n't contraction,
+  // the adverb slot, the whole-word test after a phrase, what counts as a word
+  // character and the whitespace between words.
+  // A one-token change to one engine's walk parts it from the other two here.
+  for (const [id, text] of boundaryProbes()) add("boundary", id, "spec/agency-lexicon.json", text);
+  // One sentence per word of the guard lexicon and per clause break: each
+  // negator before an intensifier and before an absolute, each word after a
+  // clause-initial "Never". The lists themselves are held by the generator's
+  // --check; these hold the walks that read them.
+  for (const [id, text] of guardProbes()) add("guard", id, "spec/guard-lexicon.json", text);
   return { rows, counts };
 }
 
@@ -381,6 +536,7 @@ async function differential(rows) {
   const results = rows.map((row, i) => ({
     ...row,
     jsMarked: analyses.js[i].marks.length > 0,
+    jsAgency: analyses.js[i].marks.some(([ruleId]) => ruleId === "agency-hiding.deleted-subject"),
     divergence: compare(row.text, ENGINES.map((e) => analyses[e][i]))
   }));
   return results;
@@ -391,6 +547,7 @@ function summarise(results) {
   return {
     inputs: results.length,
     jsMarked: results.filter((r) => r.jsMarked).length,
+    jsAgency: results.filter((r) => r.jsAgency).length,
     nonAscii: nonAscii.length,
     nonAsciiMarked: nonAscii.filter((r) => r.jsMarked).length,
     asciiControl: results.filter((r) => isAscii(r.text) && !isPlain(r.text)).length,
@@ -401,7 +558,7 @@ function summarise(results) {
 }
 
 function printCounts(label, s) {
-  console.log(`${label}: ${s.inputs} inputs; ${s.jsMarked} carry at least one JS mark`);
+  console.log(`${label}: ${s.inputs} inputs; ${s.jsMarked} carry at least one JS mark, ${s.jsAgency} an agency mark`);
   console.log(`  ${s.nonAscii} non-ASCII inputs (${s.nonAsciiMarked} marked); ${s.asciiControl} ASCII with control characters`);
   console.log(`  differences: ${s.plainDiffs} on ${s.plain} plain-ASCII inputs; ${s.divergences} on the other ${s.inputs - s.plain}`);
 }
@@ -421,7 +578,7 @@ async function check({ write }) {
   const results = await differential(rows);
   const s = summarise(results);
   printCounts("xengine", s);
-  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes (${counts.duplicates} duplicates dropped)`);
+  console.log(`  sources: ${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes, ${counts.guard} guard probes (${counts.duplicates} duplicates dropped)`);
 
   for (const r of results) {
     if (isPlain(r.text) && r.divergence) failures.push(`plain-ASCII difference (never recordable)\n  ${describe(r.id, r.divergence)}`);
@@ -492,7 +649,7 @@ async function main(argv) {
   if (argv[0] === "--build-inputs" && argv.length === 1) {
     const { rows, counts } = collectInputs();
     writeFileSync(at(INPUTS), serialiseInputs(rows));
-    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes; ${counts.duplicates} duplicates dropped)`);
+    console.log(`wrote ${INPUTS}: ${rows.length} inputs (${counts.cases} cases, ${counts.items} item paragraphs, ${counts.contrast} contrast rows, ${counts.probes} probes, ${counts.lexicon} lexicon probes, ${counts.boundary} boundary probes, ${counts.guard} guard probes; ${counts.duplicates} duplicates dropped)`);
     return 0;
   }
   let failures;

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { analyze, strip } from "../packages/core/index.mjs";
 import { toSarif } from "../packages/core/sarif.mjs";
 import { validate } from "./helpers/schema-validator.mjs";
+import { guardProbes, loadGuardLexicon } from "../scripts/gen-agency-lexicon.mjs";
 
 const RULES = JSON.parse(
   readFileSync(new URL("../packages/rules-en/rules.json", import.meta.url))
@@ -134,6 +135,173 @@ test("strip removes intensifiers without deleting adjacent qualifications", () =
   }
 });
 
+test("strip keeps an intensifier under a negator or inside a quotation", () => {
+  for (const text of [
+    "The risk is not extremely high, but it is not negligible.",
+    "The update isn't hugely different.",
+    "The update isn\u2019t hugely different.",
+    "We are not deeply sorry.",
+    "The risk cannot be extremely high.",
+    "NOT EXTREMELY HIGH",
+    "\"It was utterly devastating,\" the flood survivor told reporters.",
+    "He said \u201cwe are deeply sorry\u201d and left.",
+    // A comma is not a break for strip's negator: only absolute.universal's guard ends a negator's reach there.
+    "It isn\u2019t, frankly, extremely high.",
+    "We said no, extremely few agreed."
+  ]) {
+    const r = analyze(text, { rules: RULES });
+    const intensifiers = r.marks.filter((mark) => mark.ruleId === "intensifier.loaded");
+    assert.equal(intensifiers.length, 1, "preservation must not disable detection");
+    assert.equal(
+      text.slice(intensifiers[0].position.start.offset, intensifiers[0].position.end.offset),
+      intensifiers[0].actual
+    );
+    assert.equal(r.strip, text, "deleting it would strengthen the claim or edit quoted words");
+    assert.equal(strip(text, r.marks), text, "the direct strip API keeps it too");
+  }
+});
+
+test("strip still subtracts an intensifier the negator and quotation guards do not reach", () => {
+  for (const [text, expected] of [
+    ["This is an incredibly important update for every customer.",
+      "This is an important update for every customer."],
+    // The negator is the third word back: the window is two words.
+    ["Not bad, and extremely cheap.", "Not bad, and cheap."],
+    ["No doubt the team is extremely proud.", "No doubt the team is proud."],
+    // The negator is the word before, but a clause break stands between them.
+    ...[".", ";", ":", "!", "?"].map((brk) =>
+      [`We said no${brk} extremely few agreed.`, `We said no${brk} few agreed.`]),
+    // The quotation closed before the intensifier.
+    ["\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."],
+    ["He said \u201chello\u201d and was extremely calm.", "He said \u201chello\u201d and was calm."],
+    // A quotation opened on an earlier line does not reach this one.
+    ["He said \"hello\nand it was extremely loud.", "He said \"hello\nand it was loud."]
+  ]) {
+    const r = analyze(text, { rules: RULES });
+    assert.ok(r.marks.some((mark) => mark.ruleId === "intensifier.loaded"));
+    assert.equal(r.strip, expected);
+    assert.equal(strip(text, r.marks), expected);
+  }
+});
+
+const absolutes = (text) =>
+  analyze(text, { rules: RULES }).marks.filter((mark) => mark.ruleId === "absolute.universal");
+
+test("absolute.universal leaves a negated absolute and an imperative 'Never' unmarked", () => {
+  for (const text of [
+    "Returns are not guaranteed; past performance is no indicator.",
+    "Results aren't always typical.",
+    "Results aren\u2019t always typical.",
+    "Not everyone qualifies.",
+    "NOT EVERYONE QUALIFIES.",
+    "The risk cannot always be priced.",
+    "Never share your password with anyone.",
+    "NEVER share it.",
+    "Never\tshare it.",
+    "\"Never share it,\" he said.",
+    "Explain real constraints; never manufacture the shortage.",
+    ...[".", ";", ":", "!", "?"].map((brk) => `Check the link${brk} never click it.`),
+    // A negator followed directly by a comma reaches past the aside.
+    "Past performance is not, however, always a guide.",
+    "No, never.",
+    // An adverb between 'Never' and its verb hands the decision to the verb.
+    "Never ever share your password.",
+    "Never again leave it unlocked.",
+    "Never once doubt it.",
+    // A word is compared whole: 'answer' is not 'an'.
+    "Never answer it."
+  ]) {
+    assert.deepEqual(absolutes(text).map((mark) => mark.actual), [], text);
+  }
+});
+
+test("absolute.universal still marks absolutes the negator and imperative guards do not reach", () => {
+  for (const [text, actual] of [
+    ["This is guaranteed to double your savings.", "guaranteed"],
+    ["Everyone knows this policy works.", "Everyone"],
+    ["Our product will always be the best choice.", "always"],
+    // The negator is the third word back: the window is two words.
+    ["Not bad, and always cheap.", "always"],
+    // The negator is the word before, but a clause break stands between them.
+    ...[".", ";", ":", "!", "?"].map((brk) => [`We said no${brk} everyone agreed.`, "everyone"]),
+    // 'never' that does not open its clause, or that no lowercase word follows.
+    ["We never share data.", "never"],
+    ["Love begins with choice, never obligation.", "never"],
+    ["Never Again.", "Never"],
+    ["Never.", "Never"],
+    ["Never, ever.", "Never"],
+    ["Never\nshare it.", "Never"],
+    // A line break is not a clause break.
+    ["We will\nnever share it.", "never"],
+    // A comma ends a negator's reach once a word stands between them.
+    ["No risk, guaranteed.", "guaranteed"],
+    ["Don't wait, everyone is buying.", "everyone"],
+    ["No fees, always free.", "always"],
+    ["No contracts, no fees, no exceptions.", "no exceptions"],
+    // A clause-initial 'Never' before a word that cannot be its verb is a fragment or an inversion.
+    ["Battery life? Never an issue.", "Never"],
+    ["Never again will prices be this low.", "Never"],
+    ["Never has a product been this good.", "Never"],
+    ["Never before have prices been this low.", "Never"],
+    ["Never again.", "Never"],
+    ["Never ever again.", "Never"],
+    ["Never again\nshare it.", "Never"]
+  ]) {
+    const marks = absolutes(text);
+    assert.deepEqual(marks.map((mark) => mark.actual), [actual], text);
+    assert.equal(text.slice(marks[0].position.start.offset, marks[0].position.end.offset), actual);
+  }
+  // The guard reads absolute.universal only: other rules keep their marks under a negator.
+  assert.ok(analyze("It is not world-class.", { rules: RULES }).marks
+    .some((mark) => mark.ruleId === "puffery.peacock"));
+});
+
+// The guards' closed lists come from spec/guard-lexicon.json. Each engine's
+// copy is generated from it, and scripts/gen-agency-lexicon.mjs --check fails
+// when one drops or adds a word; the probes below hold the code that reads them.
+const GUARD = loadGuardLexicon();
+const NEVER_NON_VERBS = GUARD.neverNonVerbs;
+const NEVER_PASS_THROUGH = GUARD.neverPassThrough;
+// Words that can begin advice after "Never", so they are not on the list.
+const NEVER_ADVICE_OPENERS = GUARD.neverAdviceOpeners;
+
+test("absolute.universal reads the word after a clause-initial 'Never' against two closed lists", () => {
+  const actuals = (text) => absolutes(text).map((mark) => mark.actual);
+  for (const word of NEVER_NON_VERBS) {
+    assert.deepEqual(actuals(`Never ${word} x.`), ["Never"], word);
+    // After its lowercase first letter, the word is compared in ASCII lower case: "hAS" is "has".
+    const mixed = word[0] + word.slice(1).toUpperCase();
+    assert.deepEqual(actuals(`Go; never ${mixed} x.`), ["never"], mixed);
+  }
+  for (const word of NEVER_ADVICE_OPENERS) assert.deepEqual(actuals(`Never ${word} x.`), [], word);
+  for (const text of [
+    "Never at any time disclose your password.", "Never in any circumstances share your PIN.",
+    "Never on any account reply to this email.", "Never have more than two drinks.",
+    "Never so much as glance at it.", "Never should you share your password."
+  ]) assert.deepEqual(actuals(text), [], text);
+  for (const adverb of NEVER_PASS_THROUGH) {
+    assert.deepEqual(actuals(`Never ${adverb} share it.`), [], adverb);
+    assert.deepEqual(actuals(`Never ${adverb} ${NEVER_PASS_THROUGH[0]} share it.`), [], adverb);
+    for (const word of NEVER_NON_VERBS) assert.deepEqual(actuals(`Never ${adverb} ${word} x.`), ["Never"], `${adverb} ${word}`);
+    assert.deepEqual(actuals(`Never ${adverb}.`), ["Never"], adverb);
+    assert.deepEqual(actuals(`Never ${adverb} Share it.`), ["Never"], adverb);
+  }
+});
+
+test("each guard negator keeps an intensifier in strip and leaves an absolute unmarked", () => {
+  for (const negator of GUARD.negators) {
+    const text = `It was ${negator} extremely bad.`;
+    assert.equal(analyze(text, { rules: RULES }).strip, text, negator);
+    assert.deepEqual(absolutes(`It is ${negator} always so.`).map((mark) => mark.actual).filter((a) => a === "always"), [], negator);
+    // Two words away it still reads; three words away it does not.
+    assert.equal(analyze(`It was ${negator} so extremely bad.`, { rules: RULES }).strip, `It was ${negator} so extremely bad.`, negator);
+    assert.equal(analyze(`It was ${negator} so very extremely bad.`, { rules: RULES }).strip, `It was ${negator} so very bad.`, negator);
+  }
+  // Every guard probe is one the differential feeds all three engines.
+  const ids = guardProbes(GUARD).map(([id]) => id);
+  assert.equal(new Set(ids).size, ids.length, "guard probe ids are unique");
+});
+
 test("strip is identity without an actionable mark and cleans only removal seams", () => {
   for (const text of ["a  b", "a\n\nb", "  a  ", "a\t\tb"]) {
     assert.equal(strip(text, []), text);
@@ -180,6 +348,121 @@ test("predicate adjectives are not mistaken for passives", () => {
   const r = analyze("We were tired and we were committed to the plan.", { rules: RULES });
   const passive = r.marks.filter((m) => m.ruleId === "agency-hiding.deleted-subject");
   assert.equal(passive.length, 0, "'were tired' / 'were committed' are not agentless passives");
+});
+
+const agencySpans = (text) => analyze(text, { rules: RULES }).marks
+  .filter((m) => m.ruleId === "agency-hiding.deleted-subject")
+  .map((m) => [m.actual, m.position.start.offset, m.position.end.offset]);
+
+test("the agency detector marks an accountable past passive, auxiliary through participle", () => {
+  const cases = [
+    ["Mistakes were made.", "were made"],
+    ["Mistakes, frankly, were made.", "were made"],
+    ["Customer data was quietly accessed.", "was quietly accessed"],
+    ["Your data was shared with partners.", "was shared"],
+    ["PII may have been compromised.", "been compromised"],
+    ["Records were withheld from investigators.", "were withheld"],
+    ["It was decided that the program would end.", "was decided"],
+    ["Hundreds of workers were laid off.", "were laid off"],
+    ["Additional safeguards have been put in place.", "been put"],
+    ["Concerns were raised about the audit.", "were raised"],
+    ["MISTAKES WERE MADE.", "WERE MADE"]
+  ];
+  for (const [text, actual] of cases) {
+    const at = text.indexOf(actual);
+    assert.deepEqual(agencySpans(text), [[actual, at, at + actual.length]], text);
+  }
+});
+
+test("the agency detector leaves procedure, named agents, harm verbs and idioms unmarked", () => {
+  for (const text of [
+    "My name is Fred.",
+    "JavaScript is required.",
+    "Soil water content was measured at 5 cm depth.",
+    "The soup can be frozen for up to 3 months.",
+    "This option is ignored when the flag is unset.",
+    "The startup has been described as the next big thing by Forbes.",
+    // A pinned under-mark: "by" names when, not who, and the rule stays silent.
+    "The report was shelved by Friday.",
+    "Lives were lost in the earthquake.",
+    "Your account was closed at your request.",
+    "He got fired up about the album.",
+    "We won’t be utterly ruined.",
+    "This is guaranteed to double your savings.",
+    // Methods-section procedure: collected, retained and transferred are not in
+    // the lexicon, and a light verb needs an error or decision noun before it.
+    "Data were collected from 200 participants.",
+    "Information was collected via a survey.",
+    "Samples were collected at dawn.",
+    "Records were retained for seven years.",
+    "Data were transferred to a secure server.",
+    "If no error was raised, the call succeeded.",
+    // Present, modal, progressive and relative-clause passives are out of reach.
+    "Mistakes are made every day.",
+    "Records were being withheld.",
+    "The mistakes that have been made are regrettable.",
+    "Workers were exposed to asbestos.",
+    "Mistakes were made\nby the board."
+  ]) {
+    assert.deepEqual(agencySpans(text), [], text);
+  }
+});
+
+test("the agency detector leaves a negated passive, and 'affected' after an unheld noun, unmarked", () => {
+  // A negator anywhere in the clause before the auxiliary (in the chain, as the
+  // head word or before it, however long the subject) denies the act; it hides
+  // no doer. 'affected' and 'impacted' need a head held in trust for someone
+  // (data, an account).
+  for (const text of [
+    "Your data was never sold.",
+    "Your information has never been sold.",
+    "Passwords have not been compromised.",
+    "Passwords haven't been compromised.",
+    "Passwords haven\u2019t been compromised.",
+    "No customer data was accessed.",
+    "Nothing was withheld from investigators.",
+    "None of the records were leaked.",
+    "Neither passwords nor card numbers were exposed.",
+    "No mistakes have been made.",
+    "No personal, financial or health information was accessed.",
+    "We do not believe their information has been stolen.",
+    "No credit card numbers, bank account details or passwords were stolen.",
+    "No Social Security numbers or other sensitive personal information were exposed.",
+    "No a b c d e mistakes were made.",
+    // A comma starts no clause, so this act goes unmarked too: a recorded miss.
+    "No one called, but data were stolen.",
+    "Twelve patients were affected.",
+    "Roughly 2,000 flights were impacted after the storm."
+  ]) {
+    assert.deepEqual(agencySpans(text), [], text);
+  }
+  for (const [text, actual] of [
+    ["Approximately 4,000 accounts may have been affected.", "been affected"],
+    ["Your personal information may have been impacted.", "been impacted"],
+    // A negator behind a head stop, in an earlier clause, or after the passive
+    // it would deny, is not read.
+    ["No: mistakes were made.", "were made"],
+    ["No one called; data were stolen.", "were stolen"],
+    ["No one called\ndata were stolen.", "were stolen"],
+    ["Data was accessed and no records were leaked.", "was accessed"],
+    ["No data was accessed. Records were leaked.", "were leaked"]
+  ]) {
+    const at = text.indexOf(actual);
+    assert.deepEqual(agencySpans(text), [[actual, at, at + actual.length]], text);
+  }
+});
+
+test("a no-break space or a folded look-alike letter joins no passive", () => {
+  // U+212A KELVIN SIGN and U+017F LONG S fold to ASCII under a case-insensitive
+  // \w; "hacked" and "shared" are lexicon participles, so a fold would mark.
+  for (const text of ["Mistakes were\u00a0made.", "Your data was\u000bshared.", "Accounts were hac\u212aed.", "Your data was \u017fhared."]) {
+    assert.deepEqual(agencySpans(text), [], JSON.stringify(text));
+  }
+});
+
+test("strip flags exactly the agency marks it is given", () => {
+  assert.equal(analyze("My name is Fred.", { rules: RULES }).strip, "My name is Fred.");
+  assert.equal(analyze("Mistakes were made.", { rules: RULES }).strip, "Mistakes [who?] were made.");
 });
 
 test("the core never fabricates a rewrite", () => {

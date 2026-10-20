@@ -205,6 +205,41 @@ func TestLexicalTermsPreferLongestWithoutMutation(t *testing.T) {
 	}
 }
 
+// Smart punctuation must not silence a tell. rules-en spells the typographic
+// variants in the pack; these twelve probes mirror test/typography.test.mjs and
+// impl/python/test_rhetorlint.py (ruleId and actual only: offsets are bytes
+// here, so non-ASCII probes stay out of conformance/cases.json).
+func TestTypographyProbes(t *testing.T) {
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	probes := []struct{ text, ruleID, actual string }{
+		{"Let\u2019s not forget their record.", "deflection.whataboutism", "Let\u2019s not forget"},
+		{"Don\u2019t miss out on this deal.", "urgency.appeal-to-time", "Don\u2019t miss out"},
+		{"It\u2019s worth noting the date.", "editorializing.stance", "It\u2019s worth noting"},
+		{"He didn\u2019t even bother to reply.", "implicative.shortfall", "didn\u2019t even bother to"},
+		{"Try it risk\u2011free today.", "lure.free-offer", "risk\u2011free"},
+		{"These so\u2011called experts.", "distancing.doubt-marker", "so\u2011called"},
+		{"An officer\u2013involved shooting.", "exoneration.formula", "officer\u2013involved shooting"},
+		{"A world\u2011class team.", "puffery.peacock", "world\u2011class"},
+		{"Sources with first\u2011hand knowledge of the matter.", "sourcing.anonymous", "Sources with first\u2011hand knowledge of the matter"},
+		{"It\u2019s important to note the timing.", "editorializing.stance", "It\u2019s important to note"},
+		{"Act before it\u2019s too late.", "urgency.appeal-to-time", "before it\u2019s too late"},
+		{"A self\u2011proclaimed expert.", "distancing.doubt-marker", "self\u2011proclaimed"},
+	}
+	for _, p := range probes {
+		var got [][2]string
+		for _, m := range Analyze(p.text, pack).Marks {
+			got = append(got, [2]string{m.RuleID, m.Actual})
+		}
+		want := [][2]string{{p.ruleID, p.actual}}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("%q: got %q want %q", p.text, got, want)
+		}
+	}
+}
+
 func TestAnalyzeDetachesExpectedMetadataFromPack(t *testing.T) {
 	expected := []string{"original"}
 	rule := Rule{
@@ -267,6 +302,496 @@ func TestStripSemanticBoundaryAndIdentity(t *testing.T) {
 			}
 		}
 	})
+}
+
+func TestStripKeepsNegatedOrQuotedIntensifier(t *testing.T) {
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	t.Run("negated or quoted intensifier is kept", func(t *testing.T) {
+		for _, text := range []string{
+			"The risk is not extremely high, but it is not negligible.",
+			"The update isn't hugely different.",
+			"The update isn\u2019t hugely different.",
+			"We are not deeply sorry.",
+			"The risk cannot be extremely high.",
+			"NOT EXTREMELY HIGH",
+			"\"It was utterly devastating,\" the flood survivor told reporters.",
+			"He said \u201cwe are deeply sorry\u201d and left.",
+			// A comma is not a break for Strip's negator: only absolute.universal's
+			// guard ends a negator's reach there.
+			"It isn\u2019t, frankly, extremely high.",
+			"We said no, extremely few agreed.",
+		} {
+			result := Analyze(text, pack)
+			intensifiers := 0
+			for _, mark := range result.Marks {
+				if mark.RuleID == "intensifier.loaded" {
+					intensifiers++
+				}
+			}
+			if intensifiers != 1 {
+				t.Errorf("%q: %d intensifier marks, want 1 (preservation must not disable detection)", text, intensifiers)
+			}
+			if result.Strip != text {
+				t.Errorf("strip changed %q: got %q", text, result.Strip)
+			}
+			if got := Strip(text, result.Marks); got != text {
+				t.Errorf("Strip changed %q: got %q", text, got)
+			}
+		}
+	})
+
+	t.Run("unguarded intensifier is still removed", func(t *testing.T) {
+		tests := []struct{ input, want string }{
+			{"This is an incredibly important update for every customer.", "This is an important update for every customer."},
+			// The negator is the third word back: the window is two words.
+			{"Not bad, and extremely cheap.", "Not bad, and cheap."},
+			{"No doubt the team is extremely proud.", "No doubt the team is proud."},
+			{"\"Fine,\" she said, extremely calmly.", "\"Fine,\" she said, calmly."},
+			{"He said \u201chello\u201d and was extremely calm.", "He said \u201chello\u201d and was calm."},
+			{"He said \"hello\nand it was extremely loud.", "He said \"hello\nand it was loud."},
+		}
+		// The negator is the word before, but a clause break stands between them.
+		for _, brk := range []string{".", ";", ":", "!", "?"} {
+			tests = append(tests, struct{ input, want string }{
+				"We said no" + brk + " extremely few agreed.", "We said no" + brk + " few agreed.",
+			})
+		}
+		for _, test := range tests {
+			if got := Analyze(test.input, pack).Strip; got != test.want {
+				t.Errorf("strip %q: got %q want %q", test.input, got, test.want)
+			}
+		}
+	})
+}
+
+func absoluteActuals(text string, pack RulePack) ([]string, []Mark) {
+	actuals := []string{}
+	var marks []Mark
+	for _, mark := range Analyze(text, pack).Marks {
+		if mark.RuleID == "absolute.universal" {
+			actuals = append(actuals, mark.Actual)
+			marks = append(marks, mark)
+		}
+	}
+	return actuals, marks
+}
+
+func TestAbsoluteGuard(t *testing.T) {
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	t.Run("negated absolute and imperative never are unmarked", func(t *testing.T) {
+		texts := []string{
+			"Returns are not guaranteed; past performance is no indicator.",
+			"Results aren't always typical.",
+			"Results aren\u2019t always typical.",
+			"Not everyone qualifies.",
+			"NOT EVERYONE QUALIFIES.",
+			"The risk cannot always be priced.",
+			"Never share your password with anyone.",
+			"NEVER share it.",
+			"Never\tshare it.",
+			"\"Never share it,\" he said.",
+			"Explain real constraints; never manufacture the shortage.",
+			// A negator followed directly by a comma reaches past the aside.
+			"Past performance is not, however, always a guide.",
+			"No, never.",
+			// An adverb between 'Never' and its verb hands the decision to the verb.
+			"Never ever share your password.",
+			"Never again leave it unlocked.",
+			"Never once doubt it.",
+			// A word is compared whole: 'answer' is not 'an'.
+			"Never answer it.",
+		}
+		for _, brk := range []string{".", ";", ":", "!", "?"} {
+			texts = append(texts, "Check the link"+brk+" never click it.")
+		}
+		for _, text := range texts {
+			if actuals, _ := absoluteActuals(text, pack); len(actuals) != 0 {
+				t.Errorf("%q: absolute.universal marks %q, want none", text, actuals)
+			}
+		}
+	})
+
+	t.Run("absolutes the guards do not reach stay marked", func(t *testing.T) {
+		tests := []struct{ input, actual string }{
+			{"This is guaranteed to double your savings.", "guaranteed"},
+			{"Everyone knows this policy works.", "Everyone"},
+			{"Our product will always be the best choice.", "always"},
+			// The negator is the third word back: the window is two words.
+			{"Not bad, and always cheap.", "always"},
+			// 'never' that does not open its clause, or that no lowercase word follows.
+			{"We never share data.", "never"},
+			{"Love begins with choice, never obligation.", "never"},
+			{"Never Again.", "Never"},
+			{"Never.", "Never"},
+			{"Never, ever.", "Never"},
+			{"Never\nshare it.", "Never"},
+			// A line break is not a clause break.
+			{"We will\nnever share it.", "never"},
+			// A comma ends a negator's reach once a word stands between them.
+			{"No risk, guaranteed.", "guaranteed"},
+			{"Don't wait, everyone is buying.", "everyone"},
+			{"No fees, always free.", "always"},
+			{"No contracts, no fees, no exceptions.", "no exceptions"},
+			// A clause-initial 'Never' before a word that cannot be its verb is a
+			// fragment or an inversion.
+			{"Battery life? Never an issue.", "Never"},
+			{"Never again will prices be this low.", "Never"},
+			{"Never has a product been this good.", "Never"},
+			{"Never before have prices been this low.", "Never"},
+			{"Never again.", "Never"},
+			{"Never ever again.", "Never"},
+			{"Never again\nshare it.", "Never"},
+		}
+		// The negator is the word before, but a clause break stands between them.
+		for _, brk := range []string{".", ";", ":", "!", "?"} {
+			tests = append(tests, struct{ input, actual string }{"We said no" + brk + " everyone agreed.", "everyone"})
+		}
+		for _, test := range tests {
+			actuals, marks := absoluteActuals(test.input, pack)
+			if len(actuals) != 1 || actuals[0] != test.actual {
+				t.Errorf("%q: absolute.universal marks %q, want [%q]", test.input, actuals, test.actual)
+				continue
+			}
+			start, end := marks[0].Position.Start.Offset, marks[0].Position.End.Offset
+			if test.input[start:end] != test.actual {
+				t.Errorf("%q: mark spans %q, want %q", test.input, test.input[start:end], test.actual)
+			}
+		}
+		// The guard reads absolute.universal only: other rules keep their marks under a negator.
+		peacock := false
+		for _, mark := range Analyze("It is not world-class.", pack).Marks {
+			peacock = peacock || mark.RuleID == "puffery.peacock"
+		}
+		if !peacock {
+			t.Errorf("puffery.peacock lost its mark under a negator")
+		}
+	})
+
+	t.Run("each guard negator keeps an intensifier and leaves an absolute unmarked", func(t *testing.T) {
+		for _, negator := range readGuardLexicon(t).Negators {
+			text := "It was " + negator + " extremely bad."
+			if got := Analyze(text, pack).Strip; got != text {
+				t.Errorf("%q: strip gives %q", text, got)
+			}
+			actuals, _ := absoluteActuals("It is "+negator+" always so.", pack)
+			for _, actual := range actuals {
+				if actual == "always" {
+					t.Errorf("%q: absolute.universal marks always", negator)
+				}
+			}
+		}
+	})
+
+	t.Run("the word after a clause-initial never is read against two closed lists", func(t *testing.T) {
+		// The imperative 'Never' guard's two closed lists, and the advice
+		// openers left off them, from spec/guard-lexicon.json.
+		guard := readGuardLexicon(t)
+		nonVerbs := guard.NeverNonVerbs
+		passThrough := guard.NeverPassThrough
+		// Words that can begin advice after "Never", so they are not on the list.
+		adviceOpeners := guard.NeverAdviceOpeners
+		expect := func(text string, want ...string) {
+			t.Helper()
+			actuals, _ := absoluteActuals(text, pack)
+			if len(actuals) != len(want) || (len(want) == 1 && actuals[0] != want[0]) {
+				t.Errorf("%q: absolute.universal marks %q, want %q", text, actuals, want)
+			}
+		}
+		for _, word := range nonVerbs {
+			expect("Never "+word+" x.", "Never")
+			// After its lowercase first letter, the word is compared in ASCII
+			// lower case: "hAS" is "has".
+			expect("Go; never "+word[:1]+strings.ToUpper(word[1:])+" x.", "never")
+		}
+		for _, word := range adviceOpeners {
+			expect("Never " + word + " x.")
+		}
+		for _, text := range []string{
+			"Never at any time disclose your password.",
+			"Never in any circumstances share your PIN.",
+			"Never on any account reply to this email.",
+			"Never have more than two drinks.",
+			"Never so much as glance at it.",
+			"Never should you share your password.",
+		} {
+			expect(text)
+		}
+		for _, adverb := range passThrough {
+			expect("Never " + adverb + " share it.")
+			expect("Never " + adverb + " " + passThrough[0] + " share it.")
+			for _, word := range nonVerbs {
+				expect("Never "+adverb+" "+word+" x.", "Never")
+			}
+			expect("Never "+adverb+".", "Never")
+			expect("Never "+adverb+" Share it.", "Never")
+		}
+	})
+}
+
+// guardLexicon is spec/guard-lexicon.json, the one source of the guards'
+// lists. Negators is derived: the agency lexicon's negators and LocalNegators.
+type guardLexicon struct {
+	ClauseBreaks       string   `json:"clauseBreaks"`
+	LocalNegators      []string `json:"localNegators"`
+	Negators           []string `json:"-"`
+	NeverNonVerbs      []string `json:"neverNonVerbs"`
+	NeverPassThrough   []string `json:"neverPassThrough"`
+	NeverAdviceOpeners []string `json:"neverAdviceOpeners"`
+}
+
+func readGuardLexicon(t *testing.T) guardLexicon {
+	t.Helper()
+	raw, err := os.ReadFile(filepath.Join(repoRoot(), "spec", "guard-lexicon.json"))
+	if err != nil {
+		t.Fatalf("read spec/guard-lexicon.json: %v", err)
+	}
+	var guard guardLexicon
+	if err := json.Unmarshal(raw, &guard); err != nil {
+		t.Fatalf("parse spec/guard-lexicon.json: %v", err)
+	}
+	raw, err = os.ReadFile(filepath.Join(repoRoot(), "spec", "agency-lexicon.json"))
+	if err != nil {
+		t.Fatalf("read spec/agency-lexicon.json: %v", err)
+	}
+	var agency struct {
+		Negators []string `json:"negators"`
+	}
+	if err := json.Unmarshal(raw, &agency); err != nil {
+		t.Fatalf("parse spec/agency-lexicon.json: %v", err)
+	}
+	guard.Negators = append(append([]string{}, agency.Negators...), guard.LocalNegators...)
+	return guard
+}
+
+// wordSet is a list as the engine's map[string]bool holds it.
+func wordSet(words []string) map[string]bool {
+	set := make(map[string]bool, len(words))
+	for _, w := range words {
+		set[w] = true
+	}
+	return set
+}
+
+func TestGuardListsAreTheSpecWords(t *testing.T) {
+	// The generator writes these from the spec; an added or dropped word in
+	// one engine's copy fails here exactly.
+	guard := readGuardLexicon(t)
+	if clauseBreaks != guard.ClauseBreaks {
+		t.Errorf("clauseBreaks %q, spec %q", clauseBreaks, guard.ClauseBreaks)
+	}
+	for name, pair := range map[string][2]map[string]bool{
+		"negators":         {negators, wordSet(guard.Negators)},
+		"neverNonVerbs":    {neverNonVerbs, wordSet(guard.NeverNonVerbs)},
+		"neverPassThrough": {neverPassThrough, wordSet(guard.NeverPassThrough)},
+	} {
+		if !reflect.DeepEqual(pair[0], pair[1]) {
+			t.Errorf("%s %v, spec %v", name, pair[0], pair[1])
+		}
+	}
+}
+
+func agencySpans(text string, pack RulePack) []string {
+	var out []string
+	for _, m := range Analyze(text, pack).Marks {
+		if m.RuleID == "agency-hiding.deleted-subject" {
+			out = append(out, fmt.Sprintf("%s@%d-%d", m.Actual, m.Position.Start.Offset, m.Position.End.Offset))
+		}
+	}
+	return out
+}
+
+func TestAgencyDetector(t *testing.T) {
+	pack, err := LoadDefaultRules()
+	if err != nil {
+		t.Fatalf("load rules: %v", err)
+	}
+	t.Run("accountable past passives are marked auxiliary through participle", func(t *testing.T) {
+		cases := [][2]string{
+			{"Mistakes were made.", "were made"},
+			{"Mistakes, frankly, were made.", "were made"},
+			{"Customer data was quietly accessed.", "was quietly accessed"},
+			{"Your data was shared with partners.", "was shared"},
+			{"PII may have been compromised.", "been compromised"},
+			{"Records were withheld from investigators.", "were withheld"},
+			{"It was decided that the program would end.", "was decided"},
+			{"Hundreds of workers were laid off.", "were laid off"},
+			{"Additional safeguards have been put in place.", "been put"},
+			{"Concerns were raised about the audit.", "were raised"},
+			{"MISTAKES WERE MADE.", "WERE MADE"},
+			{"Customer records were exposed.", "were exposed"},
+		}
+		for _, c := range cases {
+			at := strings.Index(c[0], c[1])
+			want := []string{fmt.Sprintf("%s@%d-%d", c[1], at, at+len(c[1]))}
+			if got := agencySpans(c[0], pack); !reflect.DeepEqual(got, want) {
+				t.Errorf("%q: agency marks %q, want %q", c[0], got, want)
+			}
+		}
+	})
+
+	t.Run("procedure, named agents, harm verbs and idioms stay unmarked", func(t *testing.T) {
+		for _, text := range []string{
+			"My name is Fred.",
+			"JavaScript is required.",
+			"Soil water content was measured at 5 cm depth.",
+			"The soup can be frozen for up to 3 months.",
+			"This option is ignored when the flag is unset.",
+			"The startup has been described as the next big thing by Forbes.",
+			"The report was shelved by Friday.",
+			"Lives were lost in the earthquake.",
+			"Your account was closed at your request.",
+			"He got fired up about the album.",
+			"Data were collected from 200 participants.",
+			"Information was collected via a survey.",
+			"Records were retained for seven years.",
+			"If no error was raised, the call succeeded.",
+			"Records were being withheld.",
+			"Safeguards were put in a box.",
+			"Workers were exposed to asbestos.",
+			"Mistakes were made\nby the board.",
+			// RE2's (?i)\w would fold U+212A and U+017F into a participle; the
+			// detector matches an ASCII-lowercased copy with no (?i), so neither
+			// does, and a no-break space joins no words. "hacked" and "shared"
+			// are lexicon participles, so a fold would mark.
+			"Mistakes were\u00a0made.",
+			"Accounts were hac\u212aed.",
+			"Your data was \u017fhared.",
+		} {
+			if got := agencySpans(text, pack); len(got) != 0 {
+				t.Errorf("%q: agency marks %q, want none", text, got)
+			}
+		}
+	})
+
+	t.Run("negated passives and 'affected' after an unheld noun stay unmarked", func(t *testing.T) {
+		for _, text := range []string{
+			"Your data was never sold.",
+			"Your information has never been sold.",
+			"Passwords have not been compromised.",
+			"Passwords haven't been compromised.",
+			"Passwords haven\u2019t been compromised.",
+			"No customer data was accessed.",
+			"Nothing was withheld from investigators.",
+			"None of the records were leaked.",
+			"Neither passwords nor card numbers were exposed.",
+			"No mistakes have been made.",
+			"No personal, financial or health information was accessed.",
+			"We do not believe their information has been stolen.",
+			// However long the subject: a negator anywhere in the clause before
+			// the auxiliary denies the act.
+			"No credit card numbers, bank account details or passwords were stolen.",
+			"No Social Security numbers or other sensitive personal information were exposed.",
+			"No a b c d e mistakes were made.",
+			// A comma starts no clause, so this act goes unmarked too: a recorded miss.
+			"No one called, but data were stolen.",
+			"Twelve patients were affected.",
+			"Roughly 2,000 flights were impacted after the storm.",
+		} {
+			if got := agencySpans(text, pack); len(got) != 0 {
+				t.Errorf("%q: agency marks %q, want none", text, got)
+			}
+		}
+		for _, c := range [][2]string{
+			{"Approximately 4,000 accounts may have been affected.", "been affected"},
+			{"Your personal information may have been impacted.", "been impacted"},
+			// A negator behind a head stop, in an earlier clause, or after the
+			// passive it would deny, is not read.
+			{"No: mistakes were made.", "were made"},
+			{"No one called; data were stolen.", "were stolen"},
+			{"No one called\ndata were stolen.", "were stolen"},
+			{"Data was accessed and no records were leaked.", "was accessed"},
+			{"No data was accessed. Records were leaked.", "were leaked"},
+		} {
+			at := strings.Index(c[0], c[1])
+			want := []string{fmt.Sprintf("%s@%d-%d", c[1], at, at+len(c[1]))}
+			if got := agencySpans(c[0], pack); !reflect.DeepEqual(got, want) {
+				t.Errorf("%q: agency marks %q, want %q", c[0], got, want)
+			}
+		}
+	})
+
+	t.Run("the generated lexicon matches the spec", func(t *testing.T) {
+		raw, err := os.ReadFile(filepath.Join(repoRoot(), "spec", "agency-lexicon.json"))
+		if err != nil {
+			t.Fatalf("read spec/agency-lexicon.json: %v", err)
+		}
+		var lex struct {
+			Whitespace   string              `json:"whitespace"`
+			HeadStops    string              `json:"headStops"`
+			ClauseBreaks string              `json:"clauseBreaks"`
+			Negators     []string            `json:"negators"`
+			Auxiliaries  []string            `json:"auxiliaries"`
+			Heads        map[string][]string `json:"heads"`
+			Classes      []struct {
+				ID          string   `json:"id"`
+				Head        *string  `json:"head"`
+				Participles []string `json:"participles"`
+			} `json:"classes"`
+		}
+		if err := json.Unmarshal(raw, &lex); err != nil {
+			t.Fatalf("parse spec/agency-lexicon.json: %v", err)
+		}
+		if !reflect.DeepEqual(agencyAuxiliaries, lex.Auxiliaries) {
+			t.Errorf("auxiliaries %q, spec %q", agencyAuxiliaries, lex.Auxiliaries)
+		}
+		if agencyWhitespace != lex.Whitespace || agencyHeadStops != lex.HeadStops || agencyClauseBreaks != lex.ClauseBreaks {
+			t.Errorf("character sets %q %q %q, spec %q %q %q", agencyWhitespace, agencyHeadStops, agencyClauseBreaks,
+				lex.Whitespace, lex.HeadStops, lex.ClauseBreaks)
+		}
+		if len(agencyNegators) != len(lex.Negators) {
+			t.Errorf("negators %v, spec %q", agencyNegators, lex.Negators)
+		}
+		for _, w := range lex.Negators {
+			if !agencyNegators[w] {
+				t.Errorf("negators lack %q", w)
+			}
+		}
+		for name, words := range lex.Heads {
+			if len(agencyHeads[name]) != len(words) {
+				t.Errorf("head class %s: %d words, spec %d", name, len(agencyHeads[name]), len(words))
+			}
+			for _, w := range words {
+				if !agencyHeads[name][w] {
+					t.Errorf("head class %s lacks %q", name, w)
+				}
+			}
+		}
+		if len(agencyClasses) != len(lex.Classes) {
+			t.Fatalf("%d classes, spec %d", len(agencyClasses), len(lex.Classes))
+		}
+		for i, c := range lex.Classes {
+			head := ""
+			if c.Head != nil {
+				head = *c.Head
+			}
+			got := agencyClasses[i]
+			if got.id != c.ID || got.head != head || !reflect.DeepEqual(got.participles, c.Participles) {
+				t.Errorf("class %d: %+v, spec %s/%s/%q", i, got, c.ID, head, c.Participles)
+			}
+		}
+	})
+}
+
+func TestEngineVersionNamesTheCoreRevision(t *testing.T) {
+	raw, err := os.ReadFile(filepath.Join(repoRoot(), "packages", "core", "package.json"))
+	if err != nil {
+		t.Fatalf("read packages/core/package.json: %v", err)
+	}
+	var core struct {
+		Version string `json:"version"`
+	}
+	if err := json.Unmarshal(raw, &core); err != nil {
+		t.Fatalf("parse packages/core/package.json: %v", err)
+	}
+	if got := Analyze("", RulePack{ID: "empty", Version: "1", Locale: "en"}).Engine.Version; got != core.Version {
+		t.Fatalf("engine.version %q, want the core revision %q it reproduces", got, core.Version)
+	}
 }
 
 // schemaNode is the subset of JSON Schema that spec/output.schema.json actually

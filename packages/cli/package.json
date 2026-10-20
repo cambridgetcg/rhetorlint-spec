@@ -12,7 +12,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@rhetorlint/core": "^0.1.3",
+    "@rhetorlint/core": "^0.1.4",
     "@rhetorlint/rules-en": "^0.2.0"
   },
   "homepage": "https://github.com/cambridgetcg/rhetorlint-spec#readme",

@@ -1,6 +1,6 @@
 {
   "name": "@rhetorlint/rules-en",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "English tell-pack for RhetorLint: declarative rules for the families of rhetorical manipulation, aligned to the SemEval-2023 persuasion taxonomy.",
   "type": "module",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "README.md"
   ],
   "peerDependencies": {
-    "@rhetorlint/core": ">=0.1.3"
+    "@rhetorlint/core": ">=0.1.4"
   },
   "peerDependenciesMeta": {
     "@rhetorlint/core": {

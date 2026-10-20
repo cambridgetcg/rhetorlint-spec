@@ -2,11 +2,11 @@
   "version": 1,
   "note": "Contrast set: minimal pairs for every rule. Each row states what the WORDS should get (expect) and whether the engine at this revision does (status). holds: the engine matches expect. known-defect: it does not yet; tag names the opportunity that would fix it. priced-in: a false positive the repo accepts, at the file:line in cite. test/contrast.test.mjs keeps status true: a fix that makes a known-defect row hold fails until the row is flipped. Engine-neutral data: no offsets, so any engine can run it.",
   "tags": {
-    "O2": "agency-hiding.deleted-subject precision: passive-shaped text with no hidden doer (adjectives, names, procedure, a named agent, verbs the words cannot judge).",
+    "O2": "agency-hiding.deleted-subject: passive-shaped text the detector reads wrongly. Marks with no hidden doer (adjectives, names, procedure, a named agent, verbs the words cannot judge), and accountable passives it gives up because the words alone cannot judge their verb.",
     "O2-twin": "frontier's 30 honest passive twins: an agentless-looking passive whose doer is named elsewhere in the sentence or whose cause is given.",
     "O3": "typography: smart punctuation (U+2019, U+2011, U+2013) silences an ASCII-spelt tell.",
     "O4": "strip honesty: strip must not strengthen a negated claim or edit a quotation.",
-    "O6": "absolute.universal: negated and imperative absolutes, other false positives, and the lesson's own missing tell.",
+    "O6": "absolute.universal: negated and imperative absolutes, other false positives, the lesson's own missing tell, and the overclaims its negation and imperative guard leaves unmarked.",
     "O7": "precision and recall backlog for the other rules: pinned negative controls and recorded misses."
   },
   "rows": [
@@ -72,7 +72,7 @@
       "expect": "strip-preserves",
       "strip": "\"It was utterly devastating,\" the flood survivor told reporters.",
       "kind": "quotation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "The intensifier sits inside a direct quotation. Strip subtracts the writer's spin and must not edit the words of a person being quoted.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -84,7 +84,7 @@
       "expect": "strip-preserves",
       "strip": "The risk is not extremely high, but it is not negligible.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "Under 'not', deleting 'extremely' turns 'not extremely high' into 'not high', a stronger claim than the source made.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -96,7 +96,7 @@
       "expect": "strip-preserves",
       "strip": "The risk is not extremely high.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "Under 'not', deleting 'extremely' leaves 'The risk is not high.', a stronger claim than the source made.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -108,7 +108,7 @@
       "expect": "strip-preserves",
       "strip": "We are not deeply sorry.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "Deleting 'deeply' leaves 'We are not sorry.', which says something the source did not.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -120,7 +120,7 @@
       "expect": "strip-preserves",
       "strip": "The update isn't hugely different.",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "An n't negator: deleting 'hugely' leaves 'isn't different', a stronger claim than the source made.",
       "source": "constructed for this contrast set (package M3, 2026-10-19)"
@@ -132,7 +132,7 @@
       "expect": "strip-preserves",
       "strip": "He said \"we are deeply sorry\" and left.",
       "kind": "quotation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O4",
       "reason": "The intensifier is inside a direct quotation (ASCII quotes); strip must not edit quoted words.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -147,6 +147,78 @@
       "status": "holds",
       "reason": "Positive control: an unnegated, unquoted loaded intensifier is subtracted and every other word survives.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.06",
+      "text": "Nothing extremely bad happened.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "Nothing extremely bad happened.",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O4",
+      "reason": "'Nothing' negates what follows: deleting 'extremely' leaves 'Nothing bad happened.', a stronger claim than the source made. The guards read the agency lexicon's negators since guard lexicon version 2.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.07",
+      "text": "Nobody was extremely hurt.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "Nobody was extremely hurt.",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O4",
+      "reason": "'Nobody' is two words before 'extremely': deleting it leaves 'Nobody was hurt.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.08",
+      "text": "None of it was extremely bad.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "None of it was extremely bad.",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "'None' is four words before 'extremely' and the guard reads two, so strip leaves 'None of it was bad.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.09",
+      "text": "The risk is not at all extremely high.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "The risk is not at all extremely high.",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "'not' is three words before 'extremely' and the guard reads two, so strip leaves 'The risk is not at all high.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.10",
+      "text": "It is rarely extremely hot here.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "It is rarely extremely hot here.",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "'rarely' limits what follows as 'hardly' does, but only 'hardly' is a negator to the guards ('rarely', 'seldom', 'barely' and 'scarcely' are not), so strip leaves 'It is rarely hot here.', a stronger claim than the source made.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "strip.intensifier-loaded.11",
+      "text": "He called it 'utterly devastating' on air.",
+      "ruleId": "intensifier.loaded",
+      "expect": "strip-preserves",
+      "strip": "He called it 'utterly devastating' on air.",
+      "kind": "quotation",
+      "status": "known-defect",
+      "tag": "O4",
+      "reason": "Strip reads only double quotation marks (straight, or U+201C and U+201D) on the intensifier's line, so it edits this single-quoted quotation and leaves a stray space: 'He called it ' devastating' on air.'",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
     },
     {
       "id": "lesson.intensifier-loaded.tremendously",
@@ -276,7 +348,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "A clause-initial imperative 'Never <verb>' is security advice to the reader, not a claim that something always or never happens.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -298,7 +370,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "A negated absolute is a disclaimer, the opposite of an overclaim.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -320,7 +392,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "'aren't always' denies the universal: the words limit a claim instead of inflating it.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -331,7 +403,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "'Not everyone' negates the universal: a statement of limits.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -342,7 +414,7 @@
       "ruleId": "absolute.universal",
       "expect": "silent",
       "kind": "negation",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O6",
       "reason": "A clause-initial imperative 'never <verb>' after a semicolon is guidance to the reader, not a universal claim.",
       "source": "wild: one sentence from the fomoengine.io site snapshot (the estate's own text; motifs survey, 2026-10-19)"
@@ -368,6 +440,233 @@
       "status": "holds",
       "reason": "'undeniable' forecloses disagreement without giving a reason.",
       "source": "constructed for this contrast set (package M3, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.never-again",
+      "text": "Never again will prices be this low.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "Never",
+      "kind": "lesson",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "An inverted 'Never again will...' claims nothing will ever match this price: an overclaim, not advice. The imperative guard steps over the adverb 'again' and finds 'will', which cannot be the verb of an imperative 'Never <verb>', so the absolute stays marked.",
+      "source": "constructed (motifs design plan, package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.no-doubt-everyone",
+      "text": "There's no doubt everyone loves it.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "everyone",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'no doubt' asserts certainty and 'everyone' claims every person: two absolutes, nothing negated. The engine's negation guard sees 'no' among the two words before 'everyone' and leaves it unmarked; the window counts words and cannot tell what a negator governs.",
+      "source": "constructed (motifs design plan, package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.colon-never-sold",
+      "text": "Your data: never sold.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "never",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "A headline claim with its subject before the colon: 'never sold' promises the data is sold on no occasion, the same absolute as 'We never sell your data.', which stays marked. The imperative guard sees 'never' open a clause after ':' before 'sold', which is not among the words it knows cannot be a verb, and leaves it unmarked; position and a closed word list cannot tell a past participle from an imperative verb. Not opening a clause at ':' would mark this, but also the advice after a label in 'Rule: never share your password.', so the miss is kept.",
+      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.no-risk-guaranteed",
+      "text": "No risk, guaranteed.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "guaranteed",
+      "kind": "lesson",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "'No' negates 'risk', not 'guaranteed': the sentence is an unqualified guarantee. The negation guard ends a negator's reach at a comma once a word ('risk') stands between them, so 'guaranteed' stays marked.",
+      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.no-exceptions-list",
+      "text": "No contracts, no fees, no exceptions.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "no exceptions",
+      "kind": "lesson",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "Three parallel negatives: 'no exceptions' is itself the absolute, and the 'no' before 'fees' does not negate it. The comma after 'fees' ends that negator's reach, so the absolute stays marked.",
+      "source": "constructed (adversarial verification of package E3: a recorded miss of the absolute.universal guard, 2026-10-19)"
+    },
+    {
+      "id": "negation.absolute-universal.aside-cannot-be",
+      "text": "Returns are not, and cannot be, guaranteed.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'not, and cannot be, guaranteed' denies the guarantee twice: a disclaimer, the opposite of an overclaim. The negation guard ends a negator's reach at a comma once a word stands between them; here 'be' stands between 'cannot' and the comma, so 'guaranteed' is marked. The guard reads punctuation, not where an aside closes.",
+      "source": "constructed (package E3b: the false positive its comma rule brings back, 2026-10-19)"
+    },
+    {
+      "id": "imperative.absolute-universal.never-at-any-time",
+      "text": "Never at any time disclose your password.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "Advice to the reader: an adverbial stands between 'Never' and the verb. 'at' is not on the imperative's non-verb list.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "imperative.absolute-universal.never-have-drinks",
+      "text": "Never have more than two drinks.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "'have' can be the verb of an imperative, so it is not on the non-verb list.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "imperative.absolute-universal.never-should-you",
+      "text": "Never should you share your password.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "Inverted advice: a norm for the reader, not a claim about what never happens.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.never-have-i-seen",
+      "text": "Never have I seen prices this low.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "Never",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "An inversion that overclaims. 'have' is left off the non-verb list so advice ('Never have regrets.') stays unmarked; this claim goes unmarked with it.",
+      "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "lesson.absolute-universal.never-in-history",
+      "text": "Never in history has a deal been better.",
+      "ruleId": "absolute.universal",
+      "expect": "mark",
+      "actual": "Never",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "An inverted overclaim after an adverbial. 'in' is left off the non-verb list so advice ('Never in any circumstances share your PIN.') stays unmarked.",
+      "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "negation.absolute-universal.aside-never-was",
+      "text": "This isn't, and never was, guaranteed.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "A disclaimer by the same mechanism as aside-cannot-be: the comma after 'was' ends the reach of 'never'.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "imperative.absolute-universal.comma-always-ask",
+      "text": "If you're not sure, always ask.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "Advice after a negated condition. The comma ends the negator's reach, and 'always' after a comma is not read as an imperative, so it marks, as it did before the guard existed.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "imperative.absolute-universal.comma-never-fix",
+      "text": "If it isn't broken, never fix it.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "Advice: the imperative test reads only a 'never' that opens its clause after . ; : ! ? or the start of the text, not after a comma.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "imperative.absolute-universal.never-comma-ever",
+      "text": "Never, ever share your PIN.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "Advice: a comma after 'Never' defeats the imperative test, which wants spaces or tabs before the verb.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "negation.absolute-universal.nothing-guaranteed",
+      "text": "Nothing is guaranteed.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O6",
+      "reason": "A disclaimer: 'nothing' negates 'guaranteed'. The guards read the agency lexicon's negators, 'nothing' among them, since guard lexicon version 2.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "twin.absolute-universal.never-the-less",
+      "text": "Never the less, we shipped on time.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'Never the less' is 'nevertheless' written as three words: a concession, not a claim that something never happens. The imperative guard reads 'the' after a clause-initial 'Never', one of the words it keeps marked because they open a fragment ('Never the same twice.'), and its list cannot tell the two apart.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "twin.absolute-universal.never-can-tell",
+      "text": "Never can tell with these things.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "The idiom '(you) never can tell' with its subject dropped admits uncertainty, the opposite of an overclaim. 'can' is on the imperative guard's list because it opens an inversion ('Never can we accept this.'), and the guard does not read the word after it.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "twin.absolute-universal.never-is-a-long-time",
+      "text": "Never is a long time.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "'Never' is the subject here, the word itself, not a claim that something never happens. 'is' is on the imperative guard's list because it opens an inversion ('Never is it acceptable to lie.'), and both readings begin with the same two words.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "twin.absolute-universal.never-being-late",
+      "text": "Never being late is the secret to keeping a job.",
+      "ruleId": "absolute.universal",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "known-defect",
+      "tag": "O6",
+      "reason": "A gerund subject: 'never being late' names a habit and claims nothing about what never happens. 'being' is on the imperative guard's list beside 'been' ('Never been better.') because neither can begin advice, and the guard cannot tell a gerund subject from a fragment that claims.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
     },
     {
       "id": "probe.hedge-softener.01",
@@ -661,9 +960,9 @@
       "expect": "mark",
       "actual": "Let\u2019s not forget",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Let\u2019s not forget'; the ASCII-only pattern let'?s goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Let\u2019s not forget'; the pack spells the pattern let['\u2019]?s.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -864,9 +1163,9 @@
       "expect": "mark",
       "actual": "risk\u2011free",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the class [- ] admits only ASCII hyphen and space.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack widens the class to [-\u2010\u2011\u2013 ].",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -942,9 +1241,9 @@
       "expect": "mark",
       "actual": "Don\u2019t miss out",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Don\u2019t miss out'; the ASCII-only pattern don'?t goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'Don\u2019t miss out'; the pack spells the pattern don['\u2019]?t.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -954,9 +1253,9 @@
       "expect": "mark",
       "actual": "before it\u2019s too late",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'it\u2019s'; the ASCII-only pattern it'?s goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in 'it\u2019s'; the pack spells the pattern it['\u2019]?s.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1056,9 +1355,10 @@
       "expect": "mark",
       "actual": "was closed",
       "kind": "lesson",
-      "status": "holds",
-      "reason": "An agentless past passive: who closed the account is not in the words (the taxonomy's own example). 'closed' is also a verb the words alone cannot judge; a detector narrowed to fault, breach and concealment verbs would stop marking it, and must then flip this row and record the recall it gives up.",
-      "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
+      "status": "known-defect",
+      "reason": "An agentless past passive: who closed the account is not in the words. Recall the accountable-passive detector (core 0.1.4) gives up: 'closed' is a harm or news verb the words alone cannot judge ('Your account was closed at your request.' must stay silent), so it is not in spec/agency-lexicon.json and this former taxonomy example goes unmarked. Kept open so the trade stays visible.",
+      "source": "constructed probe (motifs survey rules reader, 2026-10-19)",
+      "tag": "O2"
     },
     {
       "id": "probe.agency-hiding-deleted-subject.02",
@@ -1088,7 +1388,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "Colour adjectives that end in -ed/-en after 'is'; there is no passive and no deleted doer.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1099,9 +1399,9 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
-      "reason": "A proper name that ends in -ed; HEAD's strip writes 'My name [who?] is Fred.'",
+      "reason": "A proper name that ends in -ed; there is no passive. The old detector wrote 'My name [who?] is Fred.'; core 0.1.4 reads no participle here.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -1110,7 +1410,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A numeral that ends in -en, not a participle.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1121,7 +1421,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "Stative 'is located' gives a place; there is no action and no doer to delete.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1132,7 +1432,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A present-tense recipe step; the cook is the reader.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1143,7 +1443,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "named-agent",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "The doer is named ('by the auditor') just after the adverb 'again'.",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
@@ -1154,7 +1454,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "'is required' states a precondition; there is no act whose doer is hidden.",
       "source": "wild: the opening words of a boilerplate sentence ('JavaScript is required for the ...'), which marks the same span in full; estate site snapshot (zerone.ai; motifs survey, 2026-10-19)"
@@ -1165,7 +1465,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A proper name that ends in -en after 'is'; no passive at all.",
       "source": "wild: the opening words of a longer news headline that names a public figure, which marks the same span in full; front-page snapshot of theguardian.com/international (motifs survey supplementary news, 2026-10-19)"
@@ -1176,7 +1476,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A methods-section passive: the measuring is procedure, not a fault, breach or decision whose doer is hidden.",
       "source": "pastiche: shortened from a sentence of an invented science abstract (motifs survey item inv-science-abstract, 2026-10-19)"
@@ -1187,7 +1487,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "A modal passive of instruction: the reader is the one who may freeze it.",
       "source": "constructed probe (frontier design proposal, 2026-10-19)"
@@ -1198,7 +1498,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "Present-tense procedural passive in documentation: the program is the doer, and nothing is hidden.",
       "source": "constructed probe (design synthesis, 2026-10-19)"
@@ -1209,9 +1509,9 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "named-agent",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
-      "reason": "The agent is named in the same clause ('by Forbes', six words after the participle). conformance/cases.json case 30 pins HEAD's mark as ground truth; this row records it as a defect without changing the case.",
+      "reason": "The agent is named in the same clause ('by Forbes', six words after the participle). conformance/cases.json case 30 pinned the old mark as ground truth; since core 0.1.4 it is a clean control.",
       "source": "conformance/cases.json case 30"
     },
     {
@@ -1220,7 +1520,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "unjudgeable-verb",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "'closed' is a verb the words alone cannot judge (routine closure or sanction). Here 'at your request' names the reader as the cause, so there is no hidden doer to point at.",
       "source": "constructed (motifs design plan, package M3, 2026-10-19)"
@@ -1231,7 +1531,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A harm verb with its cause given (the bus overturned on ice); no doer is hidden.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1242,7 +1542,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "unjudgeable-verb",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A harm verb ('lost') with a natural cause: the words alone cannot say a doer exists, so the rule cannot judge it.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1253,7 +1553,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "An injury with its cause given (a fall); there is no doer to name.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1264,7 +1564,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A routine arrest report; the arresting body is named in the attribution ('police said').",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1275,7 +1575,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "A routine arrest report; the arresting body is named first ('Police said').",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1286,7 +1586,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The officers who did the detaining are the subject of the main clause.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1297,7 +1597,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "'at your request' names the reader as the cause of the closure.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1308,7 +1608,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "'As you asked' names the reader as the cause of the deletion.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1319,7 +1619,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The cause is named in the because-clause (the card issuer rejected the transfer).",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1352,7 +1652,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The doer ('I') is named in the previous sentence and again in the because-clause.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1363,7 +1663,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The doer ('We') is named in the previous sentence, and the reason is given.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1407,9 +1707,9 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
-      "reason": "The speaker names its own engineers and owns the release ('which we shipped').",
+      "reason": "The speaker names its own engineers and owns the release ('which we shipped'). 'affected' marks only after a held-in-trust head (data, an account), and 'users' is not one.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
     },
     {
@@ -1451,7 +1751,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "Firing at a range during a qualification exam: the shooters are the examinees, and no harm is hidden.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1473,7 +1773,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The cause is given in the when-clause: a flood, with no doer.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1495,7 +1795,7 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2-twin",
       "reason": "The doer is named in the same sentence ('an air strike it carried out').",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
@@ -1506,9 +1806,9 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "innocent-twin",
-      "status": "holds",
+      "status": "known-defect",
       "tag": "O2-twin",
-      "reason": "The company names itself ('we closed') and its CEO in the same sentence.",
+      "reason": "The company names itself ('we closed') and its CEO in the same sentence. Since core 0.1.4 'laid off' is a concealment-class participle, and the detector reads the clause, not the sentence, so it asks 'who?' of 'were laid off'.",
       "source": "constructed honest twin (frontier design proposal, 2026-10-19)"
     },
     {
@@ -1562,8 +1862,9 @@
       "expect": "mark",
       "actual": "were made",
       "kind": "specimen",
-      "status": "holds",
-      "reason": "'serious mistakes were made': an agentless past passive of a fault in an official address; no maker of the mistakes appears.",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "'serious mistakes were made': an agentless past passive of a fault in an official address; no maker of the mistakes appears. The detector reads every word from the start of the clause (after the last . ; : ! ? or line break) to the auxiliary, and the 'not' of 'did not achieve', which negates an earlier verb, stands in that span with only a comma between. It cannot tell which verb a negator negates, so it stays silent: a recorded miss in the safe direction. Reading the whole clause is what keeps long breach-notice denials ('No credit card numbers, bank account details or passwords were stolen.') unmarked.",
       "source": "https://www.reaganlibrary.gov/archives/speech/address-joint-session-congress-state-union-1987 (1987-01-27), as quoted in the Open Lens lexicon OL.AGENTDEL (cambridgetcg/open-lens)"
     },
     {
@@ -1572,10 +1873,76 @@
       "ruleId": "agency-hiding.deleted-subject",
       "expect": "silent",
       "kind": "specimen",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O2",
       "reason": "The passive has a by-phrase ('by people who either did it deliberately or inadvertently'): an indefinite agent, but one the clause names, so the words show no deleted doer.",
       "source": "https://www.presidency.ucsb.edu/documents/the-presidents-news-conference-1067 (1997-01-28), as quoted in the Open Lens lexicon OL.AGENTDEL (cambridgetcg/open-lens)"
+    },
+    {
+      "id": "procedure.agency.collected",
+      "text": "Data were collected from 200 participants.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A methods-section procedure: collecting data says no harm, fault or concealment. 'collected', 'retained' and 'transferred' are kept out of the data class of spec/agency-lexicon.json for this reason.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.collected-information",
+      "text": "Information was collected via a survey.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "Survey procedure; the same data noun and verb as a privacy complaint, which the words alone cannot tell apart, so the rule stays silent.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.retained",
+      "text": "Records were retained for seven years.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A retention schedule: keeping records is procedure, not an act whose doer is hidden.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.transferred",
+      "text": "Data were transferred to a secure server.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A transfer log: moving data between systems is procedure.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "term-of-art.agency.error-raised",
+      "text": "If no error was raised, the call succeeded.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "term-of-art",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "Software raises an error: the program is the doer. 'raised' marks only after a challenge noun ('concerns were raised'), not after 'error'.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.shared-on-request",
+      "text": "Data were shared on request.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A data-availability statement: sharing on request is procedure. The data class keeps 'shared' after a data noun for the taxonomy's lesson ('Your data was shared with partners'), and the words cannot tell the two apart, so this marks: a recorded over-mark.",
+      "source": "constructed (motifs design plan, package E4: lexicon decision, 2026-10-19)"
     },
     {
       "id": "specimen.agency.target-2013",
@@ -1609,6 +1976,482 @@
       "status": "holds",
       "reason": "'were accessed': the clause about card numbers and identity documents ends in an agentless breach passive.",
       "source": "https://www.prnewswire.com/news-releases/equifax-announces-cybersecurity-incident-involving-consumer-information-300515960.html (2017-09-07), as quoted in the Open Lens lexicon OL.AGENTDEL (cambridgetcg/open-lens)"
+    },
+    {
+      "id": "negation.agency.never-sold",
+      "text": "Your data was never sold.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A denial, not a deleted doer: 'never' is no adverb to the detector, so 'was never sold' is not a candidate.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.has-not-been",
+      "text": "Passwords have not been compromised.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "'not' in the auxiliary chain denies the breach; there is no act whose doer is hidden.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.hasnt-been",
+      "text": "Passwords haven't been compromised.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "An n't contraction in the auxiliary chain negates like 'not'.",
+      "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.no-subject",
+      "text": "No customer data was accessed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "'No' heads the subject: the sentence says no access happened. A negator anywhere in the clause before the auxiliary silences the passive.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.none-of",
+      "text": "None of the records were leaked.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "'None of the records' denies the leak.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.nothing",
+      "text": "Nothing was withheld from investigators.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "The head word is the negator itself: nothing was withheld.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.neither-nor",
+      "text": "Neither passwords nor card numbers were exposed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "'nor' stands two words before the head 'numbers': a denial.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.long-subject",
+      "text": "No personal, financial or health information was accessed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "The negator is the fifth word before the head 'information'. The detector reads the whole clause before the auxiliary, so a subject of any length is covered.",
+      "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.do-not-believe",
+      "text": "We do not believe their information has been stolen.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A negated belief about the theft, the construction of the committed negated-disclaimer label in uk-mod-payroll-incident-2024: 'not' is the third word before the head 'information'.",
+      "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.after-participle",
+      "text": "Your data was shared with no one.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "'with no one' denies the sharing, but the negator comes after the participle and the detector reads negators only before it. A recorded over-mark.",
+      "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.breach-notice-card-numbers",
+      "text": "No credit card numbers, bank account details or passwords were stolen.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A breach notice's denial: 'No' heads a subject of three listed nouns and stands eight words before 'were'. A denial is not an agentless accusation, and a negator anywhere in the clause before the auxiliary silences the passive.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.breach-notice-ssn",
+      "text": "No Social Security numbers or other sensitive personal information were exposed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A breach notice's denial with a seven-word subject after 'No': nothing was exposed, so no doer is hidden.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.do-not-believe-far",
+      "text": "At this time, we do not believe that any of your personal information has been compromised.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A negated belief about the breach, the breach-notice form of do-not-believe: 'not' stands seven words before the head 'information', in the same clause as the passive.",
+      "source": "constructed probe (package E4b, 2026-10-19)"
+    },
+    {
+      "id": "lesson.agency.negator-earlier-clause",
+      "text": "No one called, but data were stolen.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "mark",
+      "actual": "were stolen",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "'data were stolen' is an accountable passive with no doer, and the 'No' belongs to the earlier clause 'No one called'. The detector reads every word from the clause's start (after the last . ; : ! ? or line break) to the auxiliary, and a comma starts no clause, because a long subject is a comma list; so it reads 'No' and stays silent. A recorded miss, in the safe direction.",
+      "source": "constructed probe (final re-verification of E3b+E4, recorded in package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.nobody-possessive",
+      "text": "Nobody's data was accessed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "A denial: no one's data was accessed. 'nobody' is a negator since agency lexicon version 5, as the 'no' of 'No one's data was accessed.' already was.",
+      "source": "constructed probe (package E4b, 2026-10-19)"
+    },
+    {
+      "id": "negation.agency.without-is-local",
+      "text": "Without warning, customer data was exposed.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "mark",
+      "actual": "was exposed",
+      "kind": "negation",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "'Without' negates only the word after it ('without warning'), not the clause: the breach is asserted and who exposed the data is not said. The guards read 'without' within two words of a match; the agency detector's clause reading does not read it.",
+      "source": "constructed probe (final review of PR B, 2026-10-19)"
+    },
+    {
+      "id": "lesson.agency.accounts-affected",
+      "text": "Approximately 4,000 accounts may have been affected.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "mark",
+      "actual": "been affected",
+      "kind": "lesson",
+      "status": "holds",
+      "reason": "A breach passive after a held-in-trust head ('accounts'): who affected them is not said.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "lesson.agency.information-impacted",
+      "text": "Your personal information may have been impacted.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "mark",
+      "actual": "been impacted",
+      "kind": "lesson",
+      "status": "holds",
+      "reason": "The breach-notice formula the Equifax and Target notices use, after a data head.",
+      "source": "constructed probe (E3b+E4 fixer, from the review findings, 2026-10-19)"
+    },
+    {
+      "id": "innocent.agency.patients-affected",
+      "text": "Twelve patients were affected.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "Medical sense: patients are affected by a condition or a drug, not by a doer the clause hides. 'affected' needs a held-in-trust head.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "innocent.agency.flights-impacted",
+      "text": "Roughly 2,000 flights were impacted after the storm.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "Weather, not a doer: 'impacted' needs a held-in-trust head.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "innocent.agency.earnings-affected",
+      "text": "Earnings were affected this quarter.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "innocent-twin",
+      "status": "holds",
+      "tag": "O2",
+      "reason": "Finance sense: earnings are affected by conditions. 'affected' needs a held-in-trust head.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "lesson.agency.ssn-impacted",
+      "text": "Your Social Security number was potentially impacted.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "mark",
+      "actual": "was potentially impacted",
+      "kind": "lesson",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A breach passive whose head 'number' is not in the held-in-trust list (numbers are also affected by rounding and seasons). A recorded miss, the safe direction.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.tax-withheld",
+      "text": "Federal income tax was withheld from each paycheck.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Payroll procedure: an employer withholds tax by law. 'withheld' needs no head word, so it marks. A head exclusion (tax, insurance, contributions) waits for a bench with payroll text.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "term-of-art.agency.keys-ignored",
+      "text": "Unknown keys were ignored.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "term-of-art",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Software behaviour: the program ignores the keys. 'ignored' is in the fault class, which needs no head word.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.outliers-ignored",
+      "text": "Outliers were ignored in the main analysis.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A methods-section choice the authors state openly; 'ignored' marks without a head word.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.plate-exposed",
+      "text": "Each plate was exposed for 10 minutes.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Laboratory procedure: exposure to light or air. Only 'exposed to' is excluded, so this marks.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "term-of-art.agency.port-exposed",
+      "text": "Port 8080 was exposed in the Dockerfile.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "term-of-art",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Container configuration: exposing a port is a setting, not a breach.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.renal-compromised",
+      "text": "Renal function was compromised in three patients.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Medical sense: impaired function, not a security breach. 'compromised' stays head-free because a head gate would cost a committed true positive.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "term-of-art.agency.cache-accessed",
+      "text": "The cache was accessed 40,000 times.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "term-of-art",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A count of reads: the program is the doer.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "term-of-art.agency.memory-leaked",
+      "text": "Memory was leaked each time the handler ran.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "term-of-art",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A memory leak is a bug, not a disclosure.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.hinges-concealed",
+      "text": "The hinges were concealed behind the panel for a seamless look.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Design: hidden hardware, not a concealment anyone answers for.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.arrivals-shelved",
+      "text": "New arrivals were shelved on Monday.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Library or retail sense: books put on shelves.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.bird-let-go",
+      "text": "The bird was let go at the edge of the wood.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Released, not dismissed: 'let go' is in the concealment class for layoffs and needs no head word.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "term-of-art.agency.warning-silenced",
+      "text": "The warning was silenced with a pragma.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "term-of-art",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A compiler warning switched off in code.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.measures-taken",
+      "text": "Repeated measures were taken at baseline and at 12 weeks.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Methods sense of 'measures' (measurements): the light verb marks after any error-class head.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.steps-given",
+      "text": "Detailed steps were given in section 3.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Documentation: steps listed in a section. Its only support in the lexicon is constructed or rules-aware text.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.steps-done",
+      "text": "Once all the steps were done, the dough rested for an hour.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A recipe: the cook did the steps.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.words-said",
+      "text": "Kind words were said about the late mayor.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A eulogy, not a deleted accuser: 'said' after 'words' marks.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.statements-taken",
+      "text": "Statements were taken from all the witnesses.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Police procedure: taking statements is routine and its doer is plain.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.errors-characterized",
+      "text": "Errors were characterized using a Monte Carlo method.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "Methods sense: measurement errors were estimated. 'characterized' has one non-constructed hit, in rules-aware pastiche.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "procedure.agency.it-determined",
+      "text": "It was determined that the sample was pure.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "unjudgeable-verb",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A laboratory finding, not a decision whose maker is hidden.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "named-agent.agency.agreed-between",
+      "text": "It was agreed between the parties that the fee would be waived.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "named-agent",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "A legal recital: 'between the parties' names who agreed. Only 'by' is read as an agent.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
+    },
+    {
+      "id": "named-agent.agency.by-past-window",
+      "text": "Mistakes were made in the preparation of the quarterly report by the finance team.",
+      "ruleId": "agency-hiding.deleted-subject",
+      "expect": "silent",
+      "kind": "named-agent",
+      "status": "known-defect",
+      "tag": "O2",
+      "reason": "The agent is named in the clause, but 'by' is the eighth word after the participle and the window is seven.",
+      "source": "constructed probe (doctrine and semantics review of E3b+E4, 2026-10-19)"
     },
     {
       "id": "probe.euphemism-institutional.01",
@@ -1749,9 +2592,9 @@
       "expect": "mark",
       "actual": "It\u2019s worth noting",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the lexical term is spelt only with an ASCII apostrophe.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the pack lists the term with U+2019 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1761,9 +2604,9 @@
       "expect": "mark",
       "actual": "It\u2019s important to note",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the lexical term is spelt only with an ASCII apostrophe.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe; the pack lists the term with U+2019 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1820,7 +2663,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Legal term of art: a lawsuit 'claiming that' states the pleading. The taxonomy records it as a documented residual leak.",
-      "cite": "spec/taxonomy.yaml:446",
+      "cite": "spec/taxonomy.yaml:485",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -1886,7 +2729,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Technical 'so-called' means 'known as'. The taxonomy names it as this rule's priced-in false positive.",
-      "cite": "spec/taxonomy.yaml:459",
+      "cite": "spec/taxonomy.yaml:498",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -1918,9 +2761,9 @@
       "expect": "mark",
       "actual": "so\u2011called",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the lexical term is spelt only with an ASCII hyphen.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack lists the term with U+2010, U+2011 and U+2013 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -1930,9 +2773,9 @@
       "expect": "mark",
       "actual": "self\u2011proclaimed",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the lexical term is spelt only with an ASCII hyphen.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack lists the term with U+2010, U+2011 and U+2013 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2074,9 +2917,9 @@
       "expect": "mark",
       "actual": "didn\u2019t even bother to",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in the n't contraction; the pattern n'?t goes silent.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2019 apostrophe in the n't contraction; the pack spells the pattern n['\u2019]?t.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2152,9 +2995,9 @@
       "expect": "mark",
       "actual": "Sources with first\u2011hand knowledge of the matter",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen in 'first\u2011hand'; the class [- ] admits only ASCII hyphen and space.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen in 'first\u2011hand'; the pack widens the class to [-\u2010\u2011\u2013 ].",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2296,9 +3139,9 @@
       "expect": "mark",
       "actual": "officer\u2013involved shooting",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2013 en dash; the class [- ] admits only ASCII hyphen and space.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2013 en dash; the pack widens the class to [-\u2010\u2011\u2013 ].",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     },
     {
@@ -2430,7 +3273,7 @@
       "kind": "term-of-art",
       "status": "priced-in",
       "reason": "Academic 'state-of-the-art' with the benchmark figure given. The taxonomy records it as known noise.",
-      "cite": "spec/taxonomy.yaml:354",
+      "cite": "spec/taxonomy.yaml:340",
       "source": "constructed probe (motifs survey rules reader, 2026-10-19)"
     },
     {
@@ -2440,9 +3283,9 @@
       "expect": "mark",
       "actual": "world\u2011class",
       "kind": "typography",
-      "status": "known-defect",
+      "status": "holds",
       "tag": "O3",
-      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the lexical term is spelt only with an ASCII hyphen.",
+      "reason": "The same tell as its ASCII spelling, with smart punctuation: U+2011 non-breaking hyphen; the pack lists the term with U+2010, U+2011 and U+2013 as well.",
       "source": "constructed typography probe (honest-marks design proposal, 2026-10-19)"
     }
   ]

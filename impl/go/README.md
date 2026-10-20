@@ -16,19 +16,21 @@ echo "We take your privacy extremely seriously." | go -C impl/go run .
 ## Conformance
 
 ```bash
-go -C impl/go test ./...  # 31/31 ASCII cases identical to the JS ground truth
+go -C impl/go test ./...  # 76/76 ASCII cases identical to the JS ground truth
 ```
 
 ## The RE2 lesson
 
 Go's `regexp` is RE2, which — by design — has **no lookahead**. The JS/Python
-engines use one: `(?!\s+by\b)`, to *not* flag `"the report was written by the
-committee"` as an agent-hiding passive (the agent is named). Go can't express
-that in the pattern, so this engine matches the be-verb + participle **without**
-the lookahead, then checks in code whether `" by <agent>"` follows and skips it
-if so. Same result, different mechanism — which is exactly the kind of thing a
-conformance suite is for: it proves the *output* is identical even when the
-*implementation* can't be.
+engines once used one, `(?!\s+by\b)`, to *not* flag `"the report was written
+by the committee"` as an agent-hiding passive (the agent is named), and Go
+checked in code instead. Since core 0.1.4 no engine uses lookaround for it: the
+accountable-passive detector matches the auxiliary and participle with one
+pattern, then all three engines walk the next seven words in code for `by`,
+and walk back for the head word, over the same generated word lists
+(`spec/agency-lexicon.json`). Same result, same mechanism — and the
+conformance suite still proves the *output* is identical, which is what it is
+for.
 
 Offsets here are **byte** offsets (Go strings are UTF-8). They equal the JS
 (UTF-16) and Python (code-point) offsets for ASCII, which is the corpus's

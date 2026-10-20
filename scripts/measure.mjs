@@ -11,10 +11,15 @@
 //   node scripts/measure.mjs --table    print a markdown table for a PR body
 //   node scripts/measure.mjs --compare <git-rev>
 //                                       score that revision's core and rules on today's items and labels
+//   node scripts/measure.mjs --consumer <git-rev>
+//                                       what a consumer moving from that revision's core and rules to the
+//                                       working tree's sees: density, agency marks, [who?] flags in strip
+//                                       and SARIF warnings, on the committed items and (when present) the
+//                                       local reader samples and held-out files; a markdown table
 //
 // Floors are reported and never gate: a rule's precision is one reader's
 // judgement on a small corpus, not proof.
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdtempSync, rmSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdtempSync, realpathSync, rmSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -368,6 +373,9 @@ function localStrata(analyze, rules) {
       const p = join(d, n);
       return statSync(p).isDirectory() ? walk(p) : n.endsWith(".txt") && !n.endsWith(".source.txt") ? [p] : [];
     });
+    const line = (name, n, words, tells, agency) =>
+      console.log(`  ${name.padEnd(26)} ${String(n).padStart(3)} files ${String(words).padStart(7)} words ${String(tells).padStart(5)} marks (${r2((tells / words) * 100)}/100)  agency ${agency} (${r2((agency / words) * 100)}/100)`);
+    const pooled = { n: 0, words: 0, tells: 0, agency: 0 };
     for (const set of readdirSync(heldout).sort()) {
       const files = walk(join(heldout, set));
       let words = 0, tells = 0, agency = 0;
@@ -376,8 +384,10 @@ function localStrata(analyze, rules) {
         words += r.source.words; tells += r.density.tells;
         agency += r.marks.filter((m) => m.ruleId === AGENCY).length;
       }
-      console.log(`  ${set.padEnd(26)} ${String(files.length).padStart(3)} files ${String(words).padStart(7)} words ${String(tells).padStart(5)} marks (${r2((tells / words) * 100)}/100)  agency ${agency} (${r2((agency / words) * 100)}/100)`);
+      line(set, files.length, words, tells, agency);
+      Object.assign(pooled, { n: pooled.n + files.length, words: pooled.words + words, tells: pooled.tells + tells, agency: pooled.agency + agency });
     }
+    if (pooled.words) line("pooled", pooled.n, pooled.words, pooled.tells, pooled.agency);
   }
   const lines = (name, list) => {
     const marked = list.filter((t) => analyze(t, { rules }).marks.some((m) => m.ruleId === AGENCY)).length;
@@ -403,7 +413,63 @@ async function engineAt(rev) {
   writeFileSync(join(dir, "package.json"), '{"type":"module"}\n');
   const rules = JSON.parse(show("packages/rules-en/rules.json").toString("utf8"));
   const { analyze } = await import(pathToFileURL(join(dir, "index.mjs")).href);
-  return { analyze, rules, cleanup: () => rmSync(dir, { recursive: true, force: true }) };
+  const { toSarif } = await import(pathToFileURL(join(dir, "sarif.mjs")).href);
+  return { analyze, toSarif, rules, cleanup: () => rmSync(dir, { recursive: true, force: true }) };
+}
+
+// ---------------------------------------------------------------- --consumer <rev>
+/** The texts a consumer-impact row reads: the committed items, then the local sets when present. */
+function consumerSets(corpus) {
+  const sets = [{ name: `${corpus.items.length} committed items`, texts: corpus.items.map((i) => i.text) }];
+  const L = join(M, "local");
+  const txt = (n) => n.endsWith(".txt") && !n.endsWith(".source.txt");
+  const corpusDir = join(L, "empirical", "corpus");
+  if (existsSync(corpusDir)) {
+    const files = readdirSync(corpusDir).filter(txt).sort();
+    sets.push({ name: `${files.length} local reader samples`, texts: files.map((f) => readFileSync(join(corpusDir, f), "utf8")) });
+  }
+  const heldout = join(L, "heldout");
+  if (existsSync(heldout)) {
+    const walk = (d) => readdirSync(d).sort().flatMap((n) => {
+      const p = join(d, n);
+      return statSync(p).isDirectory() ? walk(p) : txt(n) ? [p] : [];
+    });
+    const files = walk(heldout);
+    sets.push({ name: `${files.length} local held-out files`, texts: files.map((f) => readFileSync(f, "utf8")) });
+  }
+  return sets;
+}
+
+/** Totals a consumer sees from one engine over one set of texts. */
+function consumerTotals({ analyze, toSarif, rules }, texts) {
+  const t = { words: 0, marks: 0, agency: 0, who: 0, warnings: 0, engine: null };
+  const count = (s, sub) => s.split(sub).length - 1;
+  for (const text of texts) {
+    const r = analyze(text, { rules });
+    t.engine ||= `\`${r.engine.name}@${r.engine.version}\` + \`${r.engine.rules}\``;
+    t.words += r.source.words;
+    t.marks += r.density.tells;
+    t.agency += r.marks.filter((m) => m.ruleId === AGENCY).length;
+    t.who += count(r.strip, "[who?]") - count(text, "[who?]");
+    t.warnings += toSarif(r).runs[0].results.filter((x) => x.level === "warning").length;
+  }
+  return t;
+}
+
+function consumerTable(before, after, sets, rev) {
+  const n = (x) => x.toLocaleString("en-US");
+  const per100 = (t) => r2((t.marks / t.words) * 100).toFixed(2);
+  const lines = [];
+  for (const set of sets) {
+    const b = consumerTotals(before, set.texts), a = consumerTotals(after, set.texts);
+    if (!lines.length) {
+      lines.push(`Consumer impact, before (${rev}: ${b.engine}) → after (working tree: ${a.engine}).`, "",
+        "| texts | marks per 100 words | agency marks | `[who?]` in strip | SARIF warnings |", "|---|---|---|---|---|");
+    }
+    const words = a.words === b.words ? `${n(a.words)} words` : `${n(b.words)} → ${n(a.words)} words`;
+    lines.push(`| ${set.name}, ${words} | ${per100(b)} → ${per100(a)} | ${n(b.agency)} → ${n(a.agency)} | ${n(b.who)} → ${n(a.who)} | ${n(b.warnings)} → ${n(a.warnings)} |`);
+  }
+  return lines.join("\n");
 }
 
 function compareTable(before, after, revLabel) {
@@ -462,12 +528,26 @@ async function main(argv) {
       old.cleanup();
     }
   }
-  const quiet = flag("--check") || flag("--write") || flag("--table") || cmp >= 0;
+  const consumer = argv.indexOf("--consumer");
+  if (consumer >= 0) {
+    const rev = argv[consumer + 1];
+    if (!rev || rev.startsWith("--")) throw new Error("--consumer needs a git revision");
+    const old = await engineAt(rev);
+    try {
+      const { toSarif } = await import(pathToFileURL(join(ROOT, "packages", "core", "sarif.mjs")).href);
+      console.log(consumerTable(old, { analyze, toSarif, rules: corpus.rules }, consumerSets(corpus), rev));
+    } finally {
+      old.cleanup();
+    }
+  }
+  const quiet = flag("--check") || flag("--write") || flag("--table") || cmp >= 0 || consumer >= 0;
   if (!quiet || flag("--local")) printReport(report);
   if (flag("--local")) localStrata(analyze, corpus.rules);
 }
 
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+// Compare real paths: on macOS /tmp is a symlink to /private/tmp, and --check
+// run through it must still check (and fail when it should), not exit 0 silently.
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main(process.argv.slice(2)).catch((error) => {
     console.error(error.stack || String(error));
     process.exitCode = 1;

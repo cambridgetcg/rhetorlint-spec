@@ -14,7 +14,7 @@ Unlike npm, **PyPI has one flat namespace and no scopes** — the package name
 ```bash
 git clone https://github.com/cambridgetcg/rhetorlint-spec.git   # or: cd rhetorlint-spec && git pull
 cd rhetorlint-spec
-python3 impl/python/test_conformance.py     # MUST print: python conformance: 15/15 cases identical to the ground truth
+python3 impl/python/test_conformance.py     # MUST print: python conformance: N/N cases identical to the ground truth (76/76 at core 0.1.4)
 ```
 
 The count is the size of the corpus, not a target — it rises as cases are added.
