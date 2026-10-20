@@ -45,19 +45,20 @@ So the pattern is built to match **nothing** under a case-insensitive compile. E
 
 ## The seed families
 
-11 rules across 5 of the taxonomy's 7 families:
+22 rules across 6 of the taxonomy's 7 families:
 
 | family | rules |
 |--------|-------|
-| `manipulative-wording` | `intensifier.loaded` · `hedge.softener` · `hedge.deniable` · `weasel.attribution` · `contrition.rehearsed` · `lure.free-offer` · `shouting.caps` |
+| `manipulative-wording` | `intensifier.loaded` · `hedge.softener` · `hedge.deniable` · `weasel.attribution` · `contrition.rehearsed` · `lure.free-offer` · `shouting.caps` · `euphemism.institutional` · `editorializing.stance` · `attribution.factive` · `implicative.shortfall` · `sourcing.anonymous` · `combat.attack-verb` · `exoneration.formula` · `insinuation.raises-questions` · `puffery.peacock` |
 | `simplification` | `absolute.universal` |
 | `distraction` | `deflection.whataboutism` |
+| `attack-on-reputation` | `attribution.doubt-verb` · `distancing.doubt-marker` |
 | `call` | `urgency.appeal-to-time` |
 | `agency-hiding` | `agency-hiding.deleted-subject` |
 
-`attack-on-reputation` and `justification` are named in the taxonomy and not yet seeded here.
+`justification` is named in the taxonomy and not yet seeded here.
 
-The human-readable, teachable version — with definitions, worked examples, and SemEval lineage — lives in [`spec/taxonomy.yaml`](../../spec/taxonomy.yaml). This JSON is its compiled, runtime form.
+The human-readable, teachable version — with definitions, worked examples, and SemEval lineage — lives in [`spec/taxonomy.yaml`](../../spec/taxonomy.yaml). This JSON is its runtime form; no engine reads the YAML, so [`test/taxonomy-agreement.test.mjs`](../../test/taxonomy-agreement.test.mjs) holds the two to the same ids, families and technique labels.
 
 ## Authoring note
 

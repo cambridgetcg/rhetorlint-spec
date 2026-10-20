@@ -1,0 +1,47 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/cambridgetcg/rhetorlint-spec/measurement/schema/labels.schema.json",
+ "title": "RhetorLint measurement labels",
+ "description": "One reader's judgement of each mark, keyed by (item, ruleId, start, end) in UTF-16 code units into measurement/items/<item>.txt. actual must equal that slice. Labels are judgements, not ground truth, and they never feed conformance/.",
+ "type": "object",
+ "required": ["version", "labellers", "labels"],
+ "additionalProperties": false,
+ "properties": {
+  "version": { "type": "integer", "minimum": 1, "maximum": 1 },
+  "labellers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/labeller" } },
+  "labels": { "type": "array", "items": { "$ref": "#/$defs/label" } }
+ },
+ "$defs": {
+  "labeller": {
+   "type": "object",
+   "required": ["id", "who", "note"],
+   "additionalProperties": false,
+   "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "who": { "type": "string", "minLength": 1 },
+    "note": { "type": "string", "minLength": 1 }
+   }
+  },
+  "label": {
+   "type": "object",
+   "required": ["item", "ruleId", "start", "end", "actual", "label", "reason", "by", "date"],
+   "additionalProperties": false,
+   "properties": {
+    "item": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "ruleId": { "type": "string", "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$" },
+    "start": { "type": "integer", "minimum": 0 },
+    "end": { "type": "integer", "minimum": 1 },
+    "actual": { "type": "string", "minLength": 1 },
+    "label": {
+     "enum": ["TP", "MENTION", "DEBATABLE", "FPB", "FPW"],
+     "description": "TP: right construction, in use, doing the work the rule names. MENTION: right construction, quoted or exhibited as an example. DEBATABLE: right construction; whether it does that work is a judgement call. FPB: right surface construction, benign in context. FPW: wrong construction; the match is not the thing the rule describes."
+    },
+    "reason": { "enum": ["accountable-act", "quoted-specimen", "procedural-present", "stative-adjective", "named-agent", "negated-disclaimer", "imperative", "boilerplate", "other"] },
+    "note": { "type": "string", "minLength": 1 },
+    "by": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "candidate_only": { "type": "boolean", "description": "true when HEAD core with rules.json did not produce this mark at labelling time; the row was labelled because a candidate engine did." }
+   }
+  }
+ }
+}

@@ -1,0 +1,5 @@
+# reject: line 5: tab indentation is outside the subset
+version: "0.1"
+families:
+  - id: call
+	what: "Driving you to act now."

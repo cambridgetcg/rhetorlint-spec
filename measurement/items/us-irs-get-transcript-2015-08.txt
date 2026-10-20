@@ -1,0 +1,27 @@
+Aug. 17, 2015
+
+Following an incident involving the IRS’s “Get Transcript” web application discovered in May, the IRS conducted an extensive review covering the 2015 filing season to assess whether other suspicious activity occurred. Following this review, the IRS has identified more questionable attempts to obtain transcripts using sensitive information already in the hands of criminals. As a result, the IRS is moving immediately to notify and help protect these taxpayers.
+
+As it did in May, the IRS is moving aggressively to protect taxpayers whose account information may have been accessed. The IRS will begin mailing letters in the next few days to about 220,000 taxpayers where there were instances of possible or potential access to “Get Transcript” taxpayer account information. As an additional protective step, the IRS will also be mailing letters to approximately 170,000 other households alerting them that their personal information could be at risk even though identity thieves failed in efforts to access the IRS system.
+
+A wide variety of actions to protect taxpayers are being taken beyond the mailings, including offering taxpayers free credit protection as well as Identity Protection PINs. The IRS takes the security of taxpayer data extremely seriously, and we are working to continue to strengthen security for “Get Transcript,” including by enhancing taxpayer-identity authentication protocols.
+
+Additional information
+
+In May, the IRS determined unauthorized third parties already had sufficient information from a source outside the tax agency before accessing the "Get Transcript" application. This allowed them to clear a multi-step authentication process, including several personal verification questions that typically are only known by the taxpayer.
+
+When the IRS first identified the problem in May, it determined that these third parties with taxpayer-specific sensitive data from non-IRS sources cleared the Get Transcript verification process on about 114,000 total attempts. In addition, third parties made another 111,000 attempts that failed to pass the final verification step, meaning they were unable to have access to account information through the Get Transcript service.
+
+Since then, as part of the IRS’s continued efforts to protect taxpayer data, the IRS conducted a deeper analysis over a wider time period covering the 2015 filing season, analyzing more than 23 million uses of the Get Transcript system.
+
+The new review identified an estimated additional 220,000 attempts where individuals with taxpayer-specific sensitive data cleared the Get Transcript verification process. The review also identified an additional 170,000 suspected attempts that failed to clear the authentication processes.
+
+The IRS will begin mailing letters in the next few days to the taxpayers whose accounts may have been accessed. Given the uncertainty in many of these cases — where a tax return was filed before the Get Transcript access occurred for example — the IRS notices will advise taxpayers that they can disregard the letter if they were actually the ones seeking a copy of their tax return information.
+
+The IRS believes some of this information may have been gathered for potentially filing fraudulent tax returns during the upcoming 2016 filing season so anyone receiving a letter should take steps to protect themselves by taking advantage of the free credit monitoring and IP PIN which can be used to verify the authenticity of next year’s tax return.
+
+The “Get Transcript” application was shut down in May, and the IRS continues to work on strengthening the system. In the meantime, taxpayers have several other options to obtain transcripts. See IRS Special Edition Tax Tip 2015-16, Hold On to Your Tax Returns; Options for Students, Others to Get Help with Tax Information.
+
+The IRS takes the security of taxpayer data extremely seriously, and we are working aggressively to protect affected taxpayers and continue to strengthen our systems.
+
+The matter remains under review by the Treasury Inspector General for Tax Administration as well as IRS Criminal Investigation.

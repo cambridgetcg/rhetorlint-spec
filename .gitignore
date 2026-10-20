@@ -8,3 +8,4 @@ dist/
 .npmrc
 __pycache__/
 *.pyc
+measurement/local/

@@ -1,0 +1,13 @@
+Earlier this week, CMS staff detected anomalous activity in the Federally Facilitated Exchanges, or FFE’s Direct Enrollment pathway for agents and brokers. The Direct Enrollment pathway, first launched in 2013, allows agents and brokers to assist consumers with applications for coverage in the FFE.
+
+At this time, we believe that approximately 75,000 individuals’ files were accessed. While this is a small fraction of consumer records present on the FFE, any breach of our system is unacceptable.
+
+“Our number one priority is the safety and security of the Americans we serve. We will continue to work around the clock to help those potentially impacted and ensure the protection of consumer information,” said CMS Administrator Seema Verma. “I want to make clear to the public that HealthCare.gov and the Marketplace Call Center are still available, and open enrollment will not be negatively impacted. We are working to identify the individuals potentially impacted as quickly as possible so that we can notify them and provide resources such as credit protection.”
+
+CMS followed standard and appropriate security and risk protocols for researching and reporting the incident. Upon verification of the breach, CMS took immediate steps to secure the system and consumer information, further investigate the incident, and subsequently notify Federal law enforcement. We are actively engaged in and committed to helping those potentially impacted as well as ensuring the protection of consumer information.
+
+CMS began the initial investigation of anomalous system activity in the Direct Enrollment pathway for agents and brokers on October 13, 2018 and a breach was declared on October 16, 2018. The agent and broker accounts that were associated with the anomalous activity were deactivated, and – out of an abundance of caution – the Direct Enrollment pathway for agents and brokers was disabled. We are working to address the issue, implement additional security measures, and restore the Direct Enrollment pathway for agents and brokers within the next 7 days.
+
+The tool through which the breach occurred is only available through the currently-disabled Direct Enrollment pathway for agents and brokers. As a result, the remaining FFE enrollment channels, including HealthCare.gov and the Marketplace Call Center, remain operational.
+
+At the Centers for Medicare & Medicaid Services (CMS), the safety and security of consumer information is our utmost priority. It is important to note that CMS is in the beginning stages of the assessment of this breach. This is an evolving situation and we will continue to provide additional information.

@@ -1,0 +1,30 @@
+{
+ "version": 1,
+ "about": "Per-rule FPB and FPW counts of the canonical engine (packages/core with packages/rules-en/rules.json) on the committed items. test/measurement.test.mjs fails when any rule's FPB+FPW total differs from this file: a rise is a regression to fix; a fall is locked in by updating this file in the same commit.",
+ "engine": {
+  "core": "@rhetorlint/core@0.1.3",
+  "rules": "@rhetorlint/rules-en@0.2.0"
+ },
+ "false_positives": {
+  "absolute.universal": {
+   "FPB": 14,
+   "FPW": 4
+  },
+  "agency-hiding.deleted-subject": {
+   "FPB": 303,
+   "FPW": 31
+  },
+  "hedge.deniable": {
+   "FPB": 19,
+   "FPW": 7
+  },
+  "hedge.softener": {
+   "FPB": 3,
+   "FPW": 2
+  },
+  "weasel.attribution": {
+   "FPB": 0,
+   "FPW": 1
+  }
+ }
+}

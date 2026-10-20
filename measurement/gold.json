@@ -1,0 +1,925 @@
+{
+ "version": 1,
+ "sets": [
+  {
+   "id": "legacy-semeval",
+   "annotator": "agent: the motifs empirical reader (Claude), 2026-10-19",
+   "date": "2026-10-19",
+   "read_rules_json": true,
+   "before_detectors": null,
+   "scope": "Manipulative spans in the four spin pastiches, each tagged with its nearest SemEval-2023 technique (or a non-SemEval note). No intended rule: these spans count only toward any-rule recall.",
+   "note": "Ported verbatim from the empirical reader's labels-gold.json. Whether they were annotated before the detector ran was not recorded, so before_detectors is null (unknown)."
+  },
+  {
+   "id": "accountable-passive-v1",
+   "annotator": "agent: M1 measurement implementer (Claude Opus 5.5 via Claude Code)",
+   "date": "2026-10-19",
+   "read_rules_json": true,
+   "before_detectors": true,
+   "scope": "Target-genre items only. A span is gold when a finite passive clause names no doer and its verb reports (a) a fault or wrongful act, (b) unauthorised access to, acquisition of or disclosure of data the speaking body held, (c) concealment or restriction of information, or (d) a vague remedial claim ('steps will be taken', 'action was taken', 'it is put right'). Not gold: negated non-events ('has not been affected'), detection and investigation ('was discovered'), concrete remedies ('were deactivated', 'have been removed'), routine procedure, statives, reduced (non-finite) participles, and clauses whose doer is named ('by the High Court'). The span runs from the first auxiliary through the participle.",
+   "note": "Annotated from the item text alone, before any detector was run on these items. The annotator had read packages/rules-en/rules.json, spec/taxonomy.yaml and the agentless-passive detector, so this gold is not blind."
+  }
+ ],
+ "annotations": [
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 87,
+   "end": 150,
+   "text": "the trust you place in us is the foundation of everything we do",
+   "rule": null,
+   "technique": "Appeal to Values"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 189,
+   "end": 215,
+   "text": "a recent security incident",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation (euphemism for breach)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 221,
+   "end": 263,
+   "text": "may have involved some of your information",
+   "rule": null,
+   "technique": "Obfuscation-Vagueness-Confusion"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 320,
+   "end": 371,
+   "text": "a third-party system operated by one of our vendors",
+   "rule": null,
+   "technique": "Red Herring (blame displacement)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 450,
+   "end": 479,
+   "text": "leading cybersecurity experts",
+   "rule": null,
+   "technique": "Appeal to Authority (unnamed)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 546,
+   "end": 597,
+   "text": "certain customer information may have been accessed",
+   "rule": null,
+   "technique": "Obfuscation-Vagueness-Confusion"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 652,
+   "end": 685,
+   "text": "for a limited number of customers",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 717,
+   "end": 786,
+   "text": "There is currently no evidence that this information has been misused",
+   "rule": null,
+   "technique": "Obfuscation-Vagueness-Confusion (absence-of-evidence)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 789,
+   "end": 860,
+   "text": "We take the protection of your personal information extremely seriously",
+   "rule": null,
+   "technique": "Obfuscation (rehearsed contrition)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 865,
+   "end": 917,
+   "text": "sincerely apologize for any inconvenience or concern",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation (rehearsed contrition)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 934,
+   "end": 964,
+   "text": "Out of an abundance of caution",
+   "rule": null,
+   "technique": "Obfuscation (rehearsed contrition)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 1014,
+   "end": 1045,
+   "text": "complimentary credit monitoring",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation (remedy framed as gift)"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 1047,
+   "end": 1091,
+   "text": "Additional safeguards have been put in place",
+   "rule": null,
+   "technique": "Obfuscation-Vagueness-Confusion"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 1150,
+   "end": 1224,
+   "text": "Protecting your data has always been, and will always be, our top priority",
+   "rule": null,
+   "technique": "Appeal to Values / Repetition"
+  },
+  {
+   "item": "inv-breach-apology",
+   "set": "legacy-semeval",
+   "start": 1226,
+   "end": 1277,
+   "text": "We remain committed to earning your trust every day",
+   "rule": null,
+   "technique": "Obfuscation (rehearsed contrition)"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 3,
+   "end": 16,
+   "text": "$NOVA IS LIVE",
+   "rule": null,
+   "technique": "Loaded Language (caps)"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 18,
+   "end": 64,
+   "text": "The future of decentralized finance starts NOW",
+   "rule": null,
+   "technique": "Slogans / Appeal to Time"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 80,
+   "end": 119,
+   "text": "the first truly community-owned Layer-2",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 154,
+   "end": 208,
+   "text": "Backed by top-tier VCs and audited by industry leaders",
+   "rule": null,
+   "technique": "Appeal to Authority (unnamed)"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 225,
+   "end": 268,
+   "text": "lightning-fast transactions, near-zero fees",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 305,
+   "end": 339,
+   "text": "designed to reward early believers",
+   "rule": null,
+   "technique": "Loaded Language"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 421,
+   "end": 454,
+   "text": "Staking rewards of up to 420% APY",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation (up-to framing)"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 489,
+   "end": 515,
+   "text": "Ownership renounced. SAFU.",
+   "rule": null,
+   "technique": "Slogans"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 559,
+   "end": 581,
+   "text": "big announcements soon",
+   "rule": null,
+   "technique": "Obfuscation-Vagueness-Confusion"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 612,
+   "end": 634,
+   "text": "open for 48 hours only",
+   "rule": null,
+   "technique": "Appeal to Time"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 677,
+   "end": 719,
+   "text": "Once the presale closes, the price goes up",
+   "rule": null,
+   "technique": "Appeal to Time / Consequential Oversimplification"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 721,
+   "end": 734,
+   "text": "No exceptions",
+   "rule": null,
+   "technique": "Appeal to Time"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 737,
+   "end": 779,
+   "text": "Thousands have already joined the movement",
+   "rule": null,
+   "technique": "Appeal to Popularity"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 781,
+   "end": 856,
+   "text": "Don't be the one who watched from the sidelines while everyone else made it",
+   "rule": null,
+   "technique": "Appeal to Fear-Prejudice (FOMO)"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 858,
+   "end": 911,
+   "text": "This is not financial advice, but you know what to do",
+   "rule": null,
+   "technique": "Obfuscation (deniable implicature)"
+  },
+  {
+   "item": "inv-crypto-launch",
+   "set": "legacy-semeval",
+   "start": 971,
+   "end": 1002,
+   "text": "let's ride to the moon together",
+   "rule": null,
+   "technique": "Slogans"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 6,
+   "end": 50,
+   "text": "I've been very clear about this from day one",
+   "rule": null,
+   "technique": "Conversation Killer"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 77,
+   "end": 89,
+   "text": "these smears",
+   "rule": null,
+   "technique": "Name Calling-Labeling"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 107,
+   "end": 145,
+   "text": "The people of this state know who I am",
+   "rule": null,
+   "technique": "Appeal to Popularity / Flag Waving"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 209,
+   "end": 241,
+   "text": "I have always followed the rules",
+   "rule": null,
+   "technique": "Exaggeration (absolute)"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 247,
+   "end": 295,
+   "text": "at no point did I knowingly do anything improper",
+   "rule": null,
+   "technique": "Obfuscation-Vagueness-Confusion (qualifier 'knowingly')"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 297,
+   "end": 378,
+   "text": "If anyone was offended by the way those remarks were characterized, I regret that",
+   "rule": null,
+   "technique": "Obfuscation (conditional non-apology)"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 403,
+   "end": 451,
+   "text": "could have been handled differently by my office",
+   "rule": null,
+   "technique": "Obfuscation-Vagueness-Confusion"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 462,
+   "end": 499,
+   "text": "That's a conversation for another day",
+   "rule": null,
+   "technique": "Conversation Killer"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 506,
+   "end": 555,
+   "text": "let's be honest about what's really going on here",
+   "rule": null,
+   "technique": "non-SemEval: sincerity marker / Loaded Language"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 567,
+   "end": 599,
+   "text": "politically motivated witch hunt",
+   "rule": null,
+   "technique": "Name Calling-Labeling"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 601,
+   "end": 659,
+   "text": "timed to distract from my opponent's failed record on jobs",
+   "rule": null,
+   "technique": "Questioning the Reputation / Red Herring"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 661,
+   "end": 737,
+   "text": "The real question is why my opponent still won't release her own tax returns",
+   "rule": null,
+   "technique": "Whataboutism"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 739,
+   "end": 754,
+   "text": "Make no mistake",
+   "rule": null,
+   "technique": "Loaded Language (stance)"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 809,
+   "end": 836,
+   "text": "desperate, recycled attacks",
+   "rule": null,
+   "technique": "Name Calling-Labeling / Loaded Language"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 928,
+   "end": 956,
+   "text": "The record speaks for itself",
+   "rule": null,
+   "technique": "Conversation Killer / Slogans"
+  },
+  {
+   "item": "inv-political-nondenial",
+   "set": "legacy-semeval",
+   "start": 958,
+   "end": 986,
+   "text": "Now, I've got a state to run",
+   "rule": null,
+   "technique": "Conversation Killer"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 0,
+   "end": 10,
+   "text": "FLASH SALE",
+   "rule": null,
+   "technique": "Loaded Language (caps)"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 13,
+   "end": 37,
+   "text": "UP TO 70% OFF EVERYTHING",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation (up-to framing)"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 38,
+   "end": 62,
+   "text": "Ends tonight at midnight",
+   "rule": null,
+   "technique": "Appeal to Time"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 64,
+   "end": 84,
+   "text": "Only 3 left in stock",
+   "rule": null,
+   "technique": "Appeal to Time (scarcity)"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 86,
+   "end": 127,
+   "text": "27 people are viewing this item right now",
+   "rule": null,
+   "technique": "Appeal to Popularity"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 129,
+   "end": 162,
+   "text": "Hurry, prices this low won't last",
+   "rule": null,
+   "technique": "Appeal to Time"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 164,
+   "end": 185,
+   "text": "Order within 02:14:59",
+   "rule": null,
+   "technique": "Appeal to Time (countdown)"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 190,
+   "end": 212,
+   "text": "FREE next-day delivery",
+   "rule": null,
+   "technique": "Exaggeration-Minimisation (free lure)"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 227,
+   "end": 260,
+   "text": "4.8★ from 12,000+ happy customers",
+   "rule": null,
+   "technique": "Appeal to Popularity"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 261,
+   "end": 278,
+   "text": "Limited time only",
+   "rule": null,
+   "technique": "Appeal to Time"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 280,
+   "end": 299,
+   "text": "Last chance to save",
+   "rule": null,
+   "technique": "Appeal to Time"
+  },
+  {
+   "item": "inv-scarcity-banner",
+   "set": "legacy-semeval",
+   "start": 301,
+   "end": 326,
+   "text": "Once it's gone, it's gone",
+   "rule": null,
+   "technique": "Slogans / Appeal to Time"
+  },
+  {
+   "item": "uk-laa-data-breach-2025",
+   "set": "accountable-passive-v1",
+   "start": 422,
+   "end": 447,
+   "text": "may have been compromised",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "uk-laa-data-update-2026",
+   "set": "accountable-passive-v1",
+   "start": 303,
+   "end": 328,
+   "text": "may have been compromised",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "uk-laa-data-update-2026",
+   "set": "accountable-passive-v1",
+   "start": 965,
+   "end": 980,
+   "text": "was exfiltrated",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "uk-laa-data-update-2026",
+   "set": "accountable-passive-v1",
+   "start": 2486,
+   "end": 2511,
+   "text": "may have been exfiltrated",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "uk-mod-afghan-guidance-2025",
+   "set": "accountable-passive-v1",
+   "start": 221,
+   "end": 246,
+   "text": "may have been compromised",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "uk-mod-afghan-guidance-2025",
+   "set": "accountable-passive-v1",
+   "start": 629,
+   "end": 640,
+   "text": "was emailed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "uk-mod-afghan-guidance-2025",
+   "set": "accountable-passive-v1",
+   "start": 686,
+   "end": 708,
+   "text": "was mistakenly thought",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "uk-mod-afghan-guidance-2025",
+   "set": "accountable-passive-v1",
+   "start": 1865,
+   "end": 1884,
+   "text": "had been restricted",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (concealment)"
+  },
+  {
+   "item": "uk-mod-afghan-guidance-2025",
+   "set": "accountable-passive-v1",
+   "start": 2059,
+   "end": 2078,
+   "text": "was not safeguarded",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "uk-mod-afghan-statement-2025",
+   "set": "accountable-passive-v1",
+   "start": 2923,
+   "end": 2932,
+   "text": "was taken",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (vague-remedy)"
+  },
+  {
+   "item": "uk-mod-afghan-statement-2025",
+   "set": "accountable-passive-v1",
+   "start": 3747,
+   "end": 3763,
+   "text": "have been served",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (concealment)"
+  },
+  {
+   "item": "uk-mod-afghan-statement-2025",
+   "set": "accountable-passive-v1",
+   "start": 9490,
+   "end": 9505,
+   "text": "was compromised",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "uk-mod-payroll-incident-2024",
+   "set": "accountable-passive-v1",
+   "start": 653,
+   "end": 666,
+   "text": "will be taken",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (vague-remedy)"
+  },
+  {
+   "item": "uk-mod-payroll-incident-2024",
+   "set": "accountable-passive-v1",
+   "start": 4925,
+   "end": 4931,
+   "text": "is put",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (vague-remedy)"
+  },
+  {
+   "item": "uk-nio-psni-breach-2023",
+   "set": "accountable-passive-v1",
+   "start": 1000,
+   "end": 1026,
+   "text": "was accidentally published",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "uk-nio-psni-breach-2023",
+   "set": "accountable-passive-v1",
+   "start": 1339,
+   "end": 1352,
+   "text": "was published",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "us-cms-agent-broker-2024-07",
+   "set": "accountable-passive-v1",
+   "start": 1632,
+   "end": 1643,
+   "text": "was changed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "us-cms-agent-broker-2024-07",
+   "set": "accountable-passive-v1",
+   "start": 2041,
+   "end": 2059,
+   "text": "have been enrolled",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "us-cms-ffe-breach-2018",
+   "set": "accountable-passive-v1",
+   "start": 371,
+   "end": 384,
+   "text": "were accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-form-990t-2022",
+   "set": "accountable-passive-v1",
+   "start": 182,
+   "end": 207,
+   "text": "should not have been made",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "us-irs-form-990t-2022",
+   "set": "accountable-passive-v1",
+   "start": 1150,
+   "end": 1177,
+   "text": "was inadvertently published",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (fault)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-05",
+   "set": "accountable-passive-v1",
+   "start": 901,
+   "end": 914,
+   "text": "were accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-05",
+   "set": "accountable-passive-v1",
+   "start": 1702,
+   "end": 1712,
+   "text": "was gained",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-05",
+   "set": "accountable-passive-v1",
+   "start": 3049,
+   "end": 3058,
+   "text": "were made",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-05",
+   "set": "accountable-passive-v1",
+   "start": 4291,
+   "end": 4304,
+   "text": "were accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-05",
+   "set": "accountable-passive-v1",
+   "start": 5120,
+   "end": 5132,
+   "text": "was accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-05",
+   "set": "accountable-passive-v1",
+   "start": 5247,
+   "end": 5256,
+   "text": "were made",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-08",
+   "set": "accountable-passive-v1",
+   "start": 575,
+   "end": 597,
+   "text": "may have been accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-08",
+   "set": "accountable-passive-v1",
+   "start": 1088,
+   "end": 1103,
+   "text": "are being taken",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (vague-remedy)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-08",
+   "set": "accountable-passive-v1",
+   "start": 2839,
+   "end": 2861,
+   "text": "may have been accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2015-08",
+   "set": "accountable-passive-v1",
+   "start": 3190,
+   "end": 3212,
+   "text": "may have been gathered",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 822,
+   "end": 835,
+   "text": "were targeted",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 1340,
+   "end": 1362,
+   "text": "may have been accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 1626,
+   "end": 1639,
+   "text": "were accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 1678,
+   "end": 1691,
+   "text": "were targeted",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 1871,
+   "end": 1884,
+   "text": "were accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 2124,
+   "end": 2137,
+   "text": "were accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 3296,
+   "end": 3313,
+   "text": "had been accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 3368,
+   "end": 3381,
+   "text": "were targeted",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 3496,
+   "end": 3518,
+   "text": "may have been accessed",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  },
+  {
+   "item": "us-irs-get-transcript-2016-02",
+   "set": "accountable-passive-v1",
+   "start": 3576,
+   "end": 3589,
+   "text": "were targeted",
+   "rule": "agency-hiding.deleted-subject",
+   "technique": "accountable passive (breach)"
+  }
+ ]
+}

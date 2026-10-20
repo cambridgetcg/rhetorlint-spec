@@ -1,0 +1,19 @@
+On Wednesday 23 April, we became aware of a cyber-attack on the Legal Aid Agency’s online digital services.
+
+These are the services through which legal aid providers log their work and receive payment from the Government.
+
+In the days following the discovery, we took immediate action to bolster the security of the system, and informed all legal aid providers that some of their details, including financial information, may have been compromised.
+
+Since then, we have worked closely with the National Crime Agency and National Cyber Security Centre as well as informing the Information Commissioner.
+
+On Friday 16 May we discovered the attack was more extensive than originally understood and that the group behind it had accessed a large amount of information relating to legal aid applicants.
+
+We believe the group accessed and downloaded a significant amount of personal data from those who applied for legal aid through our digital service between 2007 and 16 May 2025 when the systems were taken offline.
+
+This data may have included contact details and addresses of applicants, their dates of birth, national ID numbers, criminal history, employment status and financial data such as contribution amounts, debts and payments. In some instances, information about the partners of legal aid applicants may be included in the compromised data.
+
+We would urge all members of the public who have applied for legal aid in this time period to take steps to safeguard themselves. We would recommend you are alert for any suspicious activity such as unknown messages or phone calls and to be extra vigilant to update any potentially exposed passwords. If you are in doubt about anyone you are communicating with online or over the phone you should verify their identity independently before providing any information to them.
+
+An injunction has been put in place to prohibit sharing of this data. Anyone who does so could be sent to prison.
+
+Further information on how to protect yourself from the impact of a data breach can be found on the NCSC website.

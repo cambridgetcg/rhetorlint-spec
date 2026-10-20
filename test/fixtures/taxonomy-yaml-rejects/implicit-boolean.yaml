@@ -1,0 +1,5 @@
+# reject: line 5: would load as a boolean or null
+version: "0.1"
+families:
+  - id: call
+    seeded: yes

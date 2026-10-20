@@ -1,0 +1,8 @@
+# reject: line 7: a blank line inside a folded scalar is outside the subset
+version: "0.1"
+families:
+  - id: attack-on-reputation
+    why_seeding_is_narrow: >
+      First paragraph.
+
+      Second paragraph.

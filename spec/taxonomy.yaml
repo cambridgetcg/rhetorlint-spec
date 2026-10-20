@@ -4,16 +4,42 @@
 #
 # This ONE file does two jobs at once:
 #
-#   1. PORTABLE TAXONOMY (engines read it).  It is the source of truth that the
-#      per-locale rule packs compile against.  Every `id` under `tells` matches a
-#      ruleId in packages/rules-*/rules.json; every `family` matches the fixed
-#      enum in spec/output.schema.json.  Change a family or a rule id here and the
-#      compiled packs change with it.
+#   1. PORTABLE TAXONOMY (the packs are checked against it).  No engine reads
+#      this file; test/taxonomy-agreement.test.mjs holds the rule pack to it.
+#      Every `id` under `tells` is a ruleId in packages/rules-en/rules.json with
+#      the same family and, character for character, the same technique; every
+#      `family` matches the fixed enum in spec/output.schema.json.  Change a
+#      family, technique or rule id on one side only and that test fails,
+#      naming both sides.
 #
 #   2. SYLLABUS (learners read it).  It is the curriculum for the learning wing.
 #      Each `tell` is one lesson: what the pattern is, WHY it works on a reader
 #      (the teachable mechanism), a realistic marked example, and an honest plain
 #      rewrite.  Read top to bottom and you have learned to spot the tells yourself.
+#
+#      The same test runs every lesson through the engine: each `marked` example
+#      must fire its own rule on its `tell`, and each `plain` rewrite must draw
+#      no marks.  Where the engine disagrees today, the disagreement is DECLARED
+#      beside the lesson, never hidden by rewording it:
+#        * `plain_also_marks` (on an example): each mark its plain rewrite still
+#          draws, as {ruleId, actual, status, tag, reason}.  `actual` is the
+#          marked phrase exactly as the engine reports it.  status `correct`: the
+#          mark is right, because the honest rewrite keeps a real tell.  status
+#          `known-defect`: the engine is wrong, and `tag` names the open defect.
+#        * `known_gaps` (on a tell): an example whose tell its own rule does not
+#          mark yet, as {tell, tag, reason}.
+#        * `guard_examples` (on a tell): sentences its rule must leave unmarked,
+#          or must mark, as {text, expect, actual}.  `expect` is `marked` or
+#          `unmarked`; an optional `actual` pins the phrase a marked one marks.
+#      Declarations are strict both ways: an undeclared mark fails the test, and
+#      so does a declaration the engine no longer needs.
+#
+#      Open defect tags used below:
+#        O2  agency-hiding.deleted-subject marks a passive without reading its
+#            context, even where the doer is named nearby or no doer is at issue.
+#        O6  absolute.universal matches bare absolutes word by word: it marks
+#            the 'never' of a plain statement of policy, and it misses the False
+#            Dilemma phrase its own lesson teaches ('the only option').
 #
 # ----------------------------------------------------------------------------
 # THE REFUSAL STANCE — read this before you read anything else.
@@ -95,6 +121,12 @@ families:
           - marked: "We take your privacy extremely seriously"
             tell: "extremely"
             plain: "We encrypt your messages end-to-end and never sell them."
+            plain_also_marks:
+              - ruleId: absolute.universal
+                actual: "never"
+                status: known-defect
+                tag: "O6"
+                reason: "'never sell them' states the writer's own policy in plain words; absolute.universal marks the bare word 'never' wherever it stands, so it marks the honest version too."
           - marked: "This is a hugely successful program"
             tell: "hugely"
             plain: "The program served 1,200 people last year."
@@ -121,6 +153,11 @@ families:
           - marked: "Your data may have been exposed"
             tell: "may have been"
             plain: "Your email address and password hash were exposed."
+            plain_also_marks:
+              - ruleId: agency-hiding.deleted-subject
+                actual: "were exposed"
+                status: correct
+                reason: "The rewrite keeps the breach passive the source never resolved: who exposed the data is not known here, and naming a doer would invent one. The mark is right; the reader should still ask who."
           - marked: "The outage could potentially affect some regions"
             tell: "could potentially"
             plain: "The outage took down EU-West and US-East for 40 minutes."
@@ -232,6 +269,12 @@ families:
           - marked: "An altercation ensued and a bystander was hurt."
             tell: "altercation ensued"
             plain: "The guard shoved the vendor, and a bystander was knocked down."
+            plain_also_marks:
+              - ruleId: agency-hiding.deleted-subject
+                actual: "was knocked"
+                status: known-defect
+                tag: "O2"
+                reason: "The clause before names the doer and the deed ('The guard shoved the vendor'); the detector reads each passive alone, so it asks 'who?' of a sentence that has already answered."
         lineage: "SemEval-2023 · Manipulative Wording › Obfuscation, Intentional Vagueness, Confusion (RhetorLint-authored pattern under a SemEval technique — the contrition.rehearsed precedent; structural kin: agency-hiding.deleted-subject. Seedable only where a deed-noun demands a doer; 'died in police custody' is deliberately NOT marked — intransitive 'died' states a death, not a deed, and marking it would presume an act the sentence never states)"
 
       - id: insinuation.raises-questions
@@ -242,6 +285,12 @@ families:
           - marked: "The filing raises serious questions about the timeline."
             tell: "raises serious questions about"
             plain: "The filing shows the contract was signed two weeks before the vote; the auditor asks whether the board knew."
+            plain_also_marks:
+              - ruleId: agency-hiding.deleted-subject
+                actual: "was signed"
+                status: known-defect
+                tag: "O2"
+                reason: "The rewrite's point is when the contract was signed, not who signed it; no doer is at issue, and the detector cannot tell a dated record from an accountable passive."
           - marked: "Questions swirled around the campaign's finances."
             tell: "Questions swirled around"
             plain: "Three donors asked the campaign to explain a $2m transfer; it has not yet done so."
@@ -281,6 +330,11 @@ families:
           - marked: "The memo revealed that the audit was shelved."
             tell: "revealed that"
             plain: "The memo said the audit was shelved; the auditor disputes this."
+            plain_also_marks:
+              - ruleId: agency-hiding.deleted-subject
+                actual: "was shelved"
+                status: correct
+                reason: "The rewrite keeps the concealment passive the source never resolved: the memo does not say who shelved the audit, and naming a doer would invent one. The mark is right; the reader should still ask who."
           - marked: "The paper debunked the claim."
             tell: "debunked"
             plain: "The paper published a rebuttal; the original authors stand by their data."
@@ -324,6 +378,10 @@ families:
           - marked: "This will always be free"
             tell: "always"
             plain: "It's free today. Pricing may change with 30 days' notice."
+        known_gaps:
+          - tell: "the only option"
+            tag: "O6"
+            reason: "'the only option' is not among absolute.universal's terms, so the False Dilemma phrase this lesson teaches goes unmarked; the rule marks the same sentence's 'Everyone' instead."
         lineage: "SemEval-2023 · Simplification › False Dilemma or No Choice"
 
   # ==========================================================================
@@ -376,6 +434,12 @@ families:
           - marked: "The minister claimed that the figures were audited."
             tell: "claimed that"
             plain: "The minister said the figures were audited; the auditor's office declined to confirm."
+            plain_also_marks:
+              - ruleId: agency-hiding.deleted-subject
+                actual: "were audited"
+                status: known-defect
+                tag: "O2"
+                reason: "'were audited' reports a routine procedure, not an accountable act, and the same sentence names the office that would have done it; the detector reads the passive alone and cannot tell a procedure from an evaded actor."
           - marked: "He insisted that nothing was wrong."
             tell: "insisted that"
             plain: "Asked three times, he said nothing was wrong."

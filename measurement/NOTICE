@@ -1,0 +1,116 @@
+RhetorLint measurement corpus — notices for third-party text
+=============================================================
+
+measurement/items/ holds short texts that are redistributed here only to
+measure whether RhetorLint's marks agree with a human reader. Every item's
+licence, source URL, retrieval date, licence evidence and the exact excerpt
+kept are recorded in measurement/items.json. The repository's MIT licence
+covers the repository's own code; it does not relicense the texts below.
+
+conformance/differential/inputs.jsonl also carries these items, split into
+paragraphs, one per row; each row names its item in `source`. The notices
+below apply to those rows as well.
+
+1. UK Crown copyright (OGL-UK-3.0)
+----------------------------------
+Items: uk-laa-data-breach-2025, uk-laa-data-update-2026,
+uk-mod-payroll-incident-2024, uk-mod-afghan-statement-2025,
+uk-mod-afghan-guidance-2025, uk-nio-psni-breach-2023.
+
+Contains public sector information licensed under the Open Government
+Licence v3.0.
+https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+Each source page on www.gov.uk states: "All content is available under the
+Open Government Licence v3.0, except where otherwise stated" and "© Crown
+copyright"; no other statement appears on those pages. Paragraphs quoting
+the independent Rimmer Review were left out of uk-mod-afghan-statement-2025.
+Use of this information does not imply endorsement by any UK public body.
+The OGL does not license personal data in the information. These items name
+people only as office-holders, in statements the government published (for
+example a former minister or the civil servant who led a review); no item
+adds personal data beyond those public roles.
+
+2. Python documentation (PSF-2.0)
+---------------------------------
+Items: py-tutorial-errors, py-tutorial-inputoutput, py-tutorial-modules,
+py-library-tempfile, py-library-venv, py-reference-import.
+
+Copyright © 2001 Python Software Foundation; All Rights Reserved
+
+Source: https://docs.python.org/3/ (pages named in measurement/items.json).
+Summary of changes made: each page's main text was converted from HTML to
+plain text (block elements become lines, whitespace collapsed as a browser
+renders it, pilcrow anchors dropped); code listings (<pre> blocks) were
+omitted; four pages were cut at the section boundary recorded in
+items.json. No sentence was reworded. The documentation is licensed under
+the Python Software Foundation License Version 2, reproduced here:
+
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+--------------------------------------------
+
+1. This LICENSE AGREEMENT is between the Python Software Foundation ("PSF"), and
+   the Individual or Organization ("Licensee") accessing and otherwise using this
+   software ("Python") in source or binary form and its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, PSF hereby
+   grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce,
+   analyze, test, perform and/or display publicly, prepare derivative works,
+   distribute, and otherwise use Python alone or in any derivative
+   version, provided, however, that PSF's License Agreement and PSF's notice of
+   copyright, i.e., "Copyright © 2001 Python Software Foundation; All Rights
+   Reserved" are retained in Python alone or in any derivative version
+   prepared by Licensee.
+
+3. In the event Licensee prepares a derivative work that is based on or
+   incorporates Python or any part thereof, and wants to make the
+   derivative work available to others as provided herein, then Licensee hereby
+   agrees to include in any such work a brief summary of the changes made to Python.
+
+4. PSF is making Python available to Licensee on an "AS IS" basis.
+   PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  BY WAY OF
+   EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND DISCLAIMS ANY REPRESENTATION OR
+   WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE
+   USE OF PYTHON WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+   FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF
+   MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON, OR ANY DERIVATIVE
+   THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material breach of
+   its terms and conditions.
+
+7. Nothing in this License Agreement shall be deemed to create any relationship
+   of agency, partnership, or joint venture between PSF and Licensee.  This License
+   Agreement does not grant permission to use PSF trademarks or trade name in a
+   trademark sense to endorse or promote products or services of Licensee, or any
+   third party.
+
+8. By copying, installing or otherwise using Python, Licensee agrees
+   to be bound by the terms and conditions of this License Agreement.
+
+3. United States federal government works (US-federal-public-domain)
+---------------------------------------------------------------------
+Items: us-irs-get-transcript-2015-05, us-irs-get-transcript-2015-08,
+us-irs-get-transcript-2016-02, us-irs-form-990t-2022,
+us-irs-data-safeguards-2024, us-cms-ffe-breach-2018,
+us-cms-agent-broker-2024-07, pd-declaration.
+
+Works of the United States Government are not subject to copyright in the
+United States (17 U.S.C. § 105). Credit, as the agencies request: Internal
+Revenue Service (irs.gov); Centers for Medicare & Medicaid Services
+(cms.gov); U.S. National Archives and Records Administration
+(archives.gov). Use here implies no endorsement by any agency. Only text
+written by the agencies was kept; quotations in these items are of federal
+officials speaking in office.
+
+4. Pastiche (CC-BY-SA-4.0)
+--------------------------
+Items: inv-breach-apology, inv-crypto-launch, inv-political-nondenial,
+inv-scarcity-banner, inv-recipe, inv-science-abstract.
+
+Written for this repository by an agent on 2026-10-19 after reading
+packages/rules-en/rules.json (rules-aware, so they are reported and never
+gate), and offered under the Creative Commons Attribution-ShareAlike 4.0
+International licence: https://creativecommons.org/licenses/by-sa/4.0/

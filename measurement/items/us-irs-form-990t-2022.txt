@@ -1,0 +1,11 @@
+September 2, 2022
+
+The IRS recently discovered that some machine-readable (XML) Form 990-T data made available for bulk download section on the Tax Exempt Organization Search (TEOS) should not have been made public. This section is primarily used by those with the ability to use machine-readable data; other more widely used sections of TEOS are unaffected.
+
+The IRS took immediate steps to address this issue. The files have been removed from IRS.gov and will be replaced with updated files in the near future. In addition, the IRS also will be working with groups that routinely use the files to remove the erroneous files and replace them with the correct versions as they become available. The IRS will contact all impacted filers in the coming weeks.
+
+Form 990-T is the business tax return used by tax-exempt entities, including tax-exempt organizations, government entities and retirement accounts, to report and pay income tax on income that is generated from certain investments or income unrelated to their exempt purpose.
+
+The IRS is required to publicly disclose this information for 501(c)(3) organizations; however, similar information was inadvertently published for a subset of non-501(c)(3)s, which are not subject to public disclosure. However, the data does not include Social Security numbers, detailed account-holder information or individual income tax returns (Forms 1040). In some instances, the data does include individual names or business contact information.
+
+The IRS is continuing to review this situation.

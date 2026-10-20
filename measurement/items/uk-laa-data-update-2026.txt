@@ -1,0 +1,21 @@
+On Wednesday 23 April 2025, we identified a cyber-attack affecting the Legal Aid Agency’s (LAA) online digital services
+
+In the days following the discovery, we took immediate action to secure our systems and informed legal aid providers that some of their information, including financial information, may have been compromised. We have continued to work with the National Crime Agency, National Cyber Security Centre, and Information Commission (formally the Information Commissioner’s Office) as part of our response.
+
+On 16 May 2025, we established that the attack was more extensive than originally understood and that the criminal group behind it had accessed and exfiltrated a significant amount of personal data. We subsequently informed the public that this included information relating to legal aid applicants and providers.
+
+Since then, extensive and detailed digital analysis has continued. The objective has been to establish more precisely what data was exfiltrated. That work has refined our understanding of both the date range and the type of information affected.
+
+What we now know about the data
+
+The vast majority of the LAA data relates to applications, claims or payments submitted to the LAA between January 2007 and 16 May 2025, or to cases that were live during this period. However, we have now confirmed that approximately 250,000 records predate 2007. The overwhelming majority of these are from the 1990s and 2000s, with only a fractionally small number dating from before 1990. The earliest record currently verified dates from 1978.
+
+Our analysis has also established that some information relating to HM Prison and Probation Service (HMPPS), specifically probation data, was contained within material exfiltrated during the same cyber-attack. None of this data relates to victims of crime.
+
+The nature and amount of information affected varies considerably between individuals. Additionally, but importantly; we have no indication that the stolen data has been published or shared.
+
+It is important to put this updated information in context. The presence of records predating 2007 does not mean that everyone who received or applied for legal aid, or otherwise interacted with the justice system before 2007, has been affected.
+
+We recognise that people will want to understand whether this incident is relevant to them specifically. The information below therefore provides more detail about the groups potentially affected and the types of data that may have been exfiltrated.
+
+The below tables should not be read as meaning that every individual within a particular group had all, or any, of the information listed exfiltrated. The information exfiltrated, if any, varies between individuals. In all cases personal details and circumstances are as they were reported to LAA at the point of any application, or subsequent amendment to that application.

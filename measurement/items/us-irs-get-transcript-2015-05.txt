@@ -1,0 +1,37 @@
+May 26, 2015
+
+The IRS announced today that criminals used taxpayer-specific data acquired from non-IRS sources to gain unauthorized access to information on approximately 100,000 tax accounts through IRS’ “Get Transcript” application. This data included Social Security information, date of birth and street address.
+
+These third parties gained sufficient information from an outside source before trying to access the IRS site, which allowed them to clear a multi-step authentication process, including several personal verification questions that typically are only known by the taxpayer. The matter is under review by the Treasury Inspector General for Tax Administration as well as the IRS’ Criminal Investigation unit, and the “Get Transcript” application has been shut down temporarily. The IRS will provide free credit monitoring services for the approximately 100,000 taxpayers whose accounts were accessed. In total, the IRS has identified 200,000 total attempts to access data and will be notifying all of these taxpayers about the incident.
+
+As always, the IRS takes the security of taxpayer data extremely seriously, and we are working aggressively to protect affected taxpayers and continue to strengthen our protocols.
+
+Additional information
+
+The IRS announced today it will be notifying taxpayers after third parties gained unauthorized access to information on about 100,000 accounts through the “Get Transcript” online application.
+
+The IRS determined late last week that unusual activity had taken place on the application, which indicates that unauthorized third parties had access to some accounts on the transcript application. Following an initial review, it appears that access was gained to more than 100,000 accounts through the Get Transcript application.
+
+In this sophisticated effort, third parties succeeded in clearing a multi-step authentication process that required prior personal knowledge about the taxpayer, including Social Security information, date of birth, tax filing status and street address before accessing IRS systems. The multi-layer process also requires an additional step, where applicants must correctly answer several personal identity verification questions that typically are only known by the taxpayer.
+
+The IRS temporarily shut down the Get Transcript application last week after an initial assessment identified questionable attempts were detected on the system in mid-May. The online application will remain disabled until the IRS makes modifications and further strengthens security for it.
+
+The matter is under continuing review by the Treasury Inspector General for Tax Administration and IRS offices, including Criminal Investigation.
+
+The IRS notes this issue does not involve its main computer system that handles tax filing submission; that system remains secure.
+
+On the Get Transcript application, a further review by the IRS identified that these attempts were quite complex in nature and appear to have started in February and ran through mid-May. In all, about 200,000 attempts were made from questionable email domains, with more than 100,000 of those attempts successfully clearing authentication hurdles. During this filing season, taxpayers successfully and safely downloaded a total of approximately 23 million transcripts.
+
+In addition, to disabling the Get Transcript application, the IRS has taken a number of immediate steps to protect taxpayers, including:
+
+- Sending a letter to all of the approximately 200,000 taxpayers whose accounts had attempted unauthorized accesses, notifying them that third parties appear to have had access to taxpayer Social Security numbers and additional personal financial information from a non-IRS source before attempting to access the IRS transcript application. Although half of this group did not actually have their transcript account accessed because the third parties failed the authentication tests, the IRS is still taking an additional protective step to alert taxpayers. That’s because malicious actors acquired sensitive financial information from a source outside the IRS about these households that led to the attempts to access the transcript application.
+
+- Offering free credit monitoring for the approximately 100,000 taxpayers whose Get Transcript accounts were accessed to ensure this information isn’t being used through other financial avenues. Taxpayers will receive specific instructions so they can sign up for the credit monitoring. The IRS emphasizes these outreach letters will not request any personal identification information from taxpayers. In addition, the IRS is marking the underlying taxpayer accounts on our core processing system to flag for potential identity theft to protect taxpayers going forward — both right now and in 2016.
+
+These letters will be mailed out starting later this week and will include additional details for taxpayers about the credit monitoring and other steps. At this time, no action is needed by taxpayers outside these affected groups.
+
+The IRS is continuing to conduct further reviews on those instances where the transcript application was accessed, including how many of these households filed taxes in 2015. It’s possible that some of these transcript accesses were made with an eye toward using them for identity theft for next year’s tax season.
+
+The IRS emphasizes this incident involves one application involving transcripts — it does not involve other IRS systems, such as our core taxpayer accounts or other applications, such as Where’s My Refund.
+
+The IRS will be working aggressively to protect affected taxpayers and strengthen our protocols even further going forward.

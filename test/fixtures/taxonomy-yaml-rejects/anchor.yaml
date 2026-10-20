@@ -1,0 +1,6 @@
+# reject: line 6: anchors are outside the subset
+version: "0.1"
+families:
+  - id: call
+    what: "Driving you to act now."
+    lineage: &call "SemEval-2023 · Call"
