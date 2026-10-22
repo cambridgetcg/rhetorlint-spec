@@ -1,6 +1,8 @@
 # @rhetorlint/core
 
-The reference engine for the [RhetorLint spec](../../spec). Marks rhetorical tells in text, on-device, with **zero dependencies**. Reads the language, never the person.
+The reference engine for the RhetorLint spec. Marks rhetorical tells in text, on-device, with **zero dependencies**. Reads the language, never the person.
+
+Paths such as `spec/output.schema.json` name files in the source repository, `github.com/cambridgetcg/rhetorlint-spec`, which is not public at present.
 
 ## Install
 
@@ -12,7 +14,7 @@ npm i @rhetorlint/core @rhetorlint/rules-en
 
 ### `analyze(text, options) → result`
 
-Returns a [RhetorLint result object](../../spec/output.schema.json).
+Returns a RhetorLint result object, typed in this package's `index.d.ts` (JSON Schema: `spec/output.schema.json`).
 
 ```js
 import { createRequire } from "node:module";
@@ -35,7 +37,8 @@ r.strip;        // "Mistakes [who?] were made."
 | `locale` | overrides the reported locale |
 | `rewrite` | *(optional)* synchronous `fn(text, marks) → string`. Plug in a model to produce a plain-truth paraphrase. Omitted → `result.rewrite` is `null`. Async adapters are rejected so the result remains JSON-safe. **The core never invents a paraphrase.** |
 
-Core 0.1.3 validates rule packs as closed, bounded inputs before matching. It
+Since 0.1.3, core validates rule packs as closed, bounded inputs before
+matching; 0.1.3 never reached npm, so on npm these checks start at 0.1.4. It
 rejects unknown fields and matcher kinds, duplicate IDs, invalid metadata,
 future `minEngine` requirements, and patterns that are known or observed to
 match zero characters. These checks constrain shape and size; they do not
@@ -49,7 +52,7 @@ once a word stands between them ("No risk, guaranteed." stays marked), and a
 "Never" that opens a fragment or an inversion ("Never an issue.", "Never again
 will...") stays marked. The guard is keyed by ruleId, so the rule pack is
 unchanged; the
-[rules-en README](../rules-en/README.md#the-engine-side-guard-on-absoluteuniversal)
+[rules-en README](https://www.npmjs.com/package/@rhetorlint/rules-en#the-engine-side-guard-on-absoluteuniversal)
 states exactly what it reads and what it misses.
 
 ### `strip(text, marks) → string`
@@ -150,9 +153,9 @@ consent, factual truth, intent, or safety. The callback result is not persisted
 or cryptographically bound to the covenant. Do not copy it into `metadata` and
 claim that the approval or RhetorLint review was signed.
 
-AgentTool keeps a
-[runnable, zero-socket covenant-mirror example](https://github.com/cambridgetcg/agenttool/blob/main/packages/sdk-ts/examples/rhetorlint-covenant-mirror.ts)
-whose default path refuses before any submission; its explicit demo-approval
+AgentTool's source repository, which is not public at present, keeps a runnable,
+zero-socket covenant-mirror example
+(`packages/sdk-ts/examples/rhetorlint-covenant-mirror.ts`) whose default run refuses before any submission; its explicit demo-approval
 path signs and submits once to an in-memory transport.
 
 ## Honesty guarantees
@@ -163,8 +166,8 @@ path signs and submits once to an in-memory transport.
 
 ## The one hard part
 
-Structural tells (`agency-hiding`) use the accountable-passive detector. Most passives hide nothing — methods sections, documentation and news are full of honest ones — so a bare be-verb plus participle is not the tell. A mark needs a past auxiliary (`was`, `were`, `been`), at most one adverb, and a participle from a closed class: a fault (`mishandled`, `overlooked`), a breach (`accessed`, `compromised`), a concealment (`withheld`, `shelved`, `laid off`), a light verb after an error or decision noun (`mistakes were made`, `steps were taken`), `raised` after `concerns`, `questions` or `allegations`, `agreed`, `decided` or `determined` after `it`, `shared`, `sold` or `disclosed` after a data noun, or `affected` or `impacted` after a data or account noun. A `by` among the next seven words of the clause silences it, and so does a negator anywhere in its clause before the auxiliary, counted from the last `.`, `;`, `:`, `!`, `?` or line break (`Your data was never sold`, `No customer data was accessed`, `No credit card numbers, bank account details or passwords were stolen`): a negated passive denies the act. The clause reading cannot tell which verb a negator negates, so it also leaves `No one called, but data were stolen.` and the Reagan specimen `But we did not achieve what we wished, and serious mistakes were made…` unmarked: recorded misses, in the safe direction. The words, those numbers and the characters the walks stop at live once, in [`spec/agency-lexicon.json`](../../spec/agency-lexicon.json); `scripts/gen-agency-lexicon.mjs` writes them into this engine and the Python and Go ones, a test fails when a copy drifts, and probes built from the same file hold each engine's hand-written walks to their edges.
+Structural tells (`agency-hiding`) use the accountable-passive detector. Most passives hide nothing — methods sections, documentation and news are full of honest ones — so a bare be-verb plus participle is not the tell. A mark needs a past auxiliary (`was`, `were`, `been`), at most one adverb, and a participle from a closed class: a fault (`mishandled`, `overlooked`), a breach (`accessed`, `compromised`), a concealment (`withheld`, `shelved`, `laid off`), a light verb after an error or decision noun (`mistakes were made`, `steps were taken`), `raised` after `concerns`, `questions` or `allegations`, `agreed`, `decided` or `determined` after `it`, `shared`, `sold` or `disclosed` after a data noun, or `affected` or `impacted` after a data or account noun. A `by` among the next seven words of the clause silences it, and so does a negator anywhere in its clause before the auxiliary, counted from the last `.`, `;`, `:`, `!`, `?` or line break (`Your data was never sold`, `No customer data was accessed`, `No credit card numbers, bank account details or passwords were stolen`): a negated passive denies the act. The clause reading cannot tell which verb a negator negates, so it also leaves `No one called, but data were stolen.` and the Reagan specimen `But we did not achieve what we wished, and serious mistakes were made…` unmarked: recorded misses, in the safe direction. The words, those numbers and the characters the walks stop at live once, in `spec/agency-lexicon.json`; `scripts/gen-agency-lexicon.mjs` writes them into this engine and the Python and Go ones, a test fails when a copy drifts, and probes built from the same file hold each engine's hand-written walks to their edges.
 
-It matches an ASCII-lowercased copy of the text with explicit `[ \t\n\r\f]` whitespace and ASCII word boundaries, so all three engines read the same words. It is deliberately narrow and honestly imperfect. It gives up recall it cannot judge from the words: harm and news verbs (`Lives were lost`, `Your account was closed`), present and modal `be` passives, relative clauses (`the mistakes that have been made`), `were being withheld`, and a `by` that names only when (`shelved by Friday`). On the committed gold annotations ([`measurement/report.json`](../../measurement/report.json)), accountable-passive recall by any rule falls from 39 of 41 spans before this detector to 20 of 41; the losses include disclosure and publication true positives in the target genre (`was inadvertently published`, `was emailed` outside official systems, `should not have been made public`) and the vague remedy `appropriate steps will be taken`, which wait for a fresh bench. It still asks "who?" where a nearby clause has answered (`Mistakes were made, and I made them.`), and the listed verbs keep innocent senses it marks (`Federal income tax was withheld.`, `Unknown keys were ignored.`, `Repeated measures were taken.`): open O2 rows in `measurement/contrast.json`. Genuine coverage of agency-hiding needs real part-of-speech awareness. This is where the framework wants investment, not a claim of solved.
+It matches an ASCII-lowercased copy of the text with explicit `[ \t\n\r\f]` whitespace and ASCII word boundaries, so all three engines read the same words. It is deliberately narrow and honestly imperfect. It gives up recall it cannot judge from the words: harm and news verbs (`Lives were lost`, `Your account was closed`), present and modal `be` passives, relative clauses (`the mistakes that have been made`), `were being withheld`, and a `by` that names only when (`shelved by Friday`). On the committed gold annotations (`measurement/report.json`), accountable-passive recall by any rule falls from 39 of 41 spans before this detector to 20 of 41; the losses include disclosure and publication true positives in the target genre (`was inadvertently published`, `was emailed` outside official systems, `should not have been made public`) and the vague remedy `appropriate steps will be taken`, which wait for a fresh bench. It still asks "who?" where a nearby clause has answered (`Mistakes were made, and I made them.`), and the listed verbs keep innocent senses it marks (`Federal income tax was withheld.`, `Unknown keys were ignored.`, `Repeated measures were taken.`): open O2 rows in `measurement/contrast.json`. Genuine coverage of agency-hiding needs real part-of-speech awareness. This is where the framework wants investment, not a claim of solved.
 
 MIT.
