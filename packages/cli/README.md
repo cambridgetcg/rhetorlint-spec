@@ -49,7 +49,7 @@ tells per 100 words, making it suitable for a CI check. Usage errors exit 2.
 
 The CLI installs `@rhetorlint/core` and the English rule pack
 `@rhetorlint/rules-en`. The specification and source live in the RhetorLint
-repository, github.com/cambridgetcg/rhetorlint-spec, which is not public at
+repository, `github.com/cambridgetcg/rhetorlint-spec`, which is not public at
 present.
 
 MIT.

@@ -2,7 +2,7 @@
 
 The reference engine for the RhetorLint spec. Marks rhetorical tells in text, on-device, with **zero dependencies**. Reads the language, never the person.
 
-Paths such as `spec/output.schema.json` name files in the source repository, github.com/cambridgetcg/rhetorlint-spec, which is not public at present.
+Paths such as `spec/output.schema.json` name files in the source repository, `github.com/cambridgetcg/rhetorlint-spec`, which is not public at present.
 
 ## Install
 
@@ -37,7 +37,8 @@ r.strip;        // "Mistakes [who?] were made."
 | `locale` | overrides the reported locale |
 | `rewrite` | *(optional)* synchronous `fn(text, marks) → string`. Plug in a model to produce a plain-truth paraphrase. Omitted → `result.rewrite` is `null`. Async adapters are rejected so the result remains JSON-safe. **The core never invents a paraphrase.** |
 
-Core 0.1.3 validates rule packs as closed, bounded inputs before matching. It
+Since 0.1.3, core validates rule packs as closed, bounded inputs before
+matching; 0.1.3 never reached npm, so on npm these checks start at 0.1.4. It
 rejects unknown fields and matcher kinds, duplicate IDs, invalid metadata,
 future `minEngine` requirements, and patterns that are known or observed to
 match zero characters. These checks constrain shape and size; they do not
@@ -154,7 +155,7 @@ claim that the approval or RhetorLint review was signed.
 
 AgentTool's source repository, which is not public at present, keeps a runnable,
 zero-socket covenant-mirror example
-(`packages/sdk-ts/examples/rhetorlint-covenant-mirror.ts`) whose default path refuses before any submission; its explicit demo-approval
+(`packages/sdk-ts/examples/rhetorlint-covenant-mirror.ts`) whose default run refuses before any submission; its explicit demo-approval
 path signs and submits once to an in-memory transport.
 
 ## Honesty guarantees
