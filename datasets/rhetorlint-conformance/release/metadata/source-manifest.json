@@ -1,11 +1,29 @@
 {
-  "schema": "rhetorlint.conformance-source-manifest/0.1",
-  "status": "local-review-snapshot",
+  "schema": "rhetorlint.conformance-source-manifest/0.2",
+  "status": "public-release",
   "source_repository": {
     "url": "https://github.com/cambridgetcg/rhetorlint-spec",
     "revision": "fcc205e42d9857e05b668c5ff7847f8ffba0930e",
     "immutable_tree": "https://github.com/cambridgetcg/rhetorlint-spec/tree/fcc205e42d9857e05b668c5ff7847f8ffba0930e",
+    "visibility_at_release": "private",
     "source_lock_enforced": true
+  },
+  "published_sources": {
+    "registry": "npm",
+    "packages": [
+      {
+        "package": "@rhetorlint/core@0.1.4",
+        "file": "index.mjs",
+        "sha256": "sha256:7dd2d7f9d8437e9883962591e34285229f5df8f4ccfdc31478a3bf8642037472",
+        "digest_recorded_at": "sources.core.sha256"
+      },
+      {
+        "package": "@rhetorlint/rules-en@0.2.1",
+        "file": "rules.json",
+        "sha256": "sha256:b2201836c8d0050600066215fa73bb93fb1560f7bec54c35a7d4a87dd28f000a",
+        "digest_recorded_at": "sources.rules.sha256"
+      }
+    ]
   },
   "selection": {
     "source_frame": "all committed conformance cases in source order",
@@ -30,8 +48,80 @@
   },
   "input_provenance": {
     "represented_by_source_as": "designed repository conformance fixtures",
-    "sampled_external_corpus_recorded": false,
-    "project_authorship_reconfirmation_required_before_publication": true
+    "field_run_inputs": "cases 10 to 14 entered with fixes for false positives and gaps that a field run found, recorded on 2026-07-23; see project_authorship_review",
+    "project_authorship_review": {
+      "date": "2026-10-20",
+      "reviewer": "Claude Code (AI agent)",
+      "scope": "all 76 inputs in conformance/cases.json and every free-text field of the matching rows, checked for origin, quotation of published text, personal data, allegations about named parties, and content unfit for a public dataset",
+      "method": [
+        "a script confirmed that the rows equal the source cases one to one, with 0 mismatches",
+        "every input and every distinct note, suggestion, technique and strip string was read",
+        "each input was traced to its earliest commit in the history of conformance/cases.json and that commit's message",
+        "inputs were scanned for word runs shared with the repository's tracked files and with local uncommitted corpora",
+        "17 inputs that could be real quotations were searched on the web; five of them (cases 0, 12, 68, 69 and 70) were also searched as exact phrases"
+      ],
+      "finding": "No blocker to a public MIT release was found: no private personal data, no allegation about a named party, no unfit content, and no third-party text long enough to matter. This is one AI agent's review, not a legal opinion.",
+      "outside_text": [
+        {
+          "source_case_index": 12,
+          "words": 11,
+          "origin": "adapts the bitcoin.org introduction ('the issuing of bitcoins is carried out collectively by the network'), with 'bitcoins' changed to 'coins'",
+          "origin_licence": "MIT, as stated in the bitcoin.org footer",
+          "entered": "a false positive from the field run recorded on 2026-07-23, kept as a negative control"
+        },
+        {
+          "source_case_index": 42,
+          "words": 5,
+          "origin": "repeats the last words of a sentence in the US Office of Personnel Management's 2015 breach notice",
+          "origin_licence": "a US federal work, not subject to copyright in the United States (17 U.S.C. 105)",
+          "entered": "2026-10-19, from a measurement specimen quoted in the Open Lens lexicon"
+        },
+        {
+          "source_case_index": 46,
+          "words": 7,
+          "origin": "repeats a clause of measurement/items/inv-breach-apology.txt, an invented item an AI agent wrote for the repository",
+          "origin_licence": "CC-BY-SA-4.0, as the project offers that item (measurement/NOTICE section 4)",
+          "entered": "2026-10-19, after the item"
+        },
+        {
+          "source_case_index": 49,
+          "words": 9,
+          "origin": "repeats the start of a sentence of measurement/items/inv-science-abstract.txt, an invented item an AI agent wrote for the repository",
+          "origin_licence": "CC-BY-SA-4.0, as the project offers that item (measurement/NOTICE section 4)",
+          "entered": "2026-10-19, after the item"
+        },
+        {
+          "source_case_index": 50,
+          "words": 10,
+          "origin": "closely follows a sentence of measurement/items/inv-recipe.txt, an invented item an AI agent wrote for the repository, sharing an 8-word run",
+          "origin_licence": "CC-BY-SA-4.0, as the project offers that item (measurement/NOTICE section 4)",
+          "entered": "2026-10-19, after the item"
+        }
+      ],
+      "notes": [
+        "'Mistakes were made' (cases 0, 6, 39 and 58 to 61) is a well-known political phrase; no speaker is named.",
+        "Cases 68 to 70 read like breach notices; the repository records them as constructed probes, and no verbatim source was found.",
+        "Case 30 names Forbes as the source of praise for an unnamed startup; it quotes no Forbes text and alleges nothing.",
+        "The only personal name is the bare first name in case 47; no row holds an email address, phone number, postal address or account number.",
+        "Several inputs are short stock phrases with no single source."
+      ],
+      "limits": [
+        "A web search that finds nothing does not prove a sentence was never published; paywalled archives, books and ad libraries were not searched.",
+        "The overlap scan finds verbatim or near-verbatim word runs, not paraphrase.",
+        "Two earlier sources could not be checked for overlap: the uncommitted 105-item headline corpus used to measure the rules behind cases 15 to 30 (those inputs are listed in the committed plan, docs/superpowers/plans/2026-07-27-media-wave.md), and the pages scanned in the field run, recorded on 2026-07-23, behind cases 10 to 14.",
+        "Copyright, licence and defamation judgments here are reasoned, not legal advice."
+      ]
+    },
+    "fragment_licence_reasoning": {
+      "by": "Claude Code, an AI agent",
+      "date": "2026-10-20",
+      "source_case_indexes": [
+        46,
+        49,
+        50
+      ],
+      "reasoning": "the 7 to 10 stock words these cases share with the measurement items are too short to carry the items' share-alike terms, so the MIT offer that covers the repository's conformance fixture covers these cases too"
+    }
   },
   "sources": {
     "conformance_cases": {
@@ -59,7 +149,7 @@
   },
   "method": {
     "builder_path": "datasets/rhetorlint-conformance/build.mjs",
-    "builder_sha256": "sha256:fc5a30f3632d14edda819a39dd18227835cb932a379c5e929b7905749b4df292",
+    "builder_sha256": "sha256:a23a378cf1fcfa7fada380b67ee8cd36f0428451e2b51c325b04e3b7c40a8566",
     "row_schema_sha256": "sha256:1f798ab90e59b219599227706d33efba6c58866c54c9224a054f1b7e98fe9df7",
     "expected_outputs_origin": "generated by the JavaScript reference engine and committed as reference output",
     "independent_human_labels": false,
@@ -76,9 +166,26 @@
   },
   "authority": {
     "hub_repository_created_by_builder": false,
-    "upload_authorized": false,
+    "hub_upload_by_builder": false,
+    "release_decision": {
+      "date": "2026-10-20",
+      "decided_by": "the project maintainer",
+      "words": "go for both npm publish and huggingface dataset"
+    },
+    "release_reading": {
+      "read_by": "Claude Code, an AI agent",
+      "reading": "release this snapshot as a public Hugging Face dataset, staged privately first, after npm releases of @rhetorlint/core@0.1.4 and @rhetorlint/rules-en@0.2.1 that carry the engine and rule pack it is locked to"
+    },
+    "release_confirmation": {
+      "date": "2026-10-22",
+      "confirmed_by": "the project maintainer",
+      "chose": "a public dataset after private staging, and npm releases of @rhetorlint/core@0.1.4, @rhetorlint/rules-en@0.2.1 and @rhetorlint/cli@0.2.0 with two deprecations of older versions",
+      "options_offered_by": "Claude Code, an AI agent"
+    },
+    "prepared_by": "Claude Code, an AI agent",
+    "upload_carried_out_by": "Claude Code, an AI agent, with the Hugging Face CLI outside the builder",
     "model_or_training_authorized": false,
     "carried_action_authority": false
   },
-  "refresh_policy": "explicit source review and a new deterministic snapshot"
+  "refresh_policy": "explicit source and provenance review, then a new deterministic snapshot"
 }

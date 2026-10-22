@@ -22,9 +22,9 @@ import { basename, dirname, join, parse, relative, resolve, sep } from "node:pat
 import { fileURLToPath } from "node:url";
 
 export const DATASET_SCHEMA = "rhetorlint.conformance-evaluation-row/0.1";
-export const RELEASE_SCHEMA = "rhetorlint.conformance-hf-release/0.1";
+export const RELEASE_SCHEMA = "rhetorlint.conformance-hf-release/0.2";
 export const ADMISSION_SCHEMA = "rhetorlint.claim-feedback-dataset-admission/0.1";
-export const SOURCE_MANIFEST_SCHEMA = "rhetorlint.conformance-source-manifest/0.1";
+export const SOURCE_MANIFEST_SCHEMA = "rhetorlint.conformance-source-manifest/0.2";
 export const HALT_ENV = "RHETORLINT_DATASET_HALT";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
@@ -63,6 +63,118 @@ const ROW_LIMITS = Object.freeze([
   "Strip text, expected suggestions, and confidence values are rule-pack outputs, not human corrections, preferred answers, or calibrated probabilities.",
   "Only six rule-pack families appear; the unseeded justification taxonomy family is absent.",
 ]);
+
+function freezeDeep(value) {
+  if (value && typeof value === "object") {
+    for (const item of Object.values(value)) freezeDeep(item);
+    Object.freeze(value);
+  }
+  return value;
+}
+
+// The record of this release. The project maintainer decided it; an AI agent
+// prepared it, reviewed its provenance and uploaded it, outside this builder.
+// Keep the two apart: never record the agent's choices as the maintainer's.
+// release_decision.words quotes the maintainer exactly; what the agent read
+// into those words (visibility, packages, order) sits in release_reading.
+// A later release replaces this record after its own review; it is not edited
+// to describe a release that did not happen.
+export const PUBLICATION = freezeDeep({
+  status: "public-release",
+  release_decision: {
+    date: "2026-10-20",
+    decided_by: "the project maintainer",
+    words: "go for both npm publish and huggingface dataset",
+  },
+  release_reading: {
+    read_by: "Claude Code, an AI agent",
+    reading: "release this snapshot as a public Hugging Face dataset, staged privately first, after npm releases of @rhetorlint/core@0.1.4 and @rhetorlint/rules-en@0.2.1 that carry the engine and rule pack it is locked to",
+  },
+  release_confirmation: {
+    date: "2026-10-22",
+    confirmed_by: "the project maintainer",
+    chose: "a public dataset after private staging, and npm releases of @rhetorlint/core@0.1.4, @rhetorlint/rules-en@0.2.1 and @rhetorlint/cli@0.2.0 with two deprecations of older versions",
+    options_offered_by: "Claude Code, an AI agent",
+  },
+  prepared_by: "Claude Code, an AI agent",
+  provenance_reviewed_by: "Claude Code, an AI agent",
+  uploaded_by: "Claude Code, an AI agent",
+  provenance_review: {
+    date: "2026-10-20",
+    reviewer: "Claude Code (AI agent)",
+    scope: "all 76 inputs in conformance/cases.json and every free-text field of the matching rows, checked for origin, quotation of published text, personal data, allegations about named parties, and content unfit for a public dataset",
+    method: [
+      "a script confirmed that the rows equal the source cases one to one, with 0 mismatches",
+      "every input and every distinct note, suggestion, technique and strip string was read",
+      "each input was traced to its earliest commit in the history of conformance/cases.json and that commit's message",
+      "inputs were scanned for word runs shared with the repository's tracked files and with local uncommitted corpora",
+      "17 inputs that could be real quotations were searched on the web; five of them (cases 0, 12, 68, 69 and 70) were also searched as exact phrases",
+    ],
+    finding: "No blocker to a public MIT release was found: no private personal data, no allegation about a named party, no unfit content, and no third-party text long enough to matter. This is one AI agent's review, not a legal opinion.",
+    outside_text: [
+      {
+        source_case_index: 12,
+        words: 11,
+        origin: "adapts the bitcoin.org introduction ('the issuing of bitcoins is carried out collectively by the network'), with 'bitcoins' changed to 'coins'",
+        origin_licence: "MIT, as stated in the bitcoin.org footer",
+        entered: "a false positive from the field run recorded on 2026-07-23, kept as a negative control",
+      },
+      {
+        source_case_index: 42,
+        words: 5,
+        origin: "repeats the last words of a sentence in the US Office of Personnel Management's 2015 breach notice",
+        origin_licence: "a US federal work, not subject to copyright in the United States (17 U.S.C. 105)",
+        entered: "2026-10-19, from a measurement specimen quoted in the Open Lens lexicon",
+      },
+      {
+        source_case_index: 46,
+        words: 7,
+        origin: "repeats a clause of measurement/items/inv-breach-apology.txt, an invented item an AI agent wrote for the repository",
+        origin_licence: "CC-BY-SA-4.0, as the project offers that item (measurement/NOTICE section 4)",
+        entered: "2026-10-19, after the item",
+      },
+      {
+        source_case_index: 49,
+        words: 9,
+        origin: "repeats the start of a sentence of measurement/items/inv-science-abstract.txt, an invented item an AI agent wrote for the repository",
+        origin_licence: "CC-BY-SA-4.0, as the project offers that item (measurement/NOTICE section 4)",
+        entered: "2026-10-19, after the item",
+      },
+      {
+        source_case_index: 50,
+        words: 10,
+        origin: "closely follows a sentence of measurement/items/inv-recipe.txt, an invented item an AI agent wrote for the repository, sharing an 8-word run",
+        origin_licence: "CC-BY-SA-4.0, as the project offers that item (measurement/NOTICE section 4)",
+        entered: "2026-10-19, after the item",
+      },
+    ],
+    notes: [
+      "'Mistakes were made' (cases 0, 6, 39 and 58 to 61) is a well-known political phrase; no speaker is named.",
+      "Cases 68 to 70 read like breach notices; the repository records them as constructed probes, and no verbatim source was found.",
+      "Case 30 names Forbes as the source of praise for an unnamed startup; it quotes no Forbes text and alleges nothing.",
+      "The only personal name is the bare first name in case 47; no row holds an email address, phone number, postal address or account number.",
+      "Several inputs are short stock phrases with no single source.",
+    ],
+    limits: [
+      "A web search that finds nothing does not prove a sentence was never published; paywalled archives, books and ad libraries were not searched.",
+      "The overlap scan finds verbatim or near-verbatim word runs, not paraphrase.",
+      "Two earlier sources could not be checked for overlap: the uncommitted 105-item headline corpus used to measure the rules behind cases 15 to 30 (those inputs are listed in the committed plan, docs/superpowers/plans/2026-07-27-media-wave.md), and the pages scanned in the field run, recorded on 2026-07-23, behind cases 10 to 14.",
+      "Copyright, licence and defamation judgments here are reasoned, not legal advice.",
+    ],
+  },
+  // Added after the provenance review, by the agent preparing the release; it
+  // is reasoning, not a licence grant or the maintainer's word.
+  fragment_licence_reasoning: {
+    by: "Claude Code, an AI agent",
+    date: "2026-10-20",
+    source_case_indexes: [46, 49, 50],
+    reasoning: "the 7 to 10 stock words these cases share with the measurement items are too short to carry the items' share-alike terms, so the MIT offer that covers the repository's conformance fixture covers these cases too",
+  },
+  npm_packages: [
+    { spec: "@rhetorlint/core@0.1.4", file: "index.mjs", source: "core" },
+    { spec: "@rhetorlint/rules-en@0.2.1", file: "rules.json", source: "rules" },
+  ],
+});
 
 function compareCodeUnits(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
@@ -266,6 +378,10 @@ function corpusStats(corpus, rules) {
   };
 }
 
+function npmSpec(source) {
+  return PUBLICATION.npm_packages.find((item) => item.source === source).spec;
+}
+
 function datasetCard(rowCount, dataSha256, stats) {
   return `---
 pretty_name: RhetorLint Conformance Evaluation
@@ -305,14 +421,37 @@ generalisation benchmark.
 
 ## Provenance
 
-The source file treats the inputs as designed repository conformance fixtures;
-it records no sampled external corpus. The expected values were generated by
-the JavaScript reference engine and committed as reference outputs after
-project review. This is implementation conformance, not independent human
-annotation or a sample of naturally occurring language. Reconfirm input
-provenance and licence before any public upload.
+The source file treats the inputs as designed repository conformance fixtures,
+and most were written for the tests. Cases are numbered by
+\`source_case_index\`. Cases 10 to 14 entered with fixes for false positives
+and gaps that a field run found, recorded on 2026-07-23. Two inputs repeat
+short text from elsewhere: case 12 adapts 11 words of bitcoin.org's
+introduction, which that site releases under MIT, and case 42 repeats 5 words
+of a 2015 breach notice by a US federal agency, a work not subject to copyright
+in the United States. Cases 46, 49 and 50 repeat or closely follow 7 to 10
+words of three invented measurement items written for the repository by an AI
+agent, which the project offers under CC-BY-SA-4.0.
+${PUBLICATION.fragment_licence_reasoning.by}, judged that
+${PUBLICATION.fragment_licence_reasoning.reasoning}; that is an AI agent's
+reasoning, not a licence grant.
 
-The locked source is [RhetorLint revision \`${SOURCE_REVISION}\`](${SOURCE_REPOSITORY}/tree/${SOURCE_REVISION}).
+The expected values were generated by the JavaScript reference engine and
+committed as reference outputs after project review. This is implementation
+conformance, not independent human annotation or a sample of naturally
+occurring language.
+
+On ${PUBLICATION.provenance_review.date}, ${PUBLICATION.provenance_reviewed_by}, reviewed all ${rowCount} inputs for
+origin, personal data, claims about named parties and unfit content, and found
+nothing that blocks a public MIT release. That is one AI agent's review, not a
+legal opinion; \`metadata/source-manifest.json\` records its scope, method,
+notes and limits.
+
+The locked source is revision \`${SOURCE_REVISION}\` of
+\`github.com/cambridgetcg/rhetorlint-spec\`, which is not public at present.
+URLs in the rows, schema and manifests that name it are identifiers; they do
+not open while it is private. Its rule pack and engine are published on npm as
+\`${npmSpec("rules")}\` and \`${npmSpec("core")}\`, whose \`rules.json\` and \`index.mjs\` match the SHA-256
+digests in \`metadata/source-manifest.json\`.
 The stored technique names follow the project's documented SemEval-2023 to
 SemEval-2020 taxonomy mapping; that taxonomy file is not copied here.
 
@@ -335,8 +474,10 @@ or offsets for general non-ASCII input.
 
 The unseeded justification taxonomy family is absent.
 
-The frame is short, public, rule-designed, highly imbalanced, and not a blind
-holdout. Models may already have seen the repository. Mark offsets are
+The frame is short, rule-designed, highly imbalanced, and not a blind holdout.
+The source repository was public for a time before this release, so models may
+already have seen many of these inputs, and this public release can carry them
+into later training data. Mark offsets are
 zero-based, start-inclusive and end-exclusive. ASCII makes UTF-8 byte,
 Unicode code-point and UTF-16 indices coincide for these inputs.
 
@@ -357,13 +498,20 @@ deceptive. Strip text, each mark's \`expected\` suggestions, and confidence
 values are deterministic rule-pack outputs—not human corrections, preferred
 model answers, or calibrated probabilities.
 
-This builder created no Hugging Face repository, upload, model run, or training
-run. The committed snapshot is local review material until a separate exact
-release decision.
+The builder makes no network request, creates no Hugging Face repository, and
+runs no model or training; \`manifest.json\`'s \`effects\` describe the build
+alone. The upload was a separate step, taken after the provenance review. On
+${PUBLICATION.release_decision.date} the project maintainer said:
+"${PUBLICATION.release_decision.words}".
+${PUBLICATION.release_reading.read_by}, read that as:
+${PUBLICATION.release_reading.reading}. On ${PUBLICATION.release_confirmation.date}
+the maintainer confirmed it, choosing among options the agent offered:
+${PUBLICATION.release_confirmation.chose}. The agent prepared and uploaded this
+release.
 Deletion from a later Hub revision would not prove erasure of old revisions,
 caches, forks, downloads or trained models.
-No withdrawal ingestion or carry-forward mechanism is implemented in this
-snapshot; source and rights state must be checked again before publication.
+No withdrawal mechanism is implemented; a later release re-checks source and
+rights state first.
 
 ## Files
 
@@ -376,7 +524,8 @@ snapshot; source and rights state must be checked again before publication.
 Licence: MIT, preserving the repository's LICENSE and NOTICE. The taxonomy
 file's additional CC-BY-SA offer is not copied into this dataset. The release
 derives from the repository's MIT-offered conformance fixture, rule pack, and
-engine; public release still requires a maintainer provenance/licence check.
+engine; the Provenance section names the short text from elsewhere that some
+inputs repeat, and the review behind this release.
 `;
 }
 
@@ -411,6 +560,9 @@ export async function buildSnapshot() {
   const corpus = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(casesBytes));
   const rules = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(rulesBytes));
   assertConformanceSource(corpus, rules);
+  if (npmSpec("rules") !== `${rules.id}@${rules.version}`) {
+    throw new TypeError("PUBLICATION must name the npm release of the locked rule pack");
+  }
   const stats = corpusStats(corpus, rules);
 
   const method = {
@@ -423,14 +575,28 @@ export async function buildSnapshot() {
   const rows = corpus.cases.map((item, index) => buildRow(item, index, method));
   const jsonl = Buffer.from(`${rows.map((row) => JSON.stringify(row)).join("\n")}\n`, "utf8");
   const admission = buildClaimFeedbackAdmission(fixtureBytes);
+  const publishedDigests = {
+    core: method.core_source_sha256,
+    rules: method.rules_source_sha256,
+  };
   const sourceManifest = {
     schema: SOURCE_MANIFEST_SCHEMA,
-    status: "local-review-snapshot",
+    status: PUBLICATION.status,
     source_repository: {
       url: SOURCE_REPOSITORY,
       revision: SOURCE_REVISION,
       immutable_tree: `${SOURCE_REPOSITORY}/tree/${SOURCE_REVISION}`,
+      visibility_at_release: "private",
       source_lock_enforced: true,
+    },
+    published_sources: {
+      registry: "npm",
+      packages: PUBLICATION.npm_packages.map((item) => ({
+        package: item.spec,
+        file: item.file,
+        sha256: publishedDigests[item.source],
+        digest_recorded_at: `sources.${item.source}.sha256`,
+      })),
     },
     selection: {
       source_frame: "all committed conformance cases in source order",
@@ -444,8 +610,9 @@ export async function buildSnapshot() {
     measured_frame: stats,
     input_provenance: {
       represented_by_source_as: "designed repository conformance fixtures",
-      sampled_external_corpus_recorded: false,
-      project_authorship_reconfirmation_required_before_publication: true,
+      field_run_inputs: "cases 10 to 14 entered with fixes for false positives and gaps that a field run found, recorded on 2026-07-23; see project_authorship_review",
+      project_authorship_review: PUBLICATION.provenance_review,
+      fragment_licence_reasoning: PUBLICATION.fragment_licence_reasoning,
     },
     sources: {
       conformance_cases: {
@@ -490,11 +657,16 @@ export async function buildSnapshot() {
     },
     authority: {
       hub_repository_created_by_builder: false,
-      upload_authorized: false,
+      hub_upload_by_builder: false,
+      release_decision: PUBLICATION.release_decision,
+      release_reading: PUBLICATION.release_reading,
+      release_confirmation: PUBLICATION.release_confirmation,
+      prepared_by: PUBLICATION.prepared_by,
+      upload_carried_out_by: `${PUBLICATION.uploaded_by}, with the Hugging Face CLI outside the builder`,
       model_or_training_authorized: false,
       carried_action_authority: false,
     },
-    refresh_policy: "explicit source review and a new deterministic snapshot",
+    refresh_policy: "explicit source and provenance review, then a new deterministic snapshot",
   };
 
   const files = new Map();
@@ -508,7 +680,7 @@ export async function buildSnapshot() {
 
   const manifest = {
     schema: RELEASE_SCHEMA,
-    status: "local-review-snapshot",
+    status: PUBLICATION.status,
     config: "conformance",
     split: "test",
     rows: rows.length,

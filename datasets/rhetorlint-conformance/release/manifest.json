@@ -1,6 +1,6 @@
 {
-  "schema": "rhetorlint.conformance-hf-release/0.1",
-  "status": "local-review-snapshot",
+  "schema": "rhetorlint.conformance-hf-release/0.2",
+  "status": "public-release",
   "config": "conformance",
   "split": "test",
   "rows": 76,
@@ -32,8 +32,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 4765,
-      "sha256": "sha256:9b6eaff3094fb3b96f9f4128a6926cb989394df8251984031dbf331faabd35e5"
+      "bytes": 7039,
+      "sha256": "sha256:7fb94902b2984729bc640d9b96848265a13c283672be4132b1c1f3c21d50f6c6"
     },
     {
       "path": "data/test-00000-of-00001.jsonl",
@@ -47,8 +47,8 @@
     },
     {
       "path": "metadata/source-manifest.json",
-      "bytes": 3233,
-      "sha256": "sha256:3bc9656af01baecc7ec0f33320d314f9f58c52d56dd6ef776ec60b2a17051b11"
+      "bytes": 9870,
+      "sha256": "sha256:924c06cc3cda7aa67da796ab02148322b4c102d823b2d86f9b3d7e45330d73cf"
     },
     {
       "path": "schema/row.schema.json",
