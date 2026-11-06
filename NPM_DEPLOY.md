@@ -4,9 +4,10 @@ Your job: publish each reviewed workspace whose manifest carries a new version,
 in dependency order, and verify it. A release may include all three packages or
 only one.
 
-Since the 2026-10-30 lockdown every `@rhetorlint` package requires 2FA to
-publish and disallows tokens (`mfa=publish`), and the trusted-publisher configs
-that the retired `release.yml` used were revoked. Two routes remain:
+The retired `release.yml` never matched an npm trust config: every OIDC
+exchange it made answered "package not found". On 2026-10-30 every
+`@rhetorlint` trust config was revoked, and every package now requires 2FA to
+publish and disallows tokens (`mfa=publish`). Two routes remain:
 
 - **[The staged route](#the-staged-route)**, the default: `publish-npm.yml`
   prepares one package from its annotated tag and stages it on npm, and Yu
@@ -346,15 +347,84 @@ public until Yu approves it. `scripts/npm-release.mjs` holds every decision;
 `test/npm-release.test.mjs` checks them without network.
 
 GitHub runs the workflow file of the ref you dispatch on, so the tagged commit
-must contain `publish-npm.yml` and `scripts/npm-release.mjs`.
+must contain `publish-npm.yml` and `scripts/npm-release.mjs`. GitHub also
+accepts a dispatch only when `publish-npm.yml` is on `main`, the default
+branch. Merge this route to `main` before dispatching any release tag,
+including a tag on a release branch. Merging is safe: on `main` nothing runs
+without a dispatch.
+
+**Before the first release, once: Yu lets only release tags into
+`npm-release`.** npm's trust config names only the repository, the workflow
+file's name and the environment. It cannot name a ref. The tag and commit
+checks run inside `publish-npm.yml` and `scripts/npm-release.mjs`, which come
+from the dispatched ref, so a pushed branch could carry a `publish-npm.yml`
+without them. Dispatched, it would enter `npm-release`, pass npm's exchange,
+and stage any tarball for a version npm lacks. Only Yu's 2FA approval would
+then stand between that stage and the registry. The environment's deployment
+policy is what ties npm's trust to release tags. It costs no click.
+
+```bash
+gh api -X PUT repos/cambridgetcg/rhetorlint-spec/environments/npm-release --input - <<'JSON'
+{"deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}
+JSON
+gh api -X POST repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies -f name='core-v*' -f type=tag
+gh api -X POST repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies -f name='rules-en-v*' -f type=tag
+gh api -X POST repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies -f name='cli-v*' -f type=tag
+```
+
+GitHub matches the policy against the run's `GITHUB_REF`, so a dispatch on a
+branch, or on any other tag, stops before the publish job gets an id-token.
+`prepare` and dry runs use no environment and are unaffected.
+`cambridgetcg/agenttool-packages` admits `*-v*` to its `npm-bootstrap`; here
+that pattern would also admit `py-v*` (PYPI_DEPLOY.md), so name the three
+prefixes.
+
+Two more settings narrow it, and both are Yu's choice:
+
+- **Immutable release tags.** agenttool-packages has a tag ruleset, "release
+  tags are immutable": no update, deletion or force-push of a matching tag,
+  with no one allowed to bypass. A moved tag would point a reviewed name at
+  other code. A mistaken tag then stays, so bump the version instead, as npm
+  requires anyway. The same here:
+
+  ```bash
+  gh api -X POST repos/cambridgetcg/rhetorlint-spec/rulesets --input - <<'JSON'
+  {"name":"release tags are immutable","target":"tag","enforcement":"active",
+   "conditions":{"ref_name":{"include":["refs/tags/core-v*","refs/tags/rules-en-v*","refs/tags/cli-v*"],"exclude":[]}},
+   "rules":[{"type":"deletion"},{"type":"update"},{"type":"non_fast_forward"}],
+   "bypass_actors":[]}
+  JSON
+  ```
+
+  Neither the policy nor this ruleset stops a credential that can push from
+  creating a *new* matching tag on a commit of its choosing. Today the owner
+  account is the only collaborator, so that means the owner's credentials,
+  and every tool or agent logged in with them. If writers are ever added, a
+  `creation` rule that only the admin role may bypass keeps them from minting
+  release tags. Whatever the settings, step d's own pack is the last check.
+- **Admin bypass.** `npm-release` has `can_admins_bypass: true`. GitHub's
+  docs do not say whether that bypass covers deployment branch and tag
+  policies. Clearing "Allow administrators to bypass configured protection
+  rules" in the environment's settings, as agenttool-packages' `npm-bootstrap`
+  has (`can_admins_bypass: false`), settles it.
 
 Release in dependency order: **core, then rules-en, then cli**. Finish a
 package's step e before starting the next; the CLI's caret ranges need the
 other two installable, and `plan` refuses to stage it until they are. For
 each package (core shown):
 
-**a. Yu creates one stage-only trust config, just before the release.** On
-the device with the npm login:
+**a. Yu confirms the tag policy, then creates one stage-only trust config,
+just before the release.**
+
+```bash
+gh api repos/cambridgetcg/rhetorlint-spec/environments/npm-release --jq .deployment_branch_policy
+gh api repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies --jq '.branch_policies[] | "\(.type) \(.name)"'
+```
+
+The first must show `custom_branch_policies` true and `protected_branches`
+false. The second must print `tag core-v*`, `tag rules-en-v*` and `tag cli-v*`,
+and nothing else. If either is wrong, stop: create no trust config until the
+policy is in place. Then, on the device with the npm login:
 
 ```bash
 npx --yes npm@11.17.0 trust github @rhetorlint/core --repo cambridgetcg/rhetorlint-spec --file publish-npm.yml --env npm-release --allow-stage-publish --yes
@@ -364,7 +434,13 @@ Never add `--allow-publish`: this route only stages. npm expires a config that
 no publication validates within 48 hours, so create it on release day.
 `npx --yes npm@11.17.0 trust list @rhetorlint/core` shows what exists.
 
-**b. Tag, then dry-run.**
+**b. Tag, then dry-run.** `prepare` runs only `npm run test:<package>`: every
+suite of `npm test` that names that package's files. A release-branch commit
+gets no CI of its own, because `ci.yml` runs only on pushes to `main` and on
+pull requests. So before tagging, confirm CI is green on `$REVIEWED_COMMIT`,
+or run `ci.yml`'s commands there (`npm test`, the real-Chrome worksheet test,
+the demo, Python and Go conformance, the three-engine diff, the Python unit
+tests), and note any known date-dependent failure.
 
 ```bash
 git tag -a core-v0.1.3 -m "@rhetorlint/core 0.1.3" "$REVIEWED_COMMIT"
@@ -377,51 +453,108 @@ On a clean checkout of the tag, `node scripts/npm-release.mjs check-inputs
 --package core --tag core-v0.1.3` runs the same tag checks before you push.
 The dry run refuses what the real run would refuse, except npm's trust, which
 only the publish job's identity can show. Its summary shows the receipt and
-the planned action (`stage`).
+the planned action (`stage`). Make step d's own pack now: the receipt's
+sha256 should already equal it.
 
-**c. Stage.** Dispatch again with `-f dry_run=false`. If no trust config
-matches (step a missing, expired, or naming other claims), `check-trust`
-refuses with "no trusted publisher matches" and nothing is staged. Otherwise
-the summary shows the stage id, the SHA-256 and the approval commands.
-Staging a version that already has a pending stage has not been tried here:
-approve or reject the pending one first.
+`plan` refuses `npm_tag=latest` for a version older than npm's current
+`latest`; release such a version with `npm_tag=next`.
 
-**d. Yu approves, with 2FA.**
+**c. Stage.** First run `npx --yes npm@11.17.0 stage list @rhetorlint/core`.
+Reject any pending stage that you cannot trace to your own run of this tag,
+and never approve one. Staging a version that already has a pending stage has
+not been tried here. Then dispatch again with `-f dry_run=false`. If no trust
+config matches (step a missing, expired, or naming other claims),
+`check-trust` refuses with "no trusted publisher matches" and nothing is
+staged. Otherwise the summary shows the stage id, the SHA-256 and the
+approval commands.
+
+**d. Yu checks the stage against their own run and their own pack, then
+approves with 2FA.** Everything in the run's summary, the SHA-256 included,
+comes from the run that staged. A stage from a wrong or rewritten run would
+report a matching hash of its own. So check the stage against two things that
+run did not write:
+
+- **Your run.** The stage id must be the one in the summary of the run you
+  dispatched. `gh api repos/cambridgetcg/rhetorlint-spec/actions/workflows/publish-npm.yml/runs --jq '.workflow_runs[:5][] | "\(.id) \(.head_branch) \(.head_sha) \(.triggering_actor.login) \(.created_at)"'`
+  lists the recent runs with their ref and commit. The ref must be the tag,
+  and the commit the one you tagged.
+- **Your own pack** of the reviewed tag, from a clean clone:
+
+  ```bash
+  dir=$(mktemp -d)
+  git clone --quiet --depth 1 --branch core-v0.1.3 https://github.com/cambridgetcg/rhetorlint-spec.git "$dir/src"
+  (cd "$dir/src/packages/core" && npx --yes npm@11.17.0 pack --ignore-scripts --pack-destination "$dir")
+  shasum -a 256 "$dir/rhetorlint-core-0.1.3.tgz"
+  ```
+
+  For core 0.1.3 (packages/core at `1a16766`) this printed
+  `40705425306737d515f13839a6afa9580964c9517bdea81a74b91fd58985f73c` on
+  2026-09-07 and again on 2026-11-06, with Node 25.2.1 and npm 11.6.2 and
+  11.17.0. The workflow packs on Node 24. That it gives the same bytes there
+  is expected but not yet observed, so compare it first in step b's dry run.
 
 ```bash
+npx --yes npm@11.17.0 stage view <stage-id>       # version, dist-tag and date staged must be your run's
 npx --yes npm@11.17.0 stage download <stage-id>   # prints the .tgz it wrote
-shasum -a 256 <that .tgz>                         # must equal the receipt's sha256
+shasum -a 256 <that .tgz>                         # must equal your own pack's
 npx --yes npm@11.17.0 stage approve <stage-id>    # or: stage reject <stage-id>
 ```
 
-For a few minutes after staging, `approve` can answer E409 ("automated review
-hasn't finished"). Wait and run it again.
+If the hashes differ, do not approve. Reject the stage, or first unpack both
+tarballs and `diff -r` them to see why. Never approve on the run summary's
+hash alone. For a few minutes after staging, `approve` can answer E409
+("automated review hasn't finished"). Wait and run it again.
 
 **e. Verify.** Dispatch exactly as in step c. `plan` now finds the version,
 and `verify-existing` checks that npm lists the receipt's digests, points the
 dist-tag at the version, and serves a tarball with the same bytes. It retries
-for about eight minutes while the CDN catches up. The summary records
-`already_published_exact`. Then run step 5's clean-install check.
+for up to ten minutes while the CDN catches up. The summary records
+`already_published_exact`.
+
+After the last package of a coordinated release, run step 5's clean-install
+check. Step 5 installs the CLI and rules-en at the versions in the manifests,
+so after a single-package release, such as core 0.1.3 alone, install only that
+package, beside the rules-en that npm serves, and run step 5's engine block
+(the `node --input-type=module` one) against them:
+
+```bash
+cd "$(mktemp -d)" && npm init -y >/dev/null
+npm i "@rhetorlint/core@0.1.3" "@rhetorlint/rules-en@$(npm view @rhetorlint/rules-en dist-tags.latest)"
+npm ls --all                             # core must resolve to 0.1.3 for both
+```
+
+On 2026-11-06 that pairing, core 0.1.3 packed from `1a16766` with rules-en
+0.1.2 from npm, passed step 5's engine block.
 
 **Not yet exercised here.** No run of this workflow has happened in this
 repository. Tests cover the script with fakes for npm, the registry and OIDC.
 The shape follows `cambridgetcg/agenttool-packages`' `publish-npm.yml`, which
 staged `@agenttool/wallet@0.1.4` and then verified it as
-`already_published_exact` on 2026-10-30.
+`already_published_exact` on 2026-10-30. The npm behaviours stated above (the
+48-hour expiry of an unvalidated config, E409 after staging, and a stage-only
+config allowing the exchange for `npm-command: stage`) are taken from that
+reference release, not observed in this repository.
 
-**Diagnosing.** The stage step prints npm's `oidc` debug-log lines, with
-token-shaped text replaced by `***`. `ENEEDAUTH` there means the exchange
-gave npm no token, so it stopped before signing provenance; go back to step a.
+**Diagnosing.** A dispatch on a ref the tag policy does not admit fails at the
+publish job, with GitHub's "not allowed to deploy to npm-release due to
+environment protection rules"; `prepare` still runs. The stage step prints
+npm's `oidc` debug-log lines, with token-shaped text replaced by `***`.
+`ENEEDAUTH` there means the exchange gave npm no token, so it stopped before
+signing provenance; go back to step a.
 
-The `npm-release` environment had no protection rules on 2026-11-06. Required
-reviewers would add a click before staging. A deployment-branch policy, if
-one is ever added, must allow these tags.
+On 2026-11-06 `npm-release` had no protection rules and no deployment policy
+(`deployment_branch_policy: null`), so the step before a is still to do.
+Required reviewers would add only a click before staging, since the stage
+itself waits for 2FA.
 
-`release.yml` ran `npm publish --provenance` directly. 11 of its 14 runs
-failed: the first three with a bare `ENEEDAUTH` or `E404`, the other eight with
-npm's OIDC exchange answering "package not found". With its trust configs
-revoked it could only fail, so it is gone, with `scripts/publish-npm-ci.mjs`.
-No workflow runs on tag pushes now.
+`release.yml` ran `npm publish --provenance` directly. It never matched an npm
+trust config. 11 of its 14 runs failed: the first three with a bare
+`ENEEDAUTH` or `E404`, the other eight with npm's OIDC exchange answering
+"package not found". The three green runs were two dry runs and one that
+found every version already live, and no published version carries
+provenance. On 2026-10-30 every `@rhetorlint` trust config was revoked and
+tokens were disallowed (`mfa=publish`), so it could only fail. It is gone,
+with `scripts/publish-npm-ci.mjs`. No workflow runs on tag pushes now.
 
 ---
 

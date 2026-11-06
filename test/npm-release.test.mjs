@@ -678,3 +678,17 @@ test('the runbook creates stage-only trust configs that name this workflow and e
   }
   assert.doesNotMatch(runbook, /workflow run release\.yml|PUBLISH_PACKAGES/)
 })
+
+// npm's trust config cannot name a ref, and the ref checks above live in files
+// a branch can rewrite, so the environment's tag policy is what ties npm's
+// trust to release tags. The runbook sets it up before any trust config.
+test("the runbook binds npm-release to the release tags before any trust config", () => {
+  const runbook = read('NPM_DEPLOY.md')
+  const staged = runbook.slice(runbook.indexOf('\n## The staged route\n'))
+  const policy = staged.indexOf('/environments/npm-release/deployment-branch-policies')
+  const trust = staged.search(/npm@\S+ trust github /)
+  assert.ok(policy > 0 && trust > policy, 'the tag policy comes before the first trust config')
+  assert.match(staged, /"deployment_branch_policy":\{"protected_branches":false,"custom_branch_policies":true\}/)
+  for (const key of Object.keys(release.PACKAGES)) assert.ok(staged.includes(`-f name='${key}-v*' -f type=tag`), key)
+  assert.match(job('publish'), /deployment policy/)
+})
