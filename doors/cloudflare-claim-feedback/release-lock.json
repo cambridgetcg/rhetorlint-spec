@@ -6,7 +6,7 @@
   "sourceFilesSha256": {
     ".gitattributes": "373fd9c046cf8ce13504fe0433211cd5b7da81964e632456e21bd0db74765a2c",
     "LICENSE": "a1613ba5d78294b212dfdb6691181c104c4620a848ebc17a5307d769418b0d29",
-    "package.json": "2103975801de25fe32af66340adbca3723e67646b82d9a5b693f5bee8cb1dbfb",
+    "package.json": "a59b7859f87f226f318efe5cdee43359ca8626cfbea1dea753dc6d9c6c18d592",
     "apps/claim-feedback-door/claim-feedback-browser.mjs": "b587181fb76c65d817d57548207a6635db70d8e85b4ad172782293bcc399ec3a",
     "apps/claim-feedback-door/favicon.svg": "08f8cfe1f98bc80932a9f3c9a1fe757f80ef9bf0c148b4894a11333eb54bd435",
     "apps/claim-feedback-door/index.html": "bc61c17ee381f0c826239a6b4ea88f02a65c3767a2ba75773a3bbddc17456958",
@@ -28,7 +28,7 @@
   },
   "releaseManifestRule": "releaseFilesSha256 hashes every uploaded release input except this self-describing release-lock.json; _headers is parsed as configuration and its resulting response headers require separate live verification",
   "releaseFilesSha256": {
-    ".well-known/claim-feedback.json": "952251f1c42a387f1cff9c05fa269a87182310ee0f1195b3b732270ed9f20328",
+    ".well-known/claim-feedback.json": "0957c94fb1c1f0ac811c093c37cf32d442791b7f34604310dd44f12b565c4755",
     "404.html": "f17e02e052d36f3a926c4e2d597de49fb5af69d1342711ae800959d85101a3d6",
     "README.md": "01abdf94202b5a078cf57dd88991e833cf14173ebf7d558f5b759425d2cff693",
     "_headers": "c2ffc415e8914e84a4ee868fff8a2847b647d16c1938de7d991cfbb16bec1c2a",

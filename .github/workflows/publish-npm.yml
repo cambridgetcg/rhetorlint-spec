@@ -1,0 +1,191 @@
+name: publish-npm
+
+# One @rhetorlint package per dispatch, from its annotated release tag, staged
+# on npm for a maintainer's 2FA approval. Nothing goes public without it.
+#
+#   prepare  no credentials and no id-token: check the tag, run the package's
+#            tests, pack it, and write a receipt of the exact bytes.
+#   publish  only when dry_run is off: re-verify those bytes, ask the registry
+#            what is left to do, confirm npm trusts this workflow, then
+#            `npm stage publish`. Dispatching again after the approval finds
+#            the version and checks npm serves the receipt's bytes.
+#
+# Dispatch on the tag itself (Use workflow from: core-v0.1.3), with the same
+# name in `tag`. NPM_DEPLOY.md is the runbook; scripts/npm-release.mjs holds
+# every decision. This replaces release.yml, which published directly and
+# can no longer authenticate. Adapted from cambridgetcg/agenttool-packages
+# (Apache-2.0).
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package to release (order for a coordinated release - core, rules-en, cli)
+        required: true
+        type: choice
+        options:
+          - core
+          - rules-en
+          - cli
+      tag:
+        description: Annotated tag <package>-v<version>; dispatch on this same tag
+        required: true
+        type: string
+      npm_tag:
+        description: npm dist-tag
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - next
+      dry_run:
+        description: Prepare and check only; stage nothing
+        required: true
+        default: true
+        type: boolean
+
+permissions: {}
+
+# Queued, never cancelled: a stage stopped midway is still a stage on npm.
+concurrency:
+  group: publish-npm-${{ inputs.package }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare the exact artifact (no credentials)
+    if: github.repository == 'cambridgetcg/rhetorlint-spec'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Pin npm 11.17.0
+        run: npm install --global --ignore-scripts npm@11.17.0
+      - name: Refuse anything but this package's annotated tag, dispatched on itself
+        env:
+          RELEASE_PACKAGE: ${{ inputs.package }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_NPM_TAG: ${{ inputs.npm_tag }}
+        run: node scripts/npm-release.mjs check-inputs --package "$RELEASE_PACKAGE" --tag "$RELEASE_TAG" --npm-tag "$RELEASE_NPM_TAG"
+      - name: Run the package's tests
+        env:
+          RELEASE_PACKAGE: ${{ inputs.package }}
+        run: npm run "test:${RELEASE_PACKAGE}"
+      - name: Pack without lifecycle scripts and write the receipt
+        env:
+          RELEASE_PACKAGE: ${{ inputs.package }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: node scripts/npm-release.mjs prepare --package "$RELEASE_PACKAGE" --tag "$RELEASE_TAG" --output "$RUNNER_TEMP/npm-release"
+      - name: Say what a real run would do
+        env:
+          RELEASE_NPM_TAG: ${{ inputs.npm_tag }}
+        run: node scripts/npm-release.mjs plan --receipt "$RUNNER_TEMP/npm-release/receipt.json" --npm-tag "$RELEASE_NPM_TAG"
+      - name: Record the receipt
+        run: |
+          {
+            echo '## Prepared npm artifact'
+            echo '```json'
+            cat "$RUNNER_TEMP/npm-release/receipt.json"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Hand over only the tarball and its receipt
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: npm-release-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/npm-release/receipt.json
+            ${{ runner.temp }}/npm-release/*.tgz
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+  publish:
+    name: Stage for 2FA approval, or verify what npm serves
+    needs: prepare
+    if: github.repository == 'cambridgetcg/rhetorlint-spec' && !inputs.dry_run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    # The environment and this workflow's file name are the claims npm's
+    # trust config for the package must name. Required reviewers on it would
+    # add a click before staging; the stage itself already waits for 2FA.
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write # npm's OIDC exchange and the provenance signature
+    steps:
+      - name: Check out the same release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node 24 and the npm registry
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Pin npm 11.17.0
+        run: npm install --global --ignore-scripts npm@11.17.0
+      - name: Download the prepared artifact without running package code
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: npm-release-${{ github.run_id }}
+          path: ${{ runner.temp }}/npm-release
+      - name: Recheck the inputs
+        env:
+          RELEASE_PACKAGE: ${{ inputs.package }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_NPM_TAG: ${{ inputs.npm_tag }}
+        run: node scripts/npm-release.mjs check-inputs --package "$RELEASE_PACKAGE" --tag "$RELEASE_TAG" --npm-tag "$RELEASE_NPM_TAG"
+      - name: Re-verify the bytes and decide stage or verify-existing
+        id: plan
+        env:
+          RELEASE_NPM_TAG: ${{ inputs.npm_tag }}
+        run: node scripts/npm-release.mjs plan --receipt "$RUNNER_TEMP/npm-release/receipt.json" --npm-tag "$RELEASE_NPM_TAG"
+      - name: Refuse unless npm trusts this workflow for the package
+        if: steps.plan.outputs.action == 'stage'
+        env:
+          RELEASE_PACKAGE: ${{ inputs.package }}
+        run: node scripts/npm-release.mjs check-trust --package "$RELEASE_PACKAGE"
+      - name: Stage the exact artifact for 2FA approval
+        if: steps.plan.outputs.action == 'stage'
+        env:
+          RELEASE_NPM_TAG: ${{ inputs.npm_tag }}
+          # Empty, not unset: setup-node's .npmrc reads ${NODE_AUTH_TOKEN}, and
+          # npm sends an unset one as literal text. Empty is no credential, so a
+          # failed OIDC exchange stops at ENEEDAUTH before provenance signing.
+          NODE_AUTH_TOKEN: ""
+        run: node scripts/npm-release.mjs stage --receipt "$RUNNER_TEMP/npm-release/receipt.json" --npm-tag "$RELEASE_NPM_TAG"
+      - name: Verify npm serves exactly the prepared bytes
+        if: steps.plan.outputs.action == 'verify-existing'
+        env:
+          RELEASE_NPM_TAG: ${{ inputs.npm_tag }}
+        run: node scripts/npm-release.mjs verify-existing --receipt "$RUNNER_TEMP/npm-release/receipt.json" --npm-tag "$RELEASE_NPM_TAG"
+      - name: Record the non-secret receipts
+        if: always()
+        run: |
+          for name in receipt stage result; do
+            file="$RUNNER_TEMP/npm-release/$name.json"
+            if test -f "$file"; then
+              {
+                echo "## npm $name"
+                echo '```json'
+                cat "$file"
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
