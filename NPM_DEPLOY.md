@@ -1,10 +1,22 @@
 # Publishing `@rhetorlint/*` to npm — a guide for the deploying agent
 
-You are on the device that holds the npm org's publish token. Your job: publish
-each reviewed workspace whose manifest carries a new version, in dependency
-order, and verify it. The first release may include all three packages; a later
-patch may include only one. This guide is self-contained — follow it top to
-bottom.
+Your job: publish each reviewed workspace whose manifest carries a new version,
+in dependency order, and verify it. A release may include all three packages or
+only one.
+
+The retired `release.yml` never published: eight of its 14 runs logged npm's
+OIDC exchange answering "package not found", and no published `@rhetorlint`
+version carries provenance. It is gone, with `scripts/publish-npm-ci.mjs`, and
+no workflow runs on tag pushes now. On 2026-10-30 every `@rhetorlint` trust
+config was revoked, and every package now requires 2FA to publish and
+disallows tokens (`mfa=publish`). Two routes remain:
+
+- **[The staged route](#the-staged-route)**, the default: `publish-npm.yml`
+  prepares one package from its annotated tag and stages it on npm, and Yu
+  approves the stage with 2FA.
+- **The hand route** (steps 0–6 below), the fallback:
+  `scripts/publish-npm-interactive.zsh` on the device with the npm login and
+  its security key.
 
 The three packages that publish (nothing else does):
 
@@ -12,7 +24,7 @@ The three packages that publish (nothing else does):
 |------|---------|-----------|
 | 1 | `@rhetorlint/core` | — |
 | 2 | `@rhetorlint/rules-en` | — |
-| 3 | `@rhetorlint/cli` | `^0.1.3` core, `^0.2.0` rules-en (must be live first) |
+| 3 | `@rhetorlint/cli` | `^0.1.4` core, `^0.2.0` rules-en (must be live first) |
 
 > The CLI's ranges are carets on purpose, and it was not always so: `cli@0.1.0`
 > shipped with **exact** pins, so every `npm i @rhetorlint/cli` kept installing
@@ -21,9 +33,192 @@ The three packages that publish (nothing else does):
 > receive those improvements. Keep them carets, and re-release the CLI whenever
 > a floor rises (an engine feature the CLI's own output depends on).
 
-Core 0.1.3 is the current floor for the coordinated 0.2.0 CLI and rule pack:
-it preserves modality and attribution in strip output. Allowing core 0.1.2
-would install successfully while producing the superseded strip semantics.
+Core 0.1.4 is the current floor for the coordinated 0.2.0 CLI and rules-en
+0.2.1. Rules-en 0.2.1 adds no pack key, so core 0.1.3 and core 0.1.2 (the one
+npm has) still parse it, but its agency note ("a past-tense passive of a fault,
+breach, concealment or decision verb") describes the 0.1.4 accountable-passive
+detector. An older core would put that note on its old, wider marks
+("Shipments are often delayed", "The soup can be frozen"), a label that is
+false for each of them. Core 0.1.3 was the
+floor before, because it preserves modality and attribution in strip output;
+allowing core 0.1.2 would install successfully while producing the superseded
+strip semantics.
+
+### Core 0.1.4 + rules-en 0.2.1 — prepared 2026-10-19, not published
+
+Prepared on `motifs/honest-marks` (stacked on `motifs/measure`); the letter for
+the person who publishes is `HANDOFF-PUBLISH-2026-10-19.md`. On 2026-10-19
+`npm view` showed core 0.1.0–0.1.2, rules-en 0.1.0–0.1.2 and cli 0.1.0–0.1.1,
+each `latest` the highest. Core 0.1.3, rules-en 0.2.0 and cli 0.2.0 were never
+published, so this release would carry all of them.
+
+**Core 0.1.4** contains everything in the 0.1.3 candidate below, plus the
+changes listed after this paragraph. Because 0.1.3 was never published, 0.1.4
+is also the first core on npm with that candidate's closed rule-pack
+validation. A pack core 0.1.2 reads now throws `TypeError: invalid rule pack
+at ...` when it has a key the format does not list (`$schema`, `description`,
+`author`), a family outside the taxonomy's seven, no `version`, or `level:
+"error"`. Every `^0.1.x` consumer gets this on its next install with no pin
+change: `cli@0.1.1 --rules house.json` with a `description` key exits 2 with
+that TypeError and a stack trace, where core 0.1.2 gave a mark. The version is
+Yu's choice. Published as 0.1.4, caret consumers receive both the validator
+and the agency narrowing. Published as 0.2.0, `^0.1.x` consumers receive
+neither; that needs cli `^0.2.0` for core, a rules-en peer `>=0.2.0`, and a
+regenerated explorer, door and dataset snapshot.
+
+- **The accountable-passive detector** behind `agency-hiding.deleted-subject`.
+  It marks a `was`, `were` or `been` passive only when its participle is on a
+  closed list of fault, breach, concealment and decision verbs, and only when
+  no `by` stands among the next seven words of its clause. Some classes also
+  need a head noun:
+  `raised` after a challenge noun such as `concerns`, `made` after an error or
+  decision noun, `affected` after a held-in-trust noun. There must
+  be no negator anywhere in the clause before the auxiliary. The lists live in `spec/agency-lexicon.json` and are
+  generated into JS, Python and Go by `scripts/gen-agency-lexicon.mjs`. Before
+  this, the detector marked a be-verb followed by an -ed or -en word, less a
+  stoplist.
+- **Strip** keeps a loaded intensifier when a negator is one of the two words
+  before it in the clause, or when it sits inside double quotes on its line.
+  `The risk is not extremely high.` stays as it is. It still deletes one three
+  words from its negator (`not at all extremely high`), after `rarely`, or
+  inside single quotes: open O4 rows.
+- **One negator vocabulary**, generated into every engine from
+  `spec/agency-lexicon.json` and `spec/guard-lexicon.json`: the agency
+  detector reads `cannot neither never no nobody none nor not nothing`, and
+  the strip and `absolute.universal` guards read those plus `hardly` and
+  `without`. So `Nothing is guaranteed.` is unmarked and `Nothing extremely
+  bad happened.` keeps its `extremely`.
+- **An engine-side `absolute.universal` guard**, keyed by ruleId so the pack
+  needs no new key. A negator among the two words before a match leaves it
+  unmarked; a comma ends the negator's reach once a word stands between them.
+  An imperative clause-initial `Never` before a verb is also left unmarked
+  (`Never share your password.`).
+
+**Rules-en 0.2.1** is data only, with no new key.
+
+- Nine rules spell the smart apostrophe (U+2019) and the hyphens U+2010,
+  U+2011 and U+2013 beside the ASCII ones.
+- The agency rule's note now reads "a past-tense passive of a fault, breach,
+  concealment or decision verb". Its level falls from `warning` to `note`, and
+  its confidence from 0.7 to 0.6.
+- The optional peer rises to `@rhetorlint/core >=0.1.4`. Bump core and
+  rules-en together. With core 0.1.2 pinned (fomoengine and
+  `@agenttool/browser` pin it), `npm i @rhetorlint/rules-en` fails with
+  ERESOLVE on this peer's range. Forced (`--legacy-peer-deps`, `--force`), or
+  under an installer that only warns on peers, every old passive mark carries
+  the 0.2.1 note: on core 0.1.2, "Shipments are often delayed.", "The soup can
+  be frozen." and "Your account was closed last week." all draw it.
+
+**CLI 0.2.0** is unchanged since 07-27 apart from its ranges (`^0.1.4` core,
+`^0.2.0` rules-en). Publishing it is a separate decision.
+
+- With 0.2.0 published, a fresh `npm i @rhetorlint/cli` resolves core 0.1.4 with
+  rules-en 0.2.1: 22 rules.
+- Without it, `cli@0.1.1` stays `latest`. Its ranges are `^0.1.2` for both
+  packages, so once core 0.1.4 is live a fresh install resolves **core 0.1.4
+  with rules-en 0.1.2**: 11 rules.
+
+That pairing loads and runs. The agency marks narrow, but they keep 0.1.2's
+note ("an agentless passive — who acted is deleted from the sentence") at
+`warning` 0.7, which is still true of every narrower mark. So publishing core
+alone already changes what `cli@0.1.1` users see.
+
+**Consumers.** The estate's known dependents pin exact versions, so nothing
+reaches them until someone bumps the pin:
+
+- fomoengine `fly-api`: core 0.1.2 + rules-en 0.1.2; it calls `analyze()` only;
+- `@agenttool/browser@0.6.0`: the same pins; it calls `analyze()` and `toSignal()` only;
+- `@agenttool/aletheia`: not on npm; its lock held core 0.1.2 at the 09-07
+  check.
+
+No known consumer imports `strip()`. But `analyze()` returns a `strip` field,
+and Aletheia shows it as `lintText().strip` and `lintArticle().stripPreview`.
+
+When a pin moves to core 0.1.4 + rules-en 0.2.1, these are the measured
+changes. Before is `main` (core 0.1.3 + rules-en 0.2.0), from `node
+scripts/measure.mjs --consumer origin/main`; the local rows need the
+gitignored `measurement/local/`. Each agency mark is one `toSignal` rule count.
+
+| texts | marks per 100 words | agency marks | `[who?]` in strip | SARIF warnings |
+|---|---|---|---|---|
+| 26 committed items, 21,229 words | 2.21 → 0.53 | 377 → 22 | 377 → 22 | 379 → 2 |
+| 19 local reader samples, 10,738 words | 1.19 → 0.47 | 76 → 4 | 76 → 4 | 78 → 2 |
+| 70 local held-out files, 566,466 words | 1.78 → 0.45 | 7,500 → 33 | 7,500 → 33 | 7,504 → 4 |
+
+The pair the known consumers pin today, core 0.1.2 + rules-en 0.1.2 (`node
+scripts/measure.mjs --consumer d190af1`), is close to `main` on the committed
+items: 2.20 marks per 100 words, 377 agency marks and 379 SARIF warnings. Its
+strip flags only 359 of its 377 agency marks with `[who?]`, so the "each agency
+mark is one `[who?]`" reading of the table holds from core 0.1.3 on.
+
+- **SARIF.** Every agency result moves from `warning` to `note`.
+  `contrition.rehearsed` is now the pack's only `warning` rule. On the committed
+  items the SARIF warnings fall from 379 to 2.
+- **CLI output.** The human report prints the new agency note, and `--json`
+  carries `level: "note"` and `confidence: 0.6`.
+- **`--max` gates.** The density headline falls, so a gate set against core
+  0.1.2 output passes more files.
+
+**Recall given up, on purpose.** Accountable-passive gold recall falls from
+39/41 to 19/41 by the agency rule (20/41 by any rule). The detector no longer
+marks:
+
+- harm and news verbs (`Your account was closed`, `Jobs were cut`, `Lives were
+  lost`);
+- disclosure and publication (`was inadvertently published`, `was emailed`);
+- modal, present and progressive passives (`steps will be taken`, `is put
+  right`, `are being taken`);
+- verbs outside the lists (`were targeted`, `was changed`, `have been
+  enrolled`);
+- head-gated verbs whose head is a relative pronoun or an unlisted noun (`the
+  mistakes that were made`, `attempts were made`);
+- passives with a negator anywhere earlier in their clause (`we did not achieve
+  what we wished, and serious mistakes were made`).
+
+`measurement/contrast.json` keeps each of these as an open row. One honest twin
+that core 0.1.2 leaves unmarked is now marked: `40 staff were laid off as we closed
+the Leeds office` (`twin.agency.26`).
+
+**After publishing**, run step 5 below. Its first block installs cli 0.2.0, so
+it needs that version on the registry; if the CLI is held, run the second
+block and this section's check only. Both blocks and the check pass against
+this branch's workspace packages. Then add these checks from the clean
+install:
+
+```bash
+node --input-type=module -e '
+import { analyze } from "@rhetorlint/core"
+import rules from "@rhetorlint/rules-en" with { type: "json" }
+const a = (t) => analyze(t, { rules })
+const m = a("Mistakes were made.").marks
+if (m.length !== 1 || m[0].level !== "note" || m[0].confidence !== 0.6) process.exit(1)
+const allowed = {
+  "Shipments are often delayed.": [],
+  "Never share your password with anyone.": [],
+  "Your data was never sold.": ["absolute.universal"],
+}
+for (const [t, ok] of Object.entries(allowed))
+  if (a(t).marks.some((x) => !ok.includes(x.ruleId))) process.exit(2)
+if (a("The risk is not extremely high.").strip !== "The risk is not extremely high.") process.exit(3)
+if (!a("Let\u2019s not forget who started this.").marks.some((x) => x.ruleId === "deflection.whataboutism")) process.exit(4)
+console.log("core 0.1.4 + rules-en 0.2.1 verified")
+'
+```
+
+`Your data was never sold.` still draws `absolute.universal` on `never`. That
+is the existing absolute rule, not the agency rule, so this check allows it.
+
+**Deprecation**, only after 0.1.4 is installable. Strip output before 0.1.3
+deletes hedges, and that includes the `strip` field of `analyze()`. Verified
+on core 0.1.2: `analyze("He allegedly stole it.").strip` is `"He stole it."`.
+So the message must not say `analyze()` is unaffected:
+
+```bash
+npm deprecate '@rhetorlint/core@<0.1.3' "strip output before 0.1.3 deletes hedges ('He allegedly stole it.' -> 'He stole it.') in strip() and in analyze().strip; marks are not affected by this bug. Upgrade to >=0.1.4 (which also narrows agency-hiding marks and validates rule packs strictly; see the release notes)."
+```
+
+Every published core version is below 0.1.3, so the exact-pinned consumers
+above will print this warning on their next install.
 
 ### Core-only meaning-preservation candidate
 
@@ -91,10 +286,9 @@ Neither live Aletheia dependencies nor its metadata are updated.
 Before publication, run the full release gates below and in
 `docs/core-0.2-migration.md`, inspect the core tarball, and review the candidate's
 complete delta. After explicit approval, use a **core-scoped** publication:
-manual `release.yml` dispatch with `packages=core`, or the core workspace alone.
-Do not invoke the interactive helper, run the CI publisher with its default
-`all` scope, or push a `v*`/`release-*` tag: those routes also offer the
-unpublished rules/CLI versions to npm.
+the staged route with `package=core` (each dispatch carries one package), or
+the core workspace alone by hand. Do not invoke the interactive helper: it
+also offers the unpublished rules/CLI versions to npm.
 
 After the approved core release is registry-installable, update Aletheia's core
 floor to `^0.1.3`, regenerate its registry-backed lockfile, and add permanent
@@ -139,103 +333,194 @@ never publishes.
 
 ---
 
-## The automated route (no device required)
+## The staged route
 
-Everything below this section is the hand path, and it stays valid — it is the
-right tool when you are at a keyboard with the key, and the fallback whenever
-CI is unavailable.
+`.github/workflows/publish-npm.yml` releases one package per dispatch, from an
+annotated tag `<package>-v<version>` (`core-v0.1.3`, `rules-en-v0.2.1`,
+`cli-v0.2.0`) on the commit whose `packages/<package>/package.json` carries
+that version. Both jobs run only when dispatched on that tag, and both check
+out `github.sha`. `prepare` holds no credentials: it tests, packs with
+`--ignore-scripts` and writes a receipt of the bytes. `publish` (`dry_run`
+off, environment `npm-release`, `id-token: write`) re-checks them, confirms
+npm trusts the run (`check-trust`) and runs `npm stage publish` with
+provenance. Nothing is public until Yu approves the stage.
+`scripts/npm-release.mjs` holds every decision.
 
-But a finished, tested, pushed release should not wait on which device someone
-is sitting at. `.github/workflows/release.yml` publishes the same packages in
-the same order under the same skip-and-verify rules, via
-`scripts/publish-npm-ci.mjs`. It authenticates with **npm Trusted Publishing
-(OIDC)** — this repository stores no npm token, and CI can capture no second
-factor.
+GitHub runs the workflow file of the ref you dispatch on, so the tagged commit
+must contain `publish-npm.yml` and `scripts/npm-release.mjs`. GitHub accepts a
+dispatch only when `publish-npm.yml` is also on `main`, so merge this route to
+`main` first; on `main` nothing runs without a dispatch.
 
-To release:
+**Before the first release, once: Yu lets only release tags into
+`npm-release`.** npm's trust config names only the repository, the workflow
+file and the environment; it cannot name a ref. A pushed branch could carry a
+`publish-npm.yml` without this one's tag checks, enter `npm-release`, pass
+npm's exchange and stage any tarball, leaving only Yu's 2FA approval in the
+way. The environment's deployment policy, matched against the run's
+`GITHUB_REF`, is what ties npm's trust to release tags:
 
 ```bash
-git tag v0.1.2-rules-0.1.1 && git push origin v0.1.2-rules-0.1.1
+gh api -X PUT repos/cambridgetcg/rhetorlint-spec/environments/npm-release --input - <<'JSON'
+{"deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}
+JSON
+gh api -X POST repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies -f name='core-v*' -f type=tag
+gh api -X POST repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies -f name='rules-en-v*' -f type=tag
+gh api -X POST repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies -f name='cli-v*' -f type=tag
 ```
 
-Any tag matching `v*` or `release-*` triggers an **all-package** release.
-Manual **Actions → release → Run workflow** defaults to **core only** and offers
-`packages` (`core` or `all`) plus `dry_run`. Choose `all` explicitly for a reviewed
-coordinated release. No dependency packages are automatically added to `core`.
+Name the three prefixes: agenttool-packages' `*-v*` would also admit `py-v*`
+(PYPI_DEPLOY.md). Two optional settings narrow it further:
 
-For the isolated repair, keep the reviewed branch fixed and verify each run's
-`headSha` before proceeding; do not use release-triggering tags:
+- **Immutable release tags**, as agenttool-packages' "release tags are
+  immutable" ruleset. A mistaken tag then stays; bump the version instead.
 
-```sh
-gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
-  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=true
-# Inspect the completed run: only core may be selected. After approval:
-gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
-  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=false
+  ```bash
+  gh api -X POST repos/cambridgetcg/rhetorlint-spec/rulesets --input - <<'JSON'
+  {"name":"release tags are immutable","target":"tag","enforcement":"active","bypass_actors":[],
+   "conditions":{"ref_name":{"include":["refs/tags/core-v*","refs/tags/rules-en-v*","refs/tags/cli-v*"],"exclude":[]}},
+   "rules":[{"type":"deletion"},{"type":"update"},{"type":"non_fast_forward"}]}
+  JSON
+  ```
+
+- **No admin bypass:** clear "Allow administrators to bypass configured
+  protection rules" on `npm-release`. It is on, and GitHub's docs do not say
+  whether it covers tag policies.
+
+None of these stops a credential that can push (the owner's, or any tool
+logged in with it) from minting a new matching tag. Step d's own pack is the
+last check.
+
+Release in dependency order, **core, then rules-en, then cli**, finishing a
+package's step f before starting the next; `plan` refuses to stage the CLI
+until its caret ranges are installable. For each package (core shown):
+
+**a. Yu confirms the tag policy, then creates one stage-only trust config.**
+
+```bash
+gh api repos/cambridgetcg/rhetorlint-spec/environments/npm-release --jq .deployment_branch_policy
+gh api repos/cambridgetcg/rhetorlint-spec/environments/npm-release/deployment-branch-policies --jq '.branch_policies[] | "\(.type) \(.name)"'
 ```
 
-The dry-run contacts the registry but does not publish, exercise the OIDC
-exchange, or prove the local tarball correct. Independently inspect package
-bytes before publication and verify a registry-backed install afterward; the
-existing propagation timeout warns rather than failing the workflow.
+The first must show `custom_branch_policies` true and `protected_branches`
+false; the second exactly `tag core-v*`, `tag rules-en-v*` and `tag cli-v*`.
+Otherwise stop, and create no trust config. Then, on the device with the npm
+login:
 
-The publisher receives `PUBLISH_PACKAGES` through the environment, never shell
-interpolation. It accepts exactly `core` or `all`; empty or invalid values fail
-before manifest reads and npm commands. Direct script calls with the variable
-**absent** retain the legacy `all` default. Tag names remain human labels: the
-script reads selected manifest versions and skips those already installable.
-Network-free subprocess tests use a fake npm to check these boundaries.
-
-Local scoped-workflow verification on 2026-09-07: 19 publisher regressions and
-273 total JavaScript tests passed. Python (31 conformance + nine unit tests), Go
-race tests, dataset/generated checks, the real Chrome test, and the packed
-Aletheia comparison (four candidate cases + 14 consumer tests) also passed.
-These local checks do not establish a successful OIDC publication.
-
-### One-time setup (must be done by a human, once per package)
-
-Trusted publishing must authorize the workflow on npmjs.com for **each selected
-package**. For this core-only release inspect `@rhetorlint/core` only:
-
-> Package → **Settings** → **Trusted publishing** → GitHub Actions
-> - Organization or user: `cambridgetcg`
-> - Repository: `rhetorlint-spec`
-> - Workflow filename: `release.yml` (filename only)
-> - Environment: `npm-release`
-> - Allowed actions: direct `npm publish` must be permitted
-
-Use GitHub-hosted runners, Node >=22.14.0, npm >=11.5.1, and `id-token: write`.
-The package repository URL must identify this GitHub repository. The existing
-Node 22/npm 11 workflow supplies those runtime and permission requirements.
-See [npm's trusted publisher documentation](https://docs.npmjs.com/trusted-publishers/).
-GitHub admin access does not grant access to npm's private publisher settings.
-Inspect an existing entry before changing it; do not blindly remove publisher
-records, weaken 2FA, or place tokens/one-time codes in commands or chat.
-
-If trust is rejected the publish job fails closed — it cannot fall back to a
-token, because there is none. Nothing reaches the registry unauthenticated.
-
-A bare `ENEEDAUTH` is not enough to diagnose the trust configuration: npm can
-hide the OIDC rejection at default loglevel (npm/cli#9088). The publish script
-forces `--loglevel verbose`; inspect the `npm verbose oidc` line, for example:
-
-```
-npm verbose oidc Failed token exchange request with body message:
-  OIDC token exchange error - package not found
+```bash
+npx --yes npm@11.17.0 trust github @rhetorlint/core --repo cambridgetcg/rhetorlint-spec --file publish-npm.yml --env npm-release --allow-stage-publish --yes
 ```
 
-That rejection was observed in past runs, including 2026-08-24. It does not
-inspect today's private npm settings or uniquely establish which field is
-wrong. Check the selected package's publisher record and matching repository,
-workflow, environment, and allowed-action settings. Historical tests with and
-without the environment both failed; do not treat that as proof the environment
-can never matter. After correcting verified configuration, rerun the same
-reviewed scope and revision; already-installable versions are skipped.
+Never add `--allow-publish`: this route only stages. npm expires a config that
+no publication validates within 48 hours, so create it on release day.
 
-The `npm-release` environment also gives you a second lever: add required
-reviewers to it in GitHub repo settings and every automated publish waits for a
-human approval click. Recommended, and the reason the job names an environment
-at all.
+**b. Tag, then dry-run.** `prepare` runs only `npm run test:<package>`, and
+`ci.yml` runs only on `main` and pull requests. So first confirm CI is green
+on the commit you reviewed, or run `ci.yml`'s commands there (`npm test`, the
+real-Chrome worksheet test, the demo, Python and Go conformance, the
+three-engine diff, the Python unit tests) and note any date-dependent failure.
+
+```bash
+REVIEWED_COMMIT=<the full SHA you reviewed>
+git tag -a core-v0.1.3 -m "@rhetorlint/core 0.1.3" "$REVIEWED_COMMIT"
+git push origin core-v0.1.3
+gh workflow run publish-npm.yml --repo cambridgetcg/rhetorlint-spec --ref core-v0.1.3 \
+  -f package=core -f tag=core-v0.1.3 -f npm_tag=latest -f dry_run=true
+```
+
+`node scripts/npm-release.mjs check-inputs --package core --tag core-v0.1.3`
+on a clean checkout of the tag runs the same tag checks before you push. The
+dry run refuses what the real run would, except npm's trust. Its summary shows
+the receipt and the planned action (`stage`); make step d's own pack now and
+compare its sha256 with the receipt's. `plan` refuses `npm_tag=latest` for a
+version older than npm's `latest`; use `npm_tag=next` for one.
+
+**c. Stage.** Run `npx --yes npm@11.17.0 stage list @rhetorlint/core` first,
+and reject any pending stage you cannot trace to your own run of this tag.
+Then dispatch again with `-f dry_run=false`. With no matching trust config
+(step a missing, expired, or naming other claims), `check-trust` refuses with
+"no trusted publisher matches" and nothing is staged. Otherwise the summary
+shows the stage id, the SHA-256 and the approval commands.
+
+**d. Yu checks the stage against their own run and pack, then approves with
+2FA.** Everything in the summary, the SHA-256 included, comes from the run
+that staged, so check it against two things that run did not write:
+
+- **Your run.** The stage id is in the summary of the run you dispatched,
+  whose ref must be the tag and whose commit must be `$REVIEWED_COMMIT`:
+  `gh api repos/cambridgetcg/rhetorlint-spec/actions/workflows/publish-npm.yml/runs --jq '.workflow_runs[:5][] | "\(.id) \(.head_branch) \(.head_sha) \(.triggering_actor.login) \(.created_at)"'`
+- **Your own pack of `$REVIEWED_COMMIT`**, not of a ref name: `git clone
+  --branch core-v0.1.3` takes a branch of that name over the tag.
+
+  ```bash
+  dir=$(mktemp -d)
+  git clone --quiet --no-checkout https://github.com/cambridgetcg/rhetorlint-spec.git "$dir/src"
+  git -C "$dir/src" ls-remote --exit-code --heads origin core-v0.1.3 && echo "STOP: a branch is named core-v0.1.3"
+  test "$(git -C "$dir/src" rev-parse 'refs/tags/core-v0.1.3^{commit}')" = "$REVIEWED_COMMIT" || echo "STOP: the tag is not the reviewed commit"
+  git -C "$dir/src" checkout --quiet --detach "$REVIEWED_COMMIT"
+  (cd "$dir/src/packages/core" && npx --yes npm@11.17.0 pack --ignore-scripts --pack-destination "$dir")
+  shasum -a 256 "$dir/rhetorlint-core-0.1.3.tgz"
+  ```
+
+  A pack of `packages/core` at `1a16766` (identical to tag
+  `v0.1.3-rules-0.2.0`'s) gave
+  `40705425306737d515f13839a6afa9580964c9517bdea81a74b91fd58985f73c` on
+  2026-09-07 (npm 11.6.2) and on 2026-11-06 (npm 11.6.2 and 11.17.0), both on
+  Node 25.2.1. The workflow packs on Node 24, which is not yet observed; hence
+  step b's comparison.
+
+```bash
+npx --yes npm@11.17.0 stage view <stage-id>       # version, dist-tag and date staged must be your run's
+npx --yes npm@11.17.0 stage download <stage-id>   # prints the .tgz it wrote
+shasum -a 256 <that .tgz>                         # must equal your own pack's
+npx --yes npm@11.17.0 stage approve <stage-id>    # or: stage reject <stage-id>
+```
+
+If the hashes differ, do not approve: reject the stage, or first unpack both
+tarballs and `diff -r` them. For a few minutes after staging, `approve` can
+answer E409 ("automated review hasn't finished"); wait and run it again.
+
+**e. Verify, once the approval has landed.** Wait until `npx --yes
+npm@11.17.0 view @rhetorlint/core@0.1.3 version` prints `0.1.3`: dispatched
+before that, `plan` finds the version absent and tries to stage it again.
+Then dispatch exactly as in step c. `verify-existing` checks that npm lists
+the receipt's digests, points the dist-tag at the version and serves the same
+bytes, retrying for up to ten minutes; the summary records
+`already_published_exact`.
+
+After the last package of a coordinated release, run step 5's clean-install
+check. After core 0.1.3 alone, install it beside npm's current rules-en and
+run step 5's engine block against them (with rules-en 0.1.2, core 0.1.3
+packed from `1a16766` passed it on 2026-11-06):
+
+```bash
+cd "$(mktemp -d)" && npm init -y >/dev/null
+npm i "@rhetorlint/core@0.1.3" "@rhetorlint/rules-en@$(npm view @rhetorlint/rules-en dist-tags.latest)"
+npm ls --all                             # core must resolve to 0.1.3 for both
+```
+
+**f. Revoke the trust config.** npm expires only a config nothing validated,
+so this one stays, and would let any later dispatch on an admitted tag stage
+without Yu opening trust again. Remove it; the next release starts at step a.
+
+```bash
+npx --yes npm@11.17.0 trust list @rhetorlint/core                # shows the config's id
+npx --yes npm@11.17.0 trust revoke @rhetorlint/core --id=<id>
+```
+
+**Not yet exercised here.** This workflow has not run in this repository.
+It follows `cambridgetcg/agenttool-packages`' `publish-npm.yml`, which staged
+`@agenttool/wallet@0.1.4` and verified it on 2026-10-30. The npm behaviours
+above (the 48-hour expiry, E409, a stage-only config allowing the exchange
+for `npm-command: stage`) come from that release, not from this repository.
+
+**Diagnosing.** A dispatch on any ref but `refs/tags/<tag>` skips both jobs.
+`check-inputs` refuses a tag that is lightweight, misnamed, not the run's
+commit, or named like a branch (delete the branch). "Not allowed to deploy to
+npm-release due to environment protection rules" means a run reached
+`publish` from a ref the tag policy does not admit. The stage step prints
+npm's `oidc` debug-log lines with token-shaped text as `***`; `ENEEDAUTH`
+there means the exchange gave npm no token, so it stopped before signing
+provenance: go back to step a.
 
 ---
 
@@ -270,28 +555,18 @@ The packages are named `@rhetorlint/core`, `@rhetorlint/rules-en`,
 
 ## 2 · Authenticate as a publisher in the org
 
-Use the org's token that lives on this device. Either:
+Since 2026-10-30 the packages require 2FA and disallow tokens, so a granular
+token cannot publish them, even with bypass 2FA. Log in interactively on the
+device that holds the security key:
 
 ```bash
-npm login          # interactive, if this device can do a browser/OTP flow
-# — OR — a granular token scoped to @rhetorlint with write + bypass 2FA:
-npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"   # do NOT commit this
-```
-
-Then confirm you can publish for the org:
-
-```bash
+npm login                               # browser flow
 npm whoami                              # prints your npm username
 npm org ls <org-name> 2>/dev/null || true   # you should appear as a member
 ```
 
-- npm supports granular access tokens; legacy token types were removed in 2025.
-  For non-interactive publishing, the token needs write access to the scope and
-  **bypass 2FA** enabled. Otherwise run the publish privately and answer the OTP
-  prompt there; never put an OTP in a command argument, log, or agent chat.
-- Never write the token into a tracked file. Project `.npmrc` is ignored as a
-  guardrail, but prefer an owner-only user config, a provider vault, or a
-  short-lived scoped environment.
+Answer every 2FA prompt there yourself; never put an OTP in a command argument,
+log, or agent chat. The hand route has not been exercised since the lockdown.
 
 ## 3 · Dry-run each package (see exactly what ships)
 
@@ -322,9 +597,9 @@ scripts/publish-npm-interactive.zsh
 
 The helper checks each exact workspace version and skips versions that are
 already registry-installable, so a release that moves one workspace does not
-republish the other two — a republish is refused, not merged. For a granular
-token with write access plus bypass 2FA, publish only the workspaces whose
-manifest carries a new reviewed version, in the table's order:
+republish the other two — a republish is refused, not merged. It offers every
+workspace whose version npm lacks, so to release only some, publish those
+workspaces one at a time in the table's order instead:
 
 ```bash
 npm publish -w @rhetorlint/core        # only if its version moved
@@ -393,32 +668,14 @@ one this release ships. The deploy is good when both blocks come back clean.
 
 ## 6 · Tag the release and report back
 
-⚠ **This step is not inert.** `.github/workflows/release.yml` triggers on `v*`
-and on `release-*`. Pushing either tag starts the automated publish, which
-offers **every** manifest in the repo to the registry — including workspaces you
-did not just publish by hand. After a complete hand release that run is a no-op,
-because the script skips whatever is already live. After a partial one it
-publishes the remainder, unattended, from whatever the manifests currently hold.
-Decide which of those you want before you push:
-
-- **Let it finish the release.** Push the `v*` tag. Put required reviewers on
-  the `npm-release` environment first if you want a human between the tag and
-  the registry.
-- **Record the release only.** Use a tag name matching neither pattern.
+No workflow runs on tag pushes, so a tag only records the release. Use the
+staged route's form, one annotated tag per package published, on the commit
+you published from:
 
 ```bash
 cd -                                     # back to the repo
 core_v=$(node -p "require('./packages/core/package.json').version")
-rules_v=$(node -p "require('./packages/rules-en/package.json').version")
-tag="v${core_v}-rules-${rules_v}"        # the convention already on the repo:
-                                         # core's version alone is not unique, because
-                                         # a rules-only release leaves it unchanged
-
-# fires release.yml:
-git tag "$tag" && git push origin "$tag"
-
-# — or, to mark the commit without starting a publish:
-git tag "hand-$tag" && git push origin "hand-$tag"
+git tag -a "core-v${core_v}" -m "@rhetorlint/core ${core_v}" && git push origin "core-v${core_v}"
 ```
 
 Then report the exact package versions that were published and verified (`npm
@@ -436,8 +693,7 @@ republished. Include the relevant clean-install output as proof.
   the reviewed replacement.
 - **Publish order matters** only because `@rhetorlint/cli` depends on the other
   two. core and rules-en are independent.
-- **Provenance** (optional, nice-to-have): from GitHub Actions with OIDC you can add
-  `--provenance` for a verified supply-chain badge. Not needed for this first manual
-  publish.
+- **Provenance**: the staged route signs it (`--provenance` from GitHub
+  Actions); a hand publish has none.
 - If a publish fails with `402 Payment Required` or `403`, the scope/org name
   doesn't match or you lack publish rights in the org — recheck step 1 and 2.

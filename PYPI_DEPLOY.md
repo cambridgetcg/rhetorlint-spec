@@ -112,9 +112,8 @@ py_v=$(python3 -c "import tomllib,pathlib; print(tomllib.loads(pathlib.Path('imp
 git tag "py-v${py_v}" && git push origin "py-v${py_v}"
 ```
 
-`py-v*` matches neither of `.github/workflows/release.yml`'s tag triggers (`v*`,
-`release-*`), so it records the release without starting the npm publish job.
-Keep the prefix.
+No workflow runs on tag pushes, so the tag only records the release. Keep the
+`py-v` prefix: npm release tags are `<package>-v<version>`.
 
 ---
 
