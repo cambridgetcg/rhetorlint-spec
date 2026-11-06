@@ -11,8 +11,10 @@ name: publish-npm
 #            the version and checks npm serves the receipt's bytes.
 #
 # Dispatch on the tag itself (Use workflow from: core-v0.1.3), with the same
-# name in `tag`. NPM_DEPLOY.md is the runbook; scripts/npm-release.mjs holds
-# every decision. This replaces release.yml, which published directly and
+# name in `tag`; any other dispatch skips both jobs. Each job checks out
+# github.sha, the commit GitHub took this file from, never a ref an input
+# names. NPM_DEPLOY.md is the runbook; scripts/npm-release.mjs holds every
+# decision. This replaces release.yml, which published directly and
 # can no longer authenticate. Adapted from cambridgetcg/agenttool-packages
 # (Apache-2.0).
 
@@ -56,16 +58,18 @@ concurrency:
 jobs:
   prepare:
     name: Prepare the exact artifact (no credentials)
-    if: github.repository == 'cambridgetcg/rhetorlint-spec'
+    if: github.repository == 'cambridgetcg/rhetorlint-spec' && startsWith(github.ref, 'refs/tags/') && github.ref == format('refs/tags/{0}', inputs.tag)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
       contents: read
     steps:
-      - name: Check out the release tag
+      # A bare tag name would let checkout take a branch of the same name
+      # first; github.sha is the commit GitHub resolved for refs/tags/<tag>.
+      - name: Check out the dispatched commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Set up Node 24
@@ -116,13 +120,13 @@ jobs:
   publish:
     name: Stage for 2FA approval, or verify what npm serves
     needs: prepare
-    if: github.repository == 'cambridgetcg/rhetorlint-spec' && !inputs.dry_run
+    if: github.repository == 'cambridgetcg/rhetorlint-spec' && startsWith(github.ref, 'refs/tags/') && github.ref == format('refs/tags/{0}', inputs.tag) && !inputs.dry_run
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     # npm's trust config for the package names only the repository, this
-    # file's name and this environment; it cannot name a ref. The tag and
-    # commit checks in npm-release.mjs live in files a pushed branch can
-    # rewrite, so what ties npm's trust to release tags is npm-release's
+    # file's name and this environment; it cannot name a ref. This file's
+    # guard and npm-release.mjs's checks can be left out of a copy on a
+    # pushed branch, so what ties npm's trust to release tags is npm-release's
     # deployment policy: only core-v*, rules-en-v* and cli-v* tags may enter
     # (NPM_DEPLOY.md, before step a). Required reviewers would add only a
     # click; the stage itself waits for a 2FA approval.
@@ -131,10 +135,10 @@ jobs:
       contents: read
       id-token: write # npm's OIDC exchange and the provenance signature
     steps:
-      - name: Check out the same release tag
+      - name: Check out the same commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Set up Node 24 and the npm registry

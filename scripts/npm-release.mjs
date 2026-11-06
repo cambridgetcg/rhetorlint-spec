@@ -156,6 +156,14 @@ export function checkInputs(ctx, { package: key, tag, npmTag }) {
   const kind = ctx.run('git', ['cat-file', '-t', `refs/tags/${tag}`], { cwd: ctx.root })
   if (kind.status !== 0) fail(`tag ${tag} is not in this checkout`)
   if (kind.stdout.trim() !== 'tag') fail(`${tag} must be an annotated tag (git tag -a), not a lightweight one`)
+  // A branch of the same name wins over the tag wherever the bare name is
+  // read (git clone --branch, actions/checkout), so it is refused outright.
+  // In Actions, checkout's full fetch maps every branch to refs/remotes/origin/.
+  for (const ref of [`refs/heads/${tag}`, `refs/remotes/origin/${tag}`]) {
+    if (ctx.run('git', ['rev-parse', '--verify', '--quiet', ref], { cwd: ctx.root }).status === 0) {
+      fail(`a branch named ${tag} exists (${ref}); delete it, since the bare name ${tag} would pick it over the tag`)
+    }
+  }
   const commit = git(ctx, ['rev-parse', `refs/tags/${tag}^{commit}`])
   const head = git(ctx, ['rev-parse', 'HEAD'])
   if (commit !== head) fail(`HEAD ${head} is not the commit ${commit} that ${tag} names`)
@@ -369,49 +377,28 @@ function mask(ctx, secret) {
   if (ctx.env.GITHUB_ACTIONS === 'true') ctx.log(`::add-mask::${secret}`)
 }
 
-// The redirects npm 11.17.0's fetch follows (minipass-fetch isRedirect).
-const REDIRECTS = new Set([301, 302, 303, 307, 308])
-
-// One OIDC request, 30 seconds per hop. It follows redirects as npm's fetch
-// does (a GET after a 303, or after a 301 or 302 to a POST), but only within
-// one origin: npm drops the bearer on another host, where it would get no
-// token either, so such a redirect is returned, and refused, as it is.
+// One OIDC request, 30 seconds. A redirect is refused, not followed, as
+// packument() and download() refuse one: neither service has been seen to
+// send one, and the ID token goes only to the URL named here. 'manual', not
+// 'error', so the refusal names the redirect rather than "did not answer".
 async function oidcRequest(ctx, url, init, label) {
-  let target = new URL(url)
-  let request = init
-  for (let hops = 0; ; hops += 1) {
-    let response
-    try {
-      response = await ctx.fetch(target.href, { ...request, redirect: 'manual', signal: AbortSignal.timeout(30_000) })
-    } catch {
-      fail(`${label} did not answer; dispatch again later. Nothing was staged.`)
-    }
-    const redirect = REDIRECTS.has(response.status)
-    const location = redirect && hops < 20 ? response.headers.get('location') : null
-    let next = null
-    try {
-      next = location === null ? null : new URL(location, target)
-    } catch {
-      next = null
-    }
-    if (next?.origin === target.origin) {
-      if (response.status === 303 || (request.method === 'POST' && [301, 302].includes(response.status))) request = { ...request, method: 'GET' }
-      await response.body?.cancel()
-      target = next
-      continue
-    }
-    let body
-    try {
-      body = JSON.parse(await response.text())
-    } catch {
-      body = undefined
-    }
-    return { status: response.status, ok: response.ok, redirect, body: body && typeof body === 'object' ? body : undefined }
+  let response
+  try {
+    response = await ctx.fetch(url, { ...init, redirect: 'manual', signal: AbortSignal.timeout(30_000) })
+  } catch {
+    fail(`${label} did not answer; dispatch again later. Nothing was staged.`)
   }
-}
-
-function answeredOidc(response) {
-  return `HTTP ${response.status}${response.redirect ? ', a redirect check-trust does not follow (another origin, or past 20 hops)' : ''}`
+  if (response.status >= 300 && response.status < 400) {
+    await response.body?.cancel()
+    fail(`${label} answered HTTP ${response.status}, a redirect check-trust does not follow. Nothing was staged.`)
+  }
+  let body
+  try {
+    body = JSON.parse(await response.text())
+  } catch {
+    body = undefined
+  }
+  return { status: response.status, ok: response.ok, body: body && typeof body === 'object' ? body : undefined }
 }
 
 // npm 11.17.0's OIDC exchange (lib/utils/oidc.js), made once before staging:
@@ -433,7 +420,7 @@ export async function checkTrust(ctx, { package: key }) {
     headers: { accept: 'application/json', authorization: `Bearer ${requestToken}` },
   }, "GitHub's OIDC token service")
   const idToken = issued.body?.value
-  if (!issued.ok || typeof idToken !== 'string' || !BEARER.test(idToken)) fail(`GitHub issued no OIDC ID token for ${OIDC_AUDIENCE} (${answeredOidc(issued)})`)
+  if (!issued.ok || typeof idToken !== 'string' || !BEARER.test(idToken)) fail(`GitHub issued no OIDC ID token for ${OIDC_AUDIENCE} (HTTP ${issued.status})`)
   mask(ctx, idToken)
   const exchanged = await oidcRequest(ctx, `${REGISTRY}/-/npm/v1/oidc/token/exchange/package/${spec.name.replace('/', '%2f')}`, {
     method: 'POST',
@@ -454,7 +441,7 @@ export async function checkTrust(ctx, { package: key }) {
       `npm stages it only for a trust config naming ${REPOSITORY}, workflow ${WORKFLOW_FILE} and environment ${ENVIRONMENT}, with stage publishing allowed. ` +
       'Create one as NPM_DEPLOY.md describes and dispatch this tag again within 48 hours, before npm expires an unvalidated config. Nothing was staged.')
   }
-  fail(`npm's OIDC exchange gave this workflow no token for ${spec.name} (${answeredOidc(exchanged)}${said}). Nothing was staged.`)
+  fail(`npm's OIDC exchange gave this workflow no token for ${spec.name} (HTTP ${exchanged.status}${said}). Nothing was staged.`)
 }
 
 // npm's `oidc` lines, at any level, from one debug log, with token-shaped
@@ -504,14 +491,15 @@ function summary(ctx, markdown) {
 
 // Everything here comes from the run that staged, so it cannot vouch for
 // itself: the approver checks the stage against their own dispatch and their
-// own pack of the tag (NPM_DEPLOY.md, staged route step d).
+// own pack of the commit they reviewed (NPM_DEPLOY.md, staged route step d).
 export function approvalSteps(staged) {
   const npm = `npx --yes npm@${PINNED_NPM}`
   const id = staged.stage_id
+  const { name, version } = staged.package
   return [
-    `## Staged ${staged.package.name}@${staged.package.version}: not public until approved`,
+    `## Staged ${name}@${version}: not public until approved`,
     '',
-    `Approve only if you dispatched this run, and only bytes you packed yourself from a clean checkout of \`${staged.tag}\` (NPM_DEPLOY.md, staged route step d). On the device that holds the npm login (each approval asks for 2FA):`,
+    `Approve only if you dispatched this run on \`${staged.tag}\`, and only bytes you packed yourself from the commit you reviewed; this run says it built ${staged.commit} (NPM_DEPLOY.md, staged route step d). On the device that holds the npm login (each approval asks for 2FA):`,
     '',
     '```bash',
     `${npm} stage view ${id}       # version, dist-tag and date staged must be this run's`,
@@ -521,7 +509,8 @@ export function approvalSteps(staged) {
     '```',
     '',
     'For a few minutes after staging, approve can answer E409 ("automated review hasn\'t finished"). Wait and run it again.',
-    `Then dispatch ${WORKFLOW_FILE} on \`${staged.tag}\` again with the same inputs and dry_run off. It finds the version and checks the registry serves these bytes.`,
+    `Once \`${npm} view ${name}@${version} version\` prints ${version}, and not before, dispatch ${WORKFLOW_FILE} on \`${staged.tag}\` again with the same inputs and dry_run off. It finds the version and checks the registry serves these bytes; sent while the version is still absent, it would try to stage a second copy.`,
+    `After that check, revoke the package's trust config (\`${npm} trust list ${name}\`, then \`${npm} trust revoke ${name} --id=<id>\`), so no later dispatch can stage without a new one.`,
   ].join('\n')
 }
 

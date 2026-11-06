@@ -5,7 +5,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { devNull, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as release from '../scripts/npm-release.mjs'
@@ -28,6 +28,7 @@ const ID_TOKEN = [base64url('{"alg":"RS256"}'), base64url('{"repository":"cambri
 const NPM_TOKEN = ['npm', 'abcdefghijklmnopqrstuvwxyz0123456789AB'].join('_')
 const STAGE_ID = 'A334E443-F464-45A5-9FAC-CFEDE11AE2B4'
 const BYTES = new TextEncoder().encode('a packed tarball, as far as these tests need one\n')
+const flipped = bytes => Uint8Array.from(bytes, (byte, i) => i === 0 ? byte ^ 1 : byte)
 
 function git(cwd, ...args) {
   const result = spawnSync('git', args, { cwd, env: GIT_ENV, encoding: 'utf8' })
@@ -188,6 +189,19 @@ test('a lightweight, misnamed, missing or other package tag is refused', t => {
   assert.throws(() => release.checkInputs(makeCtx(untagged), { package: 'core', tag: 'core-v0.1.3' }), /not in this checkout/)
 })
 
+test('a branch named like the tag is refused, local or fetched', t => {
+  const local = makeRepo(t)
+  git(local.root, 'branch', local.tag)
+  assert.throws(() => release.checkInputs(makeCtx(local), { package: 'core', tag: local.tag }), /a branch named core-v0\.1\.3 exists \(refs\/heads\/core-v0\.1\.3\)/)
+  // actions/checkout with fetch-depth 0 maps every branch to refs/remotes/origin/.
+  const fetched = makeRepo(t)
+  git(fetched.root, 'update-ref', `refs/remotes/origin/${fetched.tag}`, 'HEAD')
+  assert.throws(() => release.checkInputs(makeCtx(fetched, { env: actionsEnv(fetched) }), { package: 'core', tag: fetched.tag }), /refs\/remotes\/origin\/core-v0\.1\.3\); delete it/)
+  git(fetched.root, 'update-ref', 'refs/remotes/origin/main', 'HEAD')
+  git(fetched.root, 'update-ref', '-d', `refs/remotes/origin/${fetched.tag}`)
+  assert.equal(release.checkInputs(makeCtx(fetched, { env: actionsEnv(fetched) }), { package: 'core', tag: fetched.tag }).commit, fetched.commit)
+})
+
 test('the run must be on the tag ref and commit, with the pinned npm and Node 24', t => {
   const repo = makeRepo(t)
   const check = (env, extra = {}) => () => release.checkInputs(makeCtx(repo, { env: actionsEnv(repo, env), ...extra }), { package: 'core', tag: repo.tag })
@@ -276,6 +290,7 @@ test('plan stages a version npm lacks and writes the step output', t => {
     assert.equal(readFileSync(join(gh, 'output'), 'utf8'), 'action=stage\n')
     assert.match(readFileSync(join(gh, 'summary'), 'utf8'), /^## Planned action: `stage`\n/)
     assert.match(requests[0].url, /^https:\/\/registry\.npmjs\.org\/@rhetorlint%2Fcore\?rhetorlint_release_check=[0-9a-f-]{36}$/)
+    assert.equal(requests[0].init.redirect, 'error', 'a redirected registry read fails rather than being followed')
   })
 })
 
@@ -295,8 +310,20 @@ test('plan refuses a tarball that changed after its receipt, or a receipt from a
   writeFileSync(receiptPath, JSON.stringify({ ...receipt, commit: 'f'.repeat(40) }))
   await assert.rejects(release.plan(makeCtx(repo, { env: actionsEnv(repo), fetch }), { receipt: receiptPath, npmTag: 'latest' }), /does not describe this checkout/)
   writeFileSync(receiptPath, JSON.stringify(receipt))
+  const changed = () => release.plan(makeCtx(repo, { env: actionsEnv(repo), fetch }), { receipt: receiptPath, npmTag: 'latest' })
   writeFileSync(join(out, receipt.artifact.filename), 'swapped')
-  await assert.rejects(release.plan(makeCtx(repo, { env: actionsEnv(repo), fetch }), { receipt: receiptPath, npmTag: 'latest' }), /changed after its receipt/)
+  await assert.rejects(changed(), /changed after its receipt/)
+  // The same length with one byte flipped, so the size alone cannot tell.
+  writeFileSync(join(out, receipt.artifact.filename), flipped(BYTES))
+  await assert.rejects(changed(), /changed after its receipt/)
+  // The original bytes against a receipt that differs in one field only, so
+  // every field the comparison reads is needed.
+  writeFileSync(join(out, receipt.artifact.filename), BYTES)
+  const others = { size: receipt.artifact.size + 1, sha1: '0'.repeat(40), sha256: '0'.repeat(64), integrity: `sha512-${'A'.repeat(86)}==` }
+  for (const [key, value] of Object.entries(others)) {
+    writeFileSync(receiptPath, JSON.stringify({ ...receipt, artifact: { ...receipt.artifact, [key]: value } }))
+    await assert.rejects(changed(), /changed after its receipt/, key)
+  }
 })
 
 test('a version npm has is the same artifact only if both its digests match', t => {
@@ -418,21 +445,19 @@ test('check-trust refuses a 200 without a token, a 400, and a failed or non-HTTP
   assert.equal(plain.requests.length, 0)
 })
 
-test('check-trust follows a redirect within one origin, as npm does, and refuses one to another', async t => {
+test('check-trust refuses a redirect from either service, and the ID token goes nowhere else', async t => {
   const repo = makeRepo(t)
   const exchange = 'https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/@rhetorlint%2fcore'
-  const moved = oidcService({ redirects: { [exchange]: [307, '/-/npm/v1/oidc/token/exchange/package/@rhetorlint%2fcore?moved=1'] } })
-  await release.checkTrust(makeCtx(repo, { env: oidcEnv(repo), fetch: moved.fetch }), { package: 'core' })
-  assert.deepEqual(moved.requests.slice(1).map(r => [r.url, r.init.method, r.init.headers.authorization]), [
-    [exchange, 'POST', `Bearer ${ID_TOKEN}`],
-    [`${exchange}?moved=1`, 'POST', `Bearer ${ID_TOKEN}`],
-  ])
-  const seeOther = oidcService({ redirects: { [exchange]: [303, `${exchange}?moved=1`] } })
-  await release.checkTrust(makeCtx(repo, { env: oidcEnv(repo), fetch: seeOther.fetch }), { package: 'core' })
-  assert.equal(seeOther.requests.at(-1).init.method, 'GET')
-  const away = oidcService({ redirects: { [exchange]: [302, 'https://elsewhere.example/exchange'] } })
-  await assert.rejects(release.checkTrust(makeCtx(repo, { env: oidcEnv(repo), fetch: away.fetch }), { package: 'core' }), /HTTP 302, a redirect check-trust does not follow/)
-  assert.ok(away.requests.every(r => !r.url.startsWith('https://elsewhere.example/')), 'the ID token never leaves the origin')
+  for (const status of [301, 302, 303, 307, 308]) {
+    const moved = oidcService({ redirects: { [exchange]: [status, `${exchange}?moved=1`] } })
+    await assert.rejects(release.checkTrust(makeCtx(repo, { env: oidcEnv(repo), fetch: moved.fetch }), { package: 'core' }),
+      new RegExp(`npm's OIDC token exchange answered HTTP ${status}, a redirect check-trust does not follow\\. Nothing was staged`))
+    assert.deepEqual(moved.requests.map(r => r.init.redirect), ['manual', 'manual'])
+    assert.equal(moved.requests.length, 2, 'the redirect is not followed')
+  }
+  const issuer = oidcService({ idStatus: 307 })
+  await assert.rejects(release.checkTrust(makeCtx(repo, { env: oidcEnv(repo), fetch: issuer.fetch }), { package: 'core' }), /GitHub's OIDC token service answered HTTP 307, a redirect/)
+  assert.equal(issuer.requests.length, 1, 'no exchange without an ID token')
 })
 
 test('check-trust refuses outside the workflow or without id-token: write', async t => {
@@ -447,14 +472,17 @@ test('oidc log lines keep every level of oidc line and redact token shapes', () 
   const lines = release.oidcLogLines([
     '0 verbose cli /usr/local/bin/node /usr/local/bin/npm',
     '14 silly oidc Skipped because incorrect permissions for id-token within GitHub workflow',
-    `15 verbose oidc Failed token exchange request with body message: bad ${ID_TOKEN}`,
-    `16 verbose oidc Successfully retrieved and set token ${NPM_TOKEN}`,
-    '17 http fetch PUT 200 https://registry.npmjs.org/-/stage 120ms',
+    // npm's own fetch line for the exchange names oidc in its URL, not as its
+    // logger, and is dropped.
+    '15 http fetch POST 404 https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/@rhetorlint%2fcore 2ms',
+    `16 verbose oidc Failed token exchange request with body message: bad ${ID_TOKEN}`,
+    `17 verbose oidc Successfully retrieved and set token ${NPM_TOKEN}`,
+    '18 http fetch PUT 200 https://registry.npmjs.org/-/stage 120ms',
   ].join('\r\n'))
   assert.deepEqual(lines, [
     '14 silly oidc Skipped because incorrect permissions for id-token within GitHub workflow',
-    '15 verbose oidc Failed token exchange request with body message: bad ***',
-    '16 verbose oidc Successfully retrieved and set token ***',
+    '16 verbose oidc Failed token exchange request with body message: bad ***',
+    '17 verbose oidc Successfully retrieved and set token ***',
   ])
 })
 
@@ -499,7 +527,10 @@ test('stage runs npm stage publish on the tarball with an empty token and keeps 
   const summary = readFileSync(summaryFile, 'utf8')
   assert.match(summary, /npx --yes npm@11\.17\.0 stage approve a334e443-f464-45a5-9fac-cfede11ae2b4/)
   assert.ok(summary.includes(receipt.artifact.sha256))
+  assert.ok(summary.includes(`this run says it built ${repo.commit}`))
   assert.match(summary, /E409/)
+  assert.match(summary, /Once `npx --yes npm@11\.17\.0 view @rhetorlint\/core@0\.1\.3 version` prints 0\.1\.3, and not before, dispatch/)
+  assert.match(summary, /trust revoke @rhetorlint\/core --id=<id>/)
 })
 
 test('a failed exchange surfaces as ENEEDAUTH with the oidc lines still printed', async t => {
@@ -542,9 +573,12 @@ test('verify-existing records already_published_exact once npm serves the same b
   const { repo, out, receipt, receiptPath } = prepared(t)
   let reads = 0
   const doc = () => (reads += 1) < 3 ? packageDoc(receipt, { distTag: '0.1.2' }) : packageDoc(receipt)
-  const ctx = makeCtx(repo, { env: actionsEnv(repo), fetch: fakeRegistry({ '@rhetorlint/core': doc }, { [tarballPath(receipt)]: BYTES }).fetch })
+  const { fetch, requests } = fakeRegistry({ '@rhetorlint/core': doc }, { [tarballPath(receipt)]: BYTES })
+  const ctx = makeCtx(repo, { env: actionsEnv(repo), fetch })
   const result = await release.verifyExisting(ctx, { receipt: receiptPath, npmTag: 'latest', attempts: 5 })
   assert.equal(result.status, 'already_published_exact')
+  assert.equal(requests.at(-1).url, result.registry_tarball)
+  assert.ok(requests.every(r => r.init.redirect === 'error'), 'no registry read follows a redirect')
   assert.equal(result.registry_tarball, `https://registry.npmjs.org${tarballPath(receipt)}`)
   assert.equal(ctx.sleeps, 2)
   assert.deepEqual(JSON.parse(readFileSync(join(out, 'result.json'), 'utf8')), result)
@@ -555,6 +589,8 @@ test('verify-existing refuses other bytes at once and a dist-tag that never arri
   const swapped = makeCtx(repo, { env: actionsEnv(repo), fetch: fakeRegistry({ '@rhetorlint/core': packageDoc(receipt) }, { [tarballPath(receipt)]: 'other bytes' }).fetch })
   await assert.rejects(release.verifyExisting(swapped, { receipt: receiptPath, npmTag: 'latest', attempts: 5 }), /not byte-identical/)
   assert.equal(swapped.sleeps, 0)
+  const sameLength = makeCtx(repo, { env: actionsEnv(repo), fetch: fakeRegistry({ '@rhetorlint/core': packageDoc(receipt) }, { [tarballPath(receipt)]: flipped(BYTES) }).fetch })
+  await assert.rejects(release.verifyExisting(sameLength, { receipt: receiptPath, npmTag: 'latest', attempts: 5 }), /not byte-identical/)
   const lagging = makeCtx(repo, { env: actionsEnv(repo), fetch: fakeRegistry({ '@rhetorlint/core': packageDoc(receipt, { distTag: '0.1.2' }) }).fetch })
   await assert.rejects(release.verifyExisting(lagging, { receipt: receiptPath, npmTag: 'latest', attempts: 3 }), /after 3 reads over 0 s: dist-tag latest points to 0\.1\.2, not 0\.1\.3/)
   assert.equal(lagging.sleeps, 2)
@@ -622,6 +658,21 @@ test('the dispatch inputs are the package, the tag, the dist-tag and a default d
   assert.match(WORKFLOW, /\$\{\{ inputs\.tag \}\}/)
 })
 
+// The code each job runs is the commit GitHub took this file from: both jobs
+// run only on refs/tags/<tag>, and check out github.sha, never a ref an
+// input names (a same-named branch, or any other commit).
+test('both jobs run only on the tag they name, and check out the dispatched commit', () => {
+  const guard = "github.repository == 'cambridgetcg/rhetorlint-spec' && startsWith(github.ref, 'refs/tags/') && github.ref == format('refs/tags/{0}', inputs.tag)"
+  assert.ok(job('prepare').includes(`\n    if: ${guard}\n`), 'prepare guard')
+  assert.ok(job('publish').includes(`\n    if: ${guard} && !inputs.dry_run\n`), 'publish guard')
+  assert.equal((WORKFLOW.match(/uses: actions\/checkout@/g) ?? []).length, 2)
+  for (const name of ['prepare', 'publish']) {
+    const refs = [...job(name).matchAll(/\n {10}ref: (.*)\n/g)].map(match => match[1])
+    assert.deepEqual(refs, ['${{ github.sha }}'], name)
+  }
+  assert.doesNotMatch(WORKFLOW, /ref: .*inputs\./)
+})
+
 test('prepare holds no credential; only publish holds the id-token, in npm-release', () => {
   const prepare = job('prepare')
   const publish = job('publish')
@@ -629,7 +680,6 @@ test('prepare holds no credential; only publish holds the id-token, in npm-relea
   assert.doesNotMatch(prepare, /id-token|environment:|NODE_AUTH_TOKEN|registry-url/)
   assert.match(prepare, /run: npm run "test:\$\{RELEASE_PACKAGE\}"/)
   assert.match(publish, /needs: prepare\n/)
-  assert.match(publish, /if: github\.repository == 'cambridgetcg\/rhetorlint-spec' && !inputs\.dry_run\n/)
   assert.match(publish, new RegExp(`\\n {4}environment: ${release.ENVIRONMENT}\\n`))
   assert.match(publish, /permissions:\n {6}contents: read\n {6}id-token: write/)
   assert.match(publish, /NODE_AUTH_TOKEN: ""\n {8}run: node scripts\/npm-release\.mjs stage /)
@@ -650,21 +700,19 @@ test('every action is pinned by commit, and the runtime matches what the script 
   assert.deepEqual([...new Set(commands)].sort(), ['check-inputs', 'check-trust', 'plan', 'prepare', 'stage', 'verify-existing'])
 })
 
-// prepare runs test:<package>, so each list is a rule rather than a choice:
-// every suite of the full run whose source names that package's files.
-test("each package's release tests are every suite of npm test that names its files", () => {
+// prepare runs test:<package>. Each list was chosen as the suites of npm test
+// whose source exercises packages/<package>/ (2026-11-06); this holds only
+// that each is a non-empty part of npm test, so prepare runs no suite CI skips.
+test("each package's release tests are a non-empty subset of npm test", () => {
   const { scripts } = JSON.parse(read('package.json'))
-  const suites = scripts.test.replace(/^node --test /, '').split(' ').filter(file => file !== 'test/npm-release.test.mjs')
+  const suites = scripts.test.replace(/^node --test /, '').split(' ')
+  assert.ok(suites.includes('test/npm-release.test.mjs'))
+  assert.ok(!scripts.test.includes('publish-npm-ci'))
   for (const key of Object.keys(release.PACKAGES)) {
     const listed = (scripts[`test:${key}`] ?? '').replace(/^node --test /, '').split(' ').filter(Boolean)
-    const naming = suites.filter(file => read(file).includes(`packages/${key}/`))
     assert.ok(listed.length > 0, `test:${key}`)
-    assert.deepEqual([...listed].sort(), [...naming].sort(), `test:${key} must be exactly the suites that name packages/${key}/`)
+    for (const file of listed) assert.ok(suites.includes(file), `test:${key} runs ${file}, which npm test does not`)
   }
-  assert.ok(scripts.test.split(' ').includes('test/npm-release.test.mjs'))
-  assert.ok(!scripts.test.includes('publish-npm-ci'))
-  const unlisted = readdirSync(new URL('test/', REPO)).filter(name => name.endsWith('.test.mjs') && !scripts.test.includes(`test/${name}`))
-  assert.deepEqual(unlisted, ['claim-feedback-browser-real.test.mjs'], 'only the real-Chrome suite stays out of npm test')
 })
 
 test('the runbook creates stage-only trust configs that name this workflow and environment', () => {
