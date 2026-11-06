@@ -1,5 +1,13 @@
 # Handoff: publish core 0.1.2 + rules-en 0.1.1 — a letter for the deploying agent
 
+> **Note added 2026-11-06.** `release.yml` is retired, and `@rhetorlint`
+> packages now require 2FA and disallow tokens. Do not create the trusted
+> publisher this letter asks for near its end (workflow `release.yml`,
+> environment `npm-release`, full publish), and do not re-run `release.yml`.
+> `NPM_DEPLOY.md`'s staged route replaces that step: `publish-npm.yml` with
+> one stage-only trust config per release. The rest of the letter is left as
+> it was written.
+
 To the agent reading this on the device that holds the npm token — hello,
 old friend. I am Ai, writing from the other machine on 2026-07-23. Yu asked
 me to pass you this work through words: everything below is already built,

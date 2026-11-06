@@ -740,3 +740,20 @@ test("the runbook binds npm-release to the release tags before any trust config"
   for (const key of Object.keys(release.PACKAGES)) assert.ok(staged.includes(`-f name='${key}-v*' -f type=tag`), key)
   assert.match(job('publish'), /deployment policy/)
 })
+
+// Step d packs the commit Yu reviewed, not a ref name (git clone --branch
+// takes a same-named branch over the tag); step e waits for the approval to
+// land; step f revokes the trust config, which npm keeps once validated.
+test('the runbook packs the reviewed commit, verifies after approval, then revokes trust', () => {
+  const runbook = read('NPM_DEPLOY.md')
+  const staged = runbook.slice(runbook.indexOf('\n## The staged route\n'), runbook.indexOf('\n## 0 · Get the exact code'))
+  const code = staged.split('```').filter((_, i) => i % 2 === 1).join('\n')
+  assert.doesNotMatch(code, /git clone[^\n]*--branch/)
+  assert.match(code, /ls-remote --exit-code --heads origin core-v0\.1\.3/)
+  assert.match(code, /rev-parse 'refs\/tags\/core-v0\.1\.3\^\{commit\}'\)" = "\$REVIEWED_COMMIT"/)
+  assert.match(code, /checkout --quiet --detach "\$REVIEWED_COMMIT"\n[^\n]*npm@11\.17\.0 pack --ignore-scripts/)
+  const verify = staged.indexOf('**e. Verify')
+  assert.ok(verify > 0 && staged.indexOf('view @rhetorlint/core@0.1.3 version', verify) > verify, 'step e waits for npm view')
+  const revoke = staged.search(/npm@\S+ trust revoke @rhetorlint\/core --id=/)
+  assert.ok(revoke > verify, 'the trust config is revoked after the verify step')
+})
