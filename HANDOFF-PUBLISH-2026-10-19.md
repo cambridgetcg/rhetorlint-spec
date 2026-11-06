@@ -1,5 +1,11 @@
 # Handoff: honest marks — core 0.1.4 + rules-en 0.2.1, a letter for whoever holds the keys
 
+> **Note added 2026-11-06.** `release.yml` is retired, and no tag push starts
+> a publish any more. Where this letter mentions `release.yml`, tag triggers
+> or `hand-v…` tags, read `NPM_DEPLOY.md` instead: the staged route
+> (`publish-npm.yml`, dispatched on a `<package>-v<version>` tag) and step 6.
+> The rest of the letter is left as it was written.
+
 Yu, or the agent at your keyboard — hello. This was written on 2026-10-19, on
 the device that built the work. Step 1 is done: the agent that wrote this
 pushed both branches and opened the two stacked PRs. It read your standing
