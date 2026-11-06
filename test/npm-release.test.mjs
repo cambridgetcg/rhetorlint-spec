@@ -545,3 +545,15 @@ test("each package's release tests exist and the full suite runs this file", () 
   assert.ok(scripts.test.split(' ').includes('test/npm-release.test.mjs'))
   assert.ok(!scripts.test.includes('publish-npm-ci'))
 })
+
+test('the runbook creates stage-only trust configs that name this workflow and environment', () => {
+  const runbook = read('NPM_DEPLOY.md')
+  const trusts = runbook.split('\n').filter(line => /npm@\S+ trust github /.test(line))
+  assert.ok(trusts.length > 0)
+  for (const line of trusts) {
+    assert.ok(line.includes(`npm@${release.PINNED_NPM} trust github`), line)
+    assert.ok(line.includes(`--repo ${release.REPOSITORY} --file ${release.WORKFLOW_FILE} --env ${release.ENVIRONMENT} --allow-stage-publish`), line)
+    assert.doesNotMatch(line, /--allow-publish\b/)
+  }
+  assert.doesNotMatch(runbook, /workflow run release\.yml|PUBLISH_PACKAGES/)
+})

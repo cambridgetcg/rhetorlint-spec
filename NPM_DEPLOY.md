@@ -1,10 +1,19 @@
 # Publishing `@rhetorlint/*` to npm — a guide for the deploying agent
 
-You are on the device that holds the npm org's publish token. Your job: publish
-each reviewed workspace whose manifest carries a new version, in dependency
-order, and verify it. The first release may include all three packages; a later
-patch may include only one. This guide is self-contained — follow it top to
-bottom.
+Your job: publish each reviewed workspace whose manifest carries a new version,
+in dependency order, and verify it. A release may include all three packages or
+only one.
+
+Since the 2026-10-30 lockdown every `@rhetorlint` package requires 2FA to
+publish and disallows tokens (`mfa=publish`), and the trusted-publisher configs
+that the retired `release.yml` used were revoked. Two routes remain:
+
+- **[The staged route](#the-staged-route)**, the default: `publish-npm.yml`
+  prepares one package from its annotated tag and stages it on npm, and Yu
+  approves the stage with 2FA.
+- **The hand route** (steps 0–6 below), the fallback:
+  `scripts/publish-npm-interactive.zsh` on the device with the npm login and
+  its security key.
 
 The three packages that publish (nothing else does):
 
@@ -274,10 +283,9 @@ Neither live Aletheia dependencies nor its metadata are updated.
 Before publication, run the full release gates below and in
 `docs/core-0.2-migration.md`, inspect the core tarball, and review the candidate's
 complete delta. After explicit approval, use a **core-scoped** publication:
-manual `release.yml` dispatch with `packages=core`, or the core workspace alone.
-Do not invoke the interactive helper, run the CI publisher with its default
-`all` scope, or push a `v*`/`release-*` tag: those routes also offer the
-unpublished rules/CLI versions to npm.
+the staged route with `package=core` (each dispatch carries one package), or
+the core workspace alone by hand. Do not invoke the interactive helper: it
+also offers the unpublished rules/CLI versions to npm.
 
 After the approved core release is registry-installable, update Aletheia's core
 floor to `^0.1.3`, regenerate its registry-backed lockfile, and add permanent
@@ -322,103 +330,98 @@ never publishes.
 
 ---
 
-## The automated route (no device required)
+## The staged route
 
-Everything below this section is the hand path, and it stays valid — it is the
-right tool when you are at a keyboard with the key, and the fallback whenever
-CI is unavailable.
+`.github/workflows/publish-npm.yml` releases one package per dispatch, from an
+annotated tag `<package>-v<version>` (`core-v0.1.3`, `rules-en-v0.2.1`,
+`cli-v0.2.0`) on the commit whose `packages/<package>/package.json` carries
+that version. Its `prepare` job has no credentials and no id-token: it checks
+the tag, runs `npm run test:<package>`, packs with `--ignore-scripts`, and
+writes a receipt of the tarball's size, SHA-1, SHA-256 and integrity. Its
+`publish` job runs only with `dry_run` off, in environment `npm-release` with
+`id-token: write`. It re-checks those bytes, asks the registry what is left to
+do, makes npm's OIDC exchange once (`check-trust`), and runs `npm stage
+publish` with provenance and an empty `NODE_AUTH_TOKEN`. Nothing it stages is
+public until Yu approves it. `scripts/npm-release.mjs` holds every decision;
+`test/npm-release.test.mjs` checks them without network.
 
-But a finished, tested, pushed release should not wait on which device someone
-is sitting at. `.github/workflows/release.yml` publishes the same packages in
-the same order under the same skip-and-verify rules, via
-`scripts/publish-npm-ci.mjs`. It authenticates with **npm Trusted Publishing
-(OIDC)** — this repository stores no npm token, and CI can capture no second
-factor.
+GitHub runs the workflow file of the ref you dispatch on, so the tagged commit
+must contain `publish-npm.yml` and `scripts/npm-release.mjs`.
 
-To release:
+Release in dependency order: **core, then rules-en, then cli**. Finish a
+package's step e before starting the next; the CLI's caret ranges need the
+other two installable, and `plan` refuses to stage it until they are. For
+each package (core shown):
+
+**a. Yu creates one stage-only trust config, just before the release.** On
+the device with the npm login:
 
 ```bash
-git tag v0.1.2-rules-0.1.1 && git push origin v0.1.2-rules-0.1.1
+npx --yes npm@11.17.0 trust github @rhetorlint/core --repo cambridgetcg/rhetorlint-spec --file publish-npm.yml --env npm-release --allow-stage-publish --yes
 ```
 
-Any tag matching `v*` or `release-*` triggers an **all-package** release.
-Manual **Actions → release → Run workflow** defaults to **core only** and offers
-`packages` (`core` or `all`) plus `dry_run`. Choose `all` explicitly for a reviewed
-coordinated release. No dependency packages are automatically added to `core`.
+Never add `--allow-publish`: this route only stages. npm expires a config that
+no publication validates within 48 hours, so create it on release day.
+`npx --yes npm@11.17.0 trust list @rhetorlint/core` shows what exists.
 
-For the isolated repair, keep the reviewed branch fixed and verify each run's
-`headSha` before proceeding; do not use release-triggering tags:
+**b. Tag, then dry-run.**
 
-```sh
-gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
-  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=true
-# Inspect the completed run: only core may be selected. After approval:
-gh workflow run release.yml --repo cambridgetcg/rhetorlint-spec \
-  --ref "$REVIEWED_BRANCH" -f packages=core -f dry_run=false
+```bash
+git tag -a core-v0.1.3 -m "@rhetorlint/core 0.1.3" "$REVIEWED_COMMIT"
+git push origin core-v0.1.3
+gh workflow run publish-npm.yml --repo cambridgetcg/rhetorlint-spec --ref core-v0.1.3 \
+  -f package=core -f tag=core-v0.1.3 -f npm_tag=latest -f dry_run=true
 ```
 
-The dry-run contacts the registry but does not publish, exercise the OIDC
-exchange, or prove the local tarball correct. Independently inspect package
-bytes before publication and verify a registry-backed install afterward; the
-existing propagation timeout warns rather than failing the workflow.
+On a clean checkout of the tag, `node scripts/npm-release.mjs check-inputs
+--package core --tag core-v0.1.3` runs the same tag checks before you push.
+The dry run refuses what the real run would refuse, except npm's trust, which
+only the publish job's identity can show. Its summary shows the receipt and
+the planned action (`stage`).
 
-The publisher receives `PUBLISH_PACKAGES` through the environment, never shell
-interpolation. It accepts exactly `core` or `all`; empty or invalid values fail
-before manifest reads and npm commands. Direct script calls with the variable
-**absent** retain the legacy `all` default. Tag names remain human labels: the
-script reads selected manifest versions and skips those already installable.
-Network-free subprocess tests use a fake npm to check these boundaries.
+**c. Stage.** Dispatch again with `-f dry_run=false`. If no trust config
+matches (step a missing, expired, or naming other claims), `check-trust`
+refuses with "no trusted publisher matches" and nothing is staged. Otherwise
+the summary shows the stage id, the SHA-256 and the approval commands.
+Staging a version that already has a pending stage has not been tried here:
+approve or reject the pending one first.
 
-Local scoped-workflow verification on 2026-09-07: 19 publisher regressions and
-273 total JavaScript tests passed. Python (31 conformance + nine unit tests), Go
-race tests, dataset/generated checks, the real Chrome test, and the packed
-Aletheia comparison (four candidate cases + 14 consumer tests) also passed.
-These local checks do not establish a successful OIDC publication.
+**d. Yu approves, with 2FA.**
 
-### One-time setup (must be done by a human, once per package)
-
-Trusted publishing must authorize the workflow on npmjs.com for **each selected
-package**. For this core-only release inspect `@rhetorlint/core` only:
-
-> Package → **Settings** → **Trusted publishing** → GitHub Actions
-> - Organization or user: `cambridgetcg`
-> - Repository: `rhetorlint-spec`
-> - Workflow filename: `release.yml` (filename only)
-> - Environment: `npm-release`
-> - Allowed actions: direct `npm publish` must be permitted
-
-Use GitHub-hosted runners, Node >=22.14.0, npm >=11.5.1, and `id-token: write`.
-The package repository URL must identify this GitHub repository. The existing
-Node 22/npm 11 workflow supplies those runtime and permission requirements.
-See [npm's trusted publisher documentation](https://docs.npmjs.com/trusted-publishers/).
-GitHub admin access does not grant access to npm's private publisher settings.
-Inspect an existing entry before changing it; do not blindly remove publisher
-records, weaken 2FA, or place tokens/one-time codes in commands or chat.
-
-If trust is rejected the publish job fails closed — it cannot fall back to a
-token, because there is none. Nothing reaches the registry unauthenticated.
-
-A bare `ENEEDAUTH` is not enough to diagnose the trust configuration: npm can
-hide the OIDC rejection at default loglevel (npm/cli#9088). The publish script
-forces `--loglevel verbose`; inspect the `npm verbose oidc` line, for example:
-
-```
-npm verbose oidc Failed token exchange request with body message:
-  OIDC token exchange error - package not found
+```bash
+npx --yes npm@11.17.0 stage download <stage-id>   # prints the .tgz it wrote
+shasum -a 256 <that .tgz>                         # must equal the receipt's sha256
+npx --yes npm@11.17.0 stage approve <stage-id>    # or: stage reject <stage-id>
 ```
 
-That rejection was observed in past runs, including 2026-08-24. It does not
-inspect today's private npm settings or uniquely establish which field is
-wrong. Check the selected package's publisher record and matching repository,
-workflow, environment, and allowed-action settings. Historical tests with and
-without the environment both failed; do not treat that as proof the environment
-can never matter. After correcting verified configuration, rerun the same
-reviewed scope and revision; already-installable versions are skipped.
+For a few minutes after staging, `approve` can answer E409 ("automated review
+hasn't finished"). Wait and run it again.
 
-The `npm-release` environment also gives you a second lever: add required
-reviewers to it in GitHub repo settings and every automated publish waits for a
-human approval click. Recommended, and the reason the job names an environment
-at all.
+**e. Verify.** Dispatch exactly as in step c. `plan` now finds the version,
+and `verify-existing` checks that npm lists the receipt's digests, points the
+dist-tag at the version, and serves a tarball with the same bytes. It retries
+for about eight minutes while the CDN catches up. The summary records
+`already_published_exact`. Then run step 5's clean-install check.
+
+**Not yet exercised here.** No run of this workflow has happened in this
+repository. Tests cover the script with fakes for npm, the registry and OIDC.
+The shape follows `cambridgetcg/agenttool-packages`' `publish-npm.yml`, which
+staged `@agenttool/wallet@0.1.4` and then verified it as
+`already_published_exact` on 2026-10-30.
+
+**Diagnosing.** The stage step prints npm's `oidc` debug-log lines, with
+token-shaped text replaced by `***`. `ENEEDAUTH` there means the exchange
+gave npm no token, so it stopped before signing provenance; go back to step a.
+
+The `npm-release` environment had no protection rules on 2026-11-06. Required
+reviewers would add a click before staging. A deployment-branch policy, if
+one is ever added, must allow these tags.
+
+`release.yml` ran `npm publish --provenance` directly. 11 of its 14 runs
+failed: the first three with a bare `ENEEDAUTH` or `E404`, the other eight with
+npm's OIDC exchange answering "package not found". With its trust configs
+revoked it could only fail, so it is gone, with `scripts/publish-npm-ci.mjs`.
+No workflow runs on tag pushes now.
 
 ---
 
@@ -453,28 +456,18 @@ The packages are named `@rhetorlint/core`, `@rhetorlint/rules-en`,
 
 ## 2 · Authenticate as a publisher in the org
 
-Use the org's token that lives on this device. Either:
+Since 2026-10-30 the packages require 2FA and disallow tokens, so a granular
+token cannot publish them, even with bypass 2FA. Log in interactively on the
+device that holds the security key:
 
 ```bash
-npm login          # interactive, if this device can do a browser/OTP flow
-# — OR — a granular token scoped to @rhetorlint with write + bypass 2FA:
-npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"   # do NOT commit this
-```
-
-Then confirm you can publish for the org:
-
-```bash
+npm login                               # browser flow
 npm whoami                              # prints your npm username
 npm org ls <org-name> 2>/dev/null || true   # you should appear as a member
 ```
 
-- npm supports granular access tokens; legacy token types were removed in 2025.
-  For non-interactive publishing, the token needs write access to the scope and
-  **bypass 2FA** enabled. Otherwise run the publish privately and answer the OTP
-  prompt there; never put an OTP in a command argument, log, or agent chat.
-- Never write the token into a tracked file. Project `.npmrc` is ignored as a
-  guardrail, but prefer an owner-only user config, a provider vault, or a
-  short-lived scoped environment.
+Answer every 2FA prompt there yourself; never put an OTP in a command argument,
+log, or agent chat. The hand route has not been exercised since the lockdown.
 
 ## 3 · Dry-run each package (see exactly what ships)
 
@@ -505,9 +498,9 @@ scripts/publish-npm-interactive.zsh
 
 The helper checks each exact workspace version and skips versions that are
 already registry-installable, so a release that moves one workspace does not
-republish the other two — a republish is refused, not merged. For a granular
-token with write access plus bypass 2FA, publish only the workspaces whose
-manifest carries a new reviewed version, in the table's order:
+republish the other two — a republish is refused, not merged. It offers every
+workspace whose version npm lacks, so to release only some, publish those
+workspaces one at a time in the table's order instead:
 
 ```bash
 npm publish -w @rhetorlint/core        # only if its version moved
@@ -576,32 +569,14 @@ one this release ships. The deploy is good when both blocks come back clean.
 
 ## 6 · Tag the release and report back
 
-⚠ **This step is not inert.** `.github/workflows/release.yml` triggers on `v*`
-and on `release-*`. Pushing either tag starts the automated publish, which
-offers **every** manifest in the repo to the registry — including workspaces you
-did not just publish by hand. After a complete hand release that run is a no-op,
-because the script skips whatever is already live. After a partial one it
-publishes the remainder, unattended, from whatever the manifests currently hold.
-Decide which of those you want before you push:
-
-- **Let it finish the release.** Push the `v*` tag. Put required reviewers on
-  the `npm-release` environment first if you want a human between the tag and
-  the registry.
-- **Record the release only.** Use a tag name matching neither pattern.
+No workflow runs on tag pushes, so a tag only records the release. Use the
+staged route's form, one annotated tag per package published, on the commit
+you published from:
 
 ```bash
 cd -                                     # back to the repo
 core_v=$(node -p "require('./packages/core/package.json').version")
-rules_v=$(node -p "require('./packages/rules-en/package.json').version")
-tag="v${core_v}-rules-${rules_v}"        # the convention already on the repo:
-                                         # core's version alone is not unique, because
-                                         # a rules-only release leaves it unchanged
-
-# fires release.yml:
-git tag "$tag" && git push origin "$tag"
-
-# — or, to mark the commit without starting a publish:
-git tag "hand-$tag" && git push origin "hand-$tag"
+git tag -a "core-v${core_v}" -m "@rhetorlint/core ${core_v}" && git push origin "core-v${core_v}"
 ```
 
 Then report the exact package versions that were published and verified (`npm
@@ -619,8 +594,7 @@ republished. Include the relevant clean-install output as proof.
   the reviewed replacement.
 - **Publish order matters** only because `@rhetorlint/cli` depends on the other
   two. core and rules-en are independent.
-- **Provenance** (optional, nice-to-have): from GitHub Actions with OIDC you can add
-  `--provenance` for a verified supply-chain badge. Not needed for this first manual
-  publish.
+- **Provenance**: the staged route signs it (`--provenance` from GitHub
+  Actions); a hand publish has none.
 - If a publish fails with `402 Payment Required` or `403`, the scope/org name
   doesn't match or you lack publish rights in the org — recheck step 1 and 2.
