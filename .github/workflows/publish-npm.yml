@@ -47,7 +47,8 @@ on:
 
 permissions: {}
 
-# Queued, never cancelled: a stage stopped midway is still a stage on npm.
+# A running stage is never cancelled (one stopped midway is still a stage on
+# npm); a newer dispatch replaces an older one that is still pending.
 concurrency:
   group: publish-npm-${{ inputs.package }}
   cancel-in-progress: false
@@ -118,9 +119,13 @@ jobs:
     if: github.repository == 'cambridgetcg/rhetorlint-spec' && !inputs.dry_run
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-    # The environment and this workflow's file name are the claims npm's
-    # trust config for the package must name. Required reviewers on it would
-    # add a click before staging; the stage itself already waits for 2FA.
+    # npm's trust config for the package names only the repository, this
+    # file's name and this environment; it cannot name a ref. The tag and
+    # commit checks in npm-release.mjs live in files a pushed branch can
+    # rewrite, so what ties npm's trust to release tags is npm-release's
+    # deployment policy: only core-v*, rules-en-v* and cli-v* tags may enter
+    # (NPM_DEPLOY.md, before step a). Required reviewers would add only a
+    # click; the stage itself waits for a 2FA approval.
     environment: npm-release
     permissions:
       contents: read

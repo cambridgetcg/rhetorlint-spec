@@ -73,6 +73,7 @@ export function context(overrides = {}) {
     },
     fetch: (url, init) => globalThis.fetch(url, init),
     sleep: ms => delay(ms),
+    clock: () => performance.now(),
     log: line => console.log(line),
     nodeVersion: process.versions.node,
     now: () => new Date(),
@@ -289,18 +290,41 @@ export function decide(receipt, state) {
   return 'verify-existing'
 }
 
+function stableVersion(version) {
+  const parts = /^(\d+)\.(\d+)\.(\d+)$/.exec(String(version))
+  return parts ? parts.slice(1).map(Number) : null
+}
+
+function compareStable([x, y, z], [a, b, c]) {
+  return x - a || y - b || z - c
+}
+
 // ^x.y.z as npm reads it, for stable versions; anything else is refused.
 export function satisfiesCaret(version, range) {
-  const floor = /^\^(\d+)\.(\d+)\.(\d+)$/.exec(range)
+  const floor = /^\^/.test(String(range)) ? stableVersion(String(range).slice(1)) : null
   if (!floor) fail(`unsupported dependency range ${range}; use ^x.y.z`)
-  const v = /^(\d+)\.(\d+)\.(\d+)$/.exec(version)
+  const v = stableVersion(version)
   if (!v) return false
-  const [a, b, c] = floor.slice(1).map(Number)
-  const [x, y, z] = v.slice(1).map(Number)
-  const atLeast = x > a || (x === a && (y > b || (y === b && z >= c)))
+  const [a, b, c] = floor
+  const [x, y, z] = v
+  const atLeast = compareStable(v, floor) >= 0
   if (a > 0) return atLeast && x === a
   if (b > 0) return atLeast && x === 0 && y === b
   return x === 0 && y === 0 && z === c
+}
+
+// npm refuses to move latest backwards only when --tag is left at its
+// default, and this route always names the tag. So: a stable version older
+// than npm's current latest may only be staged under next. (A prerelease
+// already has to go to next.)
+export function refuseLatestBackwards(receipt, state, npmTag) {
+  if (npmTag !== 'latest') return
+  const latest = state.doc?.['dist-tags']?.latest
+  const now = stableVersion(latest)
+  const mine = stableVersion(receipt.package.version)
+  if (now && mine && compareStable(now, mine) > 0) {
+    fail(`npm's latest for ${receipt.package.name} is ${latest}, newer than ${receipt.package.version}; staging it as latest would move latest backwards. Dispatch with npm_tag next`)
+  }
 }
 
 // A package staged before its @rhetorlint dependencies are installable
@@ -322,7 +346,10 @@ export async function plan(ctx, { receipt: receiptPath, npmTag }) {
   validateNpmTag(receipt.package.version, npmTag)
   const state = await packument(ctx, receipt.package.name)
   const action = decide(receipt, state)
-  if (action === 'stage') await dependenciesLive(ctx, packageSpec(receipt.package.key))
+  if (action === 'stage') {
+    refuseLatestBackwards(receipt, state, npmTag)
+    await dependenciesLive(ctx, packageSpec(receipt.package.key))
+  }
   if (ctx.env.GITHUB_OUTPUT) appendFileSync(ctx.env.GITHUB_OUTPUT, `action=${action}\n`)
   const planned = {
     package: `${receipt.package.name}@${receipt.package.version}`,
@@ -342,20 +369,49 @@ function mask(ctx, secret) {
   if (ctx.env.GITHUB_ACTIONS === 'true') ctx.log(`::add-mask::${secret}`)
 }
 
+// The redirects npm 11.17.0's fetch follows (minipass-fetch isRedirect).
+const REDIRECTS = new Set([301, 302, 303, 307, 308])
+
+// One OIDC request, 30 seconds per hop. It follows redirects as npm's fetch
+// does (a GET after a 303, or after a 301 or 302 to a POST), but only within
+// one origin: npm drops the bearer on another host, where it would get no
+// token either, so such a redirect is returned, and refused, as it is.
 async function oidcRequest(ctx, url, init, label) {
-  let response
-  try {
-    response = await ctx.fetch(url, { ...init, redirect: 'manual', signal: AbortSignal.timeout(30_000) })
-  } catch {
-    fail(`${label} did not answer; dispatch again later. Nothing was staged.`)
+  let target = new URL(url)
+  let request = init
+  for (let hops = 0; ; hops += 1) {
+    let response
+    try {
+      response = await ctx.fetch(target.href, { ...request, redirect: 'manual', signal: AbortSignal.timeout(30_000) })
+    } catch {
+      fail(`${label} did not answer; dispatch again later. Nothing was staged.`)
+    }
+    const redirect = REDIRECTS.has(response.status)
+    const location = redirect && hops < 20 ? response.headers.get('location') : null
+    let next = null
+    try {
+      next = location === null ? null : new URL(location, target)
+    } catch {
+      next = null
+    }
+    if (next?.origin === target.origin) {
+      if (response.status === 303 || (request.method === 'POST' && [301, 302].includes(response.status))) request = { ...request, method: 'GET' }
+      await response.body?.cancel()
+      target = next
+      continue
+    }
+    let body
+    try {
+      body = JSON.parse(await response.text())
+    } catch {
+      body = undefined
+    }
+    return { status: response.status, ok: response.ok, redirect, body: body && typeof body === 'object' ? body : undefined }
   }
-  let body
-  try {
-    body = JSON.parse(await response.text())
-  } catch {
-    body = undefined
-  }
-  return { status: response.status, ok: response.ok, body: body && typeof body === 'object' ? body : undefined }
+}
+
+function answeredOidc(response) {
+  return `HTTP ${response.status}${response.redirect ? ', a redirect check-trust does not follow (another origin, or past 20 hops)' : ''}`
 }
 
 // npm 11.17.0's OIDC exchange (lib/utils/oidc.js), made once before staging:
@@ -377,7 +433,7 @@ export async function checkTrust(ctx, { package: key }) {
     headers: { accept: 'application/json', authorization: `Bearer ${requestToken}` },
   }, "GitHub's OIDC token service")
   const idToken = issued.body?.value
-  if (!issued.ok || typeof idToken !== 'string' || !BEARER.test(idToken)) fail(`GitHub issued no OIDC ID token for ${OIDC_AUDIENCE} (HTTP ${issued.status})`)
+  if (!issued.ok || typeof idToken !== 'string' || !BEARER.test(idToken)) fail(`GitHub issued no OIDC ID token for ${OIDC_AUDIENCE} (${answeredOidc(issued)})`)
   mask(ctx, idToken)
   const exchanged = await oidcRequest(ctx, `${REGISTRY}/-/npm/v1/oidc/token/exchange/package/${spec.name.replace('/', '%2f')}`, {
     method: 'POST',
@@ -398,7 +454,7 @@ export async function checkTrust(ctx, { package: key }) {
       `npm stages it only for a trust config naming ${REPOSITORY}, workflow ${WORKFLOW_FILE} and environment ${ENVIRONMENT}, with stage publishing allowed. ` +
       'Create one as NPM_DEPLOY.md describes and dispatch this tag again within 48 hours, before npm expires an unvalidated config. Nothing was staged.')
   }
-  fail(`npm's OIDC exchange gave this workflow no token for ${spec.name} (HTTP ${exchanged.status}${said}). Nothing was staged.`)
+  fail(`npm's OIDC exchange gave this workflow no token for ${spec.name} (${answeredOidc(exchanged)}${said}). Nothing was staged.`)
 }
 
 // npm's `oidc` lines, at any level, from one debug log, with token-shaped
@@ -446,18 +502,21 @@ function summary(ctx, markdown) {
   if (ctx.env.GITHUB_STEP_SUMMARY) appendFileSync(ctx.env.GITHUB_STEP_SUMMARY, `${markdown}\n`)
 }
 
+// Everything here comes from the run that staged, so it cannot vouch for
+// itself: the approver checks the stage against their own dispatch and their
+// own pack of the tag (NPM_DEPLOY.md, staged route step d).
 export function approvalSteps(staged) {
   const npm = `npx --yes npm@${PINNED_NPM}`
   const id = staged.stage_id
   return [
     `## Staged ${staged.package.name}@${staged.package.version}: not public until approved`,
     '',
-    'On the device that holds the npm login (each approval asks for 2FA):',
+    `Approve only if you dispatched this run, and only bytes you packed yourself from a clean checkout of \`${staged.tag}\` (NPM_DEPLOY.md, staged route step d). On the device that holds the npm login (each approval asks for 2FA):`,
     '',
     '```bash',
-    `${npm} stage view ${id}`,
+    `${npm} stage view ${id}       # version, dist-tag and date staged must be this run's`,
     `${npm} stage download ${id}   # prints the .tgz it wrote`,
-    `shasum -a 256 <that .tgz>   # expect ${staged.artifact.sha256}`,
+    `shasum -a 256 <that .tgz>   # must equal your own pack's sha256; this run's receipt says ${staged.artifact.sha256}`,
     `${npm} stage approve ${id}   # or: ${npm} stage reject ${id}`,
     '```',
     '',
@@ -470,9 +529,11 @@ export async function stage(ctx, { receipt: receiptPath, npmTag }) {
   ensureWorkflow(ctx)
   const { receipt, artifactPath } = verifyArtifact(ctx, receiptPath)
   validateNpmTag(receipt.package.version, npmTag)
-  if (decide(receipt, await packument(ctx, receipt.package.name)) !== 'stage') {
+  const state = await packument(ctx, receipt.package.name)
+  if (decide(receipt, state) !== 'stage') {
     fail(`npm already has ${receipt.package.name}@${receipt.package.version}; nothing to stage. Dispatch again to verify it`)
   }
+  refuseLatestBackwards(receipt, state, npmTag)
   if (!ctx.env.ACTIONS_ID_TOKEN_REQUEST_URL || !ctx.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN) fail('staging needs the GitHub OIDC request environment (permissions: id-token: write)')
   const logsDir = mkdtempSync(join(tmpdir(), 'rhetorlint-npm-logs-'))
   let result
@@ -528,14 +589,19 @@ async function download(ctx, tarball) {
 
 // After approval: npm must list the receipt's digests for the version, point
 // the requested dist-tag at it, and serve a tarball with the same bytes. The
-// registry's CDN can lag an approval by minutes, so the read is retried for
-// a bounded time; different bytes are refused at once.
-export async function verifyExisting(ctx, { receipt: receiptPath, npmTag, attempts = 90, delayMs = 5000 }) {
+// registry's CDN can lag an approval by minutes, so the read is retried, up
+// to `attempts` reads and no new read after `deadlineMs`. One read takes at
+// most 90 s, so a hung registry ends in this message, well inside the job's
+// 20-minute timeout. Different bytes are refused at once.
+export async function verifyExisting(ctx, { receipt: receiptPath, npmTag, attempts = 90, delayMs = 5000, deadlineMs = 600_000 }) {
   const { receipt } = verifyArtifact(ctx, receiptPath)
   const { name, version } = receipt.package
   validateNpmTag(version, npmTag)
+  const started = ctx.clock()
   let last = 'nothing observed'
+  let reads = 0
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    reads = attempt
     const state = await packument(ctx, name)
     if (state.status !== 200 && !retryable(state.status)) decide(receipt, state)
     if (state.status !== 200) {
@@ -569,9 +635,10 @@ export async function verifyExisting(ctx, { receipt: receiptPath, npmTag, attemp
       if (!retryable(got.status)) fail(`npm's tarball for ${name}@${version} answered HTTP ${got.status}`)
       last = `tarball download answered ${answered(got)}`
     }
-    if (attempt < attempts) await ctx.sleep(delayMs)
+    if (attempt === attempts || ctx.clock() - started + delayMs > deadlineMs) break
+    await ctx.sleep(delayMs)
   }
-  fail(`${name}@${version} could not be verified after ${attempts} reads: ${last}`)
+  fail(`${name}@${version} could not be verified after ${reads} reads over ${Math.round((ctx.clock() - started) / 1000)} s: ${last}`)
 }
 
 const COMMANDS = {
