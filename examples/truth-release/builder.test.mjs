@@ -37,8 +37,13 @@ function fixture() {
   return JSON.parse(readFileSync(FIXTURE_URL, "utf8"));
 }
 
+// The fixture's own preparation instant, on the day its evidence was updated.
+// The starter claim and the channel guidance fall due on their review dates,
+// so no test here reads the wall clock.
+const FIXTURE_NOW = "2026-08-03T10:00:00.000Z";
+
 function prepare(input = fixture()) {
-  return prepareTruthRelease(input, { now: "2026-08-03T10:00:00.000Z" });
+  return prepareTruthRelease(input, { now: FIXTURE_NOW });
 }
 
 function previewRequest(bundle, channel) {
@@ -51,8 +56,24 @@ function previewRequest(bundle, channel) {
   };
 }
 
-function run(args) {
-  return spawnSync(process.execPath, [BUILDER_PATH, ...args], { encoding: "utf8" });
+// The CLI takes "now" from new Date(). A module preloaded into the child pins
+// that clock, so the CLI under test is unchanged and has no clock override.
+function fixedClock(now) {
+  return `data:text/javascript,${encodeURIComponent(`
+    const fixed = Date.parse(${JSON.stringify(now)});
+    globalThis.Date = class extends Date {
+      constructor(...args) { super(...(args.length ? args : [fixed])); }
+      static now() { return fixed; }
+    };
+  `)}`;
+}
+
+function run(args, { now = FIXTURE_NOW } = {}) {
+  return spawnSync(
+    process.execPath,
+    ["--import", fixedClock(now), BUILDER_PATH, ...args],
+    { encoding: "utf8" },
+  );
 }
 
 function stableValue(value) {
@@ -274,7 +295,16 @@ test("the builder CLI completes start, check, prepare, and preview without mutat
     assert.equal(check.network_effects, 0);
     assert.equal(check.persistent_files_created, 0);
     assert.equal(check.directory_created, false);
-    assert.match(check.checked_at, /^\d{4}-\d{2}-\d{2}T/);
+    assert.equal(check.checked_at, new Date(FIXTURE_NOW).toISOString());
+
+    // On its own review date the same starter claim asks for revision.
+    const due = run(["check", join(project, "claim.json")], {
+      now: `${fixture().review_after}T00:00:00.000Z`,
+    });
+    assert.equal(due.status, 1, due.stderr);
+    const dueCheck = JSON.parse(due.stdout);
+    assert.equal(dueCheck.status, "needs-revision");
+    assert.ok(dueCheck.issues.some((issue) => issue.code === "review-date-due"));
 
     const built = run(["prepare", join(project, "claim.json"), "--out", prepared]);
     assert.equal(built.status, 0, built.stderr);
@@ -313,7 +343,7 @@ test("check failures are structured and prepared symlinks fail closed", () => {
     assert.equal(report.network_effects, 0);
     assert.equal(report.persistent_files_created, 0);
     assert.equal(report.directory_created, false);
-    assert.match(report.checked_at, /^\d{4}-\d{2}-\d{2}T/);
+    assert.equal(report.checked_at, new Date(FIXTURE_NOW).toISOString());
 
     const missing = run(["check", join(root, "missing.json")]);
     assert.equal(missing.status, 2);
